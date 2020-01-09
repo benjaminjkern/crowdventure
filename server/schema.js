@@ -5,7 +5,9 @@ const typeDefs = gql `
   type Account {
     ID: String!
     screenName: String!
+
     nodes: [Node!]
+    suggestedChoices: [Choice!]
 
     totalNodeViews: Int!
     totalSuggestionScore: Int!
@@ -13,18 +15,23 @@ const typeDefs = gql `
 
   type Node {
     ID: String!
-    owner: Account!
+    title: String!
     content: String!
     views: Int!
-    canon_choices: [Choice!]
-    non_canon_choices: [Choice!]
+
+    owner: Account!
+    canonChoices: [Choice!]
+    nonCanonChoices: [Choice!]
   }
 
   type Choice {
-    content: String!
+    ID: String!
+    action: String!
     likes: Int!
     dislikes: Int!
-    goesTo: Node!
+
+    from: Node!
+    to: Node!
     suggestedBy: Account!
 
     score: Int!
@@ -33,18 +40,26 @@ const typeDefs = gql `
   type Query {
     allAccounts: [Account!]
     allNodes: [Node!]
+    allChoices: [Choice!]
     searchAccounts(type: String!, query: String!): [Account!]
     searchNodes(type: String!, query: String!): [Node!]
+    searchChoices(type: String!, query: String!): [Choice!]
   }
 
   type Mutation {
-    addAccount(screenName: String!): Account
-    deleteAccount(accountID: String!): Account
-    addNode(accountID: String!, content: String!): Node
-    deleteNode(nodeID: String!): Node
-    suggestChoice(accountID: String!, content: String!, goesTo: String!): Choice
-    makeCanon(nodeID: String!): Node
-    makeNonCanon(nodeID: String!): Node
+    createAccount(screenName: String!): Account
+    deleteAccount(accountID: String!): Boolean
+    createNode(accountID: String!, title: String!, content: String!): Node
+    deleteNode(nodeID: String!): Boolean
+    suggestChoice(
+      accountID: String!
+      fromID: String!
+      action: String!
+      toID: String!
+    ): Choice
+    removeSuggestion(choiceID: String!): Boolean
+    makeCanon(nodeID: String!, choiceID: String!): Choice
+    makeNonCanon(nodeID: String!, choiceID: String!): Choice
   }
 `;
 
