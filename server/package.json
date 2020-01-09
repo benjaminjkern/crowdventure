@@ -1,0 +1,8 @@
+{
+  "name": "dventure_server",
+  "version": "1.0.0",
+  "description": "yeuh",
+  "main": "server.js",
+  "author": "Ben Kern",
+  "license": "MIT"
+}
