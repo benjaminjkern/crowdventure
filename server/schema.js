@@ -6,19 +6,45 @@ const typeDefs = gql `
     ID: String!
     screenName: String!
     nodes: [Node!]
+
+    totalNodeViews: Int!
+    totalSuggestionScore: Int!
   }
 
   type Node {
     ID: String!
     owner: Account!
     content: String!
-    canon_choices: [Node!]
-    non_canon_choices: [Node!]
+    views: Int!
+    canon_choices: [Choice!]
+    non_canon_choices: [Choice!]
+  }
+
+  type Choice {
+    content: String!
+    likes: Int!
+    dislikes: Int!
+    goesTo: Node!
+    suggestedBy: Account!
+
+    score: Int!
   }
 
   type Query {
-    allAccounts: [Account]!
-    allNodes: [Node]!
+    allAccounts: [Account!]
+    allNodes: [Node!]
+    searchAccounts(type: String!, query: String!): [Account!]
+    searchNodes(type: String!, query: String!): [Node!]
+  }
+
+  type Mutation {
+    addAccount(screenName: String!): Account
+    deleteAccount(accountID: String!): Account
+    addNode(accountID: String!, content: String!): Node
+    deleteNode(nodeID: String!): Node
+    suggestChoice(accountID: String!, content: String!, goesTo: String!): Choice
+    makeCanon(nodeID: String!): Node
+    makeNonCanon(nodeID: String!): Node
   }
 `;
 

@@ -47,6 +47,14 @@ const resolvers = {
             return NODES;
         }
     }
+    Mutation: {
+        addAccount,
+        deleteAccount,
+        addNode,
+        deleteNode,
+        makeCanon,
+        makeNonCanon,
+    }
 };
 
 module.exports = { resolvers };
