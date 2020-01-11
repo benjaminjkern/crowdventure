@@ -24,18 +24,25 @@ const resolvers = {
             );
             return parent.nodes
                 .map(id => databaseCalls.getNode(id).views)
-                .reduce((x, y) => x + y);
+                .reduce((x, y) => x + y, 0);
         },
         totalSuggestionScore: (parent, args, context, info) => {
             console.log(
                 `Retrieving total score of all choices suggested by ${parent.ID} (${parent.screenName})`
             );
-            return parent.suggestedChoices
+            return parent.suggestedChoices ?
+                parent.suggestedChoices
                 .map(id => resolvers.Choice.score(databaseCalls.getChoice(id)))
-                .reduce((x, y) => x + y);
+                .reduce((x, y) => x + y, 0) :
+                0;
         }
     },
     Node: {
+        content: (parent, args, context, info) => {
+            parent.views++;
+            databaseCalls.addNode(parent);
+            return parent.content;
+        },
         owner: (parent, args, context, info) => {
             console.log(`Retrieving owner of node ${parent.ID} (${parent.title})`);
             return databaseCalls.getAccount(parent.owner);
@@ -128,6 +135,7 @@ const resolvers = {
                     .toString(36)
                     .substring(2, 6)
                     .toUpperCase(),
+                owner: args.accountID,
                 title: args.title,
                 content: args.content,
                 views: 0,
@@ -190,7 +198,7 @@ const resolvers = {
             delete account.suggestedChoices[choice.ID];
 
             databaseCalls.addAccount(account);
-            databaseCalls.removeNode(args.nodeID);
+            databaseCalls.removeChoice(choice.ID);
         },
         makeCanon: (parent, args, context, info) => {
             let node = databaseCalls.getNode(args.nodeID);

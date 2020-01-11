@@ -41,6 +41,8 @@ const typeDefs = gql `
     allAccounts: [Account!]
     allNodes: [Node!]
     allChoices: [Choice!]
+
+    # unimplemented
     searchAccounts(type: String!, query: String!): [Account!]
     searchNodes(type: String!, query: String!): [Node!]
     searchChoices(type: String!, query: String!): [Choice!]
@@ -60,6 +62,11 @@ const typeDefs = gql `
     removeSuggestion(choiceID: String!): Boolean
     makeCanon(nodeID: String!, choiceID: String!): Choice
     makeNonCanon(nodeID: String!, choiceID: String!): Choice
+
+    # unimplemented
+    likeSuggestion(choiceID: String!): Choice
+    dislikeSuggestion(choiceID: String!): Choice
+    editNode(nodeID: String!, title: String, content: String): Node
   }
 `;
 
