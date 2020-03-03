@@ -35,4 +35,4 @@ Crowdventure is a web-based crowd-sourced dynamic create your own adventure game
 
 
 
-(Documentation repo)[https://github.com/benjaminjkern/cmsi-402-senior-project-lab]
+[Documentation repo](https://github.com/benjaminjkern/cmsi-402-senior-project-lab)
