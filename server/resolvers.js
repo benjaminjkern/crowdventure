@@ -88,6 +88,9 @@ const resolvers = {
         allAccounts: () => Object.values(databaseCalls.allAccounts()),
         allNodes: () => Object.values(databaseCalls.allNodes()),
         allChoices: () => Object.values(databaseCalls.allChoices()),
+        getAccount: (parent, args, context, info) => databaseCalls.getAccount(args.ID),
+        getNode: (parent, args, context, info) => databaseCalls.getNode(args.ID),
+        getChoice: (parent, args, context, info) => databaseCalls.getChoice(args.ID),
         searchAccounts: (parent, args, context, info) => {
             console.log(`Searching for ${args.type}: ${args.query} in accounts`);
             // TODO: Implement!

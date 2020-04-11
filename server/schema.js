@@ -42,6 +42,10 @@ const typeDefs = gql `
     allNodes: [Node!]
     allChoices: [Choice!]
 
+    getAccount(ID: String!): Account
+    getNode(ID: String!): Node
+    getChoice(ID: String!): Choice
+
     # unimplemented
     searchAccounts(type: String!, query: String!): [Account!]
     searchNodes(type: String!, query: String!): [Node!]
