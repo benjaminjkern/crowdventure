@@ -38,37 +38,13 @@ class CallableComponent extends React.Component {
   }
 }
 
-// You can also easily pass variables for dynamic arguments
-
 class Header extends React.Component {
   render() {
     return (
       <div>
         <a>Crowdventure Logo</a>
-        <button>account</button>
+        <button>Account</button>
       </div>
-    );
-  }
-}
-
-class Choice extends CallableComponent {
-  method = "getChoice";
-
-  render() {
-    return this.loadRender("Choice", this.props.id, "action,to{ID}", () =>
-      this.renderChoice()
-    );
-  }
-
-  renderChoice() {
-    return (
-      <button
-        onClick={() => {
-          this.props.onClick(this.state[this.method].to.ID);
-        }}
-      >
-        {this.state[this.method].action}
-      </button>
     );
   }
 }
@@ -81,7 +57,7 @@ class ChoiceList extends CallableComponent {
     return this.loadRender(
       "Choice List",
       this.props.nodeID,
-      `${this.choices}{ID}`,
+      `${this.choices}{ID,action,to{ID}}`,
       () => this.renderChoiceList()
     );
   }
@@ -90,19 +66,19 @@ class ChoiceList extends CallableComponent {
     return (
       <div>
         {this.state[this.method][this.choices].map((choice) => (
-          <Choice
-            id={choice.ID}
-            onClick={(toID) => {
-              this.props.onClick(toID);
-            }}
-          />
+          <button
+            key={choice.ID}
+            onClick={() => this.props.onClick(choice.to.ID)}
+          >
+            {choice.action}
+          </button>
         ))}
       </div>
     );
   }
 }
 
-class Node extends CallableComponent {
+class NodePage extends CallableComponent {
   constructor(props) {
     super(props);
     this.state = { id: props.id };
@@ -149,6 +125,28 @@ class Node extends CallableComponent {
             this.moveToNode(nodeID);
           }}
         />
+        <SuggestBox />
+      </div>
+    );
+  }
+}
+
+class SuggestBox extends CallableComponent {
+  render() {
+    // this should only work if you are logged in
+    return (
+      <div>
+        Suggest your own action:
+        <input />
+        <label>
+          <input type="radio" name="choice-create" defaultChecked />
+          Create new node
+        </label>
+        <label>
+          <input type="radio" name="choice-create" />
+          Connect existing node
+        </label>
+        <button>Suggest</button>
       </div>
     );
   }
@@ -156,7 +154,7 @@ class Node extends CallableComponent {
 
 class Crowdventure extends React.Component {
   render() {
-    return [<Header />, <Node id="Y9JJ" />];
+    return [<Header />, <NodePage id="Y9JJ" />];
   }
 }
 
