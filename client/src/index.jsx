@@ -9,6 +9,35 @@ const app_fetch = createApolloFetch({
   uri: "http://localhost:4000",
 });
 
+class CallableComponent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  loadRender(name, id, selection, renderFunc) {
+    if (!this.method)
+      throw new Error("You need to specify a method for graphql!");
+
+    switch (this.state[this.method]) {
+      case null:
+        return <span>Couldn't find {name}</span>;
+      case undefined:
+        app_fetch({
+          query: `query{${this.method}(ID:"${id}"){${selection}}}`,
+        }).then((res, err) => {
+          if (err) alert(err);
+          this.setState({
+            [this.method]: res.data ? res.data[this.method] : null,
+          });
+        });
+        return <span>Loading {name}...</span>;
+      default:
+        return renderFunc();
+    }
+  }
+}
+
 // You can also easily pass variables for dynamic arguments
 
 class Header extends React.Component {
@@ -22,83 +51,47 @@ class Header extends React.Component {
   }
 }
 
-class Choice extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+class Choice extends CallableComponent {
+  method = "getChoice";
 
   render() {
-    const { info } = this.state;
-
-    if (info) return this.renderChoice();
-    else {
-      app_fetch({
-        query: `query {
-        getChoice(ID:"${this.props.id}") {
-          action
-          to {
-            ID
-          }
-        }
-      }`,
-      }).then((res, err) => {
-        if (err) alert(err);
-        if (res.data) this.setState({ info: res.data.getChoice });
-      });
-
-      return <span>Loading Choice...</span>;
-    }
+    return this.loadRender("Choice", this.props.id, "action,to{ID}", () =>
+      this.renderChoice()
+    );
   }
 
   renderChoice() {
     return (
       <button
         onClick={() => {
-          this.props.onClick(this.state.info.to.ID);
+          this.props.onClick(this.state[this.method].to.ID);
         }}
       >
-        {this.state.info.action}
+        {this.state[this.method].action}
       </button>
     );
   }
 }
 
-class ChoiceList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+class ChoiceList extends CallableComponent {
+  choices = `${this.props.canon === "true" ? "c" : "nonC"}anonChoices`;
+  method = "getNode";
 
   render() {
-    const { choices } = this.state;
-
-    if (choices) return this.renderChoiceList();
-    else {
-      const toGrab = `${this.props.canon === "true" ? "c" : "nonC"}anonChoices`;
-
-      app_fetch({
-        query: `query {
-          getNode(ID:"${this.props.nodeID}") {
-            ${toGrab} {
-              ID
-            }
-          }
-        }`,
-      }).then((res, err) => {
-        if (err) alert(err);
-        if (res.data) this.setState({ choices: res.data.getNode[toGrab] });
-      });
-      return <span>Loading Choices...</span>;
-    }
+    return this.loadRender(
+      "Choice List",
+      this.props.nodeID,
+      `${this.choices}{ID}`,
+      () => this.renderChoiceList()
+    );
   }
 
   renderChoiceList() {
     return (
       <div>
-        {this.state.choices.map((op) => (
+        {this.state[this.method][this.choices].map((choice) => (
           <Choice
-            id={op.ID}
+            id={choice.ID}
             onClick={(toID) => {
               this.props.onClick(toID);
             }}
@@ -109,59 +102,41 @@ class ChoiceList extends React.Component {
   }
 }
 
-class NodePage extends React.Component {
+class Node extends CallableComponent {
   constructor(props) {
     super(props);
     this.state = { id: props.id };
   }
 
-  getNode() {
-    app_fetch({
-      query: `query {
-        getNode(ID:"${this.state.id}") {
-          title
-          content
-          views
-          ID
-          owner {
-            screenName
-            ID
-          }
-        }
-      }`,
-    }).then((res, err) => {
-      if (err) alert(err);
-      if (res.data) this.setState({ node: res.data.getNode });
-    });
-  }
+  method = "getNode";
 
   moveToNode(node) {
-    this.setState({ id: node, node: undefined });
+    this.setState({ id: node, [this.method]: undefined });
   }
 
   render() {
-    const { node } = this.state;
-
-    if (node) return this.renderNode();
-    else {
-      this.getNode();
-      return <span>Loading node...</span>;
-    }
+    return this.loadRender(
+      "Node",
+      this.state.id,
+      "title,content,views,ID,owner{screenName,ID}",
+      () => this.renderNode()
+    );
   }
 
   renderNode() {
     return (
       <div>
-        <h1>{this.state.node.title}</h1>
-        <p>{this.state.node.content}</p>
-        <p>Views: {this.state.node.views}</p>
+        <h1>{this.state[this.method].title}</h1>
+        <p>{this.state[this.method].content}</p>
+        <p>Views: {this.state[this.method].views}</p>
         <p>
-          Owner: {this.state.node.owner.screenName} ({this.state.node.owner.ID})
+          Owner: {this.state[this.method].owner.screenName} (
+          {this.state[this.method].owner.ID})
         </p>
         Canon Choices:
         <ChoiceList
           canon="true"
-          nodeID={this.state.node.ID}
+          nodeID={this.state[this.method].ID}
           onClick={(nodeID) => {
             this.moveToNode(nodeID);
           }}
@@ -169,7 +144,7 @@ class NodePage extends React.Component {
         Non-Canon Choices:
         <ChoiceList
           canon="false"
-          nodeID={this.state.node.ID}
+          nodeID={this.state[this.method].ID}
           onClick={(nodeID) => {
             this.moveToNode(nodeID);
           }}
@@ -181,11 +156,7 @@ class NodePage extends React.Component {
 
 class Crowdventure extends React.Component {
   render() {
-    return (
-      <div>
-        <Header /> <NodePage id="Y9JJ" />
-      </div>
-    );
+    return [<Header />, <Node id="Y9JJ" />];
   }
 }
 
