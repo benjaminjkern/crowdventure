@@ -1,11 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import * as a from "./mock-data/mockAccounts.json";
-import * as n from "./mock-data/mockNodes.json";
-import * as c from "./mock-data/mockChoices.json";
+import util from "util";
 
-const [ACCOUNTS, NODES, CHOICES] = [a, n, c].map((x) => x.default);
+const { createApolloFetch } = require("apollo-fetch");
+
+const app_fetch = createApolloFetch({
+  uri: "http://localhost:4000",
+});
+
+// You can also easily pass variables for dynamic arguments
 
 class Header extends React.Component {
   render() {
@@ -18,16 +22,83 @@ class Header extends React.Component {
   }
 }
 
-class ChoiceList extends React.Component {
+class Choice extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
   render() {
-    let node = NODES[this.props.nodeID];
-    this.choices =
-      this.props.canon === "true" ? node.canonChoices : node.nonCanonChoices;
+    const { info } = this.state;
+
+    if (info) return this.renderChoice();
+    else {
+      app_fetch({
+        query: `query {
+        getChoice(ID:"${this.props.id}") {
+          action
+          to {
+            ID
+          }
+        }
+      }`,
+      }).then((res, err) => {
+        if (err) alert(err);
+        if (res.data) this.setState({ info: res.data.getChoice });
+      });
+
+      return <span>Loading Choice...</span>;
+    }
+  }
+
+  renderChoice() {
+    return (
+      <button
+        onClick={() => {
+          this.props.onClick(this.state.info.to.ID);
+        }}
+      >
+        {this.state.info.action}
+      </button>
+    );
+  }
+}
+
+class ChoiceList extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  render() {
+    const { choices } = this.state;
+
+    if (choices) return this.renderChoiceList();
+    else {
+      const toGrab = `${this.props.canon === "true" ? "c" : "nonC"}anonChoices`;
+
+      app_fetch({
+        query: `query {
+          getNode(ID:"${this.props.nodeID}") {
+            ${toGrab} {
+              ID
+            }
+          }
+        }`,
+      }).then((res, err) => {
+        if (err) alert(err);
+        if (res.data) this.setState({ choices: res.data.getNode[toGrab] });
+      });
+      return <span>Loading Choices...</span>;
+    }
+  }
+
+  renderChoiceList() {
     return (
       <div>
-        {this.choices.map((op) => (
+        {this.state.choices.map((op) => (
           <Choice
-            id={op}
+            id={op.ID}
             onClick={(toID) => {
               this.props.onClick(toID);
             }}
@@ -38,48 +109,59 @@ class ChoiceList extends React.Component {
   }
 }
 
-class Choice extends React.Component {
-  constructor(props) {
-    super(props);
-    this.info = CHOICES[props.id];
-  }
-  render() {
-    return (
-      <button
-        onClick={() => {
-          this.props.onClick(this.info.to);
-        }}
-      >
-        {this.info.action}
-      </button>
-    );
-  }
-}
-
 class NodePage extends React.Component {
   constructor(props) {
     super(props);
-    this.state = NODES[props.id];
+    this.state = { id: props.id };
+  }
+
+  getNode() {
+    app_fetch({
+      query: `query {
+        getNode(ID:"${this.state.id}") {
+          title
+          content
+          views
+          ID
+          owner {
+            screenName
+            ID
+          }
+        }
+      }`,
+    }).then((res, err) => {
+      if (err) alert(err);
+      if (res.data) this.setState({ node: res.data.getNode });
+    });
   }
 
   moveToNode(node) {
-    this.setState(NODES[node]);
+    this.setState({ id: node, node: undefined });
   }
 
   render() {
-    const owner = ACCOUNTS[this.state.owner];
+    const { node } = this.state;
+
+    if (node) return this.renderNode();
+    else {
+      this.getNode();
+      return <span>Loading node...</span>;
+    }
+  }
+
+  renderNode() {
     return (
       <div>
-        <h1>{this.state.title}</h1>
-        <p>{this.state.content}</p>
-        <p>Views: {this.state.views}</p>
+        <h1>{this.state.node.title}</h1>
+        <p>{this.state.node.content}</p>
+        <p>Views: {this.state.node.views}</p>
         <p>
-          Owner: {owner.screenName} ({owner.ID})
+          Owner: {this.state.node.owner.screenName} ({this.state.node.owner.ID})
         </p>
         Canon Choices:
         <ChoiceList
           canon="true"
-          nodeID={this.state.ID}
+          nodeID={this.state.node.ID}
           onClick={(nodeID) => {
             this.moveToNode(nodeID);
           }}
@@ -87,7 +169,7 @@ class NodePage extends React.Component {
         Non-Canon Choices:
         <ChoiceList
           canon="false"
-          nodeID={this.state.ID}
+          nodeID={this.state.node.ID}
           onClick={(nodeID) => {
             this.moveToNode(nodeID);
           }}
