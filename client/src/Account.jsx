@@ -3,6 +3,10 @@ import CallableComponent from "./CallableComponent";
 import { Link } from "react-router-dom";
 
 class Account extends CallableComponent {
+  logOut() {
+    this.props.cookies.set("account", "");
+    window.location.reload();
+  }
   render() {
     return this.loadRender(
       "Account",
@@ -14,12 +18,22 @@ class Account extends CallableComponent {
   }
 
   renderAccount() {
-    const info = this.state["getAccount"];
+    if (
+      !this.state.loggedIn &&
+      this.props.cookies.get("account") === this.props.match.params.id
+    )
+      this.setState({
+        loggedIn: (
+          <Link onClick={() => this.logOut()}>
+            <button>Log Out</button>
+          </Link>
+        ),
+      });
+    const info = this.state.getAccount;
     return (
       <div>
-        <h1>
-          {info.screenName} ({info.ID})
-        </h1>
+        <h1>{info.screenName}</h1>
+        {this.state.loggedIn ? this.state.loggedIn : ""}
         <p>
           Nodes:
           {info.nodes.map((node) => (

@@ -3,10 +3,9 @@ import CallableComponent from "./CallableComponent";
 import { Link, Redirect } from "react-router-dom";
 
 class Node extends CallableComponent {
-  resetState() {
+  resetPage() {
     this.setState({ getNode: undefined });
   }
-
   render() {
     return this.loadRender(
       "Node",
@@ -18,7 +17,7 @@ class Node extends CallableComponent {
   }
 
   renderNode() {
-    const info = this.state["getNode"];
+    const info = this.state.getNode;
     return (
       <div>
         <h1>{info.title}</h1>
@@ -29,20 +28,20 @@ class Node extends CallableComponent {
         </p>
         Canon Choices:
         <ChoiceList
-          resetState={() => this.resetState()}
           canon={true}
           nodeID={info.ID}
+          resetPage={() => this.resetPage()}
         />
         Non-Canon Choices:
         <ChoiceList
-          resetState={() => this.resetState()}
           canon={false}
           nodeID={info.ID}
+          resetPage={() => this.resetPage()}
         />
         <p>
           <SuggestBox
             fromID={this.props.match.params.id}
-            resetState={() => this.resetState()}
+            cookies={this.props.cookies}
           />
         </p>
       </div>
@@ -66,10 +65,11 @@ class ChoiceList extends CallableComponent {
     return (
       <div>
         {info[this.choices].map((choice) => (
-          <Link to={`/node/${choice.to.ID}`}>
-            <button onClick={() => this.props.resetState()}>
-              {choice.action}
-            </button>
+          <Link
+            onClick={() => this.props.resetPage()}
+            to={`/node/${choice.to.ID}`}
+          >
+            <button>{choice.action}</button>
           </Link>
         ))}
       </div>
@@ -86,14 +86,15 @@ class SuggestBox extends CallableComponent {
   }
 
   suggest() {
+    const accountID = this.props.cookies.get("account");
     if (!this.state.toID) {
       this.mutate([
-        `createNode(accountID:"4sod26pek2",title:"",content:""){ID}`,
+        `createNode(accountID:"${accountID}",title:"",content:""){ID}`,
       ]).then((node) => {
         this.setState({ toID: node[0].createNode.ID });
 
         this.mutate([
-          `suggestChoice(accountID:"4sod26pek2"
+          `suggestChoice(accountID:"${accountID}"
                 fromID: "${this.props.fromID}"
                 action: "${this.state.action}"
                 toID: "${this.state.toID}"){ID}`,
@@ -106,18 +107,29 @@ class SuggestBox extends CallableComponent {
     } else {
       // redundant code but some of it is in the then statement so I dont wanna mess with it
       this.mutate([
-        `suggestChoice(accountID:"4sod26pek2"
+        `suggestChoice(accountID:"${accountID}"
                 fromID: "${this.props.fromID}"
                 action: "${this.state.action}"
                 toID: "${this.state.toID}"){ID}`,
       ]);
 
-      this.props.resetState();
+      window.location.reload();
     }
   }
-
   render() {
-    // this should only work if you are logged in
+    return this.loadRender(
+      "Suggestion Box",
+      [`getAccount(ID:"${this.props.cookies.get("account")}"){ID}`],
+      () => this.renderSuggestBox(),
+      () => this.renderNoBox()
+    );
+  }
+
+  renderNoBox() {
+    return <div>You can only suggest new choices if you are logged in.</div>;
+  }
+
+  renderSuggestBox() {
     return (
       <div>
         Suggest your own action:

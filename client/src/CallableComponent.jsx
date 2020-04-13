@@ -12,12 +12,16 @@ class CallableComponent extends React.Component {
     this.state = {};
   }
 
-  loadRender(name, queries, renderFunc) {
+  loadRender(name, queries, renderFunc, renderNotFound) {
     for (let id in queries) {
       let method = queries[id].match(/^\w+(?=\(|\{)/);
       switch (this.state[method]) {
         case null:
-          return <span>Couldn't find {name}!</span>;
+          return renderNotFound ? (
+            renderNotFound()
+          ) : (
+            <span>Couldn't load {name}!</span>
+          );
         case undefined:
           app_fetch({
             query: `query{${queries[id]}}`,

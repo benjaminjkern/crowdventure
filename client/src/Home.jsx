@@ -11,8 +11,8 @@ class Home extends CallableComponent {
     );
   }
   renderApp() {
-    const nodes = this.state["allNodes"];
-    const accounts = this.state["allAccounts"];
+    const nodes = this.state.allNodes;
+    const accounts = this.state.allAccounts;
     return (
       <div>
         <p>
