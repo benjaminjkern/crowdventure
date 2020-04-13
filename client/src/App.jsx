@@ -35,6 +35,7 @@ import Node from "./Node";
 import Account from "./Account";
 import Header from "./Header";
 import Home from "./Home";
+import EditNode from "./EditNode";
 
 class App extends React.Component {
   render() {
@@ -45,6 +46,7 @@ class App extends React.Component {
           <Route path="/" component={Home} exact />
           <Route path="/node/:id" component={Node} />
           <Route path="/account/:id" component={Account} />
+          <Route path="/editnode/:id" component={EditNode} />
         </Switch>
       </BrowserRouter>
     );

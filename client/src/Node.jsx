@@ -83,15 +83,17 @@ class SuggestBox extends CallableComponent {
       <div>
         Suggest your own action:
         <input />
-        <label>
-          <input type="radio" name="choice-create" defaultChecked />
-          Create new node
-        </label>
-        <label>
-          <input type="radio" name="choice-create" />
-          Connect existing node
-        </label>
-        <button>Suggest</button>
+        <p>
+          <label>
+            <input type="radio" name="choice-create" defaultChecked />
+            Create new node
+          </label>
+          <label>
+            <input type="radio" name="choice-create" />
+            Connect existing node
+          </label>
+          <button>Suggest</button>
+        </p>
       </div>
     );
   }

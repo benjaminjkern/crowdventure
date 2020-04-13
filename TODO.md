@@ -1,11 +1,9 @@
 1. Make front end look GOOOOD
-2. Accounts page
-3. Put database onto aws
-4. Add creation and whatnot to frontend
-5. Make suggestion work on frontend
-6. Make suggestion check if you are logged in
-7. Provide some sort of security measures for logging in
-8. Make views be either per account or like per ip or something
-9. Reset the views of the home page
-10. Move stuff to different files hahaha
-11. Update Readme
+2. Put database onto aws
+3. Add creation and whatnot to frontend
+4. Make suggestion work on frontend
+5. Make suggestion check if you are logged in
+6. Provide some sort of security measures for logging in
+7. Make views be either per account or like per ip or something
+8. Reset the views of the first node
+9. Update Readme

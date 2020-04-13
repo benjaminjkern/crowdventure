@@ -164,6 +164,18 @@ const resolvers = {
             delete account.nodes[node.ID];
             databaseCalls.addAccount(account);
         },
+        editNode: (parent, args, context, info) => {
+            let node = databaseCalls.getNode(args.nodeID);
+
+            console.log(`Editing node ${node.ID} (${node.title})`);
+
+            if (args.title) node.title = args.title;
+            if (args.content) node.content = args.content;
+
+            // presently I'm leaving this not throw any error if nothing is changed because I dont really care
+
+            return databaseCalls.addNode(node);
+        },
         suggestChoice: (parent, args, context, info) => {
             let account = databaseCalls.getAccount(args.accountID);
             let node = databaseCalls.getNode(args.fromID);

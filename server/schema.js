@@ -57,6 +57,7 @@ const typeDefs = gql `
     deleteAccount(accountID: String!): Boolean
     createNode(accountID: String!, title: String!, content: String!): Node
     deleteNode(nodeID: String!): Boolean
+    editNode(nodeID: String!, title: String, content: String): Node
     suggestChoice(
       accountID: String!
       fromID: String!
@@ -70,7 +71,6 @@ const typeDefs = gql `
     # unimplemented
     likeSuggestion(choiceID: String!): Choice
     dislikeSuggestion(choiceID: String!): Choice
-    editNode(nodeID: String!, title: String, content: String): Node
   }
 `;
 
