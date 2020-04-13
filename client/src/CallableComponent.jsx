@@ -17,7 +17,7 @@ class CallableComponent extends React.Component {
       let method = queries[id].match(/^\w+(?=\(|\{)/);
       switch (this.state[method]) {
         case null:
-          return <span>Couldn't find {name}</span>;
+          return <span>Couldn't find {name}!</span>;
         case undefined:
           app_fetch({
             query: `query{${queries[id]}}`,

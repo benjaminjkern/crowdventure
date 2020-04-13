@@ -219,7 +219,9 @@ const resolvers = {
 
             console.log(`Removing suggestion ${choice.ID} (${choice.action})`);
 
-            delete account.suggestedChoices[choice.ID];
+            account.suggestedChoices = account.suggestedChoices.filter(
+                (choiceID) => choiceID !== choice.ID
+            );
 
             databaseCalls.addAccount(account);
             databaseCalls.removeChoice(choice.ID);
