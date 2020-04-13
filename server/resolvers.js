@@ -10,20 +10,20 @@ const resolvers = {
             console.log(
                 `Retrieving nodes owned by ${parent.ID} (${parent.screenName})`
             );
-            return parent.nodes.map(id => databaseCalls.getNode(id));
+            return parent.nodes.map((id) => databaseCalls.getNode(id));
         },
         suggestedChoices: (parent, args, context, info) => {
             console.log(
                 `Retrieving choices suggested by ${parent.ID} (${parent.screenName})`
             );
-            return parent.suggestedChoices.map(id => databaseCalls.getChoice(id));
+            return parent.suggestedChoices.map((id) => databaseCalls.getChoice(id));
         },
         totalNodeViews: (parent, args, context, info) => {
             console.log(
                 `Retrieving total views of all nodes owned by ${parent.ID} (${parent.screenName})`
             );
             return parent.nodes
-                .map(id => databaseCalls.getNode(id).views)
+                .map((id) => databaseCalls.getNode(id).views)
                 .reduce((x, y) => x + y, 0);
         },
         totalSuggestionScore: (parent, args, context, info) => {
@@ -32,10 +32,10 @@ const resolvers = {
             );
             return parent.suggestedChoices ?
                 parent.suggestedChoices
-                .map(id => resolvers.Choice.score(databaseCalls.getChoice(id)))
+                .map((id) => resolvers.Choice.score(databaseCalls.getChoice(id)))
                 .reduce((x, y) => x + y, 0) :
                 0;
-        }
+        },
     },
     Node: {
         content: (parent, args, context, info) => {
@@ -51,14 +51,14 @@ const resolvers = {
             console.log(
                 `Retrieving all canon choices from node ${parent.ID} (${parent.title})`
             );
-            return parent.canonChoices.map(id => databaseCalls.getChoice(id));
+            return parent.canonChoices.map((id) => databaseCalls.getChoice(id));
         },
         nonCanonChoices: (parent, args, context, info) => {
             console.log(
                 `Retrieving all non-canon choices from node ${parent.ID} (${parent.title})`
             );
-            return parent.nonCanonChoices.map(id => databaseCalls.getChoice(id));
-        }
+            return parent.nonCanonChoices.map((id) => databaseCalls.getChoice(id));
+        },
     },
     Choice: {
         from: (parent, args, context, info) => {
@@ -82,15 +82,17 @@ const resolvers = {
         score: (parent, args, context, info) => {
             console.log(`Retrieving score of choice ${parent.ID} (${parent.action})`);
             return parent.likes - parent.dislikes;
-        }
+        },
     },
     Query: {
         allAccounts: () => Object.values(databaseCalls.allAccounts()),
         allNodes: () => Object.values(databaseCalls.allNodes()),
         allChoices: () => Object.values(databaseCalls.allChoices()),
-        getAccount: (parent, args, context, info) => databaseCalls.getAccount(args.ID),
+        getAccount: (parent, args, context, info) =>
+            databaseCalls.getAccount(args.ID),
         getNode: (parent, args, context, info) => databaseCalls.getNode(args.ID),
-        getChoice: (parent, args, context, info) => databaseCalls.getChoice(args.ID),
+        getChoice: (parent, args, context, info) =>
+            databaseCalls.getChoice(args.ID),
         searchAccounts: (parent, args, context, info) => {
             console.log(`Searching for ${args.type}: ${args.query} in accounts`);
             // TODO: Implement!
@@ -102,27 +104,25 @@ const resolvers = {
         searchChoices: (parent, args, context, info) => {
             console.log(`Searching for ${args.type}: ${args.query} in choices`);
             // TODO: Implement!
-        }
+        },
     },
     Mutation: {
         createAccount: (parent, args, context, info) => {
             console.log(`Creating new account with name ${args.screenName}`);
             return databaseCalls.addAccount({
-                ID: Math.random()
-                    .toString(36)
-                    .substring(2, 12),
+                ID: Math.random().toString(36).substring(2, 12),
                 screenName: args.screenName,
                 nodes: [],
-                suggestedChoices: []
+                suggestedChoices: [],
             });
         },
         deleteAccount: (parent, args, context, info) => {
             let account = databaseCalls.getAccount(args.accountID);
             console.log(`Deleting Account ${account.ID} (${account.screenName})`);
-            account.suggestedChoices.forEach(choiceID =>
+            account.suggestedChoices.forEach((choiceID) =>
                 resolvers.Mutation.removeSuggestion(undefined, { choiceID })
             );
-            account.nodes.forEach(nodeID =>
+            account.nodes.forEach((nodeID) =>
                 resolvers.Mutation.deleteNode(undefined, { nodeID })
             );
 
@@ -134,16 +134,13 @@ const resolvers = {
                 `Creating new node with title ${args.title} and owner ${account.ID} (${account.screenName})`
             );
             let newNode = {
-                ID: Math.random()
-                    .toString(36)
-                    .substring(2, 6)
-                    .toUpperCase(),
+                ID: Math.random().toString(36).substring(2, 6).toUpperCase(),
                 owner: args.accountID,
                 title: args.title,
                 content: args.content,
                 views: 0,
                 canonChoices: [],
-                nonCanonChoices: []
+                nonCanonChoices: [],
             };
             account.nodes.push(newNode.ID);
             databaseCalls.addAccount(account);
@@ -155,10 +152,10 @@ const resolvers = {
 
             console.log(`Deleting node ${node.ID} (${node.title})`);
 
-            node.canonChoices.forEach(choiceID =>
+            node.canonChoices.forEach((choiceID) =>
                 resolvers.Mutation.removeSuggestion(undefined, { choiceID })
             );
-            node.nonCanonChoices.forEach(choiceID =>
+            node.nonCanonChoices.forEach((choiceID) =>
                 resolvers.Mutation.removeSuggestion(undefined, { choiceID })
             );
 
@@ -177,18 +174,21 @@ const resolvers = {
             );
 
             let newChoice = {
-                ID: `${node.ID}-${Math.random()
-          .toString()
-          .substring(2, 6)}`,
+                ID: `${node.ID}-${Math.random().toString().substring(2, 6)}`,
                 from: node.ID,
                 action: args.action,
                 to: toNode.ID,
                 likes: 0,
-                dislikes: 0
+                dislikes: 0,
+                suggestedBy: account.ID,
             };
+
+            account.suggestedChoice.push(newChoice.ID);
+
             if (account.ID === node.owner) node.canonChoices.push(newChoice.ID);
             else node.nonCanonChoices.push(newChoice.ID);
 
+            databaseCalls.addAccount(account);
             databaseCalls.addNode(node);
             return databaseCalls.addChoice(newChoice);
         },
@@ -216,7 +216,7 @@ const resolvers = {
                 (item, pos) => node.canonChoices.indexOf(item) === pos
             );
             node.nonCanonChoices = node.nonCanonChoices.filter(
-                id => id !== choice.ID
+                (id) => id !== choice.ID
             );
 
             databaseCalls.addNode(node);
@@ -234,12 +234,12 @@ const resolvers = {
             node.nonCanonChoices = node.nonCanonChoices.filter(
                 (item, pos) => node.nonCanonChoices.indexOf(item) === pos
             );
-            node.canonChoices = node.canonChoices.filter(id => id !== choice.ID);
+            node.canonChoices = node.canonChoices.filter((id) => id !== choice.ID);
 
             databaseCalls.addNode(node);
             return choice;
-        }
-    }
+        },
+    },
 };
 
 module.exports = { resolvers };
