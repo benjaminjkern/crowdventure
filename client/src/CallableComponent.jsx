@@ -35,15 +35,14 @@ class CallableComponent extends React.Component {
     return renderFunc();
   }
 
-  mutate(queries) {
-    for (let id in queries) {
-      app_fetch({
-        query: `mutation{${queries[id]}}`,
-      }).then((res, err) => {
-        if (err) throw new Error(err);
-        // I dont think I need to do anything else cuz these are async
-      });
-    }
+  async mutate(queries) {
+    return Promise.all(
+      queries.map((query) => {
+        return app_fetch({
+          query: `mutation{${query}}`,
+        }).then((res) => res.data);
+      })
+    );
   }
 }
 

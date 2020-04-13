@@ -161,7 +161,7 @@ const resolvers = {
 
             databaseCalls.removeNode(node.ID);
 
-            delete account.nodes[node.ID];
+            account.nodes = account.nodes.filter((nodeID) => nodeID !== node.ID);
             databaseCalls.addAccount(account);
         },
         editNode: (parent, args, context, info) => {
@@ -175,6 +175,15 @@ const resolvers = {
             // presently I'm leaving this not throw any error if nothing is changed because I dont really care
 
             return databaseCalls.addNode(node);
+        },
+        deleteEmptyNodes: (parent, args, context, info) => {
+            console.log(`Deleting all empty nodes`);
+            const nodes = Object.values(databaseCalls.allNodes());
+            nodes.forEach((node) => {
+                if (!node.title && !node.content)
+                    resolvers.Mutation.deleteNode(undefined, { nodeID: node.ID });
+            });
+            return true;
         },
         suggestChoice: (parent, args, context, info) => {
             let account = databaseCalls.getAccount(args.accountID);
@@ -195,7 +204,7 @@ const resolvers = {
                 suggestedBy: account.ID,
             };
 
-            account.suggestedChoice.push(newChoice.ID);
+            account.suggestedChoices.push(newChoice.ID);
 
             if (account.ID === node.owner) node.canonChoices.push(newChoice.ID);
             else node.nonCanonChoices.push(newChoice.ID);

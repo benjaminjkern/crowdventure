@@ -58,6 +58,7 @@ const typeDefs = gql `
     createNode(accountID: String!, title: String!, content: String!): Node
     deleteNode(nodeID: String!): Boolean
     editNode(nodeID: String!, title: String, content: String): Node
+    deleteEmptyNodes: Boolean
     suggestChoice(
       accountID: String!
       fromID: String!
