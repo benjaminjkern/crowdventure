@@ -59,9 +59,7 @@ class AccountManager extends CallableComponent {
       <span>
         You are logged in as: {account.screenName}
         <Link to={`/account/${account.ID}`}>
-          <button onClick={() => this.setState({ getAccount: undefined })}>
-            Go to Account
-          </button>
+          <button>Go to Account</button>
         </Link>
       </span>
     );

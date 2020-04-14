@@ -8,3 +8,5 @@
 8. Currently deleting nodes does not delete suggestions pointing to the node. This should probably be fixed on the front end to disable actions that no longer point anywhere, or like if a page is ever loaded with an action that doesn't point anywhere, it gets purged
 9. Make everything cleaner to work in the cool async way
 10. Can suggest an empty choice
+11. Editing other people's stuff bug
+12. Make unliking/undisliking a thing

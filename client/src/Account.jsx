@@ -17,9 +17,7 @@ class Account extends CallableComponent {
   render() {
     return this.loadRender(
       "Account",
-      [
-        `getAccount(ID:"${this.props.match.params.id}"){ID,screenName,nodes{ID,title},suggestedChoices{ID,from{title},action,to{title}},totalNodeViews,totalSuggestionScore}`,
-      ],
+      `getAccount(ID:"${this.props.match.params.id}"){ID,screenName,nodes{ID,title},suggestedChoices{ID,from{title},action,to{title}},totalNodeViews,totalSuggestionScore}`,
       () => this.renderAccount()
     );
   }

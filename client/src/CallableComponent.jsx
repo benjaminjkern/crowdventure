@@ -27,10 +27,7 @@ class CallableComponent extends React.Component {
           return renderNotFound ? (
             renderNotFound()
           ) : (
-            <span>
-              Couldn't load {name}!
-              <Redirect to="/">Redirecting to Home Page...</Redirect>
-            </span>
+            <span>Couldn't load {name}!</span>
           );
         case undefined:
           app_fetch({
