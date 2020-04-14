@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const { createApolloFetch } = require("apollo-fetch");
 
@@ -26,7 +27,10 @@ class CallableComponent extends React.Component {
           return renderNotFound ? (
             renderNotFound()
           ) : (
-            <span>Couldn't load {name}!</span>
+            <span>
+              Couldn't load {name}!
+              <Link to="/">Click here to go back to home page</Link>
+            </span>
           );
         case undefined:
           app_fetch({

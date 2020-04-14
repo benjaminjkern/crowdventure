@@ -19,18 +19,36 @@ class Header extends React.Component {
 }
 
 class AccountManager extends CallableComponent {
-  handleLogin() {
-    (async () =>
-      this.props.cookies.set("account", "4sod26pek2", { path: "/" }))().then(
-      () => {
-        window.location.reload();
+  state = { value: "" };
+  loginNew() {
+    this.mutate([`createAccount(screenName:"${this.state.value}"){ID}`]).then(
+      (account) => {
+        this.handleLogin(account[0].createAccount.ID);
       }
     );
+  }
+  handleChange(event) {
+    this.setState({ value: event.target.value });
+  }
+  handleLogin(accountID) {
+    this.query(`getAccount(ID:"${accountID}"){ID}`).then((res) => {
+      if (res)
+        (async () =>
+          this.props.cookies.set("account", accountID, { path: "/" }))().then(
+          () => {
+            window.location.reload();
+          }
+        );
+      else {
+        alert("That account doesn't exist!");
+        this.setState({ getAccount: undefined, value: "" });
+      }
+    });
   }
   render() {
     return this.loadRender(
       "Account",
-      [`getAccount(ID:"${this.props.cookies.get("account")}"){screenName,ID}`],
+      `getAccount(ID:"${this.props.cookies.get("account")}"){screenName,ID}`,
       () => this.renderAM(),
       () => this.renderNoAccount()
     );
@@ -48,11 +66,62 @@ class AccountManager extends CallableComponent {
   }
   renderNoAccount() {
     return (
-      <span>
+      <div>
         You are not logged in.
-        <button onClick={() => this.handleLogin()}>Log in</button>
-        <button>Sign up</button>
-      </span>
+        {(() => {
+          switch (this.state.loginStatus) {
+            case "loggingIn":
+              return (
+                <div>
+                  <input
+                    placeholder="Enter your account id..."
+                    value={this.state.value}
+                    onChange={(event) => this.handleChange(event)}
+                  />
+                  <button onClick={() => this.handleLogin(this.state.value)}>
+                    Log in
+                  </button>
+                </div>
+              );
+            case "signingUp":
+              return (
+                <div>
+                  <input
+                    placeholder="Please enter a screenName"
+                    value={this.state.value}
+                    onChange={(event) => this.handleChange(event)}
+                  />
+                  <button onClick={() => this.loginNew()}>Sign up</button>
+                </div>
+              );
+            default:
+              return (
+                <div>
+                  <button
+                    onClick={() =>
+                      this.setState({
+                        loginStatus: "loggingIn",
+                        getAccount: undefined,
+                      })
+                    }
+                  >
+                    Log in
+                  </button>
+                  <button
+                    onClick={() =>
+                      this.setState({
+                        loginStatus: "signingUp",
+                        getAccount: undefined,
+                      })
+                    }
+                  >
+                    Sign up
+                  </button>
+                </div>
+              );
+          }
+        })()}
+      </div>
     );
   }
 }

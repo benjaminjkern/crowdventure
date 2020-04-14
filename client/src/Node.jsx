@@ -91,11 +91,13 @@ class Choice extends CallableComponent {
     this.mutate(
       `likeSuggestion(accountID:"${this.props.account}",choiceID:"${this.props.choiceID}"){ID}`
     );
+    this.setState({ getChoice: undefined });
   }
   dislike() {
     this.mutate(
       `dislikeSuggestion(accountID:"${this.props.account}",choiceID:"${this.props.choiceID}"){ID}`
     );
+    this.setState({ getChoice: undefined });
   }
   render() {
     return this.loadRender(

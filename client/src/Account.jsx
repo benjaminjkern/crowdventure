@@ -9,6 +9,14 @@ class Account extends CallableComponent {
       window.location.reload()
     );
   }
+  deleteAccount() {
+    this.mutate(
+      `deleteAccount(accountID:"${this.props.match.params.id}")`
+    ).then((res) => {
+      this.inspect(res);
+      this.logOut();
+    });
+  }
   render() {
     return this.loadRender(
       "Account",
@@ -37,12 +45,12 @@ class Account extends CallableComponent {
               </Link>
             ))}
             <br />
-            <Link onClick={() => this.logOut()}>
-              <button>Log Out</button>
-            </Link>
+            <button onClick={() => this.logOut()}>Log Out</button>
+            <button onClick={() => this.deleteAccount()}>Delete Account</button>
           </div>
         ),
       });
+
     return (
       <div>
         <h1>{info.screenName}</h1>
