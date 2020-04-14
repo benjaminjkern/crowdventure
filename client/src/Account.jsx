@@ -12,10 +12,7 @@ class Account extends CallableComponent {
   deleteAccount() {
     this.mutate(
       `deleteAccount(accountID:"${this.props.match.params.id}")`
-    ).then((res) => {
-      this.inspect(res);
-      this.logOut();
-    });
+    ).then(() => this.logOut());
   }
   render() {
     return this.loadRender(

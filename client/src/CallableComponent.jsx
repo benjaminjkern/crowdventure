@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
 const { createApolloFetch } = require("apollo-fetch");
 
@@ -29,7 +29,7 @@ class CallableComponent extends React.Component {
           ) : (
             <span>
               Couldn't load {name}!
-              <Link to="/">Click here to go back to home page</Link>
+              <Redirect to="/">Redirecting to Home Page...</Redirect>
             </span>
           );
         case undefined:

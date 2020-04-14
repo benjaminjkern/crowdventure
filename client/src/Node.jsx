@@ -102,7 +102,7 @@ class Choice extends CallableComponent {
   render() {
     return this.loadRender(
       "Choice",
-      `getChoice(ID:"${this.props.choiceID}"){to{ID},action,score}`,
+      `getChoice(ID:"${this.props.choiceID}"){to{ID},action,score,likedBy{ID},dislikedBy{ID}}`,
       () => this.renderChoice()
     );
   }
@@ -117,13 +117,27 @@ class Choice extends CallableComponent {
           <button>{choice.action}</button>
         </Link>
         <br />
-        <button onClick={() => this.dislike()} class="like-btn">
+        <button
+          onClick={() => this.dislike()}
+          class="like-btn"
+          disabled={
+            !this.props.account ||
+            choice.dislikedBy.some((elem) => elem.ID === this.props.account)
+          }
+        >
           <span role="img" aria-label="thumbs down">
             👎
           </span>
         </button>
         {" " + choice.score + " "}
-        <button onClick={() => this.like()} class="like-btn">
+        <button
+          onClick={() => this.like()}
+          class="like-btn"
+          disabled={
+            !this.props.account ||
+            choice.likedBy.some((elem) => elem.ID === this.props.account)
+          }
+        >
           <span role="img" aria-label="thumbs up">
             👍
           </span>

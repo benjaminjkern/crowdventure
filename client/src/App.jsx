@@ -8,7 +8,7 @@ import Header from "./Header";
 import Home from "./Home";
 import EditNode from "./EditNode";
 import EditChoice from "./EditChoice";
-// import "./App.css";
+import "./App.css";
 
 class App extends React.Component {
   cookies = new Cookies();
