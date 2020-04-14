@@ -5,7 +5,7 @@ import CallableComponent from "./CallableComponent";
 class Header extends React.Component {
   render() {
     return (
-      <div>
+      <div class="account-info">
         <Link to="/">
           <img
             src={process.env.PUBLIC_URL + "/logo.png"}
@@ -20,8 +20,12 @@ class Header extends React.Component {
 
 class AccountManager extends CallableComponent {
   handleLogin() {
-    this.props.cookies.set("account", "4sod26pek2");
-    window.location.reload();
+    (async () =>
+      this.props.cookies.set("account", "4sod26pek2", { path: "/" }))().then(
+      () => {
+        window.location.reload();
+      }
+    );
   }
   render() {
     return this.loadRender(
@@ -34,21 +38,21 @@ class AccountManager extends CallableComponent {
   renderAM() {
     const account = this.state.getAccount;
     return (
-      <div>
+      <span>
         You are logged in as: {account.screenName}
         <Link to={`/account/${account.ID}`}>
           <button>Go to Account</button>
         </Link>
-      </div>
+      </span>
     );
   }
   renderNoAccount() {
     return (
-      <div>
+      <span>
         You are not logged in.
         <button onClick={() => this.handleLogin()}>Log in</button>
         <button>Sign up</button>
-      </div>
+      </span>
     );
   }
 }

@@ -36,6 +36,20 @@ const resolvers = {
                 .reduce((x, y) => x + y, 0) :
                 0;
         },
+        liked: (parent, args, context, info) => {
+            console.log(
+                `Retrieving all nodes liked by ${parent.ID} (${parent.screenName})`
+            );
+            return Object.keys(parent.liked).map((id) => databaseCalls.getNode(id));
+        },
+        disliked: (parent, args, context, info) => {
+            console.log(
+                `Retrieving all nodes disliked by ${parent.ID} (${parent.screenName})`
+            );
+            return Object.keys(parent.disliked).map((id) =>
+                databaseCalls.getNode(id)
+            );
+        },
     },
     Node: {
         content: (parent, args, context, info) => {
@@ -79,9 +93,35 @@ const resolvers = {
             );
             return databaseCalls.getAccount(parent.suggestedBy);
         },
+        likes: (parent, args, context, info) => {
+            console.log(`Retrieving likes of choice ${parent.ID} (${parent.action})`);
+            return Object.keys(parent.likedBy).length;
+        },
+        dislikes: (parent, args, context, info) => {
+            console.log(
+                `Retrieving dislikes of choice ${parent.ID} (${parent.action})`
+            );
+            return Object.keys(parent.dislikedBy).length;
+        },
         score: (parent, args, context, info) => {
             console.log(`Retrieving score of choice ${parent.ID} (${parent.action})`);
-            return parent.likes - parent.dislikes;
+            return resolvers.Choice.likes(parent) - resolvers.Choice.dislikes(parent);
+        },
+        likedBy: (parent, args, context, info) => {
+            console.log(
+                `Retrieving all accounts that liked ${parent.ID} (${parent.action})`
+            );
+            return Object.keys(parent.likedBy).map((accountID) =>
+                databaseCalls.getAccount(accountID)
+            );
+        },
+        dislikedBy: (parent, args, context, info) => {
+            console.log(
+                `Retrieving all accounts that disliked ${parent.ID} (${parent.action})`
+            );
+            return Object.keys(parent.dislikedBy).map((accountID) =>
+                databaseCalls.getAccount(accountID)
+            );
         },
     },
     Query: {
@@ -95,15 +135,24 @@ const resolvers = {
             databaseCalls.getChoice(args.ID),
         searchAccounts: (parent, args, context, info) => {
             console.log(`Searching for ${args.type}: ${args.query} in accounts`);
-            // TODO: Implement!
+            if (!args.query) return [];
+            return Object.values(databaseCalls.allAccounts()).filter((account) =>
+                account[args.type].toLowerCase().includes(args.query.toLowerCase())
+            );
         },
         searchNodes: (parent, args, context, info) => {
             console.log(`Searching for ${args.type}: ${args.query} in nodes`);
-            // TODO: Implement!
+            if (!args.query) return [];
+            return Object.values(databaseCalls.allNodes()).filter((node) =>
+                node[args.type].toLowerCase().includes(args.query.toLowerCase())
+            );
         },
         searchChoices: (parent, args, context, info) => {
             console.log(`Searching for ${args.type}: ${args.query} in choices`);
-            // TODO: Implement!
+            if (!args.query) return [];
+            return Object.values(databaseCalls.allChoices()).filter((choice) =>
+                choice[args.type].toLowerCase().includes(args.query.toLowerCase())
+            );
         },
     },
     Mutation: {
@@ -114,6 +163,8 @@ const resolvers = {
                 screenName: args.screenName,
                 nodes: [],
                 suggestedChoices: [],
+                liked: {},
+                disliked: {},
             });
         },
         deleteAccount: (parent, args, context, info) => {
@@ -172,8 +223,6 @@ const resolvers = {
             if (args.title) node.title = args.title;
             if (args.content) node.content = args.content;
 
-            // presently I'm leaving this not throw any error if nothing is changed because I dont really care
-
             return databaseCalls.addNode(node);
         },
         deleteEmptyNodes: (parent, args, context, info) => {
@@ -199,8 +248,8 @@ const resolvers = {
                 from: node.ID,
                 action: args.action,
                 to: toNode.ID,
-                likes: 0,
-                dislikes: 0,
+                likedBy: {},
+                dislikedBy: {},
                 suggestedBy: account.ID,
             };
 
@@ -212,6 +261,16 @@ const resolvers = {
             databaseCalls.addAccount(account);
             databaseCalls.addNode(node);
             return databaseCalls.addChoice(newChoice);
+        },
+        editSuggestion: (parent, args, context, info) => {
+            let choice = databaseCalls.getChoice(args.choiceID);
+
+            console.log(`Editing suggestion ${choice.ID} (${choice.action})`);
+
+            if (args.toID) choice.toID = args.toID;
+            if (args.action) choice.action = args.action;
+
+            return databaseCalls.addChoice(choice);
         },
         removeSuggestion: (parent, args, context, info) => {
             let choice = databaseCalls.getChoice(args.choiceID);
@@ -227,8 +286,8 @@ const resolvers = {
             databaseCalls.removeChoice(choice.ID);
         },
         makeCanon: (parent, args, context, info) => {
-            let node = databaseCalls.getNode(args.nodeID);
             let choice = databaseCalls.getChoice(args.choiceID);
+            let node = databaseCalls.getNode(choice.from);
 
             console.log(
                 `Making choice ${choice.ID} (${choice.action}) in node ${node.ID} (${node.title}) canon`
@@ -246,8 +305,8 @@ const resolvers = {
             return choice;
         },
         makeNonCanon: (parent, args, context, info) => {
-            let node = databaseCalls.getNode(args.nodeID);
             let choice = databaseCalls.getChoice(args.choiceID);
+            let node = databaseCalls.getNode(choice.from);
 
             console.log(
                 `Making choice ${choice.ID} (${choice.action}) in node ${node.ID} (${node.title}) non-canon`
@@ -261,6 +320,34 @@ const resolvers = {
 
             databaseCalls.addNode(node);
             return choice;
+        },
+        likeSuggestion: (parent, args, context, info) => {
+            let choice = databaseCalls.getChoice(args.choiceID);
+            let account = databaseCalls.getAccount(args.accountID);
+            console.log(
+                `${account.screenName} (${account.ID}) is liking choice ${choice.ID} (${choice.action})`
+            );
+            delete choice.dislikedBy[account.ID];
+            delete account.disliked[choice.ID];
+
+            choice.likedBy[account.ID] = account.ID;
+            account.liked[choice.ID] = choice.ID;
+            databaseCalls.addAccount(account);
+            return databaseCalls.addChoice(choice);
+        },
+        dislikeSuggestion: (parent, args, context, info) => {
+            let choice = databaseCalls.getChoice(args.choiceID);
+            let account = databaseCalls.getAccount(args.accountID);
+            console.log(
+                `${account.screenName} (${account.ID}) is disliking choice ${choice.ID} (${choice.action})`
+            );
+            delete choice.likedBy[account.ID];
+            delete account.liked[choice.ID];
+
+            choice.dislikedBy[account.ID] = account.ID;
+            account.disliked[choice.ID] = choice.ID;
+            databaseCalls.addAccount(account);
+            return databaseCalls.addChoice(choice);
         },
     },
 };

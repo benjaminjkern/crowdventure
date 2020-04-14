@@ -12,7 +12,13 @@ class CallableComponent extends React.Component {
     this.state = {};
   }
 
+  inspect(object) {
+    alert(require("util").inspect(object));
+  }
+
   loadRender(name, queries, renderFunc, renderNotFound) {
+    if (typeof queries === "string") queries = [queries];
+
     for (let id in queries) {
       let method = queries[id].match(/^\w+(?=\(|\{)/);
       switch (this.state[method]) {
@@ -39,7 +45,19 @@ class CallableComponent extends React.Component {
     return renderFunc();
   }
 
+  async query(queries) {
+    if (typeof queries === "string") queries = [queries];
+    return Promise.all(
+      queries.map((query) => {
+        return app_fetch({
+          query: `query{${query}}`,
+        }).then((res) => res.data);
+      })
+    );
+  }
+
   async mutate(queries) {
+    if (typeof queries === "string") queries = [queries];
     return Promise.all(
       queries.map((query) => {
         return app_fetch({

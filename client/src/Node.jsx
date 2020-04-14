@@ -19,24 +19,34 @@ class Node extends CallableComponent {
   renderNode() {
     const info = this.state.getNode;
     return (
-      <div>
+      <div class="node">
+        <button>Go Back</button>
         <h1>{info.title}</h1>
         <p>{info.content}</p>
-        <p>Views: {info.views}</p>
-        <p>
-          Owner: {info.owner.screenName} ({info.owner.ID})
-        </p>
-        Canon Choices:
         <ChoiceList
           canon={true}
           nodeID={info.ID}
           resetPage={() => this.resetPage()}
+          account={this.props.cookies.get("account")}
         />
+        <p>
+          Views: {info.views}
+          <br /> Owner: {info.owner.screenName}{" "}
+          {info.owner.ID === this.props.cookies.get("account")
+            ? [
+                "(You)",
+                <Link to={`/editnode/${this.props.match.params.id}`}>
+                  <button>Edit Page</button>
+                </Link>,
+              ]
+            : ""}
+        </p>
         Non-Canon Choices:
         <ChoiceList
           canon={false}
           nodeID={info.ID}
           resetPage={() => this.resetPage()}
+          account={this.props.cookies.get("account")}
         />
         <p>
           <SuggestBox
@@ -55,7 +65,7 @@ class ChoiceList extends CallableComponent {
   render() {
     return this.loadRender(
       "Choice List",
-      [`getNode(ID:"${this.props.nodeID}"){${this.choices}{ID,action,to{ID}}}`],
+      [`getNode(ID:"${this.props.nodeID}"){${this.choices}{ID}}`],
       () => this.renderChoiceList()
     );
   }
@@ -63,15 +73,59 @@ class ChoiceList extends CallableComponent {
   renderChoiceList() {
     const info = this.state["getNode"];
     return (
-      <div>
+      <div class="choice-list">
         {info[this.choices].map((choice) => (
-          <Link
-            onClick={() => this.props.resetPage()}
-            to={`/node/${choice.to.ID}`}
-          >
-            <button>{choice.action}</button>
-          </Link>
+          <Choice
+            resetPage={() => this.props.resetPage()}
+            choiceID={choice.ID}
+            account={this.props.account}
+          />
         ))}
+      </div>
+    );
+  }
+}
+
+class Choice extends CallableComponent {
+  like() {
+    this.mutate(
+      `likeSuggestion(accountID:"${this.props.account}",choiceID:"${this.props.choiceID}"){ID}`
+    );
+  }
+  dislike() {
+    this.mutate(
+      `dislikeSuggestion(accountID:"${this.props.account}",choiceID:"${this.props.choiceID}"){ID}`
+    );
+  }
+  render() {
+    return this.loadRender(
+      "Choice",
+      `getChoice(ID:"${this.props.choiceID}"){to{ID},action,score}`,
+      () => this.renderChoice()
+    );
+  }
+  renderChoice() {
+    const choice = this.state.getChoice;
+    return (
+      <div class="choice">
+        <Link
+          onClick={() => this.props.resetPage()}
+          to={`/node/${choice.to.ID}`}
+        >
+          <button>{choice.action}</button>
+        </Link>
+        <br />
+        <button onClick={() => this.dislike()} class="like-btn">
+          <span role="img" aria-label="thumbs down">
+            👎
+          </span>
+        </button>
+        {" " + choice.score + " "}
+        <button onClick={() => this.like()} class="like-btn">
+          <span role="img" aria-label="thumbs up">
+            👍
+          </span>
+        </button>
       </div>
     );
   }
@@ -80,9 +134,6 @@ class ChoiceList extends CallableComponent {
 class SuggestBox extends CallableComponent {
   handleInput(event) {
     this.setState({ action: event.target.value });
-  }
-  handleChange(event) {
-    this.setState({ toID: event.target.value });
   }
 
   suggest() {
@@ -119,7 +170,7 @@ class SuggestBox extends CallableComponent {
   render() {
     return this.loadRender(
       "Suggestion Box",
-      [`getAccount(ID:"${this.props.cookies.get("account")}"){ID}`],
+      `getAccount(ID:"${this.props.cookies.get("account")}"){ID}`,
       () => this.renderSuggestBox(),
       () => this.renderNoBox()
     );
@@ -138,15 +189,59 @@ class SuggestBox extends CallableComponent {
           onChange={(event) => this.handleInput(event)}
         />
         <br />
-        Set node to go to (leave blank to create new node):
-        <input
-          value={this.state.toID}
-          onChange={(event) => this.handleChange(event)}
+        <NodeSearcher
+          setToID={(toID) => {
+            this.setState({ toID });
+          }}
         />
         <p>
           <button onClick={() => this.suggest()}>Suggest</button>
           {this.state.redirect ? this.state.redirect : ""}
         </p>
+      </div>
+    );
+  }
+}
+
+class NodeSearcher extends CallableComponent {
+  clickButton(node) {
+    this.setState({
+      search: node.title,
+      searchNodes: undefined,
+      toID: node.ID,
+    });
+    this.props.setToID(node.ID);
+  }
+  state = { search: "" };
+  search(event) {
+    this.setState({ search: event.target.value, toID: undefined });
+    this.props.setToID("");
+
+    if (event.target.value === "") this.setState({ searchNodes: undefined });
+    this.query(
+      `searchNodes(type:"title",query:"${event.target.value}"){title,ID}`
+    ).then((results) => this.setState(results[0]));
+  }
+  render() {
+    return (
+      <div>
+        Go to node:
+        <input
+          placeholder="Search for node..."
+          value={this.state.search}
+          onChange={(event) => this.search(event)}
+        />
+        {this.state.searchNodes
+          ? this.state.searchNodes.map((node) => (
+              <button onClick={() => this.clickButton(node)}>
+                {node.title}
+              </button>
+            ))
+          : ""}
+        <br />
+        {this.state.toID
+          ? `(${this.state.toID})`
+          : "(Leave empty to create new)"}
       </div>
     );
   }

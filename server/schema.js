@@ -8,6 +8,8 @@ const typeDefs = gql `
 
     nodes: [Node!]
     suggestedChoices: [Choice!]
+    liked: [Node!]
+    disliked: [Node!]
 
     totalNodeViews: Int!
     totalSuggestionScore: Int!
@@ -27,13 +29,16 @@ const typeDefs = gql `
   type Choice {
     ID: String!
     action: String!
-    likes: Int!
-    dislikes: Int!
+
+    likedBy: [Account!]
+    dislikedBy: [Account!]
 
     from: Node!
     to: Node!
     suggestedBy: Account!
 
+    likes: Int!
+    dislikes: Int!
     score: Int!
   }
 
@@ -46,7 +51,6 @@ const typeDefs = gql `
     getNode(ID: String!): Node
     getChoice(ID: String!): Choice
 
-    # unimplemented
     searchAccounts(type: String!, query: String!): [Account!]
     searchNodes(type: String!, query: String!): [Node!]
     searchChoices(type: String!, query: String!): [Choice!]
@@ -55,23 +59,26 @@ const typeDefs = gql `
   type Mutation {
     createAccount(screenName: String!): Account
     deleteAccount(accountID: String!): Boolean
+
     createNode(accountID: String!, title: String!, content: String!): Node
     deleteNode(nodeID: String!): Boolean
     editNode(nodeID: String!, title: String, content: String): Node
     deleteEmptyNodes: Boolean
+
     suggestChoice(
       accountID: String!
       fromID: String!
       action: String!
       toID: String!
     ): Choice
+    editSuggestion(choiceID: String!, action: String, toID: String): Choice
     removeSuggestion(choiceID: String!): Boolean
-    makeCanon(nodeID: String!, choiceID: String!): Choice
-    makeNonCanon(nodeID: String!, choiceID: String!): Choice
 
-    # unimplemented
-    likeSuggestion(choiceID: String!): Choice
-    dislikeSuggestion(choiceID: String!): Choice
+    makeCanon(choiceID: String!): Choice
+    makeNonCanon(choiceID: String!): Choice
+
+    likeSuggestion(accountID: String!, choiceID: String!): Choice
+    dislikeSuggestion(accountID: String!, choiceID: String!): Choice
   }
 `;
 

@@ -7,6 +7,8 @@ import Account from "./Account";
 import Header from "./Header";
 import Home from "./Home";
 import EditNode from "./EditNode";
+import EditChoice from "./EditChoice";
+// import "./App.css";
 
 class App extends React.Component {
   cookies = new Cookies();
@@ -24,7 +26,14 @@ class App extends React.Component {
             path="/account/:id"
             render={(props) => <Account {...props} cookies={this.cookies} />}
           />
-          <Route path="/editnode/:id" component={EditNode} />
+          <Route
+            path="/editnode/:id"
+            render={(props) => <EditNode {...props} cookies={this.cookies} />}
+          />
+          <Route
+            path="/editchoice/:id"
+            render={(props) => <EditChoice {...props} cookies={this.cookies} />}
+          />
         </Switch>
       </BrowserRouter>
     );

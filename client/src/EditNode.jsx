@@ -3,6 +3,15 @@ import CallableComponent from "./CallableComponent";
 import { Link } from "react-router-dom";
 
 class EditNode extends CallableComponent {
+  makeNonCanon(choiceID) {
+    this.mutate(`makeNonCanon(choiceID:"${choiceID}"){ID}`);
+    this.setState({ getNode: undefined });
+  }
+  makeCanon(choiceID) {
+    this.mutate(`makeCanon(choiceID:"${choiceID}"){ID}`);
+    this.setState({ getNode: undefined });
+  }
+
   changeTitle(event) {
     let changedState = this.state;
     changedState.getNode.title = event.target.value;
@@ -25,15 +34,22 @@ class EditNode extends CallableComponent {
   render() {
     return this.loadRender(
       "Node Editor",
-      [`getNode(ID:"${this.props.match.params.id}"){title,content}`],
+      [
+        `getNode(ID:"${this.props.match.params.id}"){title,content,owner{ID},canonChoices{ID,action},nonCanonChoices{ID,action}}`,
+      ],
       () => this.renderEditNode()
     );
   }
 
   renderEditNode() {
     const node = this.state.getNode;
-    return (
+    if (this.state.validated === undefined)
+      this.setState({
+        validated: this.props.cookies.get("account") === node.owner.ID,
+      });
+    return this.state.validated ? (
       <div>
+        <h1>Editing node</h1>
         <p>
           Title:
           <input
@@ -43,10 +59,28 @@ class EditNode extends CallableComponent {
         </p>
         <p>
           Content:
+          <br />
           <textarea
             value={node.content}
             onChange={(event) => this.changeContent(event)}
           />
+        </p>
+        <p>
+          Click to change canonicity:
+          <br />
+          Canon choices:
+          {node.canonChoices.map((choice) => (
+            <button onClick={() => this.makeNonCanon(choice.ID)}>
+              {choice.action}
+            </button>
+          ))}
+          <br />
+          Noncanon choices:
+          {node.nonCanonChoices.map((choice) => (
+            <button onClick={() => this.makeCanon(choice.ID)}>
+              {choice.action}
+            </button>
+          ))}
         </p>
         <Link
           onClick={() => this.handleSubmit()}
@@ -55,6 +89,8 @@ class EditNode extends CallableComponent {
           <button>Submit</button>
         </Link>
       </div>
+    ) : (
+      "You are not the owner of this node, and you cannot edit it"
     );
   }
 }

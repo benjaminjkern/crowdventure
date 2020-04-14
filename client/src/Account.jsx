@@ -4,36 +4,48 @@ import { Link } from "react-router-dom";
 
 class Account extends CallableComponent {
   logOut() {
-    this.props.cookies.set("account", "");
-    window.location.reload();
+    (async () =>
+      this.props.cookies.remove("account", { path: "/" }))().then(() =>
+      window.location.reload()
+    );
   }
   render() {
     return this.loadRender(
       "Account",
       [
-        `getAccount(ID:"${this.props.match.params.id}"){ID,screenName,nodes{ID,title},suggestedChoices{from{title},action,to{title}}}`,
+        `getAccount(ID:"${this.props.match.params.id}"){ID,screenName,nodes{ID,title},suggestedChoices{ID,from{title},action,to{title}},totalNodeViews,totalSuggestionScore}`,
       ],
       () => this.renderAccount()
     );
   }
 
   renderAccount() {
+    const info = this.state.getAccount;
     if (
       !this.state.loggedIn &&
       this.props.cookies.get("account") === this.props.match.params.id
     )
       this.setState({
         loggedIn: (
-          <Link onClick={() => this.logOut()}>
-            <button>Log Out</button>
-          </Link>
+          <div>
+            Edit suggested choices:
+            {info.suggestedChoices.map((choice) => (
+              <Link to={`/editchoice/${choice.ID}`}>
+                <button>
+                  {choice.from.title} -({choice.action})-> {choice.to.title}
+                </button>
+              </Link>
+            ))}
+            <br />
+            <Link onClick={() => this.logOut()}>
+              <button>Log Out</button>
+            </Link>
+          </div>
         ),
       });
-    const info = this.state.getAccount;
     return (
       <div>
         <h1>{info.screenName}</h1>
-        {this.state.loggedIn ? this.state.loggedIn : ""}
         <p>
           Nodes:
           {info.nodes.map((node) => (
@@ -45,14 +57,10 @@ class Account extends CallableComponent {
           ))}
         </p>
         <p>
-          Suggested Choices:
-          {info.suggestedChoices.map((choice) => (
-            <button>
-              {choice.from.title} -({choice.action})-> {choice.to.title}
-            </button>
-          ))}
+          Total Node Views:
+          {info.totalNodeViews}
         </p>
-        <p></p>
+        {this.state.loggedIn ? this.state.loggedIn : ""}
       </div>
     );
   }
