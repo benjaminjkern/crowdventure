@@ -119,29 +119,27 @@ class Choice extends CallableComponent {
         <br />
         <button
           onClick={() => this.dislike()}
-          class="like-btn"
-          disabled={
-            !this.props.account ||
-            choice.dislikedBy.some((elem) => elem.ID === this.props.account)
-          }
-        >
-          <span role="img" aria-label="thumbs down">
-            👎
-          </span>
-        </button>
+          class="fa fa-thumbs-down"
+          style={{
+            color: choice.dislikedBy.some(
+              (elem) => elem.ID === this.props.account
+            )
+              ? "red"
+              : "black",
+          }}
+          disabled={!this.props.account}
+        ></button>
         {" " + choice.score + " "}
         <button
           onClick={() => this.like()}
-          class="like-btn"
-          disabled={
-            !this.props.account ||
-            choice.likedBy.some((elem) => elem.ID === this.props.account)
-          }
-        >
-          <span role="img" aria-label="thumbs up">
-            👍
-          </span>
-        </button>
+          class="fa fa-thumbs-up"
+          style={{
+            color: choice.likedBy.some((elem) => elem.ID === this.props.account)
+              ? "green"
+              : "black",
+          }}
+          disabled={!this.props.account}
+        ></button>
       </div>
     );
   }

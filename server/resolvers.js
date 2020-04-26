@@ -330,8 +330,13 @@ const resolvers = {
             delete choice.dislikedBy[account.ID];
             delete account.disliked[choice.ID];
 
-            choice.likedBy[account.ID] = account.ID;
-            account.liked[choice.ID] = choice.ID;
+            if (!choice.likedBy[account.ID]) {
+                choice.likedBy[account.ID] = account.ID;
+                account.liked[choice.ID] = choice.ID;
+            } else {
+                delete choice.likedBy[account.ID];
+                delete account.liked[choice.ID];
+            }
             databaseCalls.addAccount(account);
             return databaseCalls.addChoice(choice);
         },
@@ -344,8 +349,13 @@ const resolvers = {
             delete choice.likedBy[account.ID];
             delete account.liked[choice.ID];
 
-            choice.dislikedBy[account.ID] = account.ID;
-            account.disliked[choice.ID] = choice.ID;
+            if (!choice.dislikedBy[account.ID]) {
+                choice.dislikedBy[account.ID] = account.ID;
+                account.disliked[choice.ID] = choice.ID;
+            } else {
+                delete choice.dislikedBy[account.ID];
+                delete account.disliked[choice.ID];
+            }
             databaseCalls.addAccount(account);
             return databaseCalls.addChoice(choice);
         },
