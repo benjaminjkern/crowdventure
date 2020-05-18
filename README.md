@@ -1,3 +1,5 @@
+![Logo](Logo.png)
+
 # Crowdventure
 
 > By Ben Kern
