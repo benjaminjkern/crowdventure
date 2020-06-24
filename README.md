@@ -16,7 +16,7 @@ Crowdventure is a web-based and dynamically crowd-sourced Create-Your-Own-Advent
 
 ## What's new
 
-- The website is up! <benjaminjkern.github.io/crowdventure>
+- The website is up! <https://benjaminjkern.github.io/crowdventure>
 - Database working!
 - Backend working!
 
