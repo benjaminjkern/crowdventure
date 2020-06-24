@@ -1,0 +1,2 @@
+(this.webpackJsonpclient=this.webpackJsonpclient||[]).push([[0],{10:function(e,t,n){"use strict";n.r(t);var a=n(0),c=n.n(a),r=n(2),o=n.n(r),l=function(){return c.a.createElement("div",null,"Crowdventure is down. Check back later.")},u=(n(8),(0,n(11).createApolloFetch)({uri:"https://3yfp7ejc0m.execute-api.us-east-1.amazonaws.com/dev/graphql"}));o.a.render(c.a.createElement(l,null),document.getElementById("root"));t.default=u},3:function(e,t,n){e.exports=n(10)}},[[3,1,2]]]);
+//# sourceMappingURL=main.63ed86f9.chunk.js.map
