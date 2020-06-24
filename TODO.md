@@ -1,13 +1,3 @@
-# MVP TODO
-
-1. Put server and database onto aws
-2. Put client onto github.io
-3. Escaping text security
-4. Edit choice
-5. Suggesting/Editing Choice search for node
-6. Make backend cleaner to work in the cool async way so the database works
-7. Delete Nodes from account page
-
 # Non-essential cool features
 
 1. Account bios and profile pictures also a default profile picture
@@ -22,7 +12,14 @@
 10. Featured pages at home screen really truly only shows featured pages
 11. Hide Nodes instead of deleting them, make them private
 
-# Bugs
+# Bugs / Unwanted features
 
 1. Views just increment whenever a page's content is loaded
 2. I am not sure how to get around the fact that graphql forces you to not use " like in any capacity. Actually I have some ideas but I will figure it out later. Right now it just doesnt let you input " anywhere. Not really a bug but definitely a feature I would like fleshed out more
+3. Not all text boxes are escaped properly
+4. Edit choice button doesnt work
+5. Report button doesnt work
+6. Suggesting/Editing Choice should allow you to search for a node
+7. The account page should have options on each node
+8. Account is stored via a COOKIE and that needs to be fixed
+9. The home page should have a real list of featured pages, or at least sort and show the most viewed ones

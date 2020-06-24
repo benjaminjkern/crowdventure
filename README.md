@@ -16,24 +16,15 @@ Crowdventure is a web-based and dynamically crowd-sourced Create-Your-Own-Advent
 
 ## What's new
 
-- There is a (somewhat) working frontend! It allows you to:
-  - Navigate the website from situation to situation
-  - Log in and suggest and create new situations
-  - View your account details
-- Some fixes to backend calls that weren't entirely functional before, but they are now
-
-## Big picture To do's
-
-- An actual good looking Front end!
-- Get the database up and running!
-- Get a domain!
-- Get a logo!
+- The website is up! <benjaminjkern.github.io/crowdventure>
+- Database working!
+- Backend working!
 
 ## Potential Features that I think might be cool to add eventually
 
 - Ad- or donation-based revenue to be able to have the website support itself
 - Power to the users to create intricate designs on their node pages
-- Save information within the user that can be read by nodes, giving node creators far more power to make interesting games
+- Save information variables that can be read by nodes, giving node creators far more power to make interesting games
 - Randomize function that takes you down a random path, just for fun
 
 [Documentation repo](https://github.com/benjaminjkern/cmsi-402-senior-project-lab)
