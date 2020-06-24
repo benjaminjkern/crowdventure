@@ -1,6 +1,6 @@
 import React from "react";
 import CallableComponent from "./CallableComponent";
-import { Link } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
 class EditNode extends CallableComponent {
   makeNonCanon(choiceID) {
@@ -26,9 +26,18 @@ class EditNode extends CallableComponent {
 
   handleSubmit() {
     const node = this.state.getNode;
-    this.mutate([
-      `editNode(nodeID:"${this.props.match.params.id}",title:"${node.title}",content:"${node.content}"){ID}`,
-    ]);
+    if (!node.title)
+      this.setState({
+        warning: "Your page needs a title!",
+      });
+    else {
+      this.mutate([
+        `editNode(nodeID:"${this.props.match.params.id}",title:"${node.title}",content:"${node.content}"){ID}`,
+      ]);
+      this.setState({
+        redirect: <Redirect to={`/node/${this.props.match.params.id}`} />,
+      });
+    }
   }
 
   render() {
@@ -43,13 +52,13 @@ class EditNode extends CallableComponent {
 
   renderEditNode() {
     const node = this.state.getNode;
-    if (this.state.validated === undefined)
+    if (this.props.cookies.get("account") !== node.owner.ID)
       this.setState({
-        validated: this.props.cookies.get("account") === node.owner.ID,
+        error: "You are not the owner of this page, so you cannot edit it!",
       });
-    return this.state.validated ? (
+    return this.doRender(
+      "Editing node",
       <div>
-        <h1>Editing node</h1>
         <p>
           Title:
           <input
@@ -82,15 +91,9 @@ class EditNode extends CallableComponent {
             </button>
           ))}
         </p>
-        <Link
-          onClick={() => this.handleSubmit()}
-          to={`/node/${this.props.match.params.id}`}
-        >
-          <button>Submit</button>
-        </Link>
+        <button onClick={() => this.handleSubmit()}>Submit</button>
+        {this.state.redirect ? this.state.redirect : ""}
       </div>
-    ) : (
-      "You are not the owner of this node, and you cannot edit it"
     );
   }
 }

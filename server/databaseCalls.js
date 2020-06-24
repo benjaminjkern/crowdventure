@@ -2,118 +2,118 @@
 // const NODES = require("./mock-data/mockNodes.js").MOCK_NODES;
 // const CHOICES = require("./mock-data/mockChoices.js").MOCK_CHOICES;
 
-const fs = require("fs");
+const AWS = require("aws-sdk");
+AWS.config.update({ region: "us-east-1" });
+const docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
 
-let ACCOUNTS, NODES, CHOICES;
-
-fs.readFile("./mock-data/mockAccounts.json", (err, data) => {
-    if (err) throw err;
-    ACCOUNTS = JSON.parse(data);
-});
-fs.readFile("./mock-data/mockNodes.json", (err, data) => {
-    if (err) throw err;
-    NODES = JSON.parse(data);
-});
-fs.readFile("./mock-data/mockChoices.json", (err, data) => {
-    if (err) throw err;
-    CHOICES = JSON.parse(data);
-});
+const ACCOUNT_TABLE = "Accounts";
+const NODE_TABLE = "Nodes";
+const CHOICE_TABLE = "Choices";
 
 const databaseCalls = {
-    allAccounts: () => {
+    allAccounts: async() => {
         console.log(`DATABASE: CALLING ALL ACCOUNTS`);
-        return ACCOUNTS;
+        return await getFullTable(ACCOUNT_TABLE);
     },
-    allNodes: () => {
+    allNodes: async() => {
         console.log(`DATABASE: CALLING ALL NODES`);
-        return NODES;
+        return await getFullTable(NODE_TABLE);
     },
-    allChoices: () => {
+    allChoices: async() => {
         console.log(`DATABASE: CALLING ALL CHOICES`);
-        return CHOICES;
+        return await getFullTable(CHOICE_TABLE);
     },
-    getAccount: accountID => {
-        console.log(`DATABASE: CALLING ACCOUNT (ID: ${accountID})`);
-        return ACCOUNTS[accountID];
+    getAccount: async(accountScreenName) => {
+        console.log(
+            `DATABASE: CALLING ACCOUNT (SCREEN NAME: ${accountScreenName})`
+        );
+        return await getItem(ACCOUNT_TABLE, { screenName: accountScreenName });
     },
-    getNode: nodeID => {
+    getNode: async(nodeID) => {
         console.log(`DATABASE: CALLING NODE (ID: ${nodeID})`);
-        return NODES[nodeID];
+        return await getItem(NODE_TABLE, { ID: nodeID });
     },
-    getChoice: choiceID => {
+    getChoice: async(choiceID) => {
         console.log(`DATABASE: CALLING CHOICE (ID: ${choiceID})`);
-        return CHOICES[choiceID];
+        return await getItem(CHOICE_TABLE, { ID: choiceID });
     },
-    addAccount: account => {
-        console.log(`DATABASE: ADDING NEW ACCOUNT (ID: ${account.ID})`);
-        ACCOUNTS[account.ID] = account;
-
-        fs.writeFile(
-            "./mock-data/mockAccounts.json",
-            JSON.stringify(ACCOUNTS),
-            err => {
-                if (err) throw err;
-            }
+    addAccount: async(account) => {
+        console.log(
+            `DATABASE: ADDING NEW ACCOUNT (SCREEN NAME: ${account.screenName})`
         );
-
-        return account;
+        return await addItem(ACCOUNT_TABLE, account);
     },
-    addNode: node => {
+    addNode: async(node) => {
         console.log(`DATABASE: ADDING NEW NODE (ID: ${node.ID})`);
-        NODES[node.ID] = node;
-
-        fs.writeFile("./mock-data/mockNodes.json", JSON.stringify(NODES), err => {
-            if (err) throw err;
-        });
-
-        return node;
+        return await addItem(NODE_TABLE, node);
     },
-    addChoice: choice => {
+    addChoice: async(choice) => {
         console.log(`DATABASE: ADDING NEW CHOICE (ID: ${choice.ID})`);
-        CHOICES[choice.ID] = choice;
-
-        fs.writeFile(
-            "./mock-data/mockChoices.json",
-            JSON.stringify(CHOICES),
-            err => {
-                if (err) throw err;
-            }
-        );
-
-        return choice;
+        return await addItem(CHOICE_TABLE, choice);
     },
-    removeAccount: accountID => {
-        console.log(`DATABASE: REMOVING ACCOUNT (ID: ${accountID})`);
-        delete ACCOUNTS[accountID];
-
-        fs.writeFile(
-            "./mock-data/mockAccounts.json",
-            JSON.stringify(ACCOUNTS),
-            err => {
-                if (err) throw err;
-            }
+    removeAccount: async(accountScreenName) => {
+        console.log(
+            `DATABASE: REMOVING ACCOUNT (SCREEN NAME: ${accountScreenName})`
         );
+        return await removeItem(ACCOUNT_TABLE, { screenName: accountScreenName });
     },
-    removeNode: nodeID => {
+    removeNode: async(nodeID) => {
         console.log(`DATABASE: REMOVING NODE (ID: ${nodeID})`);
-        delete NODES[nodeID];
-
-        fs.writeFile("./mock-data/mockNodes.json", JSON.stringify(NODES), err => {
-            if (err) throw err;
-        });
+        return await removeItem(NODE_TABLE, { ID: nodeID });
     },
-    removeChoice: choiceID => {
+    removeChoice: async(choiceID) => {
         console.log(`DATABASE: REMOVING CHOICE (ID: ${choiceID})`);
-        delete CHOICES[choiceID];
-
-        fs.writeFile(
-            "./mock-data/mockChoices.json",
-            JSON.stringify(CHOICES),
-            err => {
-                if (err) throw err;
-            }
-        );
-    }
+        return await removeItem(CHOICE_TABLE, { ID: choiceID });
+    },
 };
+
+const getFullTable = async(tableName, lastEvaluatedKey) => {
+    let items = await docClient
+        .scan({
+            TableName: tableName,
+            ExclusiveStartKey: lastEvaluatedKey,
+        })
+        .promise()
+        .catch((err) => console.log(err));
+
+    if (items.LastEvaluatedKey === undefined) return items.Items;
+    return [
+        ...items.Items,
+        ...(await scanTable(tableName, items.LastEvaluatedKey)),
+    ];
+};
+
+const getItem = async(tableName, key) =>
+    await docClient
+    .get({
+        TableName: tableName,
+        Key: key,
+    })
+    .promise()
+    .then((data) => data.Item)
+    .catch((err) => {
+        console.log(err);
+        return err;
+    });
+
+const addItem = async(tableName, item) =>
+    await docClient
+    .put({ TableName: tableName, Item: item })
+    .promise()
+    .then(() => item)
+    .catch((err) => {
+        console.log(err);
+        return err;
+    });
+
+const removeItem = async(tableName, key) =>
+    await docClient
+    .delete({ TableName: tableName, Key: key })
+    .promise()
+    .then(() => true)
+    .catch((err) => {
+        console.log(err);
+        return err;
+    });
 
 module.exports = { databaseCalls };

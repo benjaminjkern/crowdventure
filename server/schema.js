@@ -1,10 +1,10 @@
-const { ApolloServer, gql, UserInputError } = require(require("./server.js")
-    .serverType);
+const { gql } = require("apollo-server-lambda");
 
 const typeDefs = gql `
   type Account {
-    ID: String!
     screenName: String!
+    bio: String
+    profilePicURL: String
 
     nodes: [Node!]
     suggestedChoices: [Choice!]
@@ -21,6 +21,10 @@ const typeDefs = gql `
     content: String!
     views: Int!
 
+    pictureURL: String
+    bgColor: Int!
+    fgColor: Int!
+
     owner: Account!
     canonChoices: [Choice!]
     nonCanonChoices: [Choice!]
@@ -34,7 +38,7 @@ const typeDefs = gql `
     dislikedBy: [Account!]
 
     from: Node!
-    to: Node!
+    to: Node
     suggestedBy: Account!
 
     likes: Int!
@@ -47,7 +51,7 @@ const typeDefs = gql `
     allNodes: [Node!]
     allChoices: [Choice!]
 
-    getAccount(ID: String!): Account
+    getAccount(screenName: String!, password: String): Account
     getNode(ID: String!): Node
     getChoice(ID: String!): Choice
 
@@ -57,16 +61,40 @@ const typeDefs = gql `
   }
 
   type Mutation {
-    createAccount(screenName: String!): Account
-    deleteAccount(accountID: String!): Boolean
+    createAccount(
+      screenName: String!
+      password: String!
+      bio: String
+      profilePicURL: String
+    ): Account
+    deleteAccount(screenName: String!): Boolean
+    editAccount(
+      screenName: String!
+      password: String
+      bio: String
+      profilePic: String
+    ): Account
 
-    createNode(accountID: String!, title: String!, content: String!): Node
+    createNode(
+      accountScreenName: String!
+      title: String!
+      content: String!
+      pictureURL: String
+      bgColor: Int
+      fgColor: Int
+    ): Node
     deleteNode(nodeID: String!): Boolean
-    editNode(nodeID: String!, title: String, content: String): Node
-    deleteEmptyNodes: Boolean
+    editNode(
+      nodeID: String!
+      title: String
+      content: String
+      pictureURL: String
+      bgColor: Int
+      fgColor: Int
+    ): Node
 
     suggestChoice(
-      accountID: String!
+      accountScreenName: String!
       fromID: String!
       action: String!
       toID: String!
@@ -77,8 +105,8 @@ const typeDefs = gql `
     makeCanon(choiceID: String!): Choice
     makeNonCanon(choiceID: String!): Choice
 
-    likeSuggestion(accountID: String!, choiceID: String!): Choice
-    dislikeSuggestion(accountID: String!, choiceID: String!): Choice
+    likeSuggestion(accountScreenName: String!, choiceID: String!): Choice
+    dislikeSuggestion(accountScreenName: String!, choiceID: String!): Choice
   }
 `;
 

@@ -1,53 +1,62 @@
 const { databaseCalls } = require("./databaseCalls.js");
+const { UserInputError } = require("apollo-server-lambda");
 
 /*
  * Resolvers/endpoints for all GQL typeDefs
  */
 
+// ABSOLUTELY FIX THIS AT SOME POINT BUT WHATEVER
+const encrypt = (word) => word;
+
 const resolvers = {
     Account: {
-        nodes: (parent, args, context, info) => {
-            console.log(
-                `Retrieving nodes owned by ${parent.ID} (${parent.screenName})`
+        nodes: async(parent, args, context, info) => {
+            console.log(`Retrieving nodes owned by ${parent.screenName}`);
+            return await Promise.all(
+                parent.nodes.map((id) => databaseCalls.getNode(id))
             );
-            return parent.nodes.map((id) => databaseCalls.getNode(id));
         },
-        suggestedChoices: (parent, args, context, info) => {
-            console.log(
-                `Retrieving choices suggested by ${parent.ID} (${parent.screenName})`
+        suggestedChoices: async(parent, args, context, info) => {
+            console.log(`Retrieving choices suggested by ${parent.screenName}`);
+            return await Promise.all(
+                parent.suggestedChoices.map((id) => databaseCalls.getChoice(id))
             );
-            return parent.suggestedChoices.map((id) => databaseCalls.getChoice(id));
         },
-        totalNodeViews: (parent, args, context, info) => {
+        totalNodeViews: async(parent, args, context, info) => {
             console.log(
-                `Retrieving total views of all nodes owned by ${parent.ID} (${parent.screenName})`
+                `Retrieving total views of all nodes owned by ${parent.screenName}`
             );
-            return parent.nodes
-                .map((id) => databaseCalls.getNode(id).views)
-                .reduce((x, y) => x + y, 0);
+            return await Promise.all(
+                parent.nodes.map((id) => databaseCalls.getNode(id))
+            ).then((nodes) =>
+                nodes.map((node) => node.views).reduce((x, y) => x + y, 0)
+            );
         },
-        totalSuggestionScore: (parent, args, context, info) => {
+        totalSuggestionScore: async(parent, args, context, info) => {
             console.log(
-                `Retrieving total score of all choices suggested by ${parent.ID} (${parent.screenName})`
+                `Retrieving total score of all choices suggested by ${parent.screenName}`
             );
             return parent.suggestedChoices ?
-                parent.suggestedChoices
-                .map((id) => resolvers.Choice.score(databaseCalls.getChoice(id)))
-                .reduce((x, y) => x + y, 0) :
+                await Promise.all(
+                    parent.suggestedChoices.map((id) => databaseCalls.getChoice(id))
+                ).then((choices) =>
+                    choices
+                    .map((choice) => resolvers.Choice.score(choice))
+                    .reduce((x, y) => x + y, 0)
+                ) :
                 0;
         },
-        liked: (parent, args, context, info) => {
-            console.log(
-                `Retrieving all nodes liked by ${parent.ID} (${parent.screenName})`
+        // honestly I dont think I'll need these two but whatever
+        liked: async(parent, args, context, info) => {
+            console.log(`Retrieving all nodes liked by ${parent.screenName}`);
+            return await Promise.all(
+                Object.keys(parent.liked).map((id) => databaseCalls.getNode(id))
             );
-            return Object.keys(parent.liked).map((id) => databaseCalls.getNode(id));
         },
-        disliked: (parent, args, context, info) => {
-            console.log(
-                `Retrieving all nodes disliked by ${parent.ID} (${parent.screenName})`
-            );
-            return Object.keys(parent.disliked).map((id) =>
-                databaseCalls.getNode(id)
+        disliked: async(parent, args, context, info) => {
+            console.log(`Retrieving all nodes disliked by ${parent.screenName}`);
+            return await Promise.all(
+                Object.keys(parent.disliked).map((id) => databaseCalls.getNode(id))
             );
         },
     },
@@ -55,43 +64,48 @@ const resolvers = {
         content: (parent, args, context, info) => {
             parent.views++;
             databaseCalls.addNode(parent);
-            return parent.content;
+            return parent.content; // I dont think I need to await anything ehre because content is always within scope,
+            // though this is not checking to make sure that it actually adds the parent back into the system
         },
-        owner: (parent, args, context, info) => {
+        owner: async(parent, args, context, info) => {
             console.log(`Retrieving owner of node ${parent.ID} (${parent.title})`);
-            return databaseCalls.getAccount(parent.owner);
+            return await databaseCalls.getAccount(parent.owner);
         },
-        canonChoices: (parent, args, context, info) => {
+        canonChoices: async(parent, args, context, info) => {
             console.log(
                 `Retrieving all canon choices from node ${parent.ID} (${parent.title})`
             );
-            return parent.canonChoices.map((id) => databaseCalls.getChoice(id));
+            return await Promise.all(
+                parent.canonChoices.map((id) => databaseCalls.getChoice(id))
+            );
         },
-        nonCanonChoices: (parent, args, context, info) => {
+        nonCanonChoices: async(parent, args, context, info) => {
             console.log(
                 `Retrieving all non-canon choices from node ${parent.ID} (${parent.title})`
             );
-            return parent.nonCanonChoices.map((id) => databaseCalls.getChoice(id));
+            return await Promise.all(
+                parent.nonCanonChoices.map((id) => databaseCalls.getChoice(id))
+            );
         },
     },
     Choice: {
-        from: (parent, args, context, info) => {
+        from: async(parent, args, context, info) => {
             console.log(
                 `Retrieving node from which choice ${parent.ID} (${parent.action}) was suggested`
             );
-            return databaseCalls.getNode(parent.from);
+            return await databaseCalls.getNode(parent.from);
         },
-        to: (parent, args, context, info) => {
+        to: async(parent, args, context, info) => {
             console.log(
                 `Retrieving node that a choice ${parent.ID} (${parent.action}) goes to`
             );
-            return databaseCalls.getNode(parent.to);
+            return await databaseCalls.getNode(parent.to);
         },
-        suggestedBy: (parent, args, context, info) => {
+        suggestedBy: async(parent, args, context, info) => {
             console.log(
                 `Retrieving account that suggested choice ${parent.ID} (${parent.action})`
             );
-            return databaseCalls.getAccount(parent.suggestedBy);
+            return await databaseCalls.getAccount(parent.suggestedBy);
         },
         likes: (parent, args, context, info) => {
             console.log(`Retrieving likes of choice ${parent.ID} (${parent.action})`);
@@ -107,69 +121,101 @@ const resolvers = {
             console.log(`Retrieving score of choice ${parent.ID} (${parent.action})`);
             return resolvers.Choice.likes(parent) - resolvers.Choice.dislikes(parent);
         },
-        likedBy: (parent, args, context, info) => {
+        likedBy: async(parent, args, context, info) => {
             console.log(
                 `Retrieving all accounts that liked ${parent.ID} (${parent.action})`
             );
-            return Object.keys(parent.likedBy).map((accountID) =>
-                databaseCalls.getAccount(accountID)
+            return await Promise.all(
+                Object.keys(parent.likedBy).map((accountScreenName) =>
+                    databaseCalls.getAccount(accountScreenName)
+                )
             );
         },
-        dislikedBy: (parent, args, context, info) => {
+        dislikedBy: async(parent, args, context, info) => {
             console.log(
                 `Retrieving all accounts that disliked ${parent.ID} (${parent.action})`
             );
-            return Object.keys(parent.dislikedBy).map((accountID) =>
-                databaseCalls.getAccount(accountID)
+            return await Promise.all(
+                Object.keys(parent.dislikedBy).map((accountScreenName) =>
+                    databaseCalls.getAccount(accountScreenName)
+                )
             );
         },
     },
     Query: {
-        allAccounts: () => Object.values(databaseCalls.allAccounts()),
-        allNodes: () => Object.values(databaseCalls.allNodes()),
-        allChoices: () => Object.values(databaseCalls.allChoices()),
-        getAccount: (parent, args, context, info) =>
-            databaseCalls.getAccount(args.ID),
-        getNode: (parent, args, context, info) => databaseCalls.getNode(args.ID),
-        getChoice: (parent, args, context, info) =>
-            databaseCalls.getChoice(args.ID),
-        searchAccounts: (parent, args, context, info) => {
+        allAccounts: async() => await databaseCalls.allAccounts(),
+        allNodes: async() => await databaseCalls.allNodes(),
+        allChoices: async() => await databaseCalls.allChoices(),
+        getAccount: async(parent, args, context, info) => {
+            let fullAccount = {
+                ...(await databaseCalls.getAccount(args.screenName)),
+            };
+            if (
+                args.password &&
+                encrypt(args.password) !== fullAccount.encryptedPassword
+            )
+                return null;
+            delete fullAccount.encryptedPassword;
+            return fullAccount;
+        },
+        getNode: async(parent, args, context, info) =>
+            await databaseCalls.getNode(args.ID),
+        getChoice: async(parent, args, context, info) =>
+            await databaseCalls.getChoice(args.ID),
+        searchAccounts: async(parent, args, context, info) => {
+            // these can absolutely be made better than just grabbing the entire database and searching here
             console.log(`Searching for ${args.type}: ${args.query} in accounts`);
             if (!args.query) return [];
-            return Object.values(databaseCalls.allAccounts()).filter((account) =>
+            return (await databaseCalls.allAccounts()).filter((account) =>
                 account[args.type].toLowerCase().includes(args.query.toLowerCase())
             );
         },
-        searchNodes: (parent, args, context, info) => {
+        searchNodes: async(parent, args, context, info) => {
             console.log(`Searching for ${args.type}: ${args.query} in nodes`);
             if (!args.query) return [];
-            return Object.values(databaseCalls.allNodes()).filter((node) =>
+            return (await databaseCalls.allNodes()).filter((node) =>
                 node[args.type].toLowerCase().includes(args.query.toLowerCase())
             );
         },
-        searchChoices: (parent, args, context, info) => {
+        searchChoices: async(parent, args, context, info) => {
             console.log(`Searching for ${args.type}: ${args.query} in choices`);
             if (!args.query) return [];
-            return Object.values(databaseCalls.allChoices()).filter((choice) =>
+            return (await databaseCalls.allChoices()).filter((choice) =>
                 choice[args.type].toLowerCase().includes(args.query.toLowerCase())
             );
         },
     },
     Mutation: {
-        createAccount: (parent, args, context, info) => {
+        createAccount: async(parent, args, context, info) => {
             console.log(`Creating new account with name ${args.screenName}`);
-            return databaseCalls.addAccount({
-                ID: Math.random().toString(36).substring(2, 12),
+            if (!args.screenName)
+                throw new UserInputError(`ScreenName cannot be empty!`, {
+                    invalidArgs: Object.keys(args),
+                });
+            if (!args.password)
+                throw new UserInputError(`Password cannot be empty!`, {
+                    invalidArgs: Object.keys(args),
+                });
+            if (await databaseCalls.getAccount(args.screenName))
+                throw new UserInputError(`That screen name already exists!`, {
+                    invalidArgs: Object.keys(args),
+                });
+            return await databaseCalls.addAccount({
                 screenName: args.screenName,
+                bio: args.bio,
+                encryptedPassword: encrypt(args.password),
+                profilePicURL: args.profilePicURL,
                 nodes: [],
                 suggestedChoices: [],
                 liked: {},
                 disliked: {},
             });
         },
-        deleteAccount: (parent, args, context, info) => {
-            let account = databaseCalls.getAccount(args.accountID);
-            console.log(`Deleting Account ${account.ID} (${account.screenName})`);
+        deleteAccount: async(parent, args, context, info) => {
+            let account = await databaseCalls.getAccount(args.screenName);
+            console.log(`Deleting Account ${account.screenName}`);
+            // again, not really checking or caring if these work for now
+            // I only care about it not returning promises for now
             account.suggestedChoices.forEach((choiceID) =>
                 resolvers.Mutation.removeSuggestion(undefined, { choiceID })
             );
@@ -177,29 +223,50 @@ const resolvers = {
                 resolvers.Mutation.deleteNode(undefined, { nodeID })
             );
 
-            databaseCalls.removeAccount(account.ID);
+            return await databaseCalls.removeAccount(account.screenName);
         },
-        createNode: (parent, args, context, info) => {
-            let account = databaseCalls.getAccount(args.accountID);
+        editAccount: async(parent, args, context, info) => {
+            let account = await databaseCalls.getAccount(args.screenName);
+            console.log(`Editing Account ${account.screenName}`);
+
+            if (args.password) account.encryptedPassword = encrypt(args.password);
+            if (args.bio) account.bio = args.bio;
+            if (args.profilePicURL) account.profilePicURL = args.profilePicURL;
+
+            return await databaseCalls.addAccount(account);
+        },
+        createNode: async(parent, args, context, info) => {
+            let account = await databaseCalls.getAccount(args.accountScreenName);
             console.log(
-                `Creating new node with title ${args.title} and owner ${account.ID} (${account.screenName})`
+                `Creating new node with title ${args.title} and owner ${account.screenName}`
             );
+            if (!args.title)
+                throw new UserInputError(`Title cannot be empty!`, {
+                    invalidArgs: Object.keys(args),
+                });
+            if (!args.content)
+                throw new UserInputError(`Content cannot be empty!`, {
+                    invalidArgs: Object.keys(args),
+                });
             let newNode = {
-                ID: Math.random().toString(36).substring(2, 6).toUpperCase(),
-                owner: args.accountID,
+                ID: Math.random().toString(36).substring(2, 12).toUpperCase(),
+                owner: args.accountScreenName,
                 title: args.title,
                 content: args.content,
+                pictureURL: args.pictureURL,
+                fgColor: args.fgColor || "black",
+                bgColor: args.fgColor || "white",
                 views: 0,
                 canonChoices: [],
                 nonCanonChoices: [],
             };
             account.nodes.push(newNode.ID);
             databaseCalls.addAccount(account);
-            return databaseCalls.addNode(newNode);
+            return await databaseCalls.addNode(newNode);
         },
-        deleteNode: (parent, args, context, info) => {
-            let node = databaseCalls.getNode(args.nodeID);
-            let account = databaseCalls.getAccount(node.owner);
+        deleteNode: async(parent, args, context, info) => {
+            let node = await databaseCalls.getNode(args.nodeID);
+            let account = await databaseCalls.getAccount(node.owner);
 
             console.log(`Deleting node ${node.ID} (${node.title})`);
 
@@ -210,84 +277,96 @@ const resolvers = {
                 resolvers.Mutation.removeSuggestion(undefined, { choiceID })
             );
 
-            databaseCalls.removeNode(node.ID);
+            if (account) {
+                account.nodes = account.nodes.filter((nodeID) => nodeID !== node.ID);
+                databaseCalls.addAccount(account);
+            }
 
-            account.nodes = account.nodes.filter((nodeID) => nodeID !== node.ID);
-            databaseCalls.addAccount(account);
+            return await databaseCalls.removeNode(node.ID);
         },
-        editNode: (parent, args, context, info) => {
-            let node = databaseCalls.getNode(args.nodeID);
+        editNode: async(parent, args, context, info) => {
+            let node = await databaseCalls.getNode(args.nodeID);
 
             console.log(`Editing node ${node.ID} (${node.title})`);
 
             if (args.title) node.title = args.title;
             if (args.content) node.content = args.content;
+            if (args.pictureURL) node.pictureURL = args.pictureURL;
+            if (args.bgColor) node.bgColor = args.bgColor;
+            if (args.fgColor) node.fgColor = args.fgColor;
 
-            return databaseCalls.addNode(node);
+            return await databaseCalls.addNode(node);
         },
-        deleteEmptyNodes: (parent, args, context, info) => {
-            console.log(`Deleting all empty nodes`);
-            const nodes = Object.values(databaseCalls.allNodes());
-            nodes.forEach((node) => {
-                if (!node.title && !node.content)
-                    resolvers.Mutation.deleteNode(undefined, { nodeID: node.ID });
-            });
-            return true;
-        },
-        suggestChoice: (parent, args, context, info) => {
-            let account = databaseCalls.getAccount(args.accountID);
-            let node = databaseCalls.getNode(args.fromID);
-            let toNode = databaseCalls.getNode(args.toID);
+        suggestChoice: async(parent, args, context, info) => {
+            let account = await databaseCalls.getAccount(args.accountScreenName);
+            let node = await databaseCalls.getNode(args.fromID);
+            let toNode = await databaseCalls.getNode(args.toID);
 
             console.log(
-                `${account.ID} (${account.screenName}) is suggesting a new choice (${args.action}) to node ${node.ID} (${node.title}), which goes to node ${toNode.ID} (${toNode.title})`
+                `${account.screenName} is suggesting a new choice (${args.action}) to node ${node.ID} (${node.title}), which goes to node ${toNode.ID} (${toNode.title})`
             );
+            if (!args.action)
+                throw new UserInputError(`Action cannot be empty!`, {
+                    invalidArgs: Object.keys(args),
+                });
 
             let newChoice = {
-                ID: `${node.ID}-${Math.random().toString().substring(2, 6)}`,
+                ID: `${node.ID}-${Math.random().toString(36).substring(2, 12)}`,
                 from: node.ID,
                 action: args.action,
                 to: toNode.ID,
                 likedBy: {},
                 dislikedBy: {},
-                suggestedBy: account.ID,
+                suggestedBy: account.screenName,
             };
 
             account.suggestedChoices.push(newChoice.ID);
 
-            if (account.ID === node.owner) node.canonChoices.push(newChoice.ID);
+            if (account.screenName === node.owner)
+                node.canonChoices.push(newChoice.ID);
             else node.nonCanonChoices.push(newChoice.ID);
 
             databaseCalls.addAccount(account);
             databaseCalls.addNode(node);
-            return databaseCalls.addChoice(newChoice);
+            return await databaseCalls.addChoice(newChoice);
         },
-        editSuggestion: (parent, args, context, info) => {
-            let choice = databaseCalls.getChoice(args.choiceID);
+        editSuggestion: async(parent, args, context, info) => {
+            let choice = await databaseCalls.getChoice(args.choiceID);
 
             console.log(`Editing suggestion ${choice.ID} (${choice.action})`);
 
             if (args.toID) choice.toID = args.toID;
             if (args.action) choice.action = args.action;
 
-            return databaseCalls.addChoice(choice);
+            return await databaseCalls.addChoice(choice);
         },
-        removeSuggestion: (parent, args, context, info) => {
-            let choice = databaseCalls.getChoice(args.choiceID);
-            let account = databaseCalls.getAccount(choice.suggestedBy);
+        removeSuggestion: async(parent, args, context, info) => {
+            let choice = await databaseCalls.getChoice(args.choiceID);
+            let account = await databaseCalls.getAccount(choice.suggestedBy);
+            let node = await databaseCalls.getNode(choice.from);
 
             console.log(`Removing suggestion ${choice.ID} (${choice.action})`);
 
-            account.suggestedChoices = account.suggestedChoices.filter(
-                (choiceID) => choiceID !== choice.ID
-            );
-
-            databaseCalls.addAccount(account);
-            databaseCalls.removeChoice(choice.ID);
+            if (account) {
+                account.suggestedChoices = account.suggestedChoices.filter(
+                    (choiceID) => choiceID !== choice.ID
+                );
+                databaseCalls.addAccount(account);
+            }
+            if (node) {
+                node.canonChoices = node.canonChoices.filter(
+                    (choiceID) => choiceID !== choice.ID
+                );
+                node.nonCanonChoices = node.nonCanonChoices.filter(
+                    (choiceID) => choiceID !== choice.ID
+                );
+                databaseCalls.addNode(node);
+            }
+            return await databaseCalls.removeChoice(choice.ID);
         },
-        makeCanon: (parent, args, context, info) => {
-            let choice = databaseCalls.getChoice(args.choiceID);
-            let node = databaseCalls.getNode(choice.from);
+        makeCanon: async(parent, args, context, info) => {
+            let choice = await databaseCalls.getChoice(args.choiceID);
+            let node = await databaseCalls.getNode(choice.from);
 
             console.log(
                 `Making choice ${choice.ID} (${choice.action}) in node ${node.ID} (${node.title}) canon`
@@ -304,9 +383,9 @@ const resolvers = {
             databaseCalls.addNode(node);
             return choice;
         },
-        makeNonCanon: (parent, args, context, info) => {
-            let choice = databaseCalls.getChoice(args.choiceID);
-            let node = databaseCalls.getNode(choice.from);
+        makeNonCanon: async(parent, args, context, info) => {
+            let choice = await databaseCalls.getChoice(args.choiceID);
+            let node = await databaseCalls.getNode(choice.from);
 
             console.log(
                 `Making choice ${choice.ID} (${choice.action}) in node ${node.ID} (${node.title}) non-canon`
@@ -321,43 +400,43 @@ const resolvers = {
             databaseCalls.addNode(node);
             return choice;
         },
-        likeSuggestion: (parent, args, context, info) => {
-            let choice = databaseCalls.getChoice(args.choiceID);
-            let account = databaseCalls.getAccount(args.accountID);
+        likeSuggestion: async(parent, args, context, info) => {
+            let choice = await databaseCalls.getChoice(args.choiceID);
+            let account = await databaseCalls.getAccount(args.accountScreenName);
             console.log(
-                `${account.screenName} (${account.ID}) is liking choice ${choice.ID} (${choice.action})`
+                `${account.screenName} is liking choice ${choice.ID} (${choice.action})`
             );
-            delete choice.dislikedBy[account.ID];
+            delete choice.dislikedBy[account.screenName];
             delete account.disliked[choice.ID];
 
-            if (!choice.likedBy[account.ID]) {
-                choice.likedBy[account.ID] = account.ID;
+            if (!choice.likedBy[account.screenName]) {
+                choice.likedBy[account.screenName] = account.screenName;
                 account.liked[choice.ID] = choice.ID;
             } else {
-                delete choice.likedBy[account.ID];
+                delete choice.likedBy[account.screenName];
                 delete account.liked[choice.ID];
             }
             databaseCalls.addAccount(account);
-            return databaseCalls.addChoice(choice);
+            return await databaseCalls.addChoice(choice);
         },
-        dislikeSuggestion: (parent, args, context, info) => {
-            let choice = databaseCalls.getChoice(args.choiceID);
-            let account = databaseCalls.getAccount(args.accountID);
+        dislikeSuggestion: async(parent, args, context, info) => {
+            let choice = await databaseCalls.getChoice(args.choiceID);
+            let account = await databaseCalls.getAccount(args.accountScreenName);
             console.log(
-                `${account.screenName} (${account.ID}) is disliking choice ${choice.ID} (${choice.action})`
+                `${account.screenName} is disliking choice ${choice.ID} (${choice.action})`
             );
-            delete choice.likedBy[account.ID];
+            delete choice.likedBy[account.screenName];
             delete account.liked[choice.ID];
 
-            if (!choice.dislikedBy[account.ID]) {
-                choice.dislikedBy[account.ID] = account.ID;
+            if (!choice.dislikedBy[account.screenName]) {
+                choice.dislikedBy[account.screenName] = account.screenName;
                 account.disliked[choice.ID] = choice.ID;
             } else {
-                delete choice.dislikedBy[account.ID];
+                delete choice.dislikedBy[account.screenName];
                 delete account.disliked[choice.ID];
             }
             databaseCalls.addAccount(account);
-            return databaseCalls.addChoice(choice);
+            return await databaseCalls.addChoice(choice);
         },
     },
 };

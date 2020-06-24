@@ -1,5 +1,4 @@
 import React from "react";
-import { Redirect } from "react-router-dom";
 
 const { createApolloFetch } = require("apollo-fetch");
 
@@ -65,6 +64,22 @@ class CallableComponent extends React.Component {
           query: `mutation{${query}}`,
         }).then((res) => res.data);
       })
+    );
+  }
+
+  doRender(title, content) {
+    return this.state.error ? (
+      <p style={{ color: "red" }}>Error: {this.state.error}</p>
+    ) : (
+      <div>
+        <h1>{title}</h1>
+        {this.state.warning ? (
+          <p style={{ color: "red" }}>Error: {this.state.warning}</p>
+        ) : (
+          ""
+        )}
+        {content}
+      </div>
     );
   }
 }

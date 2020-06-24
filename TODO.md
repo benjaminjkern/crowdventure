@@ -1,12 +1,28 @@
-1. Make front end look GOOOOD
-2. Put server and database onto aws
-3. Put client onto github.io
-4. Provide some sort of security measures for logging in in general
-5. Make views be either per account or like per ip or something so they dont just keep increasing everytime you open the page
-6. Make home page not just display everything in the system so far, have it show a welcome message or something
-7. Add a back button or some sort of history feature
-8. Make choices show up in sorted order
-9. Currently deleting nodes does not delete suggestions pointing to the node. This should probably be fixed on the front end to disable actions that no longer point anywhere, or like if a page is ever loaded with an action that doesn't point anywhere, it gets purged
-10. Make everything cleaner to work in the cool async way
-11. Can suggest an empty choice
-12. Editing other people's stuff bug
+# MVP TODO
+
+1. Put server and database onto aws
+2. Put client onto github.io
+3. Escaping text security
+4. Edit choice
+5. Suggesting/Editing Choice search for node
+6. Make backend cleaner to work in the cool async way so the database works
+7. Delete Nodes from account page
+
+# Non-essential cool features
+
+1. Account bios and profile pictures also a default profile picture
+2. Report choices and nodes that are inappropriate
+3. Add a back button or some sort of history feature, could potentially have the ability to store where you've been locally
+4. A chart feature to view all connected nodes, this could blend well into the local history idea, since a massive chart displaying all potential nodes would be really bad
+5. Ability to Sort choices to be in order of best or worst
+6. Pictures or at least the ability to set colors per node
+7. Explicit content mode / make certain nodes not allow bad words
+8. Static header and Footer with contact information / patreon as well as advertisement
+9. Ability Set/delete variables, either save them per user or save pass them from node to node, I feel like passing from node to node is cooler and easier to deal with. This is a really cool idea and I definitely want to implement it eventually since this will give a shit ton of power to creators.
+10. Featured pages at home screen really truly only shows featured pages
+11. Hide Nodes instead of deleting them, make them private
+
+# Bugs
+
+1. Views just increment whenever a page's content is loaded
+2. I am not sure how to get around the fact that graphql forces you to not use " like in any capacity. Actually I have some ideas but I will figure it out later. Right now it just doesnt let you input " anywhere. Not really a bug but definitely a feature I would like fleshed out more
