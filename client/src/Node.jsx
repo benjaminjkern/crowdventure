@@ -177,7 +177,7 @@ const Node = (props) => {
 
       <p>
         Owner:{" "}
-        <a href={`/crowdventure/account/${node.owner.screenName}`}>
+        <a href={`/account/${node.owner.screenName}`}>
           {node.owner.screenName}
         </a>
         {account && node.owner.screenName === account.screenName ? (
@@ -313,7 +313,7 @@ const Node = (props) => {
           <Button variant="danger" onClick={() => setShowConfirm(false)}>
             No!
           </Button>
-          <Button variant="primary" onClick={deletePage} href="/crowdventure/">
+          <Button variant="primary" onClick={deletePage} href="/">
             Yes!
           </Button>
         </Modal.Footer>
@@ -377,7 +377,7 @@ const ChoiceColumns = (props) => {
       {choices.map((choice) => (
         <Card className="text-center">
           <a
-            href={choice.to ? `/crowdventure/node/${choice.to.ID}` : ""}
+            href={choice.to ? `/node/${choice.to.ID}` : ""}
             style={{
               pointerEvents: choice.to ? "auto" : "none",
               color: choice.to ? undefined : "grey",
@@ -455,9 +455,7 @@ const ChoiceColumns = (props) => {
             <br />
             <small className="text-muted">
               Suggested By:{" "}
-              <a
-                href={`/crowdventure/account/${choice.suggestedBy.screenName}`}
-              >
+              <a href={`/account/${choice.suggestedBy.screenName}`}>
                 {choice.suggestedBy.screenName}
               </a>
             </small>

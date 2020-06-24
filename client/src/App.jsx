@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { HashRouter, Route, Switch } from "react-router-dom";
 
 import Node from "./Node";
 import Account from "./Account";
@@ -22,7 +22,7 @@ const App = () => {
   return (
     <Container>
       <Navbar>
-        <Navbar.Brand href="/crowdventure/">
+        <Navbar.Brand href="/">
           <img
             src={process.env.PUBLIC_URL + "/logo.png"}
             alt="Crowdventure Logo"
@@ -32,13 +32,11 @@ const App = () => {
           <AccountManager />
         </Navbar.Collapse>
       </Navbar>
-      <BrowserRouter>
-        <Switch>
-          <Route path="/crowdventure" component={Home} exact />
-          <Route path="/crowdventure/node/:id" component={Node} />
-          <Route path="/crowdventure/account/:id" component={Account} />
-        </Switch>
-      </BrowserRouter>
+      <HashRouter basename="/">
+        <Route path="/" component={Home} exact />
+        <Route path="/node/:id" component={Node} />
+        <Route path="/account/:id" component={Account} />
+      </HashRouter>
     </Container>
   );
 };
@@ -227,9 +225,7 @@ const AccountManager = () => {
   return (
     <Navbar.Text>
       You are logged in as:{" "}
-      <a href={`/crowdventure/account/${account.screenName}`}>
-        {account.screenName}
-      </a>
+      <a href={`/account/${account.screenName}`}>{account.screenName}</a>
     </Navbar.Text>
   );
 };
