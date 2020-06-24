@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 
 import Cookies from "universal-cookie";
 import {
-  Navbar,
   Container,
   Button,
   Modal,
@@ -10,9 +9,6 @@ import {
   Alert,
   Card,
   CardColumns,
-  OverlayTrigger,
-  Tooltip,
-  CardDeck,
   DropdownButton,
   Dropdown,
 } from "react-bootstrap";
@@ -20,7 +16,7 @@ import {
 import app_fetch from "./index";
 
 const Node = (props) => {
-  const cookies = new Cookies();
+  const nodeID = props.match.params.id;
   const [account, setAccount] = useState(undefined);
   const [node, setNode] = useState(undefined);
 
@@ -81,7 +77,7 @@ const Node = (props) => {
       );
     else
       app_fetch({
-        query: `mutation{editNode(nodeID:"${props.match.params.id}",title:"${editTitle}",content:"${editContent}"){ID}}`,
+        query: `mutation{editNode(nodeID:"${nodeID}",title:"${editTitle}",content:"${editContent}"){ID}}`,
       }).then((res, err) => {
         if (err) alert(err);
         if (res.data && res.data.editNode) {
@@ -97,7 +93,7 @@ const Node = (props) => {
       setShowCreateNode(true);
     } else {
       app_fetch({
-        query: `mutation{suggestChoice(accountScreenName:"${account.screenName}",fromID:"${props.match.params.id}",action:"${suggestAction}",toID:"${toID}"){ID}}`,
+        query: `mutation{suggestChoice(accountScreenName:"${account.screenName}",fromID:"${nodeID}",action:"${suggestAction}",toID:"${toID}"){ID}}`,
       }).then((res, err) => {
         if (err) alert(err);
         if (res.data && res.data.suggestChoice) {
@@ -111,15 +107,16 @@ const Node = (props) => {
 
   const deletePage = () => {
     app_fetch({
-      query: `mutation{deleteNode(nodeID:"${props.match.params.id}")}`,
+      query: `mutation{deleteNode(nodeID:"${nodeID}")}`,
     });
   };
 
   useEffect(() => {
+    const cookies = new Cookies();
     const loggedInAs = cookies.get("account");
 
     app_fetch({
-      query: `query{getNode(ID:"${props.match.params.id}"){ID,title,content,views,owner{screenName},canonChoices{suggestedBy{screenName},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}},nonCanonChoices{suggestedBy{screenName},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}}}}`,
+      query: `query{getNode(ID:"${nodeID}"){ID,title,content,views,owner{screenName},canonChoices{suggestedBy{screenName},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}},nonCanonChoices{suggestedBy{screenName},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}}}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data) setNode(res.data.getNode);
@@ -127,10 +124,10 @@ const Node = (props) => {
     });
 
     app_fetch({
-      query: `query{getAccount(screenName:"${loggedInAs}"){screenName}}`,
+      query: `mutation{loginAccount(screenName:"${loggedInAs}"){screenName}}`,
     }).then((res, err) => {
       if (err) alert(err);
-      if (res.data) setAccount(res.data.getAccount);
+      if (res.data) setAccount(res.data.loginAccount);
       else {
         alert("Something went wrong when retrieving account");
         cookies.set("account", "", { path: "/" });

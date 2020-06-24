@@ -147,16 +147,14 @@ const resolvers = {
         allNodes: async() => await databaseCalls.allNodes(),
         allChoices: async() => await databaseCalls.allChoices(),
         getAccount: async(parent, args, context, info) => {
-            let fullAccount = {
-                ...(await databaseCalls.getAccount(args.screenName)),
-            };
-            if (
-                args.password &&
-                encrypt(args.password) !== fullAccount.encryptedPassword
-            )
-                return null;
-            delete fullAccount.encryptedPassword;
-            return fullAccount;
+            let account = await databaseCalls.getAccount(args.screenName);
+            if (!account)
+                throw new UserInputError(`That account doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
+            let { encryptedPassword, lastIP, ...smallAccount } = account;
+            // return everything except last IP and encrypted password since graphql cant do anything with those anyways
+            return smallAccount;
         },
         getNode: async(parent, args, context, info) =>
             await databaseCalls.getNode(args.ID),
@@ -200,10 +198,12 @@ const resolvers = {
                 throw new UserInputError(`That screen name already exists!`, {
                     invalidArgs: Object.keys(args),
                 });
+            let IP = context.headers["X-Forwarded-For"].split(",")[0];
             return await databaseCalls.addAccount({
                 screenName: args.screenName,
                 bio: args.bio,
                 encryptedPassword: encrypt(args.password),
+                lastIP: IP,
                 profilePicURL: args.profilePicURL,
                 nodes: [],
                 suggestedChoices: [],
@@ -213,6 +213,12 @@ const resolvers = {
         },
         deleteAccount: async(parent, args, context, info) => {
             let account = await databaseCalls.getAccount(args.screenName);
+
+            if (!account)
+                throw new UserInputError(`That account doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
+
             console.log(`Deleting Account ${account.screenName}`);
             // again, not really checking or caring if these work for now
             // I only care about it not returning promises for now
@@ -227,6 +233,11 @@ const resolvers = {
         },
         editAccount: async(parent, args, context, info) => {
             let account = await databaseCalls.getAccount(args.screenName);
+            if (!account)
+                throw new UserInputError(`That account doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
+
             console.log(`Editing Account ${account.screenName}`);
 
             if (args.password) account.encryptedPassword = encrypt(args.password);
@@ -235,8 +246,25 @@ const resolvers = {
 
             return await databaseCalls.addAccount(account);
         },
+        loginAccount: async(parent, args, context, info) => {
+            let account = await databaseCalls.getAccount(args.screenName);
+            if (!account)
+                throw new UserInputError(`That account doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
+            let IP = context.headers["X-Forwarded-For"].split(",")[0];
+            if (args.password && encrypt(args.password) === account.encryptedPassword)
+                account.lastIP = IP;
+            if (account.lastIP === IP) return await databaseCalls.addAccount(account);
+            return null;
+        },
         createNode: async(parent, args, context, info) => {
             let account = await databaseCalls.getAccount(args.accountScreenName);
+            if (!account)
+                throw new UserInputError(`That account doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
+
             console.log(
                 `Creating new node with title ${args.title} and owner ${account.screenName}`
             );
@@ -266,6 +294,11 @@ const resolvers = {
         },
         deleteNode: async(parent, args, context, info) => {
             let node = await databaseCalls.getNode(args.nodeID);
+            if (!node)
+                throw new UserInputError(`That account doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
+
             let account = await databaseCalls.getAccount(node.owner);
 
             console.log(`Deleting node ${node.ID} (${node.title})`);
@@ -286,6 +319,10 @@ const resolvers = {
         },
         editNode: async(parent, args, context, info) => {
             let node = await databaseCalls.getNode(args.nodeID);
+            if (!node)
+                throw new UserInputError(`That node doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
 
             console.log(`Editing node ${node.ID} (${node.title})`);
 
@@ -299,8 +336,22 @@ const resolvers = {
         },
         suggestChoice: async(parent, args, context, info) => {
             let account = await databaseCalls.getAccount(args.accountScreenName);
+            if (!account)
+                throw new UserInputError(`That account doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
+
             let node = await databaseCalls.getNode(args.fromID);
+            if (!node)
+                throw new UserInputError(`That node doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
+
             let toNode = await databaseCalls.getNode(args.toID);
+            if (!toNode)
+                throw new UserInputError(`That node doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
 
             console.log(
                 `${account.screenName} is suggesting a new choice (${args.action}) to node ${node.ID} (${node.title}), which goes to node ${toNode.ID} (${toNode.title})`
@@ -332,6 +383,10 @@ const resolvers = {
         },
         editSuggestion: async(parent, args, context, info) => {
             let choice = await databaseCalls.getChoice(args.choiceID);
+            if (!choice)
+                throw new UserInputError(`That choice doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
 
             console.log(`Editing suggestion ${choice.ID} (${choice.action})`);
 
@@ -342,6 +397,10 @@ const resolvers = {
         },
         removeSuggestion: async(parent, args, context, info) => {
             let choice = await databaseCalls.getChoice(args.choiceID);
+            if (!choice)
+                throw new UserInputError(`That choice doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
             let account = await databaseCalls.getAccount(choice.suggestedBy);
             let node = await databaseCalls.getNode(choice.from);
 
@@ -366,7 +425,15 @@ const resolvers = {
         },
         makeCanon: async(parent, args, context, info) => {
             let choice = await databaseCalls.getChoice(args.choiceID);
+            if (!choice)
+                throw new UserInputError(`That choice doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
             let node = await databaseCalls.getNode(choice.from);
+            if (!node)
+                throw new UserInputError(`That node doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
 
             console.log(
                 `Making choice ${choice.ID} (${choice.action}) in node ${node.ID} (${node.title}) canon`
@@ -385,7 +452,15 @@ const resolvers = {
         },
         makeNonCanon: async(parent, args, context, info) => {
             let choice = await databaseCalls.getChoice(args.choiceID);
+            if (!choice)
+                throw new UserInputError(`That choice doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
             let node = await databaseCalls.getNode(choice.from);
+            if (!node)
+                throw new UserInputError(`That node doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
 
             console.log(
                 `Making choice ${choice.ID} (${choice.action}) in node ${node.ID} (${node.title}) non-canon`
@@ -402,7 +477,15 @@ const resolvers = {
         },
         likeSuggestion: async(parent, args, context, info) => {
             let choice = await databaseCalls.getChoice(args.choiceID);
+            if (!choice)
+                throw new UserInputError(`That node doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
             let account = await databaseCalls.getAccount(args.accountScreenName);
+            if (!account)
+                throw new UserInputError(`That account doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
             console.log(
                 `${account.screenName} is liking choice ${choice.ID} (${choice.action})`
             );
@@ -421,7 +504,15 @@ const resolvers = {
         },
         dislikeSuggestion: async(parent, args, context, info) => {
             let choice = await databaseCalls.getChoice(args.choiceID);
+            if (!choice)
+                throw new UserInputError(`That choice doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
             let account = await databaseCalls.getAccount(args.accountScreenName);
+            if (!account)
+                throw new UserInputError(`That account doesnt exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
             console.log(
                 `${account.screenName} is disliking choice ${choice.ID} (${choice.action})`
             );

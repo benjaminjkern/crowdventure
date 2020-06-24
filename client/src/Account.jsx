@@ -2,13 +2,11 @@ import React, { useState, useEffect } from "react";
 
 import Cookies from "universal-cookie";
 import {
-  Navbar,
   Container,
   Button,
   Modal,
   Form,
   Alert,
-  CardGroup,
   Card,
   CardColumns,
 } from "react-bootstrap";
@@ -16,8 +14,9 @@ import {
 import app_fetch from "./index";
 
 const Account = (props) => {
+  const accountID = props.match.params.id;
   const [account, setAccount] = useState(undefined);
-  const [loggedInAs, setLoggedInAs] = useState(new Cookies().get("account"));
+  const [loggedInAs, setLoggedInAs] = useState(undefined);
 
   const [showCreateNode, setShowCreateNode] = useState(false);
   const [title, setTitle] = useState("");
@@ -30,11 +29,26 @@ const Account = (props) => {
 
   useEffect(() => {
     app_fetch({
-      query: `query{getAccount(screenName:"${props.match.params.id}"){bio,screenName,nodes{title,views},suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{ID,title,views}}}`,
+      query: `query{getAccount(screenName:"${accountID}"){bio,screenName,nodes{title,views},suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{ID,title,views}}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data) setAccount(res.data.getAccount);
       else alert("Something went wrong when retrieving account");
+    });
+
+    const cookies = new Cookies();
+
+    app_fetch({
+      query: `mutation{loginAccount(screenName:"${cookies.get(
+        "account"
+      )}"){screenName}}`,
+    }).then((res, err) => {
+      if (err) alert(err);
+      if (res.data) setLoggedInAs(res.data.loginAccount);
+      else {
+        alert("Something went wrong when logging in account");
+        cookies.set("account", "", { path: "/" });
+      }
     });
   }, []);
 
@@ -65,7 +79,7 @@ const Account = (props) => {
   const deleteAccount = () => {
     new Cookies().set("account", "", { path: "/" });
     app_fetch({
-      query: `mutation{deleteAccount(screenName:"${props.match.params.id}")}`,
+      query: `mutation{deleteAccount(screenName:"${accountID}")}`,
     });
   };
 
@@ -112,7 +126,7 @@ const Account = (props) => {
         ))}
       </CardColumns>
       <p />
-      {loggedInAs === account.screenName ? (
+      {loggedInAs && loggedInAs.screenName === account.screenName ? (
         <Container>
           <Button onClick={() => setShowCreateNode(true)}>
             Create new Page

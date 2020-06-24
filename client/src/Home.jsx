@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Card,
-  CardColumns,
-  CardDeck,
-  CardGroup,
-} from "react-bootstrap";
+import { Container, Card, CardColumns } from "react-bootstrap";
 
 import app_fetch from "./index";
 

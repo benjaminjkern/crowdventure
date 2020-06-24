@@ -51,7 +51,7 @@ const typeDefs = gql `
     allNodes: [Node!]
     allChoices: [Choice!]
 
-    getAccount(screenName: String!, password: String): Account
+    getAccount(screenName: String!): Account
     getNode(ID: String!): Node
     getChoice(ID: String!): Choice
 
@@ -61,12 +61,7 @@ const typeDefs = gql `
   }
 
   type Mutation {
-    createAccount(
-      screenName: String!
-      password: String!
-      bio: String
-      profilePicURL: String
-    ): Account
+    createAccount(screenName: String!, password: String!): Account
     deleteAccount(screenName: String!): Boolean
     editAccount(
       screenName: String!
@@ -74,6 +69,7 @@ const typeDefs = gql `
       bio: String
       profilePic: String
     ): Account
+    loginAccount(screenName: String!, password: String): Account
 
     createNode(
       accountScreenName: String!

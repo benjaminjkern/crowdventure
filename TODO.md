@@ -23,3 +23,8 @@
 7. The account page should have options on each node
 8. Account is stored via a COOKIE and that needs to be fixed
 9. The home page should have a real list of featured pages, or at least sort and show the most viewed ones
+10. API isnt even blocked by an API Key or anything
+11. Password security in general could be GREATLY fixed
+12. The drop down menu on actions can cover the text sometimes
+13. Liking/disliking reloads the entire page, it can probably be done locally and send a backend call
+14. It should be made clear that screen names and passwords are case sensitive
