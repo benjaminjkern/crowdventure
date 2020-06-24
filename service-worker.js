@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/crowdventure/precache-manifest.35015d8dde097c5f6f6613c751a35e65.js"
+  "/crowdventure/precache-manifest.c1339cb5a2818246f2481e4fe472fb6c.js"
 );
 
 self.addEventListener('message', (event) => {
