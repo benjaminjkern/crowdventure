@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.js": "/crowdventure/static/js/main.55c68ae1.chunk.js",
-    "main.js.map": "/crowdventure/static/js/main.55c68ae1.chunk.js.map",
+    "main.js": "/crowdventure/static/js/main.7f55091e.chunk.js",
+    "main.js.map": "/crowdventure/static/js/main.7f55091e.chunk.js.map",
     "runtime-main.js": "/crowdventure/static/js/runtime-main.7e3f0a39.js",
     "runtime-main.js.map": "/crowdventure/static/js/runtime-main.7e3f0a39.js.map",
     "static/css/2.af3c1da9.chunk.css": "/crowdventure/static/css/2.af3c1da9.chunk.css",
     "static/js/2.514ec3f1.chunk.js": "/crowdventure/static/js/2.514ec3f1.chunk.js",
     "static/js/2.514ec3f1.chunk.js.map": "/crowdventure/static/js/2.514ec3f1.chunk.js.map",
     "index.html": "/crowdventure/index.html",
-    "precache-manifest.5be423220f33288e5e581c556831912b.js": "/crowdventure/precache-manifest.5be423220f33288e5e581c556831912b.js",
+    "precache-manifest.cb729a72fcf739b2b0c60521b7e8edaf.js": "/crowdventure/precache-manifest.cb729a72fcf739b2b0c60521b7e8edaf.js",
     "service-worker.js": "/crowdventure/service-worker.js",
     "static/css/2.af3c1da9.chunk.css.map": "/crowdventure/static/css/2.af3c1da9.chunk.css.map",
     "static/js/2.514ec3f1.chunk.js.LICENSE.txt": "/crowdventure/static/js/2.514ec3f1.chunk.js.LICENSE.txt"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.7e3f0a39.js",
     "static/css/2.af3c1da9.chunk.css",
     "static/js/2.514ec3f1.chunk.js",
-    "static/js/main.55c68ae1.chunk.js"
+    "static/js/main.7f55091e.chunk.js"
   ]
 }
