@@ -41,7 +41,7 @@ const Home = () => {
       <h3>Featured Pages:</h3>
       {topNodes ? (
         <CardColumns>
-          {topNodes.slice(0, 1).map((node) => (
+          {topNodes.map((node) => (
             <Card>
               <a href={`/crowdventure/#/node/${node.ID}`}>
                 <Card.Body>

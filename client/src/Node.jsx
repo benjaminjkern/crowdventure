@@ -84,8 +84,10 @@ const Node = (props) => {
         query: `mutation{editNode(nodeID:"${props.match.params.id}",title:"${editTitle}",content:"${editContent}"){ID}}`,
       }).then((res, err) => {
         if (err) alert(err);
-        if (res.data && res.data.editNode) setShowEditNode(false);
-        else alert("Something went wrong when editing node");
+        if (res.data && res.data.editNode) {
+          setShowEditNode(false);
+          window.location.reload(false);
+        } else alert("Something went wrong when editing node");
       });
   };
 
@@ -284,7 +286,7 @@ const Node = (props) => {
         <Modal.Header closeButton>
           <Modal.Title>Edit Page</Modal.Title>
         </Modal.Header>
-        <Form onSubmit={editNode}>
+        <Form>
           <Modal.Body>
             <Form.Label>Title:</Form.Label>
             <Form.Control
@@ -301,7 +303,7 @@ const Node = (props) => {
             {info ? info : ""}
           </Modal.Body>
           <Modal.Footer>
-            <Button type="submit">Edit Page!</Button>
+            <Button onClick={editNode}>Edit Page!</Button>
           </Modal.Footer>
         </Form>
       </Modal>
