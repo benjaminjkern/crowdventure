@@ -177,7 +177,7 @@ const Node = (props) => {
 
       <p>
         Owner:{" "}
-        <a href={`/account/${node.owner.screenName}`}>
+        <a href={`/crowdventure/account/${node.owner.screenName}`}>
           {node.owner.screenName}
         </a>
         {account && node.owner.screenName === account.screenName ? (
@@ -313,7 +313,7 @@ const Node = (props) => {
           <Button variant="danger" onClick={() => setShowConfirm(false)}>
             No!
           </Button>
-          <Button variant="primary" onClick={deletePage} href="/">
+          <Button variant="primary" onClick={deletePage} href="/crowdventure/">
             Yes!
           </Button>
         </Modal.Footer>
@@ -377,7 +377,7 @@ const ChoiceColumns = (props) => {
       {choices.map((choice) => (
         <Card className="text-center">
           <a
-            href={choice.to ? `/node/${choice.to.ID}` : ""}
+            href={choice.to ? `/crowdventure/node/${choice.to.ID}` : ""}
             style={{
               pointerEvents: choice.to ? "auto" : "none",
               color: choice.to ? undefined : "grey",
@@ -424,7 +424,6 @@ const ChoiceColumns = (props) => {
           </DropdownButton>
           <Card.Footer>
             <a
-              href=""
               style={{
                 pointerEvents: account ? "auto" : "none",
                 color: account
@@ -440,7 +439,6 @@ const ChoiceColumns = (props) => {
             ></a>
             {" " + choice.score + " "}
             <a
-              href=""
               style={{
                 pointerEvents: account ? "auto" : "none",
                 color: account
@@ -457,7 +455,9 @@ const ChoiceColumns = (props) => {
             <br />
             <small className="text-muted">
               Suggested By:{" "}
-              <a href={`/account/${choice.suggestedBy.screenName}`}>
+              <a
+                href={`/crowdventure/account/${choice.suggestedBy.screenName}`}
+              >
                 {choice.suggestedBy.screenName}
               </a>
             </small>

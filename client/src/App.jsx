@@ -24,7 +24,7 @@ const App = () => {
   return (
     <Container>
       <Navbar>
-        <Navbar.Brand href="/">
+        <Navbar.Brand href="/crowdventure/">
           <img
             src={process.env.PUBLIC_URL + "/logo.png"}
             alt="Crowdventure Logo"
@@ -36,11 +36,11 @@ const App = () => {
       </Navbar>
       <BrowserRouter>
         <Switch>
-          <Route path="/" component={Home} exact />
-          <Route path="/node/:id" component={Node} />
-          <Route path="/account/:id" component={Account} />
-          <Route path="/editnode/:id" component={EditNode} />
-          <Route path="/editchoice/:id" component={EditChoice} />
+          <Route path="/crowdventure" component={Home} exact />
+          <Route path="/crowdventure/node/:id" component={Node} />
+          <Route path="/crowdventure/account/:id" component={Account} />
+          <Route path="/crowdventure/editnode/:id" component={EditNode} />
+          <Route path="/crowdventure/editchoice/:id" component={EditChoice} />
         </Switch>
       </BrowserRouter>
     </Container>
@@ -231,7 +231,9 @@ const AccountManager = () => {
   return (
     <Navbar.Text>
       You are logged in as:{" "}
-      <a href={`/account/${account.screenName}`}>{account.screenName}</a>
+      <a href={`/crowdventure/account/${account.screenName}`}>
+        {account.screenName}
+      </a>
     </Navbar.Text>
   );
 };
