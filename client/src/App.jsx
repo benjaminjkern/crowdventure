@@ -4,8 +4,6 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Node from "./Node";
 import Account from "./Account";
 import Home from "./Home";
-import EditNode from "./EditNode";
-import EditChoice from "./EditChoice";
 
 import Cookies from "universal-cookie";
 import {
@@ -39,8 +37,6 @@ const App = () => {
           <Route path="/crowdventure" component={Home} exact />
           <Route path="/crowdventure/node/:id" component={Node} />
           <Route path="/crowdventure/account/:id" component={Account} />
-          <Route path="/crowdventure/editnode/:id" component={EditNode} />
-          <Route path="/crowdventure/editchoice/:id" component={EditChoice} />
         </Switch>
       </BrowserRouter>
     </Container>
