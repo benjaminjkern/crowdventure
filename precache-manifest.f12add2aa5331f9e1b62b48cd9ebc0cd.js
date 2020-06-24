@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "d93991658b51b998d93c455818eb2f6f",
+    "revision": "1bec54b330caa598c155c2413480b6fa",
     "url": "/crowdventure/index.html"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/crowdventure/static/js/2.514ec3f1.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "14adafc83f1ba6ce21ae",
-    "url": "/crowdventure/static/js/main.3ea8c527.chunk.js"
+    "revision": "fe1e4a6af451025bd36f",
+    "url": "/crowdventure/static/js/main.fcf9a9fd.chunk.js"
   },
   {
     "revision": "fcbe28f15a7ea9dcd9f5",
