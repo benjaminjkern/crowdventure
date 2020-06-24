@@ -22,7 +22,7 @@ const App = () => {
   return (
     <Container>
       <Navbar>
-        <Navbar.Brand href="/">
+        <Navbar.Brand href="/crowdventure">
           <img
             src={process.env.PUBLIC_URL + "/logo.png"}
             alt="Crowdventure Logo"
@@ -32,10 +32,12 @@ const App = () => {
           <AccountManager />
         </Navbar.Collapse>
       </Navbar>
-      <HashRouter basename="/">
-        <Route path="/" component={Home} exact />
-        <Route path="/node/:id" component={Node} />
-        <Route path="/account/:id" component={Account} />
+      <HashRouter>
+        <Switch>
+          <Route path="/" component={Home} exact />
+          <Route path="/node/:id" component={Node} />
+          <Route path="/account/:id" component={Account} />
+        </Switch>
       </HashRouter>
     </Container>
   );
@@ -146,13 +148,13 @@ const AccountManager = () => {
     return (
       <Navbar.Text>
         You are not logged in.{" "}
-        <a href="#" onClick={() => setShowLogin(true)}>
+        <Button variant="light" onClick={() => setShowLogin(true)} size="sm">
           Log In
-        </a>{" "}
+        </Button>{" "}
         or{" "}
-        <a href="#" onClick={() => setShowSignUp(true)}>
+        <Button variant="light" onClick={() => setShowSignUp(true)} size="sm">
           Sign Up
-        </a>
+        </Button>
         <Modal show={showLogin} onHide={() => setShowLogin(false)}>
           <Modal.Header closeButton>
             <Modal.Title>Log in</Modal.Title>
@@ -225,7 +227,12 @@ const AccountManager = () => {
   return (
     <Navbar.Text>
       You are logged in as:{" "}
-      <a href={`/account/${account.screenName}`}>{account.screenName}</a>
+      <a
+        href={`/crowdventure/#/account/${account.screenName}`}
+        onClick={() => setTimeout(() => window.location.reload(false), 100)}
+      >
+        {account.screenName}
+      </a>
     </Navbar.Text>
   );
 };

@@ -98,7 +98,7 @@ const Account = (props) => {
       <CardColumns>
         {account.nodes.map((node) => (
           <Card>
-            <a href={`/node/${node.ID}`}>
+            <a href={`/crowdventure/#/node/${node.ID}`}>
               <Card.Body>
                 <Card.Title>{node.title}</Card.Title>
               </Card.Body>
@@ -118,7 +118,7 @@ const Account = (props) => {
             Create new Page
           </Button>{" "}
           <Button
-            href="/"
+            href="/crowdventure"
             variant="danger"
             onClick={() => {
               new Cookies().set("account", "", { path: "/" });
@@ -163,7 +163,11 @@ const Account = (props) => {
               <Button variant="danger" onClick={() => setShowConfirm(false)}>
                 No!
               </Button>
-              <Button variant="primary" onClick={deleteAccount} href="/">
+              <Button
+                variant="primary"
+                onClick={deleteAccount}
+                href="/crowdventure"
+              >
                 Yes!
               </Button>
             </Modal.Footer>

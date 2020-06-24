@@ -43,14 +43,14 @@ const Home = () => {
         <CardColumns>
           {topNodes.slice(0, 1).map((node) => (
             <Card>
-              <a href={`/node/${node.ID}`}>
+              <a href={`/crowdventure/#/node/${node.ID}`}>
                 <Card.Body>
                   <Card.Title>{node.title}</Card.Title>
                 </Card.Body>
               </a>
               <Card.Footer>
                 Created by:{" "}
-                <a href={`/account/${node.owner.screenName}`}>
+                <a href={`/crowdventure/#/account/${node.owner.screenName}`}>
                   {node.owner.screenName}
                 </a>
                 <br />
@@ -67,7 +67,7 @@ const Home = () => {
         <CardColumns>
           {topAccounts.map((account) => (
             <Card>
-              <a href={`/account/${account.screenName}`}>
+              <a href={`/crowdventure/#/account/${account.screenName}`}>
                 <Card.Body>
                   <Card.Title>{account.screenName}</Card.Title>
                 </Card.Body>

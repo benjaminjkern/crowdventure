@@ -117,7 +117,7 @@ const Node = (props) => {
     const loggedInAs = cookies.get("account");
 
     app_fetch({
-      query: `query{getNode(ID:"${props.match.params.id}"){title,content,views,owner{screenName},canonChoices{suggestedBy{screenName},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}},nonCanonChoices{suggestedBy{screenName},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}}}}`,
+      query: `query{getNode(ID:"${props.match.params.id}"){ID,title,content,views,owner{screenName},canonChoices{suggestedBy{screenName},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}},nonCanonChoices{suggestedBy{screenName},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}}}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data) setNode(res.data.getNode);
@@ -166,6 +166,7 @@ const Node = (props) => {
           choices={node.canonChoices}
           account={account}
           canon={true}
+          nodeID={node.ID}
         />
       ) : (
         <p className="text-muted">
@@ -177,7 +178,7 @@ const Node = (props) => {
 
       <p>
         Owner:{" "}
-        <a href={`/account/${node.owner.screenName}`}>
+        <a href={`/crowdventure/#/account/${node.owner.screenName}`}>
           {node.owner.screenName}
         </a>
         {account && node.owner.screenName === account.screenName ? (
@@ -223,6 +224,7 @@ const Node = (props) => {
         choices={node.nonCanonChoices}
         account={account}
         canon={false}
+        nodeID={node.ID}
       />
 
       <Modal show={showSuggest} onHide={() => setShowSuggest(false)}>
@@ -313,7 +315,7 @@ const Node = (props) => {
           <Button variant="danger" onClick={() => setShowConfirm(false)}>
             No!
           </Button>
-          <Button variant="primary" onClick={deletePage} href="/">
+          <Button variant="primary" onClick={deletePage} href="/crowdventure">
             Yes!
           </Button>
         </Modal.Footer>
@@ -323,7 +325,7 @@ const Node = (props) => {
 };
 
 const ChoiceColumns = (props) => {
-  const { owner, account, choices, canon } = props;
+  const { owner, account, choices, nodeID, canon } = props;
 
   const like = (choiceID) => {
     if (account)
@@ -331,8 +333,7 @@ const ChoiceColumns = (props) => {
         query: `mutation{likeSuggestion(accountScreenName:"${account.screenName}",choiceID:"${choiceID}"){ID}}`,
       }).then((res, err) => {
         if (err) alert(err);
-        if (res.data && res.data.dislikeSuggestion)
-          window.location.reload(false);
+        if (res.data && res.data.likeSuggestion) window.location.reload(false);
       });
   };
   const dislike = (choiceID) => {
@@ -377,11 +378,12 @@ const ChoiceColumns = (props) => {
       {choices.map((choice) => (
         <Card className="text-center">
           <a
-            href={choice.to ? `/node/${choice.to.ID}` : ""}
+            href={choice.to ? `/crowdventure/#/node/${choice.to.ID}` : ""}
             style={{
               pointerEvents: choice.to ? "auto" : "none",
               color: choice.to ? undefined : "grey",
             }}
+            onClick={() => setTimeout(() => window.location.reload(false), 100)}
           >
             <Card.Body style={{ cursor: "pointer" }}>
               <Card.Title>{choice.action}</Card.Title>
@@ -424,6 +426,7 @@ const ChoiceColumns = (props) => {
           </DropdownButton>
           <Card.Footer>
             <a
+              href={`/crowdventure/#/node/${nodeID}`}
               style={{
                 pointerEvents: account ? "auto" : "none",
                 color: account
@@ -439,6 +442,7 @@ const ChoiceColumns = (props) => {
             ></a>
             {" " + choice.score + " "}
             <a
+              href={`/crowdventure/#/node/${nodeID}`}
               style={{
                 pointerEvents: account ? "auto" : "none",
                 color: account
@@ -455,7 +459,9 @@ const ChoiceColumns = (props) => {
             <br />
             <small className="text-muted">
               Suggested By:{" "}
-              <a href={`/account/${choice.suggestedBy.screenName}`}>
+              <a
+                href={`/crowdventure/#/account/${choice.suggestedBy.screenName}`}
+              >
                 {choice.suggestedBy.screenName}
               </a>
             </small>
