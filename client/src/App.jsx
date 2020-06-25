@@ -6,7 +6,14 @@ import Account from "./Account";
 import Home from "./Home";
 
 import Cookies from "universal-cookie";
-import { Navbar, Container, Button, Modal, Form } from "react-bootstrap";
+import {
+  Navbar,
+  Container,
+  Button,
+  Modal,
+  Form,
+  Footer,
+} from "react-bootstrap";
 
 import app_fetch from "./index";
 
@@ -19,6 +26,7 @@ const App = () => {
             src={process.env.PUBLIC_URL + "/logo.png"}
             alt="Crowdventure Logo"
           />
+          <small class="text-muted">Version: 0.1.1</small>
         </Navbar.Brand>
         <Navbar.Collapse className="justify-content-end">
           <AccountManager />
@@ -31,6 +39,9 @@ const App = () => {
           <Route path="/account/:id" component={Account} />
         </Switch>
       </HashRouter>
+      <Navbar className="text-right">
+        <small class="text-muted">@ 2020 Copyright: (MIT) Benjamin Kern</small>
+      </Navbar>
     </Container>
   );
 };

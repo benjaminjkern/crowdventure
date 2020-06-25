@@ -13,7 +13,7 @@ const Home = () => {
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data && res.data.allNodes) setTopNodes(res.data.allNodes);
-      else alert("Something went wrong when retrieving nodes");
+      else alert("Something went wrong when retrieving featured nodes");
     });
 
     app_fetch({
@@ -29,7 +29,8 @@ const Home = () => {
     <Container>
       <h1>Welcome!</h1>
       <Container>
-        Crowdventure is a Crowd-Sourced Choose/Create-Your-Own-Adventure-Game!
+        Crowdventure is a Crowd-Sourced
+        Choose-and-Create-Your-Own-Adventure-Game!
       </Container>
       <p />
       <h3>Featured Pages:</h3>
@@ -56,7 +57,7 @@ const Home = () => {
       ) : (
         ""
       )}
-      <h3>Featured Accounts:</h3>
+      {/* <h3>Featured Accounts:</h3>
       {topAccounts ? (
         <CardColumns>
           {topAccounts.map((account) => (
@@ -76,7 +77,7 @@ const Home = () => {
         </CardColumns>
       ) : (
         ""
-      )}
+      )} */}
     </Container>
   );
 };

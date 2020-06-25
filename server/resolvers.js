@@ -8,13 +8,31 @@ const { UserInputError } = require("apollo-server-lambda");
 // ABSOLUTELY FIX THIS AT SOME POINT BUT WHATEVER
 const encrypt = (word) => word;
 
+// lil quick sort its neat
+const sort = (list, keyFunc) => {
+    if (list.length === 0) return [];
+    const tail = list.slice(1);
+    return [
+        ...sort(
+            tail.filter((item) => keyFunc(item) > keyFunc(list[0])),
+            keyFunc
+        ),
+        list[0],
+        ...tail.filter((item) => keyFunc(item) === keyFunc(list[0])),
+        ...sort(
+            tail.filter((item) => keyFunc(item) < keyFunc(list[0])),
+            keyFunc
+        ),
+    ];
+};
+
 const resolvers = {
     Account: {
         nodes: async(parent, args, context, info) => {
             console.log(`Retrieving nodes owned by ${parent.screenName}`);
             return await Promise.all(
                 parent.nodes.map((id) => databaseCalls.getNode(id))
-            );
+            ).then((nodes) => sort(nodes, (node) => resolvers.Node.views(node)));
         },
         suggestedChoices: async(parent, args, context, info) => {
             console.log(`Retrieving choices suggested by ${parent.screenName}`);
@@ -29,7 +47,9 @@ const resolvers = {
             return await Promise.all(
                 parent.nodes.map((id) => databaseCalls.getNode(id))
             ).then((nodes) =>
-                nodes.map((node) => node.views).reduce((x, y) => x + y, 0)
+                nodes
+                .map((node) => resolvers.Node.views(node))
+                .reduce((x, y) => x + y, 0)
             );
         },
         totalSuggestionScore: async(parent, args, context, info) => {
@@ -46,26 +66,18 @@ const resolvers = {
                 ) :
                 0;
         },
-        // honestly I dont think I'll need these two but whatever
-        liked: async(parent, args, context, info) => {
-            console.log(`Retrieving all nodes liked by ${parent.screenName}`);
-            return await Promise.all(
-                Object.keys(parent.liked).map((id) => databaseCalls.getNode(id))
-            );
-        },
-        disliked: async(parent, args, context, info) => {
-            console.log(`Retrieving all nodes disliked by ${parent.screenName}`);
-            return await Promise.all(
-                Object.keys(parent.disliked).map((id) => databaseCalls.getNode(id))
-            );
-        },
     },
     Node: {
         content: (parent, args, context, info) => {
-            parent.views++;
-            databaseCalls.addNode(parent);
-            return parent.content; // I dont think I need to await anything ehre because content is always within scope,
-            // though this is not checking to make sure that it actually adds the parent back into the system
+            let IP = context.headers["X-Forwarded-For"].split(",")[0];
+            if (!parent.views[IP]) {
+                parent.views[IP] = IP;
+                databaseCalls.addNode(parent);
+            }
+            return parent.content;
+        },
+        views: (parent, args, context, info) => {
+            return Object.keys(parent.views).length;
         },
         owner: async(parent, args, context, info) => {
             console.log(`Retrieving owner of node ${parent.ID} (${parent.title})`);
@@ -85,7 +97,7 @@ const resolvers = {
             );
             return await Promise.all(
                 parent.nonCanonChoices.map((id) => databaseCalls.getChoice(id))
-            );
+            ).then((choices) => sort(choices, (c) => resolvers.Choice.score(c)));
         },
     },
     Choice: {
@@ -143,8 +155,18 @@ const resolvers = {
         },
     },
     Query: {
-        allAccounts: async() => await databaseCalls.allAccounts(),
-        allNodes: async() => await databaseCalls.allNodes(),
+        featuredNodes: async() => [await databaseCalls.getNode("2TWBOAPTM1")], // my node hehe
+        allAccounts: async() =>
+            sort(
+                await databaseCalls.allAccounts(),
+                (account) =>
+                resolvers.Account.totalNodeViews(account) +
+                resolvers.Account.totalSuggestionScore(account)
+            ),
+        allNodes: async() =>
+            sort(await databaseCalls.allNodes(), (node) =>
+                resolvers.Node.views(node)
+            ),
         allChoices: async() => await databaseCalls.allChoices(),
         getAccount: async(parent, args, context, info) => {
             let account = await databaseCalls.getAccount(args.screenName);
@@ -284,7 +306,7 @@ const resolvers = {
                 pictureURL: args.pictureURL,
                 fgColor: args.fgColor || "black",
                 bgColor: args.fgColor || "white",
-                views: 0,
+                views: {},
                 canonChoices: [],
                 nonCanonChoices: [],
             };
@@ -489,16 +511,13 @@ const resolvers = {
             console.log(
                 `${account.screenName} is liking choice ${choice.ID} (${choice.action})`
             );
-            delete choice.dislikedBy[account.screenName];
-            delete account.disliked[choice.ID];
 
-            if (!choice.likedBy[account.screenName]) {
+            delete choice.dislikedBy[account.screenName];
+
+            if (!choice.likedBy[account.screenName])
                 choice.likedBy[account.screenName] = account.screenName;
-                account.liked[choice.ID] = choice.ID;
-            } else {
-                delete choice.likedBy[account.screenName];
-                delete account.liked[choice.ID];
-            }
+            else delete choice.likedBy[account.screenName];
+
             databaseCalls.addAccount(account);
             return await databaseCalls.addChoice(choice);
         },
@@ -508,6 +527,7 @@ const resolvers = {
                 throw new UserInputError(`That choice doesnt exist!`, {
                     invalidArgs: Object.keys(args),
                 });
+
             let account = await databaseCalls.getAccount(args.accountScreenName);
             if (!account)
                 throw new UserInputError(`That account doesnt exist!`, {
@@ -516,16 +536,13 @@ const resolvers = {
             console.log(
                 `${account.screenName} is disliking choice ${choice.ID} (${choice.action})`
             );
-            delete choice.likedBy[account.screenName];
-            delete account.liked[choice.ID];
 
-            if (!choice.dislikedBy[account.screenName]) {
+            delete choice.likedBy[account.screenName];
+
+            if (!choice.dislikedBy[account.screenName])
                 choice.dislikedBy[account.screenName] = account.screenName;
-                account.disliked[choice.ID] = choice.ID;
-            } else {
-                delete choice.dislikedBy[account.screenName];
-                delete account.disliked[choice.ID];
-            }
+            else delete choice.dislikedBy[account.screenName];
+
             databaseCalls.addAccount(account);
             return await databaseCalls.addChoice(choice);
         },

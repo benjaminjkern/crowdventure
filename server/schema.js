@@ -8,8 +8,6 @@ const typeDefs = gql `
 
     nodes: [Node!]
     suggestedChoices: [Choice!]
-    liked: [Node!]
-    disliked: [Node!]
 
     totalNodeViews: Int!
     totalSuggestionScore: Int!
@@ -19,8 +17,6 @@ const typeDefs = gql `
     ID: String!
     title: String!
     content: String!
-    views: Int!
-
     pictureURL: String
     bgColor: Int!
     fgColor: Int!
@@ -28,6 +24,8 @@ const typeDefs = gql `
     owner: Account!
     canonChoices: [Choice!]
     nonCanonChoices: [Choice!]
+
+    views: Int!
   }
 
   type Choice {
@@ -50,6 +48,8 @@ const typeDefs = gql `
     allAccounts: [Account!]
     allNodes: [Node!]
     allChoices: [Choice!]
+
+    featuredNodes: [Node!]
 
     getAccount(screenName: String!): Account
     getNode(ID: String!): Node
