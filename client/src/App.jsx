@@ -6,14 +6,7 @@ import Account from "./Account";
 import Home from "./Home";
 
 import Cookies from "universal-cookie";
-import {
-  Navbar,
-  Container,
-  Button,
-  Modal,
-  Form,
-  Footer,
-} from "react-bootstrap";
+import { Navbar, Container, Button, Modal, Form } from "react-bootstrap";
 
 import app_fetch from "./index";
 

@@ -12,10 +12,12 @@ import {
   DropdownButton,
   Dropdown,
 } from "react-bootstrap";
+import { Redirect } from "react-router-dom";
 
 import app_fetch from "./index";
 
 const Node = (props) => {
+  const [redirect, setRedirect] = useState(undefined);
   const nodeID = props.match.params.id;
   const [account, setAccount] = useState(undefined);
   const [node, setNode] = useState(undefined);
@@ -29,12 +31,16 @@ const Node = (props) => {
   const [showCreateNode, setShowCreateNode] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [createNodeCallback, setCreateNodeCallback] = useState(undefined);
 
   const [showEditNode, setShowEditNode] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
 
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const [showEditSuggest, setShowEditSuggest] = useState(false);
+  const [choiceID, setChoiceID] = useState("");
 
   const createNode = () => {
     if (title.includes('"'))
@@ -55,9 +61,9 @@ const Node = (props) => {
         query: `mutation{createNode(accountScreenName:"${account.screenName}",title:"${title}",content:"${content}"){ID}}`,
       }).then((res, err) => {
         if (err) alert(err);
-        if (res.data && res.data.createNode)
-          createNewAction(res.data.createNode.ID);
-        else alert("Something went wrong when creating node");
+        if (res.data && res.data.createNode) {
+          createNodeCallback[0](res.data.createNode.ID);
+        } else alert("Something went wrong when creating node");
       });
   };
 
@@ -91,24 +97,47 @@ const Node = (props) => {
     if (!toID) {
       setShowSuggest(false);
       setShowCreateNode(true);
-    } else {
+      setCreateNodeCallback([createNewAction]);
+    } else
       app_fetch({
         query: `mutation{suggestChoice(accountScreenName:"${account.screenName}",fromID:"${nodeID}",action:"${suggestAction}",toID:"${toID}"){ID}}`,
       }).then((res, err) => {
         if (err) alert(err);
-        if (res.data && res.data.suggestChoice) {
+        if (res.data) {
           setShowSuggest(false);
           setShowCreateNode(false);
           window.location.reload(false);
         } else alert("Something went wrong when creating choice!");
       });
-    }
   };
 
   const deletePage = () => {
     app_fetch({
       query: `mutation{deleteNode(nodeID:"${nodeID}")}`,
+    }).then((res, err) => {
+      if (err) alert(err);
+      if (res.data) setRedirect(<Redirect to="/" />);
+      else alert("Something went wrong when deleting node");
     });
+  };
+
+  const editChoice = (toID) => {
+    if (!toID) {
+      setShowEditSuggest(false);
+      setShowCreateNode(true);
+      setCreateNodeCallback([editChoice]);
+    } else {
+      app_fetch({
+        query: `mutation{editSuggestion(choiceID:"${choiceID}",action:"${suggestAction}",toID:"${toID}"){ID}}`,
+      }).then((res, err) => {
+        if (err) alert(err);
+        if (res.data) {
+          setShowEditSuggest(false);
+          setShowCreateNode(false);
+          window.location.reload(false);
+        } else alert("Something went wrong when editing choice!");
+      });
+    }
   };
 
   useEffect(() => {
@@ -166,6 +195,12 @@ const Node = (props) => {
           account={account}
           canon={true}
           nodeID={node.ID}
+          onEdit={(choice) => {
+            setSuggestAction(choice.action);
+            setToPage(choice.to.ID);
+            setChoiceID(choice.ID);
+            setShowEditSuggest(true);
+          }}
         />
       ) : (
         <p className="text-muted">
@@ -224,7 +259,42 @@ const Node = (props) => {
         account={account}
         canon={false}
         nodeID={node.ID}
+        onEdit={(choice) => {
+          setSuggestAction(choice.action);
+          setToPage(choice.to.ID);
+          setChoiceID(choice.ID);
+          setShowEditSuggest(true);
+        }}
       />
+
+      {/******************************************
+                         MODALS 
+        ******************************************/}
+
+      <Modal show={showEditSuggest} onHide={() => setShowEditSuggest(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Editing Choice</Modal.Title>
+        </Modal.Header>
+        <Form>
+          <Modal.Body>
+            <Form.Label>Action:</Form.Label>
+            <Form.Control
+              required
+              value={suggestAction}
+              onChange={(e) => setSuggestAction(e.target.value)}
+            ></Form.Control>
+            <Form.Label>Go to Page:</Form.Label>
+            <Form.Control
+              value={toPage}
+              placeholder="(Leave Empty to Create New Page)"
+              onChange={(e) => setToPage(e.target.value)}
+            ></Form.Control>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={() => editChoice(toPage)}>Edit Choice</Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
 
       <Modal show={showSuggest} onHide={() => setShowSuggest(false)}>
         <Modal.Header closeButton>
@@ -314,17 +384,18 @@ const Node = (props) => {
           <Button variant="danger" onClick={() => setShowConfirm(false)}>
             No!
           </Button>
-          <Button variant="primary" onClick={deletePage} href="/crowdventure">
+          <Button variant="primary" onClick={deletePage}>
             Yes!
           </Button>
         </Modal.Footer>
       </Modal>
+      {redirect ? redirect : ""}
     </Container>
   );
 };
 
 const ChoiceColumns = (props) => {
-  const { owner, account, choices, nodeID, canon } = props;
+  const { owner, account, choices, nodeID, canon, onEdit } = props;
 
   const like = (choiceID) => {
     if (account)
@@ -414,6 +485,7 @@ const ChoiceColumns = (props) => {
               Delete
             </Dropdown.Item>
             <Dropdown.Item
+              onClick={() => onEdit(choice)}
               disabled={
                 !account || choice.suggestedBy.screenName !== account.screenName
               }

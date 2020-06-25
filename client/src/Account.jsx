@@ -10,11 +10,13 @@ import {
   Card,
   CardColumns,
 } from "react-bootstrap";
+import { Redirect } from "react-router-dom";
 
 import app_fetch from "./index";
 
 const Account = (props) => {
   const accountID = props.match.params.id;
+  const [redirect, setRedirect] = useState(undefined);
   const [account, setAccount] = useState(undefined);
   const [loggedInAs, setLoggedInAs] = useState(undefined);
 
@@ -106,6 +108,12 @@ const Account = (props) => {
     new Cookies().set("account", "", { path: "/" });
     app_fetch({
       query: `mutation{deleteAccount(screenName:"${accountID}")}`,
+    }).then((res, err) => {
+      if (err) alert(err);
+      if (res.data) {
+        setRedirect(<Redirect to="/" />);
+        window.location.reload(false);
+      } else alert("Something went wrong when deleting account");
     });
   };
 
@@ -236,11 +244,7 @@ const Account = (props) => {
               <Button variant="danger" onClick={() => setShowConfirm(false)}>
                 No!
               </Button>
-              <Button
-                variant="primary"
-                onClick={deleteAccount}
-                href="/crowdventure"
-              >
+              <Button variant="primary" onClick={deleteAccount}>
                 Yes!
               </Button>
             </Modal.Footer>
@@ -249,6 +253,7 @@ const Account = (props) => {
       ) : (
         ""
       )}
+      {redirect ? redirect : ""}
     </Container>
   );
 };
