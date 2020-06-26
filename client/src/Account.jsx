@@ -193,6 +193,8 @@ const Account = (props) => {
                 ></Form.Control>
                 <Form.Label>Content:</Form.Label>
                 <Form.Control
+                  as="textarea"
+                  rows="3"
                   required
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
@@ -212,7 +214,8 @@ const Account = (props) => {
               <Modal.Body>
                 <Form.Label>Bio:</Form.Label>
                 <Form.Control
-                  required
+                  as="textarea"
+                  rows="3"
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                 ></Form.Control>

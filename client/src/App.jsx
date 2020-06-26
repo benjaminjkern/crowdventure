@@ -13,15 +13,18 @@ import app_fetch from "./index";
 const App = () => {
   return (
     <Container>
-      <Navbar>
+      <Navbar expand="lg">
         <Navbar.Brand href="/crowdventure">
           <img
+            href="/crowdventure"
             src={process.env.PUBLIC_URL + "/logo.png"}
             alt="Crowdventure Logo"
+            style={{ width: "100%" }}
           />
-          <small class="text-muted">Version: 0.1.1</small>
         </Navbar.Brand>
-        <Navbar.Collapse className="justify-content-end">
+        <small class="text-muted">Version: 0.1.2</small>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" className="bg-light" />
+        <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           <AccountManager />
         </Navbar.Collapse>
       </Navbar>

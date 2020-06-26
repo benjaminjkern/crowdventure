@@ -6,7 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 const { createApolloFetch } = require("apollo-fetch");
 
 const app_fetch = createApolloFetch({
-  uri: "https://3yfp7ejc0m.execute-api.us-east-1.amazonaws.com/dev/graphql",
+  uri: require("./apolloURL.js"),
 });
 
 // ========================================

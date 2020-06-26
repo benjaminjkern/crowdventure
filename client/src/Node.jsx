@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import Cookies from "universal-cookie";
 import {
@@ -11,8 +11,12 @@ import {
   CardColumns,
   DropdownButton,
   Dropdown,
+  OverlayTrigger,
+  Tooltip,
 } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
+
+import { Typeahead } from "react-bootstrap-typeahead";
 
 import app_fetch from "./index";
 
@@ -242,14 +246,30 @@ const Node = (props) => {
       </p>
       <h3>
         Other options:
-        <Button
-          className="float-right"
-          onClick={() => setShowSuggest(true)}
-          disabled={!account}
-          size="lg"
+        <p />
+        <OverlayTrigger
+          overlay={
+            !account ? (
+              <Tooltip id="tooltip-disabled">You must be signed in!</Tooltip>
+            ) : (
+              <p />
+            )
+          }
+          style={{ width: "100%" }}
         >
-          Suggest New Choice
-        </Button>
+          <span className="d-inline-block" style={{ width: "100%" }}>
+            <Button
+              onClick={() => setShowSuggest(true)}
+              disabled={!account}
+              style={{
+                width: "100%",
+                pointerEvents: account ? "auto" : "none",
+              }}
+            >
+              Suggest New Choice
+            </Button>
+          </span>
+        </OverlayTrigger>
       </h3>
       <p />
 
@@ -284,11 +304,10 @@ const Node = (props) => {
               onChange={(e) => setSuggestAction(e.target.value)}
             ></Form.Control>
             <Form.Label>Go to Page:</Form.Label>
-            <Form.Control
-              value={toPage}
-              placeholder="(Leave Empty to Create New Page)"
-              onChange={(e) => setToPage(e.target.value)}
-            ></Form.Control>
+            <SearchPage
+              callback={(nodeID) => setToPage(nodeID)}
+              toID={toPage}
+            />
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={() => editChoice(toPage)}>Edit Choice</Button>
@@ -307,13 +326,12 @@ const Node = (props) => {
               required
               value={suggestAction}
               onChange={(e) => setSuggestAction(e.target.value)}
-            ></Form.Control>
+            />
             <Form.Label>Go to Page:</Form.Label>
-            <Form.Control
-              value={toPage}
-              placeholder="(Leave Empty to Create New Page)"
-              onChange={(e) => setToPage(e.target.value)}
-            ></Form.Control>
+            <SearchPage
+              callback={(nodeID) => setToPage(nodeID)}
+              toID={toPage}
+            />
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={() => createNewAction(toPage)}>
@@ -337,6 +355,8 @@ const Node = (props) => {
             ></Form.Control>
             <Form.Label>Content:</Form.Label>
             <Form.Control
+              as="textarea"
+              rows="3"
               required
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -540,6 +560,65 @@ const ChoiceColumns = (props) => {
         </Card>
       ))}
     </CardColumns>
+  );
+};
+
+const SearchPage = (props) => {
+  const { callback, toID } = props;
+  const [allNodes, setAllNodes] = useState(undefined);
+  const [toNode, setToNode] = useState(undefined);
+  const ref = useRef();
+
+  const filterByCallback = (node, props) => {
+    if (props.text === "") {
+      callback("");
+      return true;
+    }
+    return (
+      node.title.toLowerCase().includes(props.text) ||
+      node.owner.screenName.toLowerCase().includes(props.text)
+    );
+  };
+
+  useEffect(() => {
+    if (toID) {
+      alert(toID);
+      app_fetch({
+        query: `query{getNode(ID:"${toID}"){title,ID}}`,
+      }).then((res, err) => {
+        if (err) alert(err);
+        if (res.data && res.data.getNode) setToNode(res.data.getNode);
+        else alert("Something went wrong when retrieving node");
+      });
+    } else setToNode(null);
+
+    app_fetch({
+      query: `query{allNodes{title,owner{screenName},ID}}`,
+    }).then((res, err) => {
+      if (err) alert(err);
+      if (res.data && res.data.allNodes) setAllNodes(res.data.allNodes);
+      else alert("Something went wrong when retrieving all nodes");
+    });
+  }, []);
+
+  if (!allNodes || toNode === undefined) return <div>Loading...</div>;
+
+  return (
+    <Typeahead
+      filterBy={filterByCallback}
+      defaultSelected={[toNode ? toNode.title : ""]}
+      labelKey="title"
+      options={allNodes}
+      placeholder="(Leave Empty to Create New Page)"
+      renderMenuItemChildren={(node) => (
+        <div onClick={() => callback(node.ID)}>
+          {node.title}
+          <div>
+            <small>Author: {node.owner.screenName}</small>
+          </div>
+        </div>
+      )}
+    />
   );
 };
 
