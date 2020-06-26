@@ -377,6 +377,8 @@ const Node = (props) => {
           <Modal.Body>
             <Form.Label>Title:</Form.Label>
             <Form.Control
+              as="textarea"
+              rows="3"
               required
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
@@ -567,7 +569,6 @@ const SearchPage = (props) => {
   const { callback, toID } = props;
   const [allNodes, setAllNodes] = useState(undefined);
   const [toNode, setToNode] = useState(undefined);
-  const ref = useRef();
 
   const filterByCallback = (node, props) => {
     if (props.text === "") {
@@ -582,7 +583,6 @@ const SearchPage = (props) => {
 
   useEffect(() => {
     if (toID) {
-      alert(toID);
       app_fetch({
         query: `query{getNode(ID:"${toID}"){title,ID}}`,
       }).then((res, err) => {
