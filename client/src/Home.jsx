@@ -9,22 +9,24 @@ const Home = () => {
 
   useEffect(() => {
     app_fetch({
-      query: `query{allNodes{ID,title,owner{screenName},views}}`,
+      query: `query{featuredNodes{ID,title,owner{screenName},views}}`,
     }).then((res, err) => {
       if (err) alert(err);
-      if (res.data && res.data.allNodes) setTopNodes(res.data.allNodes);
+      if (res.data && res.data.featuredNodes)
+        setTopNodes(res.data.featuredNodes);
       else alert("Something went wrong when retrieving featured nodes");
     });
 
-    app_fetch({
-      query: `query{allAccounts{screenName,totalNodeViews,totalSuggestionScore}}`,
-    }).then((res, err) => {
-      if (err) alert(err);
-      if (res.data && res.data.allAccounts)
-        setTopAccounts(res.data.allAccounts);
-      else alert("Something went wrong when retrieving accounts");
-    });
+    // app_fetch({
+    //   query: `query{allAccounts{screenName,totalNodeViews,totalSuggestionScore}}`,
+    // }).then((res, err) => {
+    //   if (err) alert(err);
+    //   if (res.data && res.data.allAccounts)
+    //     setTopAccounts(res.data.allAccounts);
+    //   else alert("Something went wrong when retrieving accounts");
+    // });
   }, []);
+
   return (
     <Container>
       <h1>Welcome!</h1>
@@ -37,19 +39,21 @@ const Home = () => {
       {topNodes ? (
         <CardColumns>
           {topNodes.map((node) => (
-            <Card>
+            <Card className="text-center">
               <a href={`/crowdventure/#/node/${node.ID}`}>
                 <Card.Body>
                   <Card.Title>{node.title}</Card.Title>
                 </Card.Body>
               </a>
               <Card.Footer>
-                Created by:{" "}
-                <a href={`/crowdventure/#/account/${node.owner.screenName}`}>
-                  {node.owner.screenName}
-                </a>
-                <br />
-                Views:{" " + node.views}
+                <small className="text-muted">
+                  Created by:{" "}
+                  <a href={`/crowdventure/#/account/${node.owner.screenName}`}>
+                    {node.owner.screenName}
+                  </a>
+                  <br />
+                  Views:{" " + node.views}
+                </small>
               </Card.Footer>
             </Card>
           ))}

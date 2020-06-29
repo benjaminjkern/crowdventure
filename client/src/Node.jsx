@@ -21,8 +21,9 @@ import { Typeahead } from "react-bootstrap-typeahead";
 import app_fetch from "./index";
 
 const Node = (props) => {
+  const { history, match } = props;
   const [redirect, setRedirect] = useState(undefined);
-  const nodeID = props.match.params.id;
+  const nodeID = match.params.id;
   const [account, setAccount] = useState(undefined);
   const [node, setNode] = useState(undefined);
 
@@ -214,11 +215,25 @@ const Node = (props) => {
       )}
       <p />
 
+      <Button
+        variant="light"
+        className="text-primary"
+        onClick={() => {
+          history.back();
+          setTimeout(() => window.location.reload(false), 100);
+        }}
+        size="sm"
+      >
+        Go back!
+      </Button>
+
+      <p />
       <p>
         Owner:{" "}
         <a href={`/crowdventure/#/account/${node.owner.screenName}`}>
           {node.owner.screenName}
-        </a>
+        </a>{" "}
+        Views: {node.views}
         {account && node.owner.screenName === account.screenName ? (
           <p>
             <Button

@@ -10,6 +10,8 @@ import { Navbar, Container, Button, Modal, Form } from "react-bootstrap";
 
 import app_fetch from "./index";
 
+import history from "history/browser";
+
 const App = () => {
   return (
     <Container>
@@ -31,7 +33,10 @@ const App = () => {
       <HashRouter>
         <Switch>
           <Route path="/" component={Home} exact />
-          <Route path="/node/:id" component={Node} />
+          <Route
+            path="/node/:id"
+            render={(props) => <Node {...props} history={history} />}
+          />
           <Route path="/account/:id" component={Account} />
         </Switch>
       </HashRouter>

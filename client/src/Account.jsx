@@ -9,6 +9,10 @@ import {
   Alert,
   Card,
   CardColumns,
+  DropdownButton,
+  Dropdown,
+  OverlayTrigger,
+  Tooltip,
 } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 
@@ -34,7 +38,7 @@ const Account = (props) => {
 
   useEffect(() => {
     app_fetch({
-      query: `query{getAccount(screenName:"${accountID}"){bio,screenName,nodes{title,views},suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{ID,title,views}}}`,
+      query: `query{getAccount(screenName:"${accountID}"){bio,screenName,suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{featured,ID,title,views}}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data) setAccount(res.data.getAccount);
@@ -66,7 +70,7 @@ const Account = (props) => {
       );
     else {
       app_fetch({
-        query: `mutation{editAccount(screenName:"${account.screenName}",bio:"${bio}"){bio,screenName,nodes{title,views},suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{ID,title,views}}}`,
+        query: `mutation{editAccount(screenName:"${account.screenName}",bio:"${bio}"){bio,screenName,suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{featured,ID,title,views}}}`,
       }).then((res, err) => {
         if (err) alert(err);
         if (res.data && res.data.editAccount) {
@@ -94,7 +98,7 @@ const Account = (props) => {
       );
     else
       app_fetch({
-        query: `mutation{createNode(accountScreenName:"${account.screenName}",title:"${title}",content:"${content}"){ID}}`,
+        query: `mutation{createNode(accountScreenName:"${account.screenName}",title:"${title}",content:"${content}",featured:true){ID}}`,
       }).then((res, err) => {
         if (err) alert(err);
         if (res.data && res.data.createNode) {
@@ -115,6 +119,19 @@ const Account = (props) => {
         window.location.reload(false);
       } else alert("Something went wrong when deleting account");
     });
+  };
+
+  const featurePage = (node, flag) => {
+    app_fetch({
+      query: `mutation{editNode(nodeID:"${
+        node.ID
+      }", featured:${!flag}){title}}`,
+    }).then((res, err) => {
+      if (err) alert(err);
+      if (res.data) window.location.reload(false);
+      else alert("Something went wrong when featuring page");
+    });
+    node.featured = true;
   };
 
   if (account === undefined) {
@@ -141,25 +158,88 @@ const Account = (props) => {
       <h1 style={{ position: "relative", left: "5px" }}>
         {account.screenName}
       </h1>
+      {account.bio ? <Container>{account.bio}</Container> : ""}
       <Container className="text-muted text-right">
         Total views: {account.totalNodeViews} Total score:{" "}
         {account.totalSuggestionScore}
       </Container>
-      {account.bio ? <Container>{account.bio}</Container> : ""}
       <p />
       <h3>Featured Pages:</h3>
       <CardColumns>
         {account.nodes.map((node) => (
           <Card>
             <a href={`/crowdventure/#/node/${node.ID}`}>
-              <Card.Body>
+              <Card.Body className="text-center">
                 <Card.Title>{node.title}</Card.Title>
               </Card.Body>
             </a>
-            <Card.Footer>
-              Created by: {account.screenName}
-              <br />
-              Views:{" " + node.views}
+            {node.featured ? (
+              <OverlayTrigger
+                overlay={
+                  <Tooltip>This page has been starred by this user!</Tooltip>
+                }
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "5px",
+                    left: "5px",
+                    color: "yellow",
+                    "-webkit-touch-callout": "none",
+                    "-webkit-user-select": "none",
+                    "-khtml-user-select": "none",
+                    "-moz-user-select": "none",
+                    "-ms-user-select": "none",
+                    "user-select": "none",
+                    "text-shadow": "0 0 1px black",
+                  }}
+                  class="fa"
+                >
+                  &#xf005;
+                </div>
+              </OverlayTrigger>
+            ) : (
+              ""
+            )}
+
+            <DropdownButton
+              variant="light"
+              style={{ position: "absolute", top: "0px", right: "0px" }}
+              size="sm"
+              drop="right"
+              title={<span class="fa">&#xf013;</span>}
+            >
+              <Dropdown.Item
+                onClick={() => featurePage(node, node.featured)}
+                disabled={
+                  !loggedInAs || loggedInAs.screenName !== account.screenName
+                }
+              >
+                {node.featured ? "Un-f" : "F"}eature page
+              </Dropdown.Item>
+              <Dropdown.Item
+                disabled={
+                  !loggedInAs || loggedInAs.screenName !== account.screenName
+                }
+              >
+                Delete
+              </Dropdown.Item>
+              <Dropdown.Item
+                disabled={
+                  !loggedInAs || loggedInAs.screenName !== account.screenName
+                }
+              >
+                Make Private
+              </Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item>Report</Dropdown.Item>
+            </DropdownButton>
+            <Card.Footer className="text-muted text-center">
+              <small>
+                Created by: {account.screenName}
+                <br />
+                Views:{" " + node.views}
+              </small>
             </Card.Footer>
           </Card>
         ))}
