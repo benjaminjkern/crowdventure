@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.js": "/crowdventure/static/js/main.1a4b8c9e.chunk.js",
-    "main.js.map": "/crowdventure/static/js/main.1a4b8c9e.chunk.js.map",
+    "main.js": "/crowdventure/static/js/main.7971de69.chunk.js",
+    "main.js.map": "/crowdventure/static/js/main.7971de69.chunk.js.map",
     "runtime-main.js": "/crowdventure/static/js/runtime-main.64259df9.js",
     "runtime-main.js.map": "/crowdventure/static/js/runtime-main.64259df9.js.map",
     "static/css/2.af3c1da9.chunk.css": "/crowdventure/static/css/2.af3c1da9.chunk.css",
-    "static/js/2.7b3c3d24.chunk.js": "/crowdventure/static/js/2.7b3c3d24.chunk.js",
-    "static/js/2.7b3c3d24.chunk.js.map": "/crowdventure/static/js/2.7b3c3d24.chunk.js.map",
+    "static/js/2.4e7ac23e.chunk.js": "/crowdventure/static/js/2.4e7ac23e.chunk.js",
+    "static/js/2.4e7ac23e.chunk.js.map": "/crowdventure/static/js/2.4e7ac23e.chunk.js.map",
     "index.html": "/crowdventure/index.html",
-    "precache-manifest.afc273dd4e322829695994bba5ada238.js": "/crowdventure/precache-manifest.afc273dd4e322829695994bba5ada238.js",
+    "precache-manifest.97945420d853445d244097e645175a5e.js": "/crowdventure/precache-manifest.97945420d853445d244097e645175a5e.js",
     "service-worker.js": "/crowdventure/service-worker.js",
     "static/css/2.af3c1da9.chunk.css.map": "/crowdventure/static/css/2.af3c1da9.chunk.css.map",
-    "static/js/2.7b3c3d24.chunk.js.LICENSE.txt": "/crowdventure/static/js/2.7b3c3d24.chunk.js.LICENSE.txt"
+    "static/js/2.4e7ac23e.chunk.js.LICENSE.txt": "/crowdventure/static/js/2.4e7ac23e.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.64259df9.js",
     "static/css/2.af3c1da9.chunk.css",
-    "static/js/2.7b3c3d24.chunk.js",
-    "static/js/main.1a4b8c9e.chunk.js"
+    "static/js/2.4e7ac23e.chunk.js",
+    "static/js/main.7971de69.chunk.js"
   ]
 }
