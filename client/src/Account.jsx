@@ -16,10 +16,11 @@ import {
 } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 
-import app_fetch from "./index";
+import { app_fetch, escape } from "./index";
 
 const Account = (props) => {
-  const accountID = props.match.params.id;
+  const accountID = escape(props.match.params.id);
+  const loggedInAsID = escape(new Cookies().get("account"));
   const [redirect, setRedirect] = useState(undefined);
   const [account, setAccount] = useState(undefined);
   const [loggedInAs, setLoggedInAs] = useState(undefined);
@@ -48,68 +49,48 @@ const Account = (props) => {
     const cookies = new Cookies();
 
     app_fetch({
-      query: `mutation{loginAccount(screenName:"${cookies.get(
-        "account"
-      )}"){screenName}}`,
+      query: `mutation{loginAccount(screenName:"${loggedInAsID}"){screenName}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data) setLoggedInAs(res.data.loginAccount);
       else {
-        alert("Something went wrong when logging in account");
+        alert("Something went wrong when logging in account, logging out");
         cookies.set("account", "", { path: "/" });
       }
     });
   }, []);
 
   const editPage = () => {
-    if (bio.includes('"'))
-      setInfo(
-        <p style={{ color: "red" }}>
-          Your bio cannot contain (") character! Try using (') or (`) instead!
-        </p>
-      );
-    else {
-      app_fetch({
-        query: `mutation{editAccount(screenName:"${account.screenName}",bio:"${bio}"){bio,screenName,suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{featured,ID,title,views}}}`,
-      }).then((res, err) => {
-        if (err) alert(err);
-        if (res.data && res.data.editAccount) {
-          setAccount(res.data.editAccount);
-          setShowEditPage(false);
-          window.location.reload(false);
-        } else alert("Something went wrong when editing account");
-      });
-    }
+    const esBio = escape(bio, true);
+    app_fetch({
+      query: `mutation{editAccount(screenName:"${account.screenName}",bio:"""${esBio}"""){bio,screenName,suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{featured,ID,title,views}}}`,
+    }).then((res, err) => {
+      if (err) alert(err);
+      if (res.data && res.data.editAccount) {
+        setAccount(res.data.editAccount);
+        setShowEditPage(false);
+        window.location.reload(false);
+      } else alert("Something went wrong when editing account");
+    });
   };
 
   const createNode = () => {
-    if (title.includes('"'))
-      setInfo(
-        <p style={{ color: "red" }}>
-          The title cannot contain (") character! Try using (') or (`) instead!
-        </p>
-      );
-    else if (content.includes('"'))
-      setInfo(
-        <p style={{ color: "red" }}>
-          The content cannot contain (") character! Try using (') or (`)
-          instead!
-        </p>
-      );
-    else
-      app_fetch({
-        query: `mutation{createNode(accountScreenName:"${account.screenName}",title:"${title}",content:"${content}",featured:true){ID}}`,
-      }).then((res, err) => {
-        if (err) alert(err);
-        if (res.data && res.data.createNode) {
-          setShowCreateNode(false);
-          window.location.reload(false);
-        } else alert("Something went wrong when creating node");
-      });
+    const esTitle = escape(title);
+    const esContent = escape(content);
+    app_fetch({
+      query: `mutation{createNode(accountScreenName:"${account.screenName}",title:"${esTitle}",content:"${esContent}",featured:true){ID}}`,
+    }).then((res, err) => {
+      if (err) alert(err);
+      if (res.data && res.data.createNode) {
+        setShowCreateNode(false);
+        window.location.reload(false);
+      } else alert("Something went wrong when creating node");
+    });
   };
 
   const deleteAccount = () => {
     new Cookies().set("account", "", { path: "/" });
+
     app_fetch({
       query: `mutation{deleteAccount(screenName:"${accountID}")}`,
     }).then((res, err) => {
@@ -121,17 +102,16 @@ const Account = (props) => {
     });
   };
 
-  const featurePage = (node, flag) => {
+  const featurePage = (node, alreadyFeatured) => {
     app_fetch({
       query: `mutation{editNode(nodeID:"${
         node.ID
-      }", featured:${!flag}){title}}`,
+      }", featured:${!alreadyFeatured}){title}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data) window.location.reload(false);
       else alert("Something went wrong when featuring page");
     });
-    node.featured = true;
   };
 
   if (account === undefined) {
@@ -158,7 +138,15 @@ const Account = (props) => {
       <h1 style={{ position: "relative", left: "5px" }}>
         {account.screenName}
       </h1>
-      {account.bio ? <Container>{account.bio}</Container> : ""}
+      {account.bio ? (
+        <Container>
+          {account.bio.split("\n").map((line) => (
+            <p>{line}</p>
+          ))}
+        </Container>
+      ) : (
+        ""
+      )}
       <Container className="text-muted text-right">
         Total views: {account.totalNodeViews} Total score:{" "}
         {account.totalSuggestionScore}
@@ -217,22 +205,10 @@ const Account = (props) => {
               >
                 {node.featured ? "Un-f" : "F"}eature page
               </Dropdown.Item>
-              <Dropdown.Item
-                disabled={
-                  !loggedInAs || loggedInAs.screenName !== account.screenName
-                }
-              >
-                Delete
-              </Dropdown.Item>
-              <Dropdown.Item
-                disabled={
-                  !loggedInAs || loggedInAs.screenName !== account.screenName
-                }
-              >
-                Make Private
-              </Dropdown.Item>
+              <Dropdown.Item disabled>Delete</Dropdown.Item>
+              <Dropdown.Item disabled>Make Private</Dropdown.Item>
               <Dropdown.Divider />
-              <Dropdown.Item>Report</Dropdown.Item>
+              <Dropdown.Item disabled>Report</Dropdown.Item>
             </DropdownButton>
             <Card.Footer className="text-muted text-center">
               <small>
@@ -248,7 +224,7 @@ const Account = (props) => {
       {loggedInAs && loggedInAs.screenName === account.screenName ? (
         <Container>
           <Button onClick={() => setShowCreateNode(true)}>
-            Create new Page
+            Create New Page
           </Button>{" "}
           <Button
             variant="light"

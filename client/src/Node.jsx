@@ -18,12 +18,12 @@ import { Redirect } from "react-router-dom";
 
 import { Typeahead } from "react-bootstrap-typeahead";
 
-import app_fetch from "./index";
+import { app_fetch, escape } from "./index";
 
 const Node = (props) => {
   const { history, match } = props;
   const [redirect, setRedirect] = useState(undefined);
-  const nodeID = match.params.id;
+  const nodeID = escape(match.params.id);
   const [account, setAccount] = useState(undefined);
   const [node, setNode] = useState(undefined);
 
@@ -48,54 +48,30 @@ const Node = (props) => {
   const [choiceID, setChoiceID] = useState("");
 
   const createNode = () => {
-    if (title.includes('"'))
-      setInfo(
-        <p style={{ color: "red" }}>
-          The title cannot contain (") character! Try using (') or (`) instead!
-        </p>
-      );
-    else if (content.includes('"'))
-      setInfo(
-        <p style={{ color: "red" }}>
-          The content cannot contain (") character! Try using (') or (`)
-          instead!
-        </p>
-      );
-    else
-      app_fetch({
-        query: `mutation{createNode(accountScreenName:"${account.screenName}",title:"${title}",content:"${content}"){ID}}`,
-      }).then((res, err) => {
-        if (err) alert(err);
-        if (res.data && res.data.createNode) {
-          createNodeCallback[0](res.data.createNode.ID);
-        } else alert("Something went wrong when creating node");
-      });
+    const esTitle = escape(title);
+    const esContent = escape(content, true);
+    app_fetch({
+      query: `mutation{createNode(accountScreenName:"${account.screenName}",title:"${esTitle}",content:"""${esContent}"""){ID}}`,
+    }).then((res, err) => {
+      if (err) alert(err);
+      if (res.data && res.data.createNode) {
+        createNodeCallback[0](res.data.createNode.ID);
+      } else alert("Something went wrong when creating node");
+    });
   };
 
   const editNode = () => {
-    if (editTitle.includes('"'))
-      setInfo(
-        <p style={{ color: "red" }}>
-          The title cannot contain (") character! Try using (') or (`) instead!
-        </p>
-      );
-    else if (editContent.includes('"'))
-      setInfo(
-        <p style={{ color: "red" }}>
-          The content cannot contain (") character! Try using (') or (`)
-          instead!
-        </p>
-      );
-    else
-      app_fetch({
-        query: `mutation{editNode(nodeID:"${nodeID}",title:"${editTitle}",content:"${editContent}"){ID}}`,
-      }).then((res, err) => {
-        if (err) alert(err);
-        if (res.data && res.data.editNode) {
-          setShowEditNode(false);
-          window.location.reload(false);
-        } else alert("Something went wrong when editing node");
-      });
+    const esTitle = escape(editTitle);
+    const esContent = escape(editContent, true);
+    app_fetch({
+      query: `mutation{editNode(nodeID:"${nodeID}",title:"${esTitle}",content:"""${esContent}"""){ID}}`,
+    }).then((res, err) => {
+      if (err) alert(err);
+      if (res.data && res.data.editNode) {
+        setShowEditNode(false);
+        window.location.reload(false);
+      } else alert("Something went wrong when editing node");
+    });
   };
 
   const createNewAction = (toID) => {
@@ -103,9 +79,10 @@ const Node = (props) => {
       setShowSuggest(false);
       setShowCreateNode(true);
       setCreateNodeCallback([createNewAction]);
-    } else
+    } else {
+      const escaped = escape(suggestAction);
       app_fetch({
-        query: `mutation{suggestChoice(accountScreenName:"${account.screenName}",fromID:"${nodeID}",action:"${suggestAction}",toID:"${toID}"){ID}}`,
+        query: `mutation{suggestChoice(accountScreenName:"${account.screenName}",fromID:"${nodeID}",action:"${escaped}",toID:"${toID}"){ID}}`,
       }).then((res, err) => {
         if (err) alert(err);
         if (res.data) {
@@ -114,6 +91,7 @@ const Node = (props) => {
           window.location.reload(false);
         } else alert("Something went wrong when creating choice!");
       });
+    }
   };
 
   const deletePage = () => {
@@ -132,8 +110,9 @@ const Node = (props) => {
       setShowCreateNode(true);
       setCreateNodeCallback([editChoice]);
     } else {
+      let escaped = escape(suggestAction);
       app_fetch({
-        query: `mutation{editSuggestion(choiceID:"${choiceID}",action:"${suggestAction}",toID:"${toID}"){ID}}`,
+        query: `mutation{editSuggestion(choiceID:"${choiceID}",action:"${escaped}",toID:"${toID}"){ID}}`,
       }).then((res, err) => {
         if (err) alert(err);
         if (res.data) {
@@ -147,13 +126,13 @@ const Node = (props) => {
 
   useEffect(() => {
     const cookies = new Cookies();
-    const loggedInAs = cookies.get("account");
+    const loggedInAs = escape(cookies.get("account"));
 
     app_fetch({
       query: `query{getNode(ID:"${nodeID}"){ID,title,content,views,owner{screenName},canonChoices{suggestedBy{screenName},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}},nonCanonChoices{suggestedBy{screenName},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}}}}`,
     }).then((res, err) => {
       if (err) alert(err);
-      if (res.data) setNode(res.data.getNode);
+      if (res.data && res.data.getNode) setNode(res.data.getNode);
       else setNode(null);
     });
 
@@ -163,7 +142,7 @@ const Node = (props) => {
       if (err) alert(err);
       if (res.data) setAccount(res.data.loginAccount);
       else {
-        alert("Something went wrong when retrieving account");
+        alert("Something went wrong when retrieving account logging out");
         cookies.set("account", "", { path: "/" });
       }
     });
@@ -191,7 +170,11 @@ const Node = (props) => {
   return (
     <Container>
       <h1>{node.title}</h1>
-      <Container>{node.content}</Container>
+      <Container>
+        {node.content.split("\n").map((line) => (
+          <p>{line}</p>
+        ))}
+      </Container>
       <p />
       {node.canonChoices.length ? (
         <ChoiceColumns
@@ -392,14 +375,14 @@ const Node = (props) => {
           <Modal.Body>
             <Form.Label>Title:</Form.Label>
             <Form.Control
-              as="textarea"
-              rows="3"
               required
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
             ></Form.Control>
             <Form.Label>Content:</Form.Label>
             <Form.Control
+              as="textarea"
+              rows="3"
               required
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
@@ -524,13 +507,16 @@ const ChoiceColumns = (props) => {
             <Dropdown.Item
               onClick={() => onEdit(choice)}
               disabled={
-                !account || choice.suggestedBy.screenName !== account.screenName
+                !canon ||
+                !account ||
+                (account.screenName !== choice.suggestedBy.screenName &&
+                  account.screenName !== owner.screenName)
               }
             >
               Edit
             </Dropdown.Item>
             <Dropdown.Divider />
-            <Dropdown.Item>Report</Dropdown.Item>
+            <Dropdown.Item disabled>Report</Dropdown.Item>
           </DropdownButton>
           <Card.Footer>
             <a
@@ -591,8 +577,8 @@ const SearchPage = (props) => {
       return true;
     }
     return (
-      node.title.toLowerCase().includes(props.text) ||
-      node.owner.screenName.toLowerCase().includes(props.text)
+      node.title.toLowerCase().includes(props.text.toLowerCase()) ||
+      node.owner.screenName.toLowerCase().includes(props.text.toLowerCase())
     );
   };
 

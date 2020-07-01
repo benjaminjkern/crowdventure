@@ -8,7 +8,7 @@ import Home from "./Home";
 import Cookies from "universal-cookie";
 import { Navbar, Container, Button, Modal, Form } from "react-bootstrap";
 
-import app_fetch from "./index";
+import { app_fetch, escape } from "./index";
 
 import history from "history/browser";
 
@@ -24,7 +24,7 @@ const App = () => {
             style={{ width: "100%" }}
           />
         </Navbar.Brand>
-        <small class="text-muted">Version: 0.1.2</small>
+        <small class="text-muted">Version: 0.1.3</small>
         <Navbar.Toggle aria-controls="basic-navbar-nav" className="bg-light" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           <AccountManager />
@@ -60,21 +60,10 @@ const AccountManager = () => {
   const handleSubmitSignUp = () => {
     if (pass1 !== pass2)
       setInfo(<div style={{ color: "red" }}>Passwords must match!</div>);
-    else if (screenName.includes('"'))
-      setInfo(
-        <div style={{ color: "red" }}>
-          Screen Name cannot include (") character!
-        </div>
-      );
-    else if (pass1.includes('"'))
-      setInfo(
-        <div style={{ color: "red" }}>
-          Password cannot include (") character!
-        </div>
-      );
-    else
+    else {
+      const esScreenName = escape(screenName);
       app_fetch({
-        query: `query{getAccount(screenName:"${screenName}"){screenName}}`,
+        query: `query{getAccount(screenName:"${esScreenName}"){screenName}}`,
       }).then((res, err) => {
         if (err) alert(err);
         if (res.data && res.data.getAccount)
@@ -85,11 +74,14 @@ const AccountManager = () => {
           createAccount();
         }
       });
+    }
   };
 
-  const createAccount = () =>
+  const createAccount = () => {
+    const esScreenName = escape(screenName);
+    const esPass = escape(pass1);
     app_fetch({
-      query: `mutation{createAccount(screenName:"${screenName}",password:"${pass1}"){screenName}}`,
+      query: `mutation{createAccount(screenName:"${esScreenName}",password:"${esPass}"){screenName}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data && res.data.createAccount) {
@@ -99,42 +91,31 @@ const AccountManager = () => {
         window.location.reload(false);
       } else alert("Something went wrong when creating account");
     });
+  };
 
   const login = () => {
-    if (screenName.includes('"'))
-      setInfo(
-        <div style={{ color: "red" }}>
-          Screen Name cannot include (") character!
-        </div>
-      );
-    else if (pass1.includes('"'))
-      setInfo(
-        <div style={{ color: "red" }}>
-          Password cannot include (") character!
-        </div>
-      );
-    else {
-      app_fetch({
-        query: `mutation{loginAccount(screenName:"${screenName}",password:"${pass1}"){screenName}}`,
-      }).then((res, err) => {
-        if (err) alert(err);
-        if (res.data && res.data.loginAccount) {
-          new Cookies().set("account", screenName, { path: "/" });
-          setAccount(res.data.getAccount);
-          setShowLogin(false);
-          window.location.reload(false);
-        } else
-          setInfo(
-            <div style={{ color: "red" }}>
-              That account does not exist or the password did not match!
-            </div>
-          );
-      });
-    }
+    const esScreenName = escape(screenName);
+    const esPass = escape(pass1);
+    app_fetch({
+      query: `mutation{loginAccount(screenName:"${esScreenName}",password:"${esPass}"){screenName}}`,
+    }).then((res, err) => {
+      if (err) alert(err);
+      if (res.data && res.data.loginAccount) {
+        new Cookies().set("account", screenName, { path: "/" });
+        setAccount(res.data.getAccount);
+        setShowLogin(false);
+        window.location.reload(false);
+      } else
+        setInfo(
+          <div style={{ color: "red" }}>
+            That account does not exist or the password did not match!
+          </div>
+        );
+    });
   };
 
   useEffect(() => {
-    let loggedInAs = new Cookies().get("account"); // INSECURE DOES NOT CHECK FOR PASSWORD WHEN YOU LOAD PAGE BUT WAHTEVER
+    let loggedInAs = escape(new Cookies().get("account"));
     if (loggedInAs)
       app_fetch({
         query: `mutation{loginAccount(screenName:"${loggedInAs}"){screenName}}`,
