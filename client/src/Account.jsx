@@ -34,12 +34,13 @@ const Account = (props) => {
   const [bio, setBio] = useState("");
 
   const [showConfirm, setShowConfirm] = useState(false);
+  const [picture, setPicture] = useState("");
 
-  const [showProfilePic, setShowProfilePic] = useState(false);
+  const [showPicture, setShowPicture] = useState(false);
 
   useEffect(() => {
     app_fetch({
-      query: `query{getAccount(screenName:"${accountID}"){bio,screenName,suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{featured,ID,title,views}}}`,
+      query: `query{getAccount(screenName:"${accountID}"){bio,screenName,profilePicURL,suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{featured,ID,title,views}}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data) setAccount(res.data.getAccount);
@@ -62,8 +63,9 @@ const Account = (props) => {
 
   const editPage = () => {
     const esBio = escape(bio, true);
+    const esPicture = escape(picture);
     app_fetch({
-      query: `mutation{editAccount(screenName:"${account.screenName}",bio:"""${esBio}"""){bio,screenName,suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{featured,ID,title,views}}}`,
+      query: `mutation{editAccount(screenName:"${account.screenName}",bio:"""${esBio}""",profilePicURL:"${esPicture}"){bio,screenName,suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{featured,ID,title,views}}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data && res.data.editAccount) {
@@ -117,6 +119,7 @@ const Account = (props) => {
   if (account === undefined) {
     return (
       <Alert variant="light">
+        <title>Loading Account...</title>
         <Alert.Heading>Loading...</Alert.Heading>
       </Alert>
     );
@@ -135,7 +138,28 @@ const Account = (props) => {
 
   return (
     <Container>
-      <h1 style={{ position: "relative", left: "5px" }}>
+      <title>{account.screenName} on Crowdventure!</title>
+      <h1>
+        <img
+          src={
+            account.profilePicURL
+              ? account.profilePicURL
+              : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
+          }
+          onError={(e) => {
+            e.target.src = process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
+          }}
+          style={{
+            border: "1px solid #bbb",
+            height: "3em",
+            width: "3em",
+            "object-fit": "cover",
+            "border-radius": "50%",
+            "margin-right": "5px",
+            cursor: "pointer",
+          }}
+          onClick={() => setShowPicture(true)}
+        />{" "}
         {account.screenName}
       </h1>
       {account.bio ? (
@@ -147,9 +171,26 @@ const Account = (props) => {
       ) : (
         ""
       )}
-      <Container className="text-muted text-right">
-        Total views: {account.totalNodeViews} Total score:{" "}
-        {account.totalSuggestionScore}
+
+      <Container>
+        {loggedInAs && loggedInAs.screenName === account.screenName ? (
+          <Button
+            variant="light"
+            onClick={() => {
+              setBio(account.bio);
+              setPicture(account.profilePicURL);
+              setShowEditPage(true);
+            }}
+          >
+            Edit Account
+          </Button>
+        ) : (
+          ""
+        )}
+        <div style={{ float: "right" }} class="text-muted">
+          Total views: {account.totalNodeViews} Total score:{" "}
+          {account.totalSuggestionScore}
+        </div>
       </Container>
       <p />
       <h3>Featured Pages:</h3>
@@ -212,7 +253,26 @@ const Account = (props) => {
             </DropdownButton>
             <Card.Footer className="text-muted text-center">
               <small>
-                Created by: {account.screenName}
+                Created by:{" "}
+                <img
+                  src={
+                    account.profilePicURL
+                      ? account.profilePicURL
+                      : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
+                  }
+                  onError={(e) => {
+                    e.target.src =
+                      process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
+                  }}
+                  style={{
+                    border: "1px solid #bbb",
+                    height: "2em",
+                    width: "2em",
+                    "object-fit": "cover",
+                    "border-radius": "50%",
+                  }}
+                />{" "}
+                {account.screenName}
                 <br />
                 Views:{" " + node.views}
               </small>
@@ -220,21 +280,42 @@ const Account = (props) => {
           </Card>
         ))}
       </CardColumns>
+
+      <Modal show={showPicture} onHide={() => setShowPicture(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{account.screenName}</Modal.Title>
+        </Modal.Header>
+        <img
+          src={
+            account.profilePicURL
+              ? account.profilePicURL
+              : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
+          }
+          onError={(e) => {
+            e.target.src = process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
+          }}
+          style={{
+            width: "100%",
+            "object-fit": "contain",
+          }}
+        />
+        {info ? info : "" /* it actually shouldnt ever get here but whatever */}
+        <Modal.Footer>
+          <Button size="sm" onClick={() => setShowPicture(false)}>
+            Wow, {account.screenName} has a{" "}
+            {Math.random() < 0.5 ? "cool" : "neat"} profile picture!
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <p />
       {loggedInAs && loggedInAs.screenName === account.screenName ? (
         <Container>
-          <Button onClick={() => setShowCreateNode(true)}>
+          <Button
+            onClick={() => setShowCreateNode(true)}
+            style={{ width: "100%" }}
+          >
             Create New Page
           </Button>{" "}
-          <Button
-            variant="light"
-            onClick={() => {
-              setBio(account.bio);
-              setShowEditPage(true);
-            }}
-          >
-            Edit Account
-          </Button>
           <Modal show={showCreateNode} onHide={() => setShowCreateNode(false)}>
             <Modal.Header closeButton>
               <Modal.Title>Creating New Page</Modal.Title>
@@ -268,13 +349,36 @@ const Account = (props) => {
             </Modal.Header>
             <Form>
               <Modal.Body>
+                {account.profilePicURL ? (
+                  <img
+                    src={account.profilePicURL}
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      setInfo(
+                        <span style={{ color: "red" }}>Picture not found!</span>
+                      );
+                    }}
+                    style={{
+                      opacity: account.profilePicURL === picture ? 1 : 0.2,
+                      width: "100%",
+                      "object-fit": "contain",
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
+                <Form.Label>Profile Pic URL:</Form.Label>
+                <Form.Control
+                  value={picture}
+                  onChange={(e) => setPicture(e.target.value)}
+                />
                 <Form.Label>Bio:</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows="3"
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                ></Form.Control>
+                />
                 {info ? info : ""}
               </Modal.Body>
               <Modal.Footer>

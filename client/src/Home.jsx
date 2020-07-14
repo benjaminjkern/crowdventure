@@ -8,11 +8,15 @@ import {
   Modal,
   OverlayTrigger,
   Tooltip,
+  Alert,
 } from "react-bootstrap";
 import Cookies from "universal-cookie";
 import { Redirect } from "react-router-dom";
 
-import { app_fetch, loggedInAs } from "./index";
+import AspectRatio from "react-aspect-ratio";
+import "react-aspect-ratio/aspect-ratio.css";
+
+import { app_fetch, escape } from "./index";
 
 const Home = () => {
   const [topNodes, setTopNodes] = useState(undefined);
@@ -31,7 +35,7 @@ const Home = () => {
 
   useEffect(() => {
     app_fetch({
-      query: `query{featuredNodes{ID,title,owner{screenName},views}}`,
+      query: `query{featuredNodes{ID,title,owner{screenName,profilePicURL},views,size,pictureURL}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data && res.data.featuredNodes)
@@ -87,18 +91,38 @@ const Home = () => {
 
   return (
     <Container>
+      <title>Crowdventure!</title>
       <h1>Welcome!</h1>
       <Container>
         Crowdventure is a Crowd-Sourced
         Choose-and-Create-Your-Own-Adventure-Game!
       </Container>
       <p />
+
       <h3>Featured Pages:</h3>
       {topNodes ? (
         <CardColumns>
           {topNodes.map((node) => (
             <Card className="text-center">
               <a href={`/crowdventure/#/node/${node.ID}`}>
+                {node.pictureURL ? (
+                  <Card.Header
+                    style={{
+                      "background-color": "white",
+                      padding: "0px",
+                    }}
+                  >
+                    <Card.Img
+                      src={node.pictureURL}
+                      style={{
+                        "max-height": "56.25vw",
+                        "object-fit": "cover",
+                      }}
+                    />
+                  </Card.Header>
+                ) : (
+                  ""
+                )}
                 <Card.Body>
                   <Card.Title>{node.title}</Card.Title>
                 </Card.Body>
@@ -107,17 +131,39 @@ const Home = () => {
                 <small className="text-muted">
                   Created by:{" "}
                   <a href={`/crowdventure/#/account/${node.owner.screenName}`}>
+                    <img
+                      src={
+                        node.owner.profilePicURL
+                          ? node.owner.profilePicURL
+                          : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
+                      }
+                      onError={(e) => {
+                        e.target.src =
+                          process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
+                      }}
+                      style={{
+                        border: "1px solid #bbb",
+                        height: "2em",
+                        width: "2em",
+                        "object-fit": "cover",
+                        "border-radius": "50%",
+                      }}
+                    />{" "}
                     {node.owner.screenName}
                   </a>
                   <br />
-                  Views:{" " + node.views}
+                  Story Size: {node.size}
+                  <br />
+                  Views: {node.views}
                 </small>
               </Card.Footer>
             </Card>
           ))}
         </CardColumns>
       ) : (
-        ""
+        <Alert variant="light">
+          <Alert.Heading>Loading...</Alert.Heading>
+        </Alert>
       )}
       <OverlayTrigger
         overlay={

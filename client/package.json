@@ -17,6 +17,7 @@
         "history": "^5.0.0",
         "node-fetch": "^2.6.0",
         "react": "^16.13.1",
+        "react-aspect-ratio": "^1.0.42",
         "react-bootstrap": "^1.0.1",
         "react-bootstrap-typeahead": "^5.0.0",
         "react-cookie": "^4.0.3",

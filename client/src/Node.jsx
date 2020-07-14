@@ -36,22 +36,27 @@ const Node = (props) => {
   const [showCreateNode, setShowCreateNode] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [picture, setPicture] = useState("");
   const [createNodeCallback, setCreateNodeCallback] = useState(undefined);
 
   const [showEditNode, setShowEditNode] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
+  const [editURL, setEditURL] = useState("");
 
   const [showConfirm, setShowConfirm] = useState(false);
 
   const [showEditSuggest, setShowEditSuggest] = useState(false);
   const [choiceID, setChoiceID] = useState("");
 
+  const [showPicture, setShowPicture] = useState(false);
+
   const createNode = () => {
     const esTitle = escape(title);
     const esContent = escape(content, true);
+    const esPicture = escape(picture);
     app_fetch({
-      query: `mutation{createNode(accountScreenName:"${account.screenName}",title:"${esTitle}",content:"""${esContent}"""){ID}}`,
+      query: `mutation{createNode(accountScreenName:"${account.screenName}",title:"${esTitle}",content:"""${esContent}""",pictureURL:"${esPicture}"){ID}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data && res.data.createNode) {
@@ -63,8 +68,9 @@ const Node = (props) => {
   const editNode = () => {
     const esTitle = escape(editTitle);
     const esContent = escape(editContent, true);
+    const esURL = escape(editURL);
     app_fetch({
-      query: `mutation{editNode(nodeID:"${nodeID}",title:"${esTitle}",content:"""${esContent}"""){ID}}`,
+      query: `mutation{editNode(nodeID:"${nodeID}",title:"${esTitle}",content:"""${esContent}""",pictureURL:"${esURL}"){ID}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data && res.data.editNode) {
@@ -78,6 +84,7 @@ const Node = (props) => {
     if (!toID) {
       setShowSuggest(false);
       setShowCreateNode(true);
+      setPicture(node.pictureURL);
       setCreateNodeCallback([createNewAction]);
     } else {
       const escaped = escape(suggestAction);
@@ -108,6 +115,7 @@ const Node = (props) => {
     if (!toID) {
       setShowEditSuggest(false);
       setShowCreateNode(true);
+      setPicture(node.pictureURL);
       setCreateNodeCallback([editChoice]);
     } else {
       let escaped = escape(suggestAction);
@@ -129,11 +137,14 @@ const Node = (props) => {
     const loggedInAs = escape(cookies.get("account"));
 
     app_fetch({
-      query: `query{getNode(ID:"${nodeID}"){ID,title,content,views,owner{screenName},canonChoices{suggestedBy{screenName},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}},nonCanonChoices{suggestedBy{screenName},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}}}}`,
+      query: `query{getNode(ID:"${nodeID}"){pictureURL,fgColor,bgColor,ID,title,content,views,owner{screenName},canonChoices{suggestedBy{screenName,profilePicURL},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}},nonCanonChoices{suggestedBy{screenName,profilePicURL},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}}}}`,
     }).then((res, err) => {
       if (err) alert(err);
-      if (res.data && res.data.getNode) setNode(res.data.getNode);
-      else setNode(null);
+      if (res.data && res.data.getNode) {
+        setNode(res.data.getNode);
+        props.setBgColor(res.data.getNode.bgColor);
+        props.setFgColor(res.data.getNode.fgColor);
+      } else setNode(null);
     });
 
     app_fetch({
@@ -151,6 +162,7 @@ const Node = (props) => {
   if (node === undefined) {
     return (
       <Alert variant="light">
+        <title>Loading Page...</title>
         <Alert.Heading>Loading...</Alert.Heading>
       </Alert>
     );
@@ -169,6 +181,30 @@ const Node = (props) => {
 
   return (
     <Container>
+      <title>Crowdventure! - {node.title}</title>
+      {node.pictureURL ? (
+        <img
+          src={node.pictureURL}
+          onError={(e) => {
+            e.target.style.display = "none";
+            setInfo(<span style={{ color: "red" }}>Picture not found!</span>);
+          }}
+          style={{
+            display: "block",
+            "margin-left": "auto",
+            "margin-right": "auto",
+            border: "1px solid #eee",
+            "border-radius": "8px",
+            width: "90%",
+            height: "25vw",
+            "object-fit": "cover",
+            cursor: "pointer",
+          }}
+          onClick={() => setShowPicture(true)}
+        />
+      ) : (
+        ""
+      )}
       <h1>{node.title}</h1>
       <Container>
         {node.content.split("\n").map((line) => (
@@ -225,6 +261,7 @@ const Node = (props) => {
               onClick={() => {
                 setEditTitle(node.title);
                 setEditContent(node.content);
+                setEditURL(node.pictureURL);
                 setShowEditNode(true);
               }}
             >
@@ -345,12 +382,30 @@ const Node = (props) => {
         </Modal.Header>
         <Form>
           <Modal.Body>
+            {node.pictureURL ? (
+              <img
+                src={node.pictureURL}
+                onError={(e) => {
+                  e.target.style.display = "none";
+                  setInfo(
+                    <span style={{ color: "red" }}>Picture not found!</span>
+                  );
+                }}
+                style={{
+                  opacity: node.pictureURL === picture ? 1 : 0.2,
+                  width: "100%",
+                  "object-fit": "contain",
+                }}
+              />
+            ) : (
+              ""
+            )}
             <Form.Label>Title:</Form.Label>
             <Form.Control
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-            ></Form.Control>
+            />
             <Form.Label>Content:</Form.Label>
             <Form.Control
               as="textarea"
@@ -358,7 +413,14 @@ const Node = (props) => {
               required
               value={content}
               onChange={(e) => setContent(e.target.value)}
-            ></Form.Control>
+            />
+            <Form.Label>Picture URL:</Form.Label>
+            <Form.Control
+              required
+              value={picture}
+              onChange={(e) => setPicture(e.target.value)}
+              placeholder="(Leave empty to not use a picture)"
+            />
             {info ? info : ""}
           </Modal.Body>
           <Modal.Footer>
@@ -373,12 +435,30 @@ const Node = (props) => {
         </Modal.Header>
         <Form>
           <Modal.Body>
+            {node.pictureURL ? (
+              <img
+                src={node.pictureURL}
+                onError={(e) => {
+                  e.target.style.display = "none";
+                  setInfo(
+                    <span style={{ color: "red" }}>Picture not found!</span>
+                  );
+                }}
+                style={{
+                  opacity: node.pictureURL === editURL ? 1 : 0.2,
+                  width: "100%",
+                  "object-fit": "contain",
+                }}
+              />
+            ) : (
+              ""
+            )}
             <Form.Label>Title:</Form.Label>
             <Form.Control
               required
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-            ></Form.Control>
+            />
             <Form.Label>Content:</Form.Label>
             <Form.Control
               as="textarea"
@@ -386,7 +466,17 @@ const Node = (props) => {
               required
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
-            ></Form.Control>
+            />
+            <Form.Label>Picture URL:</Form.Label>
+            <Form.Control
+              required
+              value={editURL}
+              onChange={(e) => {
+                setEditURL(e.target.value);
+                setInfo("");
+              }}
+              placeholder="(Leave empty to not use a picture)"
+            />
             {info ? info : ""}
           </Modal.Body>
           <Modal.Footer>
@@ -406,6 +496,34 @@ const Node = (props) => {
           </Button>
           <Button variant="primary" onClick={deletePage}>
             Yes!
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showPicture} onHide={() => setShowPicture(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{node.title}</Modal.Title>
+        </Modal.Header>
+        <img
+          src={node.pictureURL}
+          onError={(e) => {
+            e.target.style.display = "none";
+            setInfo(<span style={{ color: "red" }}>Picture not found!</span>);
+          }}
+          style={{
+            width: "100%",
+            "object-fit": "contain",
+          }}
+        />
+        {
+          info
+            ? info
+            : "" /* it acctually shouldnt ever get here but whatever */
+        }
+        <Modal.Footer>
+          <Button size="sm" onClick={() => setShowPicture(false)}>
+            Thanks for showing me this {Math.random() < 0.5 ? "cool" : "neat"}{" "}
+            picture!
           </Button>
         </Modal.Footer>
       </Modal>
@@ -556,6 +674,24 @@ const ChoiceColumns = (props) => {
               <a
                 href={`/crowdventure/#/account/${choice.suggestedBy.screenName}`}
               >
+                <img
+                  src={
+                    choice.suggestedBy.profilePicURL
+                      ? choice.suggestedBy.profilePicURL
+                      : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
+                  }
+                  onError={(e) => {
+                    e.target.src =
+                      process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
+                  }}
+                  style={{
+                    border: "1px solid #bbb",
+                    height: "2em",
+                    width: "2em",
+                    "object-fit": "cover",
+                    "border-radius": "50%",
+                  }}
+                />{" "}
                 {choice.suggestedBy.screenName}
               </a>
             </small>

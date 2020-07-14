@@ -13,6 +13,8 @@ import { app_fetch, escape } from "./index";
 import history from "history/browser";
 
 const App = () => {
+  const [bgColor, setBgColor] = useState(undefined);
+  const [fgColor, setFgColor] = useState(undefined);
   return (
     <Container>
       <Navbar expand="lg">
@@ -24,7 +26,7 @@ const App = () => {
             style={{ width: "100%" }}
           />
         </Navbar.Brand>
-        <small class="text-muted">Version: 0.1.3</small>
+        <small class="text-muted">Version: 0.1.4</small>
         <Navbar.Toggle aria-controls="basic-navbar-nav" className="bg-light" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           <AccountManager />
@@ -35,7 +37,14 @@ const App = () => {
           <Route path="/" component={Home} exact />
           <Route
             path="/node/:id"
-            render={(props) => <Node {...props} history={history} />}
+            render={(props) => (
+              <Node
+                {...props}
+                history={history}
+                setBgColor={setBgColor}
+                setFgColor={setFgColor}
+              />
+            )}
           />
           <Route path="/account/:id" component={Account} />
         </Switch>
@@ -43,6 +52,7 @@ const App = () => {
       <Navbar className="text-right">
         <small class="text-muted">@ 2020 Copyright: (MIT) Benjamin Kern</small>
       </Navbar>
+      <title>Crowdventure! - Page not found!</title>
     </Container>
   );
 };

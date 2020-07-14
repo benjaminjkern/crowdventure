@@ -10,9 +10,11 @@ const app_fetch = createApolloFetch({
 });
 
 const escape = (text, newlines = false) =>
-  newlines
-    ? text.replace(/"""/g, ` "" " `)
-    : text.replace(/\n/g, "").replace(/\\/g, `\\\\`).replace(/"/g, `\\"`);
+  text
+    ? newlines
+      ? text.replace(/"""/g, ` "" " `)
+      : text.replace(/\n/g, "").replace(/\\/g, `\\\\`).replace(/"/g, `\\"`)
+    : text;
 
 // ========================================
 
