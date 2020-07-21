@@ -31,3 +31,4 @@
 12. You can't edit your account
 13. It's a little slow to load home page because its doing a database filter every time
 14. There are tons of react warnings, and a few github security warnings that should probably be fixed
+15. There aren't really tests
