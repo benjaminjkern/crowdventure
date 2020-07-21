@@ -9,21 +9,49 @@ const { UserInputError } = require("apollo-server-lambda");
 const encrypt = (word) => word;
 
 // lil quick sort its neat
-const sort = (list, keyFunc) => {
+const sort = (list, compFunc) => {
     if (list.length === 0) return [];
     const tail = list.slice(1);
+    let before = [],
+        same = [],
+        after = [];
+    tail.forEach((item) => {
+        switch (compFunc(item, list[0])) {
+            case -1:
+                before.push(item);
+                break;
+            case 0:
+                same.push(item);
+                break;
+            case 1:
+                after.push(item);
+                break;
+        }
+    });
+
     return [
-        ...sort(
-            tail.filter((item) => keyFunc(item) > keyFunc(list[0])),
-            keyFunc
-        ),
+        ...sort(before, compFunc),
         list[0],
-        ...tail.filter((item) => keyFunc(item) === keyFunc(list[0])),
-        ...sort(
-            tail.filter((item) => keyFunc(item) < keyFunc(list[0])),
-            keyFunc
-        ),
+        ...same,
+        ...sort(after, compFunc),
     ];
+};
+
+const allConnected = async(node, visited = {}) => {
+    const children = await resolvers.Node.canonChoices(node).then((choices) =>
+        Promise.all(choices.map((choice) => resolvers.Choice.to(choice)))
+    );
+    let newVisited = {...visited, [node.ID]: node.ID };
+
+    for (let childKey in children) {
+        const child = children[childKey];
+        if (!newVisited[child.ID] && !child.featured)
+            newVisited = {
+                ...newVisited,
+                ...(await allConnected(child, newVisited)),
+            };
+    }
+    return newVisited;
 };
 
 const resolvers = {
@@ -31,8 +59,18 @@ const resolvers = {
         nodes: async(parent, args, context, info) => {
             console.log(`Retrieving nodes owned by ${parent.screenName}`);
             return await Promise.all(
-                parent.nodes.map((id) => databaseCalls.getNode(id))
-            ).then((nodes) => sort(nodes, (node) => resolvers.Node.views(node)));
+                    parent.nodes.map((id) => databaseCalls.getNode(id))
+                )
+                .then((nodes) =>
+                    nodes.map((node) => ({...node, views: resolvers.Node.views(node) }))
+                )
+                .then((nodes) =>
+                    sort(nodes, (a, b) => {
+                        if (a.featured) return b.featured ? 0 : -1;
+                        if (b.featured) return 1;
+                        return a.views === b.views ? 0 : a.views > b.views ? -1 : 1;
+                    })
+                );
         },
         suggestedChoices: async(parent, args, context, info) => {
             console.log(`Retrieving choices suggested by ${parent.screenName}`);
@@ -66,6 +104,18 @@ const resolvers = {
                 ) :
                 0;
         },
+        featuredNodes: async(parent, args, context, info) => {
+            console.log(`Retrieving featured nodes owned by ${parent.screenName}`);
+            let allNodes = await resolvers.Account.nodes(parent);
+            return await Promise.all(
+                allNodes
+                .filter((node) => node.featured)
+                .map(async(node) => ({
+                    ...node,
+                    size: await resolvers.Node.size(node),
+                }))
+            );
+        },
     },
     Node: {
         content: (parent, args, context, info) => {
@@ -77,7 +127,9 @@ const resolvers = {
             return parent.content;
         },
         views: (parent, args, context, info) => {
-            return Object.keys(parent.views).length;
+            return typeof parent.views === "object" ?
+                Object.keys(parent.views).length :
+                parent.views;
         },
         owner: async(parent, args, context, info) => {
             console.log(`Retrieving owner of node ${parent.ID} (${parent.title})`);
@@ -96,8 +148,27 @@ const resolvers = {
                 `Retrieving all non-canon choices from node ${parent.ID} (${parent.title})`
             );
             return await Promise.all(
-                parent.nonCanonChoices.map((id) => databaseCalls.getChoice(id))
-            ).then((choices) => sort(choices, (c) => resolvers.Choice.score(c)));
+                    parent.nonCanonChoices.map((id) => databaseCalls.getChoice(id))
+                )
+                .then((choices) =>
+                    choices.map((choice) => ({
+                        ...choice,
+                        score: resolvers.Choice.score(choice),
+                    }))
+                )
+                .then((choices) =>
+                    sort(choices, (a, b) =>
+                        a.score === b.score ? 0 : a.score > b.score ? -1 : 1
+                    )
+                );
+        },
+        // should return the total number of nodes it is connected to
+        size: async(parent, args, context, info) => {
+            console.log(
+                `Retrieving size of story stemming from  from node ${parent.ID} (${parent.title})`
+            );
+            if (parent.size) return parent.size;
+            return Object.keys(await allConnected(parent)).length;
         },
     },
     Choice: {
@@ -131,7 +202,10 @@ const resolvers = {
         },
         score: (parent, args, context, info) => {
             console.log(`Retrieving score of choice ${parent.ID} (${parent.action})`);
-            return resolvers.Choice.likes(parent) - resolvers.Choice.dislikes(parent);
+            return (
+                parent.score ||
+                resolvers.Choice.likes(parent) - resolvers.Choice.dislikes(parent)
+            );
         },
         likedBy: async(parent, args, context, info) => {
             console.log(
@@ -155,18 +229,9 @@ const resolvers = {
         },
     },
     Query: {
-        featuredNodes: async() => [await databaseCalls.getNode("2TWBOAPTM1")], // my node hehe
-        allAccounts: async() =>
-            sort(
-                await databaseCalls.allAccounts(),
-                (account) =>
-                resolvers.Account.totalNodeViews(account) +
-                resolvers.Account.totalSuggestionScore(account)
-            ),
-        allNodes: async() =>
-            sort(await databaseCalls.allNodes(), (node) =>
-                resolvers.Node.views(node)
-            ),
+        featuredNodes: async() => await databaseCalls.filterFeatured(),
+        allAccounts: async() => await databaseCalls.allAccounts(),
+        allNodes: async() => await databaseCalls.allNodes(),
         allChoices: async() => await databaseCalls.allChoices(),
         getAccount: async(parent, args, context, info) => {
             let account = await databaseCalls.getAccount(args.screenName);
@@ -304,8 +369,9 @@ const resolvers = {
                 title: args.title,
                 content: args.content,
                 pictureURL: args.pictureURL,
-                fgColor: args.fgColor || "black",
+                fgColor: args.fgColor || "auto",
                 bgColor: args.fgColor || "white",
+                featured: args.featured || false,
                 views: {},
                 canonChoices: [],
                 nonCanonChoices: [],
@@ -353,6 +419,7 @@ const resolvers = {
             if (args.pictureURL) node.pictureURL = args.pictureURL;
             if (args.bgColor) node.bgColor = args.bgColor;
             if (args.fgColor) node.fgColor = args.fgColor;
+            if (args.featured !== undefined) node.featured = args.featured;
 
             return await databaseCalls.addNode(node);
         },

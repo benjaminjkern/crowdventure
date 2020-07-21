@@ -11,6 +11,7 @@ const typeDefs = gql `
 
     totalNodeViews: Int!
     totalSuggestionScore: Int!
+    featuredNodes: [Node!]
   }
 
   type Node {
@@ -18,14 +19,16 @@ const typeDefs = gql `
     title: String!
     content: String!
     pictureURL: String
-    bgColor: Int!
-    fgColor: Int!
+    bgColor: String
+    fgColor: String
+    featured: Boolean
 
     owner: Account!
     canonChoices: [Choice!]
     nonCanonChoices: [Choice!]
 
     views: Int!
+    size: Int!
   }
 
   type Choice {
@@ -44,10 +47,19 @@ const typeDefs = gql `
     score: Int!
   }
 
+  type Report {
+    ID: String!
+    submittedBy: Account
+    inQuestion: Account! | Node! | Choice!
+    reason: String!
+    additionalInfo: String
+  }
+
   type Query {
     allAccounts: [Account!]
     allNodes: [Node!]
     allChoices: [Choice!]
+    allReports: [Report!]
 
     featuredNodes: [Node!]
 
@@ -67,7 +79,7 @@ const typeDefs = gql `
       screenName: String!
       password: String
       bio: String
-      profilePic: String
+      profilePicURL: String
     ): Account
     loginAccount(screenName: String!, password: String): Account
 
@@ -76,8 +88,9 @@ const typeDefs = gql `
       title: String!
       content: String!
       pictureURL: String
-      bgColor: Int
-      fgColor: Int
+      bgColor: String
+      fgColor: String
+      featured: Boolean
     ): Node
     deleteNode(nodeID: String!): Boolean
     editNode(
@@ -85,8 +98,9 @@ const typeDefs = gql `
       title: String
       content: String
       pictureURL: String
-      bgColor: Int
-      fgColor: Int
+      bgColor: String
+      fgColor: String
+      featured: Boolean
     ): Node
 
     suggestChoice(
@@ -103,6 +117,9 @@ const typeDefs = gql `
 
     likeSuggestion(accountScreenName: String!, choiceID: String!): Choice
     dislikeSuggestion(accountScreenName: String!, choiceID: String!): Choice
+
+    createReport(accountScreenName: String, type: String!, objectID: String!, reason: String!, other: String): Report
+    removeReport(reportID: String!): Boolean
   }
 `;
 

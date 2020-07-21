@@ -160,7 +160,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/apollo-lambda/dev/1593064751486-2020-06-25T05:59:11.486Z/apollo-lambda.zip"
+                "S3Key": "serverless/apollo-lambda/dev/1595293412431-2020-07-21T01:03:32.431Z/apollo-lambda.zip"
               },
               "FunctionName": "apollo-lambda-dev-graphql",
               "Handler": "server.graphqlHandler",
@@ -178,14 +178,14 @@
               "GraphqlLogGroup"
             ]
           },
-          "GraphqlLambdaVersionid6yT8o88nZaDdHHycjfs5sbbq2COWAigzKjMw9bCWQ": {
+          "GraphqlLambdaVersion5ZARAUldQE194icF9O6J6AQur1o2r7Fona8QN3Z0": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "GraphqlLambdaFunction"
               },
-              "CodeSha256": "TiDNLU0UwsuRKf56kd2vaIFXtN5zuclU3KMeWYCkWyo="
+              "CodeSha256": "45t+KrMWvE7bUX0oiP01RMswGtc3KTjL7D8JRwZSeoE="
             }
           },
           "ApiGatewayRestApi": {
@@ -346,7 +346,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1593064741847": {
+          "ApiGatewayDeployment1595293396519": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -407,7 +407,7 @@
           "GraphqlLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "GraphqlLambdaVersionid6yT8o88nZaDdHHycjfs5sbbq2COWAigzKjMw9bCWQ"
+              "Ref": "GraphqlLambdaVersion5ZARAUldQE194icF9O6J6AQur1o2r7Fona8QN3Z0"
             }
           },
           "ServiceEndpoint": {
@@ -568,7 +568,7 @@
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "GraphqlLambdaVersionid6yT8o88nZaDdHHycjfs5sbbq2COWAigzKjMw9bCWQ"
+        "versionLogicalId": "GraphqlLambdaVersion5ZARAUldQE194icF9O6J6AQur1o2r7Fona8QN3Z0"
       }
     },
     "serviceFilename": "serverless.yml",
@@ -577,7 +577,7 @@
     "artifact": "/Users/benkern/Documents/crowdventure/server/.serverless/apollo-lambda.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/apollo-lambda/dev/1593064751486-2020-06-25T05:59:11.486Z",
+    "artifactDirectoryName": "serverless/apollo-lambda/dev/1595293412431-2020-07-21T01:03:32.431Z",
     "artifact": "apollo-lambda.zip"
   }
 }

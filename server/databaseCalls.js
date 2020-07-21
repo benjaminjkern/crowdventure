@@ -9,62 +9,34 @@ const docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
 const ACCOUNT_TABLE = "Accounts";
 const NODE_TABLE = "Nodes";
 const CHOICE_TABLE = "Choices";
+const REPORT_TABLE = "Reports";
 
 const databaseCalls = {
-    allAccounts: async() => {
-        console.log(`DATABASE: CALLING ALL ACCOUNTS`);
-        return await getFullTable(ACCOUNT_TABLE);
-    },
-    allNodes: async() => {
-        console.log(`DATABASE: CALLING ALL NODES`);
-        return await getFullTable(NODE_TABLE);
-    },
-    allChoices: async() => {
-        console.log(`DATABASE: CALLING ALL CHOICES`);
-        return await getFullTable(CHOICE_TABLE);
-    },
-    getAccount: async(accountScreenName) => {
-        console.log(
-            `DATABASE: CALLING ACCOUNT (SCREEN NAME: ${accountScreenName})`
-        );
-        return await getItem(ACCOUNT_TABLE, { screenName: accountScreenName });
-    },
-    getNode: async(nodeID) => {
-        console.log(`DATABASE: CALLING NODE (ID: ${nodeID})`);
-        return await getItem(NODE_TABLE, { ID: nodeID });
-    },
-    getChoice: async(choiceID) => {
-        console.log(`DATABASE: CALLING CHOICE (ID: ${choiceID})`);
-        return await getItem(CHOICE_TABLE, { ID: choiceID });
-    },
-    addAccount: async(account) => {
-        console.log(
-            `DATABASE: ADDING NEW ACCOUNT (SCREEN NAME: ${account.screenName})`
-        );
-        return await addItem(ACCOUNT_TABLE, account);
-    },
-    addNode: async(node) => {
-        console.log(`DATABASE: ADDING NEW NODE (ID: ${node.ID})`);
-        return await addItem(NODE_TABLE, node);
-    },
-    addChoice: async(choice) => {
-        console.log(`DATABASE: ADDING NEW CHOICE (ID: ${choice.ID})`);
-        return await addItem(CHOICE_TABLE, choice);
-    },
-    removeAccount: async(accountScreenName) => {
-        console.log(
-            `DATABASE: REMOVING ACCOUNT (SCREEN NAME: ${accountScreenName})`
-        );
-        return await removeItem(ACCOUNT_TABLE, { screenName: accountScreenName });
-    },
-    removeNode: async(nodeID) => {
-        console.log(`DATABASE: REMOVING NODE (ID: ${nodeID})`);
-        return await removeItem(NODE_TABLE, { ID: nodeID });
-    },
-    removeChoice: async(choiceID) => {
-        console.log(`DATABASE: REMOVING CHOICE (ID: ${choiceID})`);
-        return await removeItem(CHOICE_TABLE, { ID: choiceID });
-    },
+    filterFeatured: async() => await filter(NODE_TABLE, "featured", true),
+
+    allAccounts: async() => await getFullTable(ACCOUNT_TABLE),
+    allNodes: async() => await getFullTable(NODE_TABLE),
+    allChoices: async() => await getFullTable(CHOICE_TABLE),
+    allReports: async() => await getFullTable(REPORT_TABLE),
+
+    getAccount: async(accountScreenName) =>
+        await getItem(ACCOUNT_TABLE, { screenName: accountScreenName }),
+    getNode: async(nodeID) => await getItem(NODE_TABLE, { ID: nodeID }),
+    getChoice: async(choiceID) => await getItem(CHOICE_TABLE, { ID: choiceID }),
+    getReport: async(reportID) => await getItem(REPORT_TABLE, { ID: reportID }),
+
+    addAccount: async(account) => await addItem(ACCOUNT_TABLE, account),
+    addNode: async(node) => await addItem(NODE_TABLE, node),
+    addChoice: async(choice) => await addItem(CHOICE_TABLE, choice),
+    addReport: async(report) => await addItem(REPORT_TABLE, report),
+
+    removeAccount: async(accountScreenName) =>
+        await removeItem(ACCOUNT_TABLE, { screenName: accountScreenName }),
+    removeNode: async(nodeID) => await removeItem(NODE_TABLE, { ID: nodeID }),
+    removeChoice: async(choiceID) =>
+        await removeItem(CHOICE_TABLE, { ID: choiceID }),
+    removeReport: async(reportID) =>
+        await removeItem(REPORT_TABLE, { ID: reportID }),
 };
 
 const getFullTable = async(tableName, lastEvaluatedKey) => {
@@ -111,6 +83,22 @@ const removeItem = async(tableName, key) =>
     .delete({ TableName: tableName, Key: key })
     .promise()
     .then(() => true)
+    .catch((err) => {
+        console.log(err);
+        return err;
+    });
+
+const filter = async(tableName, arg, value) =>
+    await docClient
+    .scan({
+        TableName: tableName,
+        ExpressionAttributeValues: {
+            ":r": value,
+        },
+        FilterExpression: `${arg} = :r`,
+    })
+    .promise()
+    .then((data) => data.Items)
     .catch((err) => {
         console.log(err);
         return err;
