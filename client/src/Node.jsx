@@ -187,16 +187,16 @@ const Node = (props) => {
           src={node.pictureURL}
           onError={(e) => {
             e.target.style.display = "none";
-            setInfo(<span style={{ color: "red" }}>Picture not found!</span>);
           }}
           style={{
             display: "block",
-            "margin-left": "auto",
-            "margin-right": "auto",
+            marginLeft: "auto",
+            marginRight: "auto",
+            padding: "1px",
             border: "1px solid #eee",
             "border-radius": "8px",
             width: "90%",
-            height: "25vw",
+            maxHeight: "30vh",
             "object-fit": "cover",
             cursor: "pointer",
           }}
@@ -382,24 +382,6 @@ const Node = (props) => {
         </Modal.Header>
         <Form>
           <Modal.Body>
-            {node.pictureURL ? (
-              <img
-                src={node.pictureURL}
-                onError={(e) => {
-                  e.target.style.display = "none";
-                  setInfo(
-                    <span style={{ color: "red" }}>Picture not found!</span>
-                  );
-                }}
-                style={{
-                  opacity: node.pictureURL === picture ? 1 : 0.2,
-                  width: "100%",
-                  "object-fit": "contain",
-                }}
-              />
-            ) : (
-              ""
-            )}
             <Form.Label>Title:</Form.Label>
             <Form.Control
               required
@@ -414,12 +396,32 @@ const Node = (props) => {
               value={content}
               onChange={(e) => setContent(e.target.value)}
             />
-            <Form.Label>Picture URL:</Form.Label>
-            <Form.Control
-              required
-              value={picture}
-              onChange={(e) => setPicture(e.target.value)}
-              placeholder="(Leave empty to not use a picture)"
+            {picture ? (
+              <img
+                src={picture}
+                onError={(e) => {
+                  e.target.style.display = "none";
+                  setInfo(
+                    <span style={{ color: "red" }}>Picture not found!</span>
+                  );
+                }}
+                style={{
+                  border: "1px solid #eee",
+                  borderRadius: "8px",
+                  width: "100%",
+                  "object-fit": "contain",
+                }}
+              />
+            ) : (
+              ""
+            )}
+            <Form.Label>Picture:</Form.Label>
+            <Form.File
+              id="custom-file"
+              onChange={(e) => {
+                setPicture(URL.createObjectURL(e.target.files[0]));
+              }}
+              custom
             />
             {info ? info : ""}
           </Modal.Body>
@@ -512,6 +514,7 @@ const Node = (props) => {
           }}
           style={{
             width: "100%",
+            maxHeight: "70vh",
             "object-fit": "contain",
           }}
         />
@@ -560,9 +563,11 @@ const ChoiceColumns = (props) => {
       query: `mutation{makeCanon(choiceID:"${choiceID}"){ID}}`,
     }).then((res, err) => {
       if (err) alert(err);
-      if (res.data && res.data.makeCanon) window.location.reload(false);
+      if (res.data && res.data.makeCanon)
+        setTimeout(() => window.location.reload(false), 100); // TODO: Figure out why this is necessary
     });
   };
+
   const makeNonCanon = (choiceID) => {
     app_fetch({
       query: `mutation{makeNonCanon(choiceID:"${choiceID}"){ID}}`,
@@ -593,7 +598,7 @@ const ChoiceColumns = (props) => {
             }}
             onClick={() => setTimeout(() => window.location.reload(false), 100)}
           >
-            <Card.Body style={{ cursor: "pointer" }}>
+            <Card.Body style={{ cursor: "pointer", paddingTop: "2em" }}>
               <Card.Title>{choice.action}</Card.Title>
             </Card.Body>
           </a>
@@ -625,10 +630,9 @@ const ChoiceColumns = (props) => {
             <Dropdown.Item
               onClick={() => onEdit(choice)}
               disabled={
-                !canon ||
                 !account ||
                 (account.screenName !== choice.suggestedBy.screenName &&
-                  account.screenName !== owner.screenName)
+                  (!canon || account.screenName !== owner.screenName))
               }
             >
               Edit

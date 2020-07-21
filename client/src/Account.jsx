@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import Cookies from "universal-cookie";
 import {
@@ -40,7 +40,8 @@ const Account = (props) => {
 
   useEffect(() => {
     app_fetch({
-      query: `query{getAccount(screenName:"${accountID}"){bio,screenName,profilePicURL,suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{featured,ID,title,views}}}`,
+      // TODO: EITHER IMPLEMENT SUGGESTED CHOICES OR GET RID OF IT
+      query: `query{getAccount(screenName:"${accountID}"){bio,screenName,profilePicURL,suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{featured,ID,title,views,pictureURL}}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data) setAccount(res.data.getAccount);
@@ -105,6 +106,7 @@ const Account = (props) => {
   };
 
   const featurePage = (node, alreadyFeatured) => {
+    alert(alreadyFeatured);
     app_fetch({
       query: `mutation{editNode(nodeID:"${
         node.ID
@@ -175,7 +177,7 @@ const Account = (props) => {
       <Container>
         {loggedInAs && loggedInAs.screenName === account.screenName ? (
           <Button
-            variant="light"
+            variant="secondary"
             onClick={() => {
               setBio(account.bio);
               setPicture(account.profilePicURL);
@@ -192,93 +194,131 @@ const Account = (props) => {
           {account.totalSuggestionScore}
         </div>
       </Container>
+      <br />
+
+      {loggedInAs && loggedInAs.screenName === account.screenName ? (
+        <Button
+          onClick={() => setShowCreateNode(true)}
+          style={{ width: "100%" }}
+        >
+          Create New Page!
+        </Button>
+      ) : (
+        ""
+      )}
       <p />
       <h3>Featured Pages:</h3>
       <CardColumns>
-        {account.nodes.map((node) => (
-          <Card>
-            <a href={`/crowdventure/#/node/${node.ID}`}>
-              <Card.Body className="text-center">
-                <Card.Title>{node.title}</Card.Title>
-              </Card.Body>
-            </a>
-            {node.featured ? (
-              <OverlayTrigger
-                overlay={
-                  <Tooltip>This page has been starred by this user!</Tooltip>
-                }
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "5px",
-                    left: "5px",
-                    color: "yellow",
-                    "-webkit-touch-callout": "none",
-                    "-webkit-user-select": "none",
-                    "-khtml-user-select": "none",
-                    "-moz-user-select": "none",
-                    "-ms-user-select": "none",
-                    "user-select": "none",
-                    "text-shadow": "0 0 1px black",
-                  }}
-                  class="fa"
+        {account.nodes.map((node, idx) => {
+          return (
+            <Card>
+              <a href={`/crowdventure/#/node/${node.ID}`}>
+                {node.pictureURL ? (
+                  <Card.Header
+                    style={{
+                      "background-color": "white",
+                      padding: "1px",
+                    }}
+                  >
+                    <Card.Img
+                      src={node.pictureURL}
+                      style={{
+                        "max-height": "30vh",
+                        "object-fit": "cover",
+                      }}
+                      onError={(e) => {
+                        e.target.parentNode.style.display = "none";
+                      }}
+                    />
+                  </Card.Header>
+                ) : (
+                  ""
+                )}
+                <Card.Body
+                  className="text-center"
+                  style={{ paddingTop: "2em" }}
                 >
-                  &#xf005;
-                </div>
-              </OverlayTrigger>
-            ) : (
-              ""
-            )}
-
-            <DropdownButton
-              variant="light"
-              style={{ position: "absolute", top: "0px", right: "0px" }}
-              size="sm"
-              drop="right"
-              title={<span class="fa">&#xf013;</span>}
-            >
-              <Dropdown.Item
-                onClick={() => featurePage(node, node.featured)}
-                disabled={
-                  !loggedInAs || loggedInAs.screenName !== account.screenName
-                }
-              >
-                {node.featured ? "Un-f" : "F"}eature page
-              </Dropdown.Item>
-              <Dropdown.Item disabled>Delete</Dropdown.Item>
-              <Dropdown.Item disabled>Make Private</Dropdown.Item>
-              <Dropdown.Divider />
-              <Dropdown.Item disabled>Report</Dropdown.Item>
-            </DropdownButton>
-            <Card.Footer className="text-muted text-center">
-              <small>
-                Created by:{" "}
-                <img
-                  src={
-                    account.profilePicURL
-                      ? account.profilePicURL
-                      : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
+                  <Card.Title>{node.title}</Card.Title>
+                </Card.Body>
+              </a>
+              {node.featured ? (
+                <OverlayTrigger
+                  overlay={
+                    <Tooltip>This page has been starred by this user!</Tooltip>
                   }
-                  onError={(e) => {
-                    e.target.src =
-                      process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
-                  }}
-                  style={{
-                    border: "1px solid #bbb",
-                    height: "2em",
-                    width: "2em",
-                    "object-fit": "cover",
-                    "border-radius": "50%",
-                  }}
-                />{" "}
-                {account.screenName}
-                <br />
-                Views:{" " + node.views}
-              </small>
-            </Card.Footer>
-          </Card>
-        ))}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "5px",
+                      left: "5px",
+                      color: "yellow",
+                      "-webkit-touch-callout": "none",
+                      "-webkit-user-select": "none",
+                      "-khtml-user-select": "none",
+                      "-moz-user-select": "none",
+                      "-ms-user-select": "none",
+                      "user-select": "none",
+                      "text-shadow": "0 0 1px black",
+                    }}
+                    class="fa"
+                  >
+                    &#xf005;
+                  </div>
+                </OverlayTrigger>
+              ) : (
+                ""
+              )}
+
+              <DropdownButton
+                variant="light"
+                style={{ position: "absolute", top: "0px", right: "0px" }}
+                size="sm"
+                drop="right"
+                title={<span class="fa">&#xf013;</span>}
+              >
+                <Dropdown.Item
+                  onClick={() => featurePage(node, node.featured)}
+                  disabled={
+                    !loggedInAs || loggedInAs.screenName !== account.screenName
+                  }
+                >
+                  {node.featured ? "Un-f" : "F"}eature page
+                </Dropdown.Item>
+                <Dropdown.Item disabled>Delete</Dropdown.Item>
+                <Dropdown.Item disabled>Make Private</Dropdown.Item>
+                <Dropdown.Divider />
+                <Dropdown.Item disabled>Report</Dropdown.Item>
+              </DropdownButton>
+              <Card.Footer className="text-muted text-center">
+                <small>
+                  Created by:{" "}
+                  <img
+                    src={
+                      account.profilePicURL
+                        ? account.profilePicURL
+                        : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
+                    }
+                    onError={(e) => {
+                      e.target.src =
+                        process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
+                    }}
+                    style={{
+                      border: "1px solid #bbb",
+                      height: "2em",
+                      width: "2em",
+                      "object-fit": "cover",
+                      "border-radius": "50%",
+                    }}
+                  />{" "}
+                  {account.screenName}
+                  <br />
+                  Views:{" " + node.views}
+                </small>
+              </Card.Footer>
+            </Card>
+          );
+        })}
       </CardColumns>
 
       <Modal show={showPicture} onHide={() => setShowPicture(false)}>
@@ -296,6 +336,7 @@ const Account = (props) => {
           }}
           style={{
             width: "100%",
+            height: "70vh",
             "object-fit": "contain",
           }}
         />
@@ -310,12 +351,6 @@ const Account = (props) => {
       <p />
       {loggedInAs && loggedInAs.screenName === account.screenName ? (
         <Container>
-          <Button
-            onClick={() => setShowCreateNode(true)}
-            style={{ width: "100%" }}
-          >
-            Create New Page
-          </Button>{" "}
           <Modal show={showCreateNode} onHide={() => setShowCreateNode(false)}>
             <Modal.Header closeButton>
               <Modal.Title>Creating New Page</Modal.Title>

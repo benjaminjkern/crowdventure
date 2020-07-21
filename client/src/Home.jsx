@@ -13,7 +13,6 @@ import {
 import Cookies from "universal-cookie";
 import { Redirect } from "react-router-dom";
 
-import AspectRatio from "react-aspect-ratio";
 import "react-aspect-ratio/aspect-ratio.css";
 
 import { app_fetch, escape } from "./index";
@@ -99,6 +98,31 @@ const Home = () => {
       </Container>
       <p />
 
+      <OverlayTrigger
+        overlay={
+          !account ? (
+            <Tooltip id="tooltip-disabled">You must be signed in!</Tooltip>
+          ) : (
+            <p />
+          )
+        }
+        style={{ width: "100%" }}
+      >
+        <span className="d-inline-block" style={{ width: "100%" }}>
+          <Button
+            onClick={() => setShowCreateNode(true)}
+            disabled={!account}
+            style={{
+              width: "100%",
+              pointerEvents: account ? "auto" : "none",
+            }}
+          >
+            Create New!
+          </Button>
+        </span>
+      </OverlayTrigger>
+      <p />
+
       <h3>Featured Pages:</h3>
       {topNodes ? (
         <CardColumns>
@@ -109,21 +133,24 @@ const Home = () => {
                   <Card.Header
                     style={{
                       "background-color": "white",
-                      padding: "0px",
+                      padding: "1px",
                     }}
                   >
                     <Card.Img
                       src={node.pictureURL}
                       style={{
-                        "max-height": "56.25vw",
+                        "max-height": "30vh",
                         "object-fit": "cover",
+                      }}
+                      onError={(e) => {
+                        e.target.parentNode.style.display = "none";
                       }}
                     />
                   </Card.Header>
                 ) : (
                   ""
                 )}
-                <Card.Body>
+                <Card.Body style={{ paddingTop: "2em" }}>
                   <Card.Title>{node.title}</Card.Title>
                 </Card.Body>
               </a>
@@ -165,29 +192,6 @@ const Home = () => {
           <Alert.Heading>Loading...</Alert.Heading>
         </Alert>
       )}
-      <OverlayTrigger
-        overlay={
-          !account ? (
-            <Tooltip id="tooltip-disabled">You must be signed in!</Tooltip>
-          ) : (
-            <p />
-          )
-        }
-        style={{ width: "100%" }}
-      >
-        <span className="d-inline-block" style={{ width: "100%" }}>
-          <Button
-            onClick={() => setShowCreateNode(true)}
-            disabled={!account}
-            style={{
-              width: "100%",
-              pointerEvents: account ? "auto" : "none",
-            }}
-          >
-            Create New!
-          </Button>
-        </span>
-      </OverlayTrigger>
       {/* <h3>Featured Accounts:</h3>
       {topAccounts ? (
         <CardColumns>

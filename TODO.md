@@ -1,26 +1,33 @@
-# Non-essential cool features
+# Non-essential cool future features
 
-1. Profile pictures also a default profile picture
-2. Report choices and nodes that are inappropriate
-3. Add a back button or some sort of history feature, could potentially have the ability to store where you've been locally
-4. A chart feature to view all connected nodes, this could blend well into the local history idea, since a massive chart displaying all potential nodes would be really bad
-5. Ability to Sort choices to be in order of best or worst
-6. Pictures or at least the ability to set colors per node
-7. Explicit content mode / make certain nodes not allow bad words
-8. Static header and Footer with contact information / patreon as well as advertisement
-9. Ability Set/delete variables, either save them per user or save pass them from node to node, I feel like passing from node to node is cooler and easier to deal with. This is a really cool idea and I definitely want to implement it eventually since this will give a shit ton of power to creators.
-10. Featured pages at home screen really truly only shows featured pages
-11. Ability to hide Nodes instead of deleting them, i.e. make them private
+1. Report choices and nodes that are inappropriate / mature content filter4. A chart feature to view all connected nodes, this could blend well into the local history idea, since a massive chart displaying all potential nodes would be really bad
+2. Ability to Sort choices to be in order of best or worst
+3. Static header and Footer with contact information / patreon as well as advertisements
+4. Ability to Set/delete variables, either save them per user or save pass them from node to node, I feel like passing from node to node is cooler and easier to deal with but will be weird if a back tracking system is set up. This is a really cool idea in general and I definitely want to implement it eventually since this will give a shit ton of power to creators.
+5. Ability to hide Nodes instead of deleting them, i.e. make them private
+6. Notifications when someone adds a suggestion on your nodes
+7. Subscriptions - not sure how this will work at all or If I wanna do it
+8. A better tutorial
+9. The actions taken should really not have to reload the page every single time, it would be better if they just edited the page only reloaded when they need to
+10. I still don't love how the choices look
+11. I wish the button colors were slightly brighter or like more appealing
+12. Page colors are implemented but its not possible to edit them on the front end, I dont even know if I want them to be a thing anyways
+13. You should be able to upload photos or maybe search giphy library
+    - Maybe if you dont put a picture in it does an auto search of the giphy library based on the title of the node
 
 # Bugs / Unwanted features
 
-1. I am not sure how to get around the fact that graphql forces you to not use " like in any capacity. Actually I have some ideas but I will figure it out later. Right now it just doesnt let you input " anywhere. Not really a bug but definitely a feature I would like fleshed out more
-2. Not all text boxes are escaped properly
-3. Edit choice button doesnt work
-4. Report button doesnt work
-5. Suggesting/Editing Choice should allow you to search for a node
-6. The account page should have options on each node
-7. API isnt even blocked by an API Key or anything
-8. The drop down menu on actions can cover the text sometimes
-9. Liking/disliking reloads the entire page, it can probably be done locally and send a backend call
-10. It should be made clear that screen names and passwords are case sensitive
+1. Report button doesnt work
+2. API isnt even blocked by an API Key or anything, that should be fixed before it gets too big but its fine for now
+3. It should be made clear that screen names and passwords are case sensitive
+4. The required validations dont work anymore since the forms arent submitting
+5. Something I did while editing node deleted it - not sure what
+6. When creating a new node that stems from a node that was created before pictures were implemented, the picture returns as null instead of empty - backend fix
+7. Editing the picture field doesn’t get rid of the “picture not found” field
+8. On iPhone the go to page search bar goes off the side and you can’t scroll
+9. They should probably be a limit on the size of the content and titles
+10. The search bar shouldn’t load everything at once
+11. I’m not sure if total node views on accounts even matters
+12. You can't edit your account
+13. It's a little slow to load home page because its doing a database filter every time
+14. There are tons of react warnings, and a few github security warnings that should probably be fixed

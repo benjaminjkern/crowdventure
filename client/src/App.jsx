@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { HashRouter, Route, Switch } from "react-router-dom";
+import { HashRouter, Route, Switch, Redirect, Router } from "react-router-dom";
 
 import Node from "./Node";
 import Account from "./Account";
@@ -11,6 +11,7 @@ import { Navbar, Container, Button, Modal, Form } from "react-bootstrap";
 import { app_fetch, escape } from "./index";
 
 import history from "history/browser";
+const packageJson = require("../package.json");
 
 const App = () => {
   const [bgColor, setBgColor] = useState(undefined);
@@ -26,7 +27,9 @@ const App = () => {
             style={{ width: "100%" }}
           />
         </Navbar.Brand>
-        <small class="text-muted">Version: 0.1.4</small>
+        <a href="https://github.com/benjaminjkern/crowdventure/blob/master/CHANGELOG.md">
+          <small class="text-muted">Version: {packageJson.version}</small>
+        </a>
         <Navbar.Toggle aria-controls="basic-navbar-nav" className="bg-light" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           <AccountManager />
@@ -91,7 +94,7 @@ const AccountManager = () => {
     const esScreenName = escape(screenName);
     const esPass = escape(pass1);
     app_fetch({
-      query: `mutation{createAccount(screenName:"${esScreenName}",password:"${esPass}"){screenName}}`,
+      query: `mutation{createAccount(screenName:"${esScreenName}",password:"${esPass}"){screenName,profilePicURL}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data && res.data.createAccount) {
@@ -107,7 +110,7 @@ const AccountManager = () => {
     const esScreenName = escape(screenName);
     const esPass = escape(pass1);
     app_fetch({
-      query: `mutation{loginAccount(screenName:"${esScreenName}",password:"${esPass}"){screenName}}`,
+      query: `mutation{loginAccount(screenName:"${esScreenName}",password:"${esPass}"){screenName,profilePicURL}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data && res.data.loginAccount) {
@@ -128,7 +131,7 @@ const AccountManager = () => {
     let loggedInAs = escape(new Cookies().get("account"));
     if (loggedInAs)
       app_fetch({
-        query: `mutation{loginAccount(screenName:"${loggedInAs}"){screenName}}`,
+        query: `mutation{loginAccount(screenName:"${loggedInAs}"){screenName,profilePicURL}}`,
       }).then((res, err) => {
         if (err) alert(err);
         if (res.data) setAccount(res.data.loginAccount);
@@ -226,6 +229,23 @@ const AccountManager = () => {
         href={`/crowdventure/#/account/${account.screenName}`}
         onClick={() => setTimeout(() => window.location.reload(false), 100)}
       >
+        <img
+          src={
+            account.profilePicURL
+              ? account.profilePicURL
+              : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
+          }
+          onError={(e) => {
+            e.target.src = process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
+          }}
+          style={{
+            border: "1px solid #bbb",
+            height: "2em",
+            width: "2em",
+            "object-fit": "cover",
+            "border-radius": "50%",
+          }}
+        />{" "}
         {account.screenName}
       </a>
     </Navbar.Text>
