@@ -1,1 +1,9 @@
-{ "extends": ["prettier", "prettier/react"] }
+{
+  "extends": ["prettier", "prettier/react"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true,
+      "modules": true
+    }
+  }
+}

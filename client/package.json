@@ -16,6 +16,7 @@
         "graphql": "^15.0.0",
         "graphql-tools": "^4.0.7",
         "history": "^5.0.0",
+        "lodash": "^4.17.19",
         "node-fetch": "^2.6.0",
         "react": "^16.13.1",
         "react-aspect-ratio": "^1.0.42",

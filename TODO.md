@@ -28,7 +28,7 @@
 9. They should probably be a limit on the size of the content and titles
 10. The search bar shouldn’t load everything at once
 11. I’m not sure if total node views on accounts even matters
-12. You can't edit your account
+12. You can't edit your account screenname or password
 13. It's a little slow to load home page because its doing a database filter every time
 14. There are tons of react warnings, and a few github security warnings that should probably be fixed
 15. There aren't really tests
