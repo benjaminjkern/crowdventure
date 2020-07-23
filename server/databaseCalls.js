@@ -9,7 +9,7 @@ const docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
 const ACCOUNT_TABLE = "Accounts";
 const NODE_TABLE = "Nodes";
 const CHOICE_TABLE = "Choices";
-const REPORT_TABLE = "Reports";
+const FEEDBACK_TABLE = "Feedback";
 
 const databaseCalls = {
     filterFeatured: async() => await filter(NODE_TABLE, "featured", true),
@@ -17,26 +17,27 @@ const databaseCalls = {
     allAccounts: async() => await getFullTable(ACCOUNT_TABLE),
     allNodes: async() => await getFullTable(NODE_TABLE),
     allChoices: async() => await getFullTable(CHOICE_TABLE),
-    allReports: async() => await getFullTable(REPORT_TABLE),
+    allFeedback: async() => await getFullTable(FEEDBACK_TABLE),
 
     getAccount: async(accountScreenName) =>
         await getItem(ACCOUNT_TABLE, { screenName: accountScreenName }),
     getNode: async(nodeID) => await getItem(NODE_TABLE, { ID: nodeID }),
     getChoice: async(choiceID) => await getItem(CHOICE_TABLE, { ID: choiceID }),
-    getReport: async(reportID) => await getItem(REPORT_TABLE, { ID: reportID }),
+    getFeedback: async(feedbackID) =>
+        await getItem(FEEDBACK_TABLE, { ID: feedbackID }),
 
     addAccount: async(account) => await addItem(ACCOUNT_TABLE, account),
     addNode: async(node) => await addItem(NODE_TABLE, node),
     addChoice: async(choice) => await addItem(CHOICE_TABLE, choice),
-    addReport: async(report) => await addItem(REPORT_TABLE, report),
+    addFeedback: async(feedback) => await addItem(FEEDBACK_TABLE, feedback),
 
     removeAccount: async(accountScreenName) =>
         await removeItem(ACCOUNT_TABLE, { screenName: accountScreenName }),
     removeNode: async(nodeID) => await removeItem(NODE_TABLE, { ID: nodeID }),
     removeChoice: async(choiceID) =>
         await removeItem(CHOICE_TABLE, { ID: choiceID }),
-    removeReport: async(reportID) =>
-        await removeItem(REPORT_TABLE, { ID: reportID }),
+    removeFeedback: async(feedbackID) =>
+        await removeItem(FEEDBACK_TABLE, { ID: feedbackID }),
 };
 
 const getFullTable = async(tableName, lastEvaluatedKey) => {

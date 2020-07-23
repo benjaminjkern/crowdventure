@@ -47,19 +47,19 @@ const typeDefs = gql `
     score: Int!
   }
 
-  type Report {
+  type Feedback {
     ID: String!
+    info: String!
+
     submittedBy: Account
-    inQuestion: Account! | Node! | Choice!
-    reason: String!
-    additionalInfo: String
+    reporting: String
   }
 
   type Query {
     allAccounts: [Account!]
     allNodes: [Node!]
     allChoices: [Choice!]
-    allReports: [Report!]
+    allFeedback: [Feedback!]
 
     featuredNodes: [Node!]
 
@@ -118,8 +118,13 @@ const typeDefs = gql `
     likeSuggestion(accountScreenName: String!, choiceID: String!): Choice
     dislikeSuggestion(accountScreenName: String!, choiceID: String!): Choice
 
-    createReport(accountScreenName: String, type: String!, objectID: String!, reason: String!, other: String): Report
-    removeReport(reportID: String!): Boolean
+    createFeedback(
+      accountScreenName: String
+      reportingObjectType: String
+      reportingObjectID: String
+      info: String!
+    ): Feedback
+    removeFeedback(feedbackID: String!): Boolean
   }
 `;
 

@@ -8,12 +8,12 @@
 6. Notifications when someone adds a suggestion on your nodes
 7. Subscriptions - not sure how this will work at all or If I wanna do it
 8. A better tutorial
-9. The actions taken should really not have to reload the page every single time, it would be better if they just edited the page only reloaded when they need to
-10. I still don't love how the choices look
-11. I wish the button colors were slightly brighter or like more appealing
-12. Page colors are implemented but its not possible to edit them on the front end, I dont even know if I want them to be a thing anyways
-13. You should be able to upload photos or maybe search giphy library
+9. I still don't love how the choices look
+10. Page colors are implemented but its not possible to edit them on the front end, I dont even know if I want them to be a thing anyways
+11. You should be able to upload photos or maybe search giphy library
     - Maybe if you dont put a picture in it does an auto search of the giphy library based on the title of the node
+12. Maybe owner catch phrases / Taglines?? Could be fun hahaha
+13.
 
 # Bugs / Unwanted features
 
@@ -32,3 +32,5 @@
 13. It's a little slow to load home page because its doing a database filter every time
 14. There are tons of react warnings, and a few github security warnings that should probably be fixed
 15. There aren't really tests
+16. Story size doesnt work at the moment/is too slow
+17. Making stuff canon/noncanon still reloads the page, but thats not a huge deal

@@ -16,8 +16,14 @@ const escape = (text, newlines = false) =>
       : text.replace(/\n/g, "").replace(/\\/g, `\\\\`).replace(/"/g, `\\"`)
     : text;
 
+const palette = [
+  "rgb(100, 180, 244)",
+  "rgb(158, 232, 255)",
+  "rgb(90, 170, 234)",
+];
+
 // ========================================
 
 ReactDOM.render(<App />, document.getElementById("root"));
 
-export { app_fetch, escape };
+export { app_fetch, escape, palette };

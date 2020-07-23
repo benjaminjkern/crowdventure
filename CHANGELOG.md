@@ -14,9 +14,16 @@
 - Cleaned up backend so it doesnt flood the log files with second-order or redundant calls
 - Pictures show up on account page featured nodes
 - Fixed bug where images would error and still show in the header of cards
-- Changed colors of buttons to be consistent and also moved delete page button to be inside of the edit page modal
-  NOT DONE YET
 - Cleaned repo
+- Logging out no longer forces you to go to home page
+- Added feedback capabilities on backend
+- Changed colors, text, and position of buttons and divs to be more consistent/to look a bit better
+- Changed "Owner" to "Author" on the front end on all pages
+- Made it show the profile pic of the author when you are searching for a node as well as at the bottom of the page
+- A lot of small visual changes to be a bit cleaner
+- Temporarily removed story sized on frontend, for now it just returns everything in random order which is kind of fun
+- Made liking/disliking not have to reload the page
+- Made link switching and going back not have to reload the page (STILL NEED TO DO ACCOUNTS)
 
 > Note: All changelogs before version 0.1.5 are approximated, as the changelog was not actually implemented until version 0.1.5
 
@@ -48,7 +55,7 @@
 
 ### Version 0.1.1
 
-- Security checks on frontend
+- Security checks on frontend, which allow it to actually act as a real system
 - Bug fixes
 
 ### Version 0.1.0

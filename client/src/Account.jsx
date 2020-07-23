@@ -16,7 +16,7 @@ import {
 } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 
-import { app_fetch, escape } from "./index";
+import { app_fetch, escape, palette } from "./index";
 
 const Account = (props) => {
   const accountID = escape(props.match.params.id);
@@ -162,7 +162,7 @@ const Account = (props) => {
           }}
           onClick={() => setShowPicture(true)}
         />{" "}
-        {account.screenName}
+        <span className="display-4 align-middle">{account.screenName}</span>
       </h1>
       {account.bio ? (
         <Container>
@@ -177,12 +177,13 @@ const Account = (props) => {
       <Container>
         {loggedInAs && loggedInAs.screenName === account.screenName ? (
           <Button
-            variant="secondary"
+            variant="light"
             onClick={() => {
               setBio(account.bio);
               setPicture(account.profilePicURL);
               setShowEditPage(true);
             }}
+            size="sm"
           >
             Edit Account
           </Button>
@@ -199,9 +200,15 @@ const Account = (props) => {
       {loggedInAs && loggedInAs.screenName === account.screenName ? (
         <Button
           onClick={() => setShowCreateNode(true)}
-          style={{ width: "100%" }}
+          style={{
+            width: "100%",
+            border: `1px solid ${palette[2]}`,
+            backgroundColor: palette[0],
+          }}
+          onMouseEnter={(e) => (e.target.style.backgroundColor = palette[2])}
+          onMouseLeave={(e) => (e.target.style.backgroundColor = palette[0])}
         >
-          Create New Page!
+          Create New Crowdventure!
         </Button>
       ) : (
         ""
@@ -292,7 +299,7 @@ const Account = (props) => {
               </DropdownButton>
               <Card.Footer className="text-muted text-center">
                 <small>
-                  Created by:{" "}
+                  Author:{" "}
                   <img
                     src={
                       account.profilePicURL
@@ -419,11 +426,11 @@ const Account = (props) => {
               <Modal.Footer>
                 <Button onClick={editPage}>Edit Account</Button>
                 <Button
-                  href="/crowdventure"
-                  onClick={() =>
-                    new Cookies().set("account", "", { path: "/" })
-                  }
-                  variant="danger"
+                  onClick={() => {
+                    new Cookies().set("account", "", { path: "/" });
+                    window.location.reload(false);
+                  }}
+                  variant="secondary"
                 >
                   Log out
                 </Button>

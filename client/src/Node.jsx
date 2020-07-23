@@ -18,12 +18,11 @@ import { Redirect } from "react-router-dom";
 
 import { Typeahead } from "react-bootstrap-typeahead";
 
-import { app_fetch, escape } from "./index";
+import { app_fetch, escape, palette } from "./index";
 
 const Node = (props) => {
   const { history, match } = props;
   const [redirect, setRedirect] = useState(undefined);
-  const nodeID = escape(match.params.id);
   const [account, setAccount] = useState(undefined);
   const [node, setNode] = useState(undefined);
 
@@ -70,7 +69,7 @@ const Node = (props) => {
     const esContent = escape(editContent, true);
     const esURL = escape(editURL);
     app_fetch({
-      query: `mutation{editNode(nodeID:"${nodeID}",title:"${esTitle}",content:"""${esContent}""",pictureURL:"${esURL}"){ID}}`,
+      query: `mutation{editNode(nodeID:"${node.ID}",title:"${esTitle}",content:"""${esContent}""",pictureURL:"${esURL}"){ID}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data && res.data.editNode) {
@@ -89,7 +88,7 @@ const Node = (props) => {
     } else {
       const escaped = escape(suggestAction);
       app_fetch({
-        query: `mutation{suggestChoice(accountScreenName:"${account.screenName}",fromID:"${nodeID}",action:"${escaped}",toID:"${toID}"){ID}}`,
+        query: `mutation{suggestChoice(accountScreenName:"${account.screenName}",fromID:"${node.ID}",action:"${escaped}",toID:"${toID}"){ID}}`,
       }).then((res, err) => {
         if (err) alert(err);
         if (res.data) {
@@ -103,7 +102,7 @@ const Node = (props) => {
 
   const deletePage = () => {
     app_fetch({
-      query: `mutation{deleteNode(nodeID:"${nodeID}")}`,
+      query: `mutation{deleteNode(nodeID:"${node.ID}")}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data) setRedirect(<Redirect to="/" />);
@@ -133,31 +132,37 @@ const Node = (props) => {
   };
 
   useEffect(() => {
-    const cookies = new Cookies();
-    const loggedInAs = escape(cookies.get("account"));
+    const pageID = escape(match.params.id);
+    if (!node || pageID !== node.ID)
+      app_fetch({
+        query: `query{getNode(ID:"${pageID}"){pictureURL,fgColor,bgColor,ID,title,content,views,owner{screenName,profilePicURL},canonChoices{suggestedBy{screenName,profilePicURL},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}},nonCanonChoices{suggestedBy{screenName,profilePicURL},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}}}}`,
+      }).then((res, err) => {
+        if (err) alert(err);
+        if (res.data && res.data.getNode) {
+          setNode(res.data.getNode);
+          props.setBgColor(res.data.getNode.bgColor);
+          props.setFgColor(res.data.getNode.fgColor);
+        } else setNode(null);
+      });
 
-    app_fetch({
-      query: `query{getNode(ID:"${nodeID}"){pictureURL,fgColor,bgColor,ID,title,content,views,owner{screenName},canonChoices{suggestedBy{screenName,profilePicURL},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}},nonCanonChoices{suggestedBy{screenName,profilePicURL},ID,action,to{ID},score,likedBy{screenName},dislikedBy{screenName}}}}`,
-    }).then((res, err) => {
-      if (err) alert(err);
-      if (res.data && res.data.getNode) {
-        setNode(res.data.getNode);
-        props.setBgColor(res.data.getNode.bgColor);
-        props.setFgColor(res.data.getNode.fgColor);
-      } else setNode(null);
-    });
-
-    app_fetch({
-      query: `mutation{loginAccount(screenName:"${loggedInAs}"){screenName}}`,
-    }).then((res, err) => {
-      if (err) alert(err);
-      if (res.data) setAccount(res.data.loginAccount);
-      else {
-        alert("Something went wrong when retrieving account logging out");
-        cookies.set("account", "", { path: "/" });
-      }
-    });
-  }, []);
+    if (!account) {
+      const cookies = new Cookies();
+      const loggedInAs = escape(cookies.get("account"));
+      if (loggedInAs)
+        app_fetch({
+          query: `mutation{loginAccount(screenName:"${loggedInAs}"){screenName}}`,
+        }).then((res, err) => {
+          if (err) alert(err);
+          if (res.data) setAccount(res.data.loginAccount);
+          else {
+            alert("Something went wrong when retrieving account, logging out");
+            cookies.set("account", "", { path: "/" });
+            setAccount(null);
+          }
+        });
+      else setAccount(null);
+    }
+  });
 
   if (node === undefined) {
     return (
@@ -182,9 +187,13 @@ const Node = (props) => {
   return (
     <Container>
       <title>Crowdventure! - {node.title}</title>
+      <h1 class="display-4 text-center">{node.title}</h1>
       {node.pictureURL ? (
         <img
           src={node.pictureURL}
+          onLoad={(e) => {
+            e.target.style.display = "block";
+          }}
           onError={(e) => {
             e.target.style.display = "none";
           }}
@@ -205,13 +214,34 @@ const Node = (props) => {
       ) : (
         ""
       )}
-      <h1>{node.title}</h1>
+      <br />
       <Container>
         {node.content.split("\n").map((line) => (
-          <p>{line}</p>
+          <p style={{ textIndent: "5%" }}>{line}</p>
         ))}
       </Container>
-      <p />
+      <Container className="row" style={{ paddingRight: "0px" }}>
+        <div class="col">
+          <h3>Choices:</h3>
+        </div>
+        <div class="col" style={{ paddingRight: "0px" }}>
+          <Button
+            onClick={() => {
+              history.back();
+            }}
+            size="lg"
+            className="float-right"
+            style={{
+              border: `1px solid ${palette[2]}`,
+              backgroundColor: palette[0],
+            }}
+            onMouseEnter={(e) => (e.target.style.backgroundColor = palette[2])}
+            onMouseLeave={(e) => (e.target.style.backgroundColor = palette[0])}
+          >
+            Go back!
+          </Button>
+        </div>
+      </Container>
       {node.canonChoices.length ? (
         <ChoiceColumns
           owner={node.owner}
@@ -232,80 +262,88 @@ const Node = (props) => {
           ends here.
         </p>
       )}
+
       <p />
 
-      <Button
-        variant="light"
-        className="text-primary"
-        onClick={() => {
-          history.back();
-          setTimeout(() => window.location.reload(false), 100);
-        }}
-        size="sm"
+      <Container className="row" style={{ paddingRight: "0px" }}>
+        <div class="col align-bottom">
+          <h3 class="align-bottom">Other options:</h3>
+        </div>
+        <div class="col text-right" style={{ paddingRight: "0px" }}>
+          <small class="text-muted">
+            Author:{" "}
+            <a href={`/crowdventure/#/account/${node.owner.screenName}`}>
+              <img
+                src={
+                  node.owner.profilePicURL
+                    ? node.owner.profilePicURL
+                    : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
+                }
+                onError={(e) => {
+                  e.target.src =
+                    process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
+                }}
+                style={{
+                  border: "1px solid #bbb",
+                  height: "2em",
+                  width: "2em",
+                  "object-fit": "cover",
+                  "border-radius": "50%",
+                }}
+              />{" "}
+              {node.owner.screenName}{" "}
+            </a>{" "}
+            <br />
+            Views: {node.views}
+          </small>
+          {account && node.owner.screenName === account.screenName ? (
+            <p>
+              <Button
+                variant="light"
+                size="sm"
+                onClick={() => {
+                  setEditTitle(node.title);
+                  setEditContent(node.content);
+                  setEditURL(node.pictureURL);
+                  setShowEditNode(true);
+                }}
+              >
+                Edit Page
+              </Button>
+            </p>
+          ) : (
+            ""
+          )}
+        </div>
+      </Container>
+      <p />
+      <OverlayTrigger
+        overlay={
+          !account ? (
+            <Tooltip id="tooltip-disabled">You must be signed in!</Tooltip>
+          ) : (
+            <p />
+          )
+        }
+        style={{ width: "100%" }}
       >
-        Go back!
-      </Button>
-
-      <p />
-      <p>
-        Owner:{" "}
-        <a href={`/crowdventure/#/account/${node.owner.screenName}`}>
-          {node.owner.screenName}
-        </a>{" "}
-        Views: {node.views}
-        {account && node.owner.screenName === account.screenName ? (
-          <p>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                setEditTitle(node.title);
-                setEditContent(node.content);
-                setEditURL(node.pictureURL);
-                setShowEditNode(true);
-              }}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={() => setShowConfirm(true)}
-            >
-              Delete
-            </Button>
-          </p>
-        ) : (
-          ""
-        )}
-      </p>
-      <h3>
-        Other options:
-        <p />
-        <OverlayTrigger
-          overlay={
-            !account ? (
-              <Tooltip id="tooltip-disabled">You must be signed in!</Tooltip>
-            ) : (
-              <p />
-            )
-          }
-          style={{ width: "100%" }}
-        >
-          <span className="d-inline-block" style={{ width: "100%" }}>
-            <Button
-              onClick={() => setShowSuggest(true)}
-              disabled={!account}
-              style={{
-                width: "100%",
-                pointerEvents: account ? "auto" : "none",
-              }}
-            >
-              Suggest New Choice
-            </Button>
-          </span>
-        </OverlayTrigger>
-      </h3>
+        <span className="d-inline-block" style={{ width: "100%" }}>
+          <Button
+            onClick={() => setShowSuggest(true)}
+            disabled={!account}
+            style={{
+              width: "100%",
+              pointerEvents: account ? "auto" : "none",
+              border: `1px solid ${palette[2]}`,
+              backgroundColor: palette[0],
+            }}
+            onMouseEnter={(e) => (e.target.style.backgroundColor = palette[2])}
+            onMouseLeave={(e) => (e.target.style.backgroundColor = palette[0])}
+          >
+            Suggest New Choice
+          </Button>
+        </span>
+      </OverlayTrigger>
       <p />
 
       <ChoiceColumns
@@ -483,6 +521,9 @@ const Node = (props) => {
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={editNode}>Edit Page!</Button>
+            <Button variant="danger" onClick={() => setShowConfirm(true)}>
+              Delete
+            </Button>
           </Modal.Footer>
         </Form>
       </Modal>
@@ -537,6 +578,9 @@ const Node = (props) => {
 
 const ChoiceColumns = (props) => {
   const { owner, account, choices, nodeID, canon, onEdit } = props;
+  const [info, setInfo] = useState("");
+  const [likeMap, setLikeMap] = useState(undefined);
+  const [thisNode, setThisNode] = useState(undefined);
 
   const like = (choiceID) => {
     if (account)
@@ -544,7 +588,6 @@ const ChoiceColumns = (props) => {
         query: `mutation{likeSuggestion(accountScreenName:"${account.screenName}",choiceID:"${choiceID}"){ID}}`,
       }).then((res, err) => {
         if (err) alert(err);
-        if (res.data && res.data.likeSuggestion) window.location.reload(false);
       });
   };
   const dislike = (choiceID) => {
@@ -553,8 +596,6 @@ const ChoiceColumns = (props) => {
         query: `mutation{dislikeSuggestion(accountScreenName:"${account.screenName}",choiceID:"${choiceID}"){ID}}`,
       }).then((res, err) => {
         if (err) alert(err);
-        if (res.data && res.data.dislikeSuggestion)
-          window.location.reload(false);
       });
   };
 
@@ -586,124 +627,186 @@ const ChoiceColumns = (props) => {
     });
   };
 
-  return (
-    <CardColumns>
-      {choices.map((choice) => (
-        <Card className="text-center">
-          <a
-            href={choice.to ? `/crowdventure/#/node/${choice.to.ID}` : ""}
-            style={{
-              pointerEvents: choice.to ? "auto" : "none",
-              color: choice.to ? undefined : "grey",
-            }}
-            onClick={() => setTimeout(() => window.location.reload(false), 100)}
-          >
-            <Card.Body style={{ cursor: "pointer", paddingTop: "2em" }}>
-              <Card.Title>{choice.action}</Card.Title>
-            </Card.Body>
-          </a>
-          <DropdownButton
-            variant="light"
-            style={{ position: "absolute", top: "0px", right: "0px" }}
-            size="sm"
-            drop="right"
-            title={<span class="fa">&#xf013;</span>}
-          >
-            <Dropdown.Item
-              disabled={!account || account.screenName !== owner.screenName}
-              onClick={() =>
-                canon ? makeNonCanon(choice.ID) : makeCanon(choice.ID)
-              }
-            >
-              Make {canon ? "Nonc" : "C"}anon
-            </Dropdown.Item>
-            <Dropdown.Item
-              disabled={
-                !account ||
-                (account.screenName !== choice.suggestedBy.screenName &&
-                  account.screenName !== owner.screenName)
-              }
-              onClick={() => removeSuggestion(choice.ID)}
-            >
-              Delete
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={() => onEdit(choice)}
-              disabled={
-                !account ||
-                (account.screenName !== choice.suggestedBy.screenName &&
-                  (!canon || account.screenName !== owner.screenName))
-              }
-            >
-              Edit
-            </Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item disabled>Report</Dropdown.Item>
-          </DropdownButton>
-          <Card.Footer>
-            <a
-              href={`/crowdventure/#/node/${nodeID}`}
-              style={{
-                pointerEvents: account ? "auto" : "none",
-                color: account
-                  ? choice.dislikedBy
-                      .map((account) => account.screenName)
-                      .includes(account.screenName)
-                    ? "red"
-                    : "black"
-                  : "grey",
-              }}
-              className="fa fa-thumbs-down"
-              onClick={() => dislike(choice.ID)}
-            ></a>
-            {" " + choice.score + " "}
-            <a
-              href={`/crowdventure/#/node/${nodeID}`}
-              style={{
-                pointerEvents: account ? "auto" : "none",
-                color: account
-                  ? choice.likedBy
-                      .map((account) => account.screenName)
-                      .includes(account.screenName)
-                    ? "green"
-                    : "black"
-                  : "grey",
-              }}
-              className="fa fa-thumbs-up"
-              onClick={() => like(choice.ID)}
-            ></a>
-            <br />
-            <small className="text-muted">
-              Suggested By:{" "}
+  useEffect(() => {
+    setLikeMap({
+      ...choices.reduce(
+        (p, choice, idx) => ({
+          ...p,
+          [idx]: {
+            disliked: account
+              ? choice.dislikedBy
+                  .map((account) => account.screenName)
+                  .includes(account.screenName)
+              : false,
+            liked: account
+              ? choice.likedBy
+                  .map((account) => account.screenName)
+                  .includes(account.screenName)
+              : false,
+            score: choice.score,
+          },
+        }),
+        {}
+      ),
+    });
+    setThisNode(nodeID);
+  });
+
+  if (likeMap && thisNode === nodeID)
+    return (
+      <CardColumns>
+        {info ? info : ""}
+        {choices.map((choice, idx) => {
+          return (
+            <Card className="text-center">
               <a
-                href={`/crowdventure/#/account/${choice.suggestedBy.screenName}`}
+                href={choice.to ? `/crowdventure/#/node/${choice.to.ID}` : ""}
+                style={{
+                  pointerEvents: choice.to ? "auto" : "none",
+                  color: choice.to ? undefined : "grey",
+                }}
               >
-                <img
-                  src={
-                    choice.suggestedBy.profilePicURL
-                      ? choice.suggestedBy.profilePicURL
-                      : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
-                  }
-                  onError={(e) => {
-                    e.target.src =
-                      process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
-                  }}
-                  style={{
-                    border: "1px solid #bbb",
-                    height: "2em",
-                    width: "2em",
-                    "object-fit": "cover",
-                    "border-radius": "50%",
-                  }}
-                />{" "}
-                {choice.suggestedBy.screenName}
+                <Card.Body style={{ cursor: "pointer", paddingTop: "2em" }}>
+                  <Card.Title>{choice.action}</Card.Title>
+                </Card.Body>
               </a>
-            </small>
-          </Card.Footer>
-        </Card>
-      ))}
-    </CardColumns>
-  );
+              <DropdownButton
+                variant="light"
+                style={{ position: "absolute", top: "0px", right: "0px" }}
+                size="sm"
+                drop="right"
+                title={<span class="fa">&#xf013;</span>}
+              >
+                <Dropdown.Item
+                  disabled={!account || account.screenName !== owner.screenName}
+                  onClick={() =>
+                    canon ? makeNonCanon(choice.ID) : makeCanon(choice.ID)
+                  }
+                >
+                  Make {canon ? "Nonc" : "C"}anon
+                </Dropdown.Item>
+                <Dropdown.Item
+                  disabled={
+                    !account ||
+                    (account.screenName !== choice.suggestedBy.screenName &&
+                      account.screenName !== owner.screenName)
+                  }
+                  onClick={() => removeSuggestion(choice.ID)}
+                >
+                  Delete
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() => onEdit(choice)}
+                  disabled={
+                    !account ||
+                    (account.screenName !== choice.suggestedBy.screenName &&
+                      (!canon || account.screenName !== owner.screenName))
+                  }
+                >
+                  Edit
+                </Dropdown.Item>
+                <Dropdown.Divider />
+                <Dropdown.Item disabled>Report</Dropdown.Item>
+              </DropdownButton>
+              <Card.Footer>
+                <a
+                  href={`/crowdventure/#/node/${nodeID}`}
+                  style={{
+                    pointerEvents: account ? "auto" : "none",
+                    color: account
+                      ? likeMap[idx].disliked
+                        ? "red"
+                        : "black"
+                      : "grey",
+                  }}
+                  className="fa fa-thumbs-down"
+                  onClick={(e) => {
+                    if (account) {
+                      setLikeMap({
+                        ...likeMap,
+                        [idx]: {
+                          liked: false,
+                          disliked: !likeMap[idx].disliked,
+                          score:
+                            likeMap[idx].score +
+                            (likeMap[idx].liked
+                              ? -2
+                              : likeMap[idx].disliked
+                              ? 1
+                              : -1),
+                        },
+                      });
+                    }
+                    dislike(choice.ID);
+                  }}
+                ></a>
+                {" " + (likeMap[idx] ? likeMap[idx].score : 0) + " "}
+                <a
+                  href={`/crowdventure/#/node/${nodeID}`}
+                  style={{
+                    pointerEvents: account ? "auto" : "none",
+                    color:
+                      account && likeMap[idx]
+                        ? likeMap[idx].liked
+                          ? "green"
+                          : "black"
+                        : "grey",
+                  }}
+                  className="fa fa-thumbs-up"
+                  onClick={() => {
+                    if (account) {
+                      setLikeMap({
+                        ...likeMap,
+                        [idx]: {
+                          disliked: false,
+                          liked: !likeMap[idx].liked,
+                          score:
+                            likeMap[idx].score +
+                            (likeMap[idx].disliked
+                              ? 2
+                              : likeMap[idx].liked
+                              ? -1
+                              : 1),
+                        },
+                      });
+                    }
+                    like(choice.ID);
+                  }}
+                ></a>
+                <br />
+                <small className="text-muted">
+                  Suggested By:{" "}
+                  <a
+                    href={`/crowdventure/#/account/${choice.suggestedBy.screenName}`}
+                  >
+                    <img
+                      src={
+                        choice.suggestedBy.profilePicURL
+                          ? choice.suggestedBy.profilePicURL
+                          : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
+                      }
+                      onError={(e) => {
+                        e.target.src =
+                          process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
+                      }}
+                      style={{
+                        border: "1px solid #bbb",
+                        height: "2em",
+                        width: "2em",
+                        "object-fit": "cover",
+                        "border-radius": "50%",
+                      }}
+                    />{" "}
+                    {choice.suggestedBy.screenName}
+                  </a>
+                </small>
+              </Card.Footer>
+            </Card>
+          );
+        })}
+      </CardColumns>
+    );
+  return null;
 };
 
 const SearchPage = (props) => {
@@ -734,7 +837,7 @@ const SearchPage = (props) => {
     } else setToNode(null);
 
     app_fetch({
-      query: `query{allNodes{title,owner{screenName},ID}}`,
+      query: `query{allNodes{title,owner{screenName,profilePicURL},ID}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data && res.data.allNodes) setAllNodes(res.data.allNodes);
@@ -755,7 +858,28 @@ const SearchPage = (props) => {
         <div onClick={() => callback(node.ID)}>
           {node.title}
           <div>
-            <small>Author: {node.owner.screenName}</small>
+            <small>
+              Author:{" "}
+              <img
+                src={
+                  node.owner.profilePicURL
+                    ? node.owner.profilePicURL
+                    : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
+                }
+                onError={(e) => {
+                  e.target.src =
+                    process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
+                }}
+                style={{
+                  border: "1px solid #bbb",
+                  height: "2em",
+                  width: "2em",
+                  "object-fit": "cover",
+                  "border-radius": "50%",
+                }}
+              />{" "}
+              {node.owner.screenName}
+            </small>
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 const { databaseCalls } = require("./databaseCalls.js");
 const { UserInputError } = require("apollo-server-lambda");
+const { inspect } = require("util");
 
 /*
  * Resolvers/endpoints for all GQL typeDefs
@@ -35,6 +36,17 @@ const sort = (list, compFunc) => {
         ...same,
         ...sort(after, compFunc),
     ];
+};
+
+const scramble = (list) => {
+    let newList = [...list];
+    for (let i in newList) {
+        const r = Math.floor(Math.random() * list.length);
+        let switcher = newList[r];
+        newList[r] = newList[i];
+        newList[i] = switcher;
+    }
+    return newList;
 };
 
 const allConnected = async(node, visited = {}) => {
@@ -167,6 +179,7 @@ const resolvers = {
             console.log(
                 `Retrieving size of story stemming from  from node ${parent.ID} (${parent.title})`
             );
+            return 0;
             if (parent.size) return parent.size;
             return Object.keys(await allConnected(parent)).length;
         },
@@ -228,11 +241,39 @@ const resolvers = {
             );
         },
     },
+    Feedback: {
+        submittedBy: async(parent, args, context, info) =>
+            await databaseCalls.getAccount(parent.submittedBy),
+        reporting: async(parent, args, context, info) => {
+            if (!parent.reporting.type) return null;
+            switch (parent.reporting.type) {
+                case "Account":
+                    return inspect(
+                        await databaseCalls.getAccount(parent.reporting.ID)
+                    ).replace(/\n/g, "");
+                case "Node":
+                    return inspect(
+                        await databaseCalls.getNode(parent.reporting.ID)
+                    ).replace(/\n/g, "");
+                case "Choice":
+                    return inspect(
+                        await databaseCalls.getChoice(parent.reporting.ID)
+                    ).replace(/\n/g, "");
+            }
+
+            throw new UserInputError(
+                `The parent's reporting object type is invalid`, {
+                    invalidArgs: parent.reporting.type,
+                }
+            );
+        },
+    },
     Query: {
-        featuredNodes: async() => await databaseCalls.filterFeatured(),
+        featuredNodes: async() => scramble(await databaseCalls.filterFeatured()),
         allAccounts: async() => await databaseCalls.allAccounts(),
         allNodes: async() => await databaseCalls.allNodes(),
         allChoices: async() => await databaseCalls.allChoices(),
+        allFeedback: async() => await databaseCalls.allFeedback(),
         getAccount: async(parent, args, context, info) => {
             let account = await databaseCalls.getAccount(args.screenName);
             if (!account)
@@ -612,6 +653,49 @@ const resolvers = {
 
             databaseCalls.addAccount(account);
             return await databaseCalls.addChoice(choice);
+        },
+        createFeedback: async(parent, args, context, info) => {
+            let account;
+            let reporting;
+            if (args.accountScreenName) {
+                account = await databaseCalls.getAccount(args.accountScreenName);
+                if (!account)
+                    throw new UserInputError(`That account doesnt exist!`, {
+                        invalidArgs: Object.keys(args),
+                    });
+            }
+
+            if (
+                (args.reportingObjectType !== undefined) !==
+                (args.reportingObjectID !== undefined)
+            )
+                throw new UserInputError(
+                    `Invalid input, make sure you report both object type and ID`, {
+                        invalidArgs: Object.keys(args),
+                    }
+                );
+            if (args.reportingObjectType && args.reportingObjectID)
+                reporting = {
+                    type: args.reportingObjectType,
+                    ID: args.reportingObjectID,
+                };
+
+            const IP = context.headers["X-Forwarded-For"].split(",")[0];
+            return await databaseCalls.addFeedback({
+                ID: Math.random().toString(36).substring(2, 12).toUpperCase(),
+                submittedBy: args.accountScreenName || "",
+                IP,
+                reporting: reporting || "",
+                info: args.info,
+            });
+        },
+        removeFeedback: async(parent, args, context, info) => {
+            const feedback = await databaseCalls.getFeedback(args.feedbackID);
+            if (!feedback)
+                throw new UserInputError(`That feedback doesn't exist!`, {
+                    invalidArgs: Object.keys(args),
+                });
+            return await databaseCalls.removeFeedback(feedback.ID);
         },
     },
 };

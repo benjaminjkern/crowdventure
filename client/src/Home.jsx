@@ -15,7 +15,7 @@ import { Redirect } from "react-router-dom";
 
 import "react-aspect-ratio/aspect-ratio.css";
 
-import { app_fetch, escape } from "./index";
+import { app_fetch, escape, palette } from "./index";
 
 const Home = () => {
   const [topNodes, setTopNodes] = useState(undefined);
@@ -91,7 +91,7 @@ const Home = () => {
   return (
     <Container>
       <title>Crowdventure!</title>
-      <h1>Welcome!</h1>
+      <h1 className="display-4">Welcome!</h1>
       <Container>
         Crowdventure is a Crowd-Sourced
         Choose-and-Create-Your-Own-Adventure-Game!
@@ -115,9 +115,13 @@ const Home = () => {
             style={{
               width: "100%",
               pointerEvents: account ? "auto" : "none",
+              border: `1px solid ${palette[2]}`,
+              backgroundColor: palette[0],
             }}
+            onMouseEnter={(e) => (e.target.style.backgroundColor = palette[2])}
+            onMouseLeave={(e) => (e.target.style.backgroundColor = palette[0])}
           >
-            Create New!
+            Create New Crowdventure!
           </Button>
         </span>
       </OverlayTrigger>
@@ -156,7 +160,7 @@ const Home = () => {
               </a>
               <Card.Footer>
                 <small className="text-muted">
-                  Created by:{" "}
+                  Author:{" "}
                   <a href={`/crowdventure/#/account/${node.owner.screenName}`}>
                     <img
                       src={
@@ -178,8 +182,6 @@ const Home = () => {
                     />{" "}
                     {node.owner.screenName}
                   </a>
-                  <br />
-                  Story Size: {node.size}
                   <br />
                   Views: {node.views}
                 </small>

@@ -10,6 +10,7 @@
     "apollo-server": "^2.14.2",
     "apollo-server-lambda": "^2.15.0",
     "aws-sdk": "^2.703.0",
+    "color-thief-node": "^1.0.3",
     "dotenv": "^8.2.0"
   }
 }
