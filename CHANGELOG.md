@@ -1,6 +1,6 @@
 # Crowdventure Changelog
 
-### Version 0.1.5 (current)
+### Version 0.1.5 (In Progress)
 
 - Added Changelog as well as link to changelog in the version text, also reads the version from the package.json instead of manually putting it in every time
 - Adjusted Picture height for page links on home screen as well as on each page so that they feel more intuitive
@@ -27,7 +27,7 @@
 
 > Note: All changelogs before version 0.1.5 are approximated, as the changelog was not actually implemented until version 0.1.5
 
-### Version 0.1.4
+### Version 0.1.4 (current)
 
 - Pages can have pictures
 - Accounts can have pictures
