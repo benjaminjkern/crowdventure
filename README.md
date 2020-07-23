@@ -16,7 +16,7 @@ Crowdventure is a web-based and dynamically crowd-sourced Create-Your-Own-Advent
 
 Currently in Version 0.1.5. [See Change Log](https://github.com/benjaminjkern/crowdventure/blob/master/CHANGELOG.md)
 
-# Check it out here: [benjaminjkern.github.io/crowdventure](benjaminjkern.github.io/crowdventure)
+# Check it out here: [benjaminjkern.github.io/crowdventure](https://benjaminjkern.github.io/crowdventure)
 
 I made this project originally for school, but I liked the idea a lot so I stuck with it.
 Here is the [Documentation repo](https://github.com/benjaminjkern/cmsi-402-senior-project-lab).
