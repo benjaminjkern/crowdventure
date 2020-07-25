@@ -19,8 +19,6 @@ import { Redirect } from "react-router-dom";
 import { app_fetch, escape, palette } from "./index";
 
 const Account = (props) => {
-  const accountID = escape(props.match.params.id);
-  const loggedInAsID = escape(new Cookies().get("account"));
   const [redirect, setRedirect] = useState(undefined);
   const [account, setAccount] = useState(undefined);
   const [loggedInAs, setLoggedInAs] = useState(undefined);
@@ -39,28 +37,34 @@ const Account = (props) => {
   const [showPicture, setShowPicture] = useState(false);
 
   useEffect(() => {
-    app_fetch({
-      // TODO: EITHER IMPLEMENT SUGGESTED CHOICES OR GET RID OF IT
-      query: `query{getAccount(screenName:"${accountID}"){bio,screenName,profilePicURL,suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{featured,ID,title,views,pictureURL}}}`,
-    }).then((res, err) => {
-      if (err) alert(err);
-      if (res.data) setAccount(res.data.getAccount);
-      else alert("Something went wrong when retrieving account");
-    });
+    const pageID = escape(props.match.params.id);
+    if (!account || pageID !== account.screenName) {
+      app_fetch({
+        // TODO: EITHER IMPLEMENT SUGGESTED CHOICES OR GET RID OF IT
+        query: `query{getAccount(screenName:"${pageID}"){bio,screenName,profilePicURL,totalNodeViews,totalSuggestionScore,nodes{featured,ID,title,views,pictureURL}}}`,
+      }).then((res, err) => {
+        if (err) alert(err);
+        if (res.data && res.data.getAccount) {
+          setAccount(res.data.getAccount);
+        } else alert("Something went wrong when retrieving account");
+      });
+    }
 
-    const cookies = new Cookies();
-
-    app_fetch({
-      query: `mutation{loginAccount(screenName:"${loggedInAsID}"){screenName}}`,
-    }).then((res, err) => {
-      if (err) alert(err);
-      if (res.data) setLoggedInAs(res.data.loginAccount);
-      else {
-        alert("Something went wrong when logging in account, logging out");
-        cookies.set("account", "", { path: "/" });
-      }
-    });
-  }, []);
+    if (!loggedInAs) {
+      const cookies = new Cookies();
+      const loggedInAsID = escape(cookies.get("account"));
+      app_fetch({
+        query: `mutation{loginAccount(screenName:"${loggedInAsID}"){screenName}}`,
+      }).then((res, err) => {
+        if (err) alert(err);
+        if (res.data) setLoggedInAs(res.data.loginAccount);
+        else {
+          alert("Something went wrong when logging in account, logging out");
+          cookies.set("account", "", { path: "/" });
+        }
+      });
+    }
+  });
 
   const editPage = () => {
     const esBio = escape(bio, true);
@@ -92,17 +96,19 @@ const Account = (props) => {
   };
 
   const deleteAccount = () => {
-    new Cookies().set("account", "", { path: "/" });
+    if (loggedInAs && loggedInAs.screenName === account.screenName) {
+      new Cookies().set("account", "", { path: "/" });
 
-    app_fetch({
-      query: `mutation{deleteAccount(screenName:"${accountID}")}`,
-    }).then((res, err) => {
-      if (err) alert(err);
-      if (res.data) {
-        setRedirect(<Redirect to="/" />);
-        window.location.reload(false);
-      } else alert("Something went wrong when deleting account");
-    });
+      app_fetch({
+        query: `mutation{deleteAccount(screenName:"${loggedInAs.screenName}")}`,
+      }).then((res, err) => {
+        if (err) alert(err);
+        if (res.data) {
+          setRedirect(<Redirect to="/" />);
+          window.location.reload(false);
+        } else alert("Something went wrong when deleting account");
+      });
+    }
   };
 
   const featurePage = (node, alreadyFeatured) => {
@@ -160,14 +166,17 @@ const Account = (props) => {
             "margin-right": "5px",
             cursor: "pointer",
           }}
-          onClick={() => setShowPicture(true)}
+          onClick={() => {
+            setShowPicture(true);
+            setInfo("");
+          }}
         />{" "}
         <span className="display-4 align-middle">{account.screenName}</span>
       </h1>
       {account.bio ? (
         <Container>
           {account.bio.split("\n").map((line) => (
-            <p>{line}</p>
+            <p style={{ textIndent: "5%" }}>{line}</p>
           ))}
         </Container>
       ) : (
@@ -182,6 +191,7 @@ const Account = (props) => {
               setBio(account.bio);
               setPicture(account.profilePicURL);
               setShowEditPage(true);
+              setInfo("");
             }}
             size="sm"
           >
@@ -199,7 +209,12 @@ const Account = (props) => {
 
       {loggedInAs && loggedInAs.screenName === account.screenName ? (
         <Button
-          onClick={() => setShowCreateNode(true)}
+          onClick={() => {
+            setShowCreateNode(true);
+            setTitle("");
+            setContent("");
+            setInfo("");
+          }}
           style={{
             width: "100%",
             border: `1px solid ${palette[2]}`,
@@ -208,7 +223,7 @@ const Account = (props) => {
           onMouseEnter={(e) => (e.target.style.backgroundColor = palette[2])}
           onMouseLeave={(e) => (e.target.style.backgroundColor = palette[0])}
         >
-          Create New Crowdventure!
+          Create a New Adventure!
         </Button>
       ) : (
         ""
@@ -366,7 +381,6 @@ const Account = (props) => {
               <Modal.Body>
                 <Form.Label>Title:</Form.Label>
                 <Form.Control
-                  required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 ></Form.Control>
@@ -374,14 +388,31 @@ const Account = (props) => {
                 <Form.Control
                   as="textarea"
                   rows="3"
-                  required
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                 ></Form.Control>
                 {info ? info : ""}
               </Modal.Body>
               <Modal.Footer>
-                <Button onClick={createNode}>Create Page!</Button>
+                <Button
+                  onClick={() =>
+                    title
+                      ? content
+                        ? createNode()
+                        : setInfo(
+                            <span style={{ color: "red" }}>
+                              Content cannot be empty!
+                            </span>
+                          )
+                      : setInfo(
+                          <span style={{ color: "red" }}>
+                            Title cannot be empty!
+                          </span>
+                        )
+                  }
+                >
+                  Create Page!
+                </Button>
               </Modal.Footer>
             </Form>
           </Modal>
@@ -434,7 +465,13 @@ const Account = (props) => {
                 >
                   Log out
                 </Button>
-                <Button onClick={() => setShowConfirm(true)} variant="danger">
+                <Button
+                  onClick={() => {
+                    setShowConfirm(true);
+                    setInfo("");
+                  }}
+                  variant="danger"
+                >
                   Delete Account
                 </Button>
               </Modal.Footer>

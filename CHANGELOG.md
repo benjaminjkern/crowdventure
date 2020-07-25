@@ -2,6 +2,8 @@
 
 ### Version 0.1.5 (In Progress)
 
+> Release Date: TBD
+
 - Added Changelog as well as link to changelog in the version text, also reads the version from the package.json instead of manually putting it in every time
 - Adjusted Picture height for page links on home screen as well as on each page so that they feel more intuitive
 - Added profile pic to navbar at top of screen if you are logged in
@@ -23,11 +25,22 @@
 - A lot of small visual changes to be a bit cleaner
 - Temporarily removed story sized on frontend, for now it just returns everything in random order which is kind of fun
 - Made liking/disliking not have to reload the page
-- Made link switching and going back not have to reload the page (STILL NEED TO DO ACCOUNTS)
+- Made link switching and going back not have to reload the page
+- The required fields in forms prevent from submitting again
+- Fixed bug where warning info is not reset for modals
+- Made all data reset whenever you open a modal
+- Fixed bug where old nodes would return null pictureURLs
+
+WIP:
+
+- Uploading pictures instead of having to find a picture online
+- Put a picture with a brand new node (created from home screen or account screen)
 
 > Note: All changelogs before version 0.1.5 are approximated, as the changelog was not actually implemented until version 0.1.5
 
 ### Version 0.1.4 (current)
+
+> Release Date: 7/13/20
 
 - Pages can have pictures
 - Accounts can have pictures
@@ -41,6 +54,8 @@
 
 ### Version 0.1.3
 
+> Release Date: 6/30/20
+
 - Added the ability to look up nodes rather than needing them to be input by node ID
 - Added account bios
 - Moved delete account button to be within an edit modal that also allows you to edit the account bio
@@ -49,16 +64,22 @@
 
 ### Version 0.1.2
 
+> Release Date: 6/25/20
+
 - Added a blue background
 - Added the "Version" text
 - Added Copyright text at bottom of screen
 
 ### Version 0.1.1
 
+> Release Date: 6/24/20
+
 - Security checks on frontend, which allow it to actually act as a real system
 - Bug fixes
 
 ### Version 0.1.0
+
+> Release Date: 6/23/20
 
 - Initial Alpha release
 - Database and backend up and running

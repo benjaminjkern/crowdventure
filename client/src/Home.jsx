@@ -91,8 +91,8 @@ const Home = () => {
   return (
     <Container>
       <title>Crowdventure!</title>
-      <h1 className="display-4">Welcome!</h1>
-      <Container>
+      <h1 className="display-4 text-center">Welcome!</h1>
+      <Container className="text-center">
         Crowdventure is a Crowd-Sourced
         Choose-and-Create-Your-Own-Adventure-Game!
       </Container>
@@ -110,7 +110,10 @@ const Home = () => {
       >
         <span className="d-inline-block" style={{ width: "100%" }}>
           <Button
-            onClick={() => setShowCreateNode(true)}
+            onClick={() => {
+              setShowCreateNode(true);
+              setInfo("");
+            }}
             disabled={!account}
             style={{
               width: "100%",
@@ -121,7 +124,7 @@ const Home = () => {
             onMouseEnter={(e) => (e.target.style.backgroundColor = palette[2])}
             onMouseLeave={(e) => (e.target.style.backgroundColor = palette[0])}
           >
-            Create New Crowdventure!
+            Create a New Adventure!
           </Button>
         </span>
       </OverlayTrigger>
@@ -223,7 +226,6 @@ const Home = () => {
           <Modal.Body>
             <Form.Label>Title:</Form.Label>
             <Form.Control
-              required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             ></Form.Control>
@@ -231,14 +233,31 @@ const Home = () => {
             <Form.Control
               as="textarea"
               rows="3"
-              required
               value={content}
               onChange={(e) => setContent(e.target.value)}
             ></Form.Control>
             {info ? info : ""}
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={createNode}>Create Page!</Button>
+            <Button
+              onClick={() =>
+                title
+                  ? content
+                    ? createNode()
+                    : setInfo(
+                        <span style={{ color: "red" }}>
+                          Content cannot be empty!
+                        </span>
+                      )
+                  : setInfo(
+                      <span style={{ color: "red" }}>
+                        Title cannot be empty!
+                      </span>
+                    )
+              }
+            >
+              Create Page!
+            </Button>
           </Modal.Footer>
         </Form>
       </Modal>

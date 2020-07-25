@@ -13,24 +13,20 @@
 11. You should be able to upload photos or maybe search giphy library
     - Maybe if you dont put a picture in it does an auto search of the giphy library based on the title of the node
 12. Maybe owner catch phrases / Taglines?? Could be fun hahaha
-13.
 
 # Bugs / Unwanted features
 
 1. Report button doesnt work
 2. API isnt even blocked by an API Key or anything, that should be fixed before it gets too big but its fine for now
 3. It should be made clear that screen names and passwords are case sensitive
-4. The required validations dont work anymore since the forms arent submitting
-5. Something I did while editing node deleted it - not sure what
-6. When creating a new node that stems from a node that was created before pictures were implemented, the picture returns as null instead of empty - backend fix
-7. Editing the picture field doesn’t get rid of the “picture not found” field
-8. On iPhone the go to page search bar goes off the side and you can’t scroll
-9. They should probably be a limit on the size of the content and titles
-10. The search bar shouldn’t load everything at once
-11. I’m not sure if total node views on accounts even matters
-12. You can't edit your account screenname or password
-13. It's a little slow to load home page because its doing a database filter every time
-14. There are tons of react warnings, and a few github security warnings that should probably be fixed
-15. There aren't really tests
-16. Story size doesnt work at the moment/is too slow
-17. Making stuff canon/noncanon still reloads the page, but thats not a huge deal
+4. Something I did while editing node deleted it - not sure what
+5. On iPhone the go to page search bar goes off the side and you can’t scroll to read it
+6. They should probably be a limit on the size of the content and titles
+7. The search bar shouldn’t load everything at once
+8. I’m not sure if total node views on accounts even matters, and the more nodes a person has the slower this will be
+9. You can't edit your account screenname or password
+10. There are tons of react warnings that should be fixed
+11. There aren't tests
+12. Story size doesnt work at the moment because it is too slow
+13. Featuring a page shouldnt reload it
+14. Can't add pictures if you create a new abstract node

@@ -146,11 +146,25 @@ const AccountManager = () => {
     return (
       <Navbar.Text>
         You are not logged in.{" "}
-        <Button variant="light" onClick={() => setShowLogin(true)} size="sm">
+        <Button
+          variant="light"
+          onClick={() => {
+            setShowLogin(true);
+            setInfo("");
+          }}
+          size="sm"
+        >
           Log In
         </Button>{" "}
         or{" "}
-        <Button variant="light" onClick={() => setShowSignUp(true)} size="sm">
+        <Button
+          variant="light"
+          onClick={() => {
+            setShowSignUp(true);
+            setInfo("");
+          }}
+          size="sm"
+        >
           Sign Up
         </Button>
         <Modal show={showLogin} onHide={() => setShowLogin(false)}>
@@ -161,13 +175,11 @@ const AccountManager = () => {
             <Modal.Body>
               <Form.Label>Screen Name:</Form.Label>
               <Form.Control
-                required
                 value={screenName}
                 onChange={(e) => setScreenName(e.target.value)}
               />
               <Form.Label>Password:</Form.Label>
               <Form.Control
-                required
                 type="password"
                 value={pass1}
                 onChange={(e) => setPass1(e.target.value)}
@@ -175,7 +187,24 @@ const AccountManager = () => {
               {info ? info : ""}
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="primary" onClick={() => login()}>
+              <Button
+                variant="primary"
+                onClick={() =>
+                  screenName
+                    ? pass1
+                      ? login()
+                      : setInfo(
+                          <span style={{ color: "red" }}>
+                            Please enter your screenName!
+                          </span>
+                        )
+                    : setInfo(
+                        <span style={{ color: "red" }}>
+                          Please enter your password!
+                        </span>
+                      )
+                }
+              >
                 Log in
               </Button>
             </Modal.Footer>
@@ -190,20 +219,17 @@ const AccountManager = () => {
               <Form.Group>
                 <Form.Label>Screen Name:</Form.Label>
                 <Form.Control
-                  required
                   value={screenName}
                   onChange={(e) => setScreenName(e.target.value)}
                 />
                 <Form.Label>Create Password:</Form.Label>
                 <Form.Control
-                  required
                   type="password"
                   value={pass1}
                   onChange={(e) => setPass1(e.target.value)}
                 />
                 <Form.Label>Confirm Password:</Form.Label>
                 <Form.Control
-                  required
                   type="password"
                   value={pass2}
                   onChange={(e) => setPass2(e.target.value)}
@@ -212,7 +238,24 @@ const AccountManager = () => {
               {info ? info : ""}
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="primary" onClick={() => handleSubmitSignUp()}>
+              <Button
+                variant="primary"
+                onClick={() =>
+                  screenName
+                    ? pass1
+                      ? handleSubmitSignUp()
+                      : setInfo(
+                          <span style={{ color: "red" }}>
+                            Please enter a screen name!
+                          </span>
+                        )
+                    : setInfo(
+                        <span style={{ color: "red" }}>
+                          Please enter a password!
+                        </span>
+                      )
+                }
+              >
                 Sign Up
               </Button>
             </Modal.Footer>

@@ -83,7 +83,10 @@ const Node = (props) => {
     if (!toID) {
       setShowSuggest(false);
       setShowCreateNode(true);
-      setPicture(node.pictureURL);
+      setTitle("");
+      setContent("");
+      setInfo("");
+      setPicture(node.pictureURL ? node.pictureURL : "");
       setCreateNodeCallback([createNewAction]);
     } else {
       const escaped = escape(suggestAction);
@@ -114,7 +117,10 @@ const Node = (props) => {
     if (!toID) {
       setShowEditSuggest(false);
       setShowCreateNode(true);
-      setPicture(node.pictureURL);
+      setInfo("");
+      setTitle("");
+      setContent("");
+      setPicture(node.pictureURL ? node.pictureURL : "");
       setCreateNodeCallback([editChoice]);
     } else {
       let escaped = escape(suggestAction);
@@ -209,7 +215,10 @@ const Node = (props) => {
             "object-fit": "cover",
             cursor: "pointer",
           }}
-          onClick={() => setShowPicture(true)}
+          onClick={() => {
+            setShowPicture(true);
+            setInfo("");
+          }}
         />
       ) : (
         ""
@@ -254,6 +263,7 @@ const Node = (props) => {
             setToPage(choice.to.ID);
             setChoiceID(choice.ID);
             setShowEditSuggest(true);
+            setInfo("");
           }}
         />
       ) : (
@@ -306,6 +316,7 @@ const Node = (props) => {
                   setEditContent(node.content);
                   setEditURL(node.pictureURL);
                   setShowEditNode(true);
+                  setInfo("");
                 }}
               >
                 Edit Page
@@ -329,7 +340,13 @@ const Node = (props) => {
       >
         <span className="d-inline-block" style={{ width: "100%" }}>
           <Button
-            onClick={() => setShowSuggest(true)}
+            onClick={() => {
+              setShowSuggest(true);
+              setToPage("");
+              setChoiceID("");
+              setSuggestAction("");
+              setInfo("");
+            }}
             disabled={!account}
             style={{
               width: "100%",
@@ -357,6 +374,7 @@ const Node = (props) => {
           setToPage(choice.to.ID);
           setChoiceID(choice.ID);
           setShowEditSuggest(true);
+          setInfo("");
         }}
       />
 
@@ -372,7 +390,6 @@ const Node = (props) => {
           <Modal.Body>
             <Form.Label>Action:</Form.Label>
             <Form.Control
-              required
               value={suggestAction}
               onChange={(e) => setSuggestAction(e.target.value)}
             ></Form.Control>
@@ -381,9 +398,22 @@ const Node = (props) => {
               callback={(nodeID) => setToPage(nodeID)}
               toID={toPage}
             />
+            {info ? info : ""}
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={() => editChoice(toPage)}>Edit Choice</Button>
+            <Button
+              onClick={() =>
+                suggestAction
+                  ? editChoice(toPage)
+                  : setInfo(
+                      <span style={{ color: "red" }}>
+                        Action cannot be empty!
+                      </span>
+                    )
+              }
+            >
+              Edit Choice
+            </Button>
           </Modal.Footer>
         </Form>
       </Modal>
@@ -396,7 +426,6 @@ const Node = (props) => {
           <Modal.Body>
             <Form.Label>Action:</Form.Label>
             <Form.Control
-              required
               value={suggestAction}
               onChange={(e) => setSuggestAction(e.target.value)}
             />
@@ -405,9 +434,20 @@ const Node = (props) => {
               callback={(nodeID) => setToPage(nodeID)}
               toID={toPage}
             />
+            {info ? info : ""}
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={() => createNewAction(toPage)}>
+            <Button
+              onClick={() =>
+                suggestAction
+                  ? createNewAction(toPage)
+                  : setInfo(
+                      <span style={{ color: "red" }}>
+                        Action cannot be empty!
+                      </span>
+                    )
+              }
+            >
               Submit New Choice
             </Button>
           </Modal.Footer>
@@ -420,20 +460,6 @@ const Node = (props) => {
         </Modal.Header>
         <Form>
           <Modal.Body>
-            <Form.Label>Title:</Form.Label>
-            <Form.Control
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <Form.Label>Content:</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows="3"
-              required
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-            />
             {picture ? (
               <img
                 src={picture}
@@ -444,6 +470,7 @@ const Node = (props) => {
                   );
                 }}
                 style={{
+                  padding: "1px",
                   border: "1px solid #eee",
                   borderRadius: "8px",
                   width: "100%",
@@ -455,16 +482,44 @@ const Node = (props) => {
             )}
             <Form.Label>Picture:</Form.Label>
             <Form.File
-              id="custom-file"
               onChange={(e) => {
                 setPicture(URL.createObjectURL(e.target.files[0]));
               }}
-              custom
+            />
+            <Form.Label>Title:</Form.Label>
+            <Form.Control
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <Form.Label>Content:</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows="3"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
             />
             {info ? info : ""}
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={createNode}>Create Page!</Button>
+            <Button
+              onClick={() =>
+                title
+                  ? content
+                    ? createNode()
+                    : setInfo(
+                        <span style={{ color: "red" }}>
+                          Content cannot be empty!
+                        </span>
+                      )
+                  : setInfo(
+                      <span style={{ color: "red" }}>
+                        Title cannot be empty!
+                      </span>
+                    )
+              }
+            >
+              Create Page!
+            </Button>
           </Modal.Footer>
         </Form>
       </Modal>
@@ -495,7 +550,6 @@ const Node = (props) => {
             )}
             <Form.Label>Title:</Form.Label>
             <Form.Control
-              required
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
             />
@@ -503,7 +557,6 @@ const Node = (props) => {
             <Form.Control
               as="textarea"
               rows="3"
-              required
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
             />
@@ -520,8 +573,32 @@ const Node = (props) => {
             {info ? info : ""}
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={editNode}>Edit Page!</Button>
-            <Button variant="danger" onClick={() => setShowConfirm(true)}>
+            <Button
+              onClick={() =>
+                title
+                  ? content
+                    ? editNode()
+                    : setInfo(
+                        <span style={{ color: "red" }}>
+                          Content cannot be empty!
+                        </span>
+                      )
+                  : setInfo(
+                      <span style={{ color: "red" }}>
+                        Title cannot be empty!
+                      </span>
+                    )
+              }
+            >
+              Edit Page!
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                setShowConfirm(true);
+                setInfo("");
+              }}
+            >
               Delete
             </Button>
           </Modal.Footer>
@@ -581,6 +658,7 @@ const ChoiceColumns = (props) => {
   const [info, setInfo] = useState("");
   const [likeMap, setLikeMap] = useState(undefined);
   const [thisNode, setThisNode] = useState(undefined);
+  const [thisAccount, setThisAccount] = useState(undefined);
 
   const like = (choiceID) => {
     if (account)
@@ -628,31 +706,34 @@ const ChoiceColumns = (props) => {
   };
 
   useEffect(() => {
-    setLikeMap({
-      ...choices.reduce(
-        (p, choice, idx) => ({
-          ...p,
-          [idx]: {
-            disliked: account
-              ? choice.dislikedBy
-                  .map((account) => account.screenName)
-                  .includes(account.screenName)
-              : false,
-            liked: account
-              ? choice.likedBy
-                  .map((account) => account.screenName)
-                  .includes(account.screenName)
-              : false,
-            score: choice.score,
-          },
-        }),
-        {}
-      ),
-    });
-    setThisNode(nodeID);
+    if (!thisNode || thisNode !== nodeID || thisAccount === undefined) {
+      setLikeMap({
+        ...choices.reduce(
+          (p, choice, idx) => ({
+            ...p,
+            [idx]: {
+              disliked: account
+                ? choice.dislikedBy
+                    .map((account) => account.screenName)
+                    .includes(account.screenName)
+                : false,
+              liked: account
+                ? choice.likedBy
+                    .map((account) => account.screenName)
+                    .includes(account.screenName)
+                : false,
+              score: choice.score,
+            },
+          }),
+          {}
+        ),
+      });
+      setThisNode(nodeID);
+      setThisAccount(account);
+    }
   });
 
-  if (likeMap && thisNode === nodeID)
+  if (likeMap && thisNode === nodeID && thisAccount !== undefined)
     return (
       <CardColumns>
         {info ? info : ""}
