@@ -58,9 +58,11 @@ WIP:
 
 - Added the ability to look up nodes rather than needing them to be input by node ID
 - Added account bios
+- Added ability to feature nodes so that the home screen doesn't just show all possible nodes and accounts
 - Moved delete account button to be within an edit modal that also allows you to edit the account bio
-- Added a back button
-- Escape text and bug fixing
+- Added a back button - much easier to navigate between nodes now
+- Escaping text and bug fixing
+- Centered all text on cards
 
 ### Version 0.1.2
 
@@ -69,13 +71,17 @@ WIP:
 - Added a blue background
 - Added the "Version" text
 - Added Copyright text at bottom of screen
+- Made backend a bit more secure
+- Home screen sorts featured nodes (which is just all nodes rn) by views
 
 ### Version 0.1.1
 
 > Release Date: 6/24/20
 
-- Security checks on frontend, which allow it to actually act as a real system
+- Security checks on frontend, which allow it to actually act as a real system with accounts
 - Bug fixes
+- Ability to edit nodes and choices so that you don't have to delete them
+- Hook nodes up to other nodes with choices by using node IDs, I'll change this later so that you can just search for the nodes by title or author
 
 ### Version 0.1.0
 
