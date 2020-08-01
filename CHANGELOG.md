@@ -5,10 +5,10 @@
 > Release Date: TBD
 
 ##### TLDR:
-- Pictures are done through Pixabay now, meaning you don't have to go find a URL for each image
-- Switching between pages is a lot faster and smoother now
-- Lots of aesthetic changes to be a little bit more intuitive and consistent
-- Bug fixes that should've been done long ago
+- Pictures are done through Pixabay now, meaning you don't have to go find a URL for each image!
+- Switching between pages is a lot faster and smoother now!
+- Lots of aesthetic changes to be a little bit more intuitive and consistent!
+- Bug fixes that should've been done long ago!
 - This Changelog is now public!
 
 ##### Full list of changes:
