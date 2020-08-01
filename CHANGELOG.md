@@ -2,7 +2,7 @@
 
 ### Version 0.1.5 (Current)
 
-> Release Date: TBD
+> Release Date: 7/31/20
 
 ##### TLDR:
 - Pictures are done through Pixabay now, meaning you don't have to go find a URL for each image!
