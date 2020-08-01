@@ -1,6 +1,6 @@
 # Crowdventure Changelog
 
-### Version 0.1.5 (In Progress)
+### Version 0.1.5 (Current)
 
 > Release Date: TBD
 
@@ -41,7 +41,7 @@
 
 > Note: All changelogs before version 0.1.5 are approximated, as the changelog was not actually implemented until version 0.1.5
 
-### Version 0.1.4 (current)
+### Version 0.1.4
 
 > Release Date: 7/13/20
 
