@@ -227,7 +227,10 @@ const Node = (props) => {
           <p style={{ textIndent: "5%" }}>{line}</p>
         ))}
       </Container>
-      <Container className="row" style={{ paddingRight: "0px" }}>
+      <Container
+        className="row"
+        style={{ paddingRight: "0px", paddingBottom: "5px" }}
+      >
         <div class="col">
           <h3>Choices:</h3>
         </div>

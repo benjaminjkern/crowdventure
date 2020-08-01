@@ -43,3 +43,4 @@
 25. There should be a little image loading thing but I didnt wanna deal with it
 26. Image alt texts should be something significant
 27. Should put the API stuff in a env file instead of a private js file
+28. The titles being done per page was so that I could send a link and it would show up, not so that I cold send a link and have it not show up
