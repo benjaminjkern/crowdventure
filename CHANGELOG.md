@@ -63,6 +63,7 @@
 - Added ability to count size of the story
 - You can click on pictures and they will tell you they are either cool or neat!
 - Better Favicon that actually makes sense lol
+- Titles are done per page now
 
 ### Version 0.1.3
 
