@@ -1,6 +1,16 @@
 const { databaseCalls } = require("./databaseCalls.js");
 const { UserInputError } = require("apollo-server-lambda");
 const { inspect } = require("util");
+require("dotenv").config();
+const cloudinary = require("cloudinary");
+
+const CV = {
+    cloud_name: "crowdventure",
+    api_key: "617326335513481",
+    api_secret: "QLHvxspFW32zh9ced7mVMce2qnA",
+};
+
+cloudinary.config(CV);
 
 /*
  * Resolvers/endpoints for all GQL typeDefs
@@ -69,7 +79,6 @@ const allConnected = async(node, visited = {}) => {
 const resolvers = {
     Account: {
         nodes: async(parent, args, context, info) => {
-            console.log(`Retrieving nodes owned by ${parent.screenName}`);
             return await Promise.all(
                     parent.nodes.map((id) => databaseCalls.getNode(id))
                 )
@@ -85,15 +94,11 @@ const resolvers = {
                 );
         },
         suggestedChoices: async(parent, args, context, info) => {
-            console.log(`Retrieving choices suggested by ${parent.screenName}`);
             return await Promise.all(
                 parent.suggestedChoices.map((id) => databaseCalls.getChoice(id))
             );
         },
         totalNodeViews: async(parent, args, context, info) => {
-            console.log(
-                `Retrieving total views of all nodes owned by ${parent.screenName}`
-            );
             return await Promise.all(
                 parent.nodes.map((id) => databaseCalls.getNode(id))
             ).then((nodes) =>
@@ -103,9 +108,6 @@ const resolvers = {
             );
         },
         totalSuggestionScore: async(parent, args, context, info) => {
-            console.log(
-                `Retrieving total score of all choices suggested by ${parent.screenName}`
-            );
             return parent.suggestedChoices ?
                 await Promise.all(
                     parent.suggestedChoices.map((id) => databaseCalls.getChoice(id))
@@ -117,7 +119,6 @@ const resolvers = {
                 0;
         },
         featuredNodes: async(parent, args, context, info) => {
-            console.log(`Retrieving featured nodes owned by ${parent.screenName}`);
             let allNodes = await resolvers.Account.nodes(parent);
             return await Promise.all(
                 allNodes
@@ -144,21 +145,14 @@ const resolvers = {
                 parent.views;
         },
         owner: async(parent, args, context, info) => {
-            console.log(`Retrieving owner of node ${parent.ID} (${parent.title})`);
             return await databaseCalls.getAccount(parent.owner);
         },
         canonChoices: async(parent, args, context, info) => {
-            console.log(
-                `Retrieving all canon choices from node ${parent.ID} (${parent.title})`
-            );
             return await Promise.all(
                 parent.canonChoices.map((id) => databaseCalls.getChoice(id))
             );
         },
         nonCanonChoices: async(parent, args, context, info) => {
-            console.log(
-                `Retrieving all non-canon choices from node ${parent.ID} (${parent.title})`
-            );
             return await Promise.all(
                     parent.nonCanonChoices.map((id) => databaseCalls.getChoice(id))
                 )
@@ -176,9 +170,6 @@ const resolvers = {
         },
         // should return the total number of nodes it is connected to
         size: async(parent, args, context, info) => {
-            console.log(
-                `Retrieving size of story stemming from  from node ${parent.ID} (${parent.title})`
-            );
             return 0;
             if (parent.size) return parent.size;
             return Object.keys(await allConnected(parent)).length;
@@ -186,44 +177,27 @@ const resolvers = {
     },
     Choice: {
         from: async(parent, args, context, info) => {
-            console.log(
-                `Retrieving node from which choice ${parent.ID} (${parent.action}) was suggested`
-            );
             return await databaseCalls.getNode(parent.from);
         },
         to: async(parent, args, context, info) => {
-            console.log(
-                `Retrieving node that a choice ${parent.ID} (${parent.action}) goes to`
-            );
             return await databaseCalls.getNode(parent.to);
         },
         suggestedBy: async(parent, args, context, info) => {
-            console.log(
-                `Retrieving account that suggested choice ${parent.ID} (${parent.action})`
-            );
             return await databaseCalls.getAccount(parent.suggestedBy);
         },
         likes: (parent, args, context, info) => {
-            console.log(`Retrieving likes of choice ${parent.ID} (${parent.action})`);
             return Object.keys(parent.likedBy).length;
         },
         dislikes: (parent, args, context, info) => {
-            console.log(
-                `Retrieving dislikes of choice ${parent.ID} (${parent.action})`
-            );
             return Object.keys(parent.dislikedBy).length;
         },
         score: (parent, args, context, info) => {
-            console.log(`Retrieving score of choice ${parent.ID} (${parent.action})`);
             return (
                 parent.score ||
                 resolvers.Choice.likes(parent) - resolvers.Choice.dislikes(parent)
             );
         },
         likedBy: async(parent, args, context, info) => {
-            console.log(
-                `Retrieving all accounts that liked ${parent.ID} (${parent.action})`
-            );
             return await Promise.all(
                 Object.keys(parent.likedBy).map((accountScreenName) =>
                     databaseCalls.getAccount(accountScreenName)
@@ -231,9 +205,6 @@ const resolvers = {
             );
         },
         dislikedBy: async(parent, args, context, info) => {
-            console.log(
-                `Retrieving all accounts that disliked ${parent.ID} (${parent.action})`
-            );
             return await Promise.all(
                 Object.keys(parent.dislikedBy).map((accountScreenName) =>
                     databaseCalls.getAccount(accountScreenName)
@@ -290,21 +261,18 @@ const resolvers = {
             await databaseCalls.getChoice(args.ID),
         searchAccounts: async(parent, args, context, info) => {
             // these can absolutely be made better than just grabbing the entire database and searching here
-            console.log(`Searching for ${args.type}: ${args.query} in accounts`);
             if (!args.query) return [];
             return (await databaseCalls.allAccounts()).filter((account) =>
                 account[args.type].toLowerCase().includes(args.query.toLowerCase())
             );
         },
         searchNodes: async(parent, args, context, info) => {
-            console.log(`Searching for ${args.type}: ${args.query} in nodes`);
             if (!args.query) return [];
             return (await databaseCalls.allNodes()).filter((node) =>
                 node[args.type].toLowerCase().includes(args.query.toLowerCase())
             );
         },
         searchChoices: async(parent, args, context, info) => {
-            console.log(`Searching for ${args.type}: ${args.query} in choices`);
             if (!args.query) return [];
             return (await databaseCalls.allChoices()).filter((choice) =>
                 choice[args.type].toLowerCase().includes(args.query.toLowerCase())
@@ -696,6 +664,26 @@ const resolvers = {
                     invalidArgs: Object.keys(args),
                 });
             return await databaseCalls.removeFeedback(feedback.ID);
+        },
+        uploadFile: async(parent, { file }, context, info) => {
+            console.log("Uploading new file");
+            const { createReadStream, filename, mimetype, encoding } = await file;
+            console.log(file);
+            console.log(createReadStream);
+            console.log(filename);
+            console.log(mimetype);
+            console.log(encoding);
+
+            const stream = createReadStream();
+
+            const response = await cloudinary.v2.uploader.upload(
+                stream, {
+                    public_id: filename,
+                },
+                (data) => data
+            );
+
+            return { URL: response.secure_url, filename, mimetype };
         },
     },
 };

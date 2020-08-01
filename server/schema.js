@@ -55,6 +55,13 @@ const typeDefs = gql `
     reporting: String
   }
 
+  type File {
+    URL: String!
+    filename: String!
+    mimetype: String!
+    encoding: String!
+  }
+
   type Query {
     allAccounts: [Account!]
     allNodes: [Node!]
@@ -125,6 +132,8 @@ const typeDefs = gql `
       info: String!
     ): Feedback
     removeFeedback(feedbackID: String!): Boolean
+
+    uploadFile(file: Upload!): File!
   }
 `;
 

@@ -28,5 +28,18 @@
 10. There are tons of react warnings that should be fixed
 11. There aren't tests
 12. Story size doesnt work at the moment because it is too slow
-13. Featuring a page shouldnt reload it
-14. Can't add pictures if you create a new abstract node
+13. Featuring a page shouldnt have to reload it
+14. Pictures should show what part of them will show or have some sort of indication that it is going to be a banner
+15. There should probably be a limit on the amount of photos people can upload so that it doesnt get overrun, not a huge deal for now though -- doesnt matter rn because you cant upload hehe
+16. Oh my god there is a fucking react apollo I am so dumb I should switch to that
+17. Pressing enter when a modal is open submits the form (which doesnt do anything at the moment but I need to either make it submit for real or figure out a way so that submitting doesnt reload the page)
+18. The picture is a little bit too tall on the creating new page screen
+19. Figure out how to get it to show something if they have a script blocker
+20. Grayed out actions should have a tooltip that say why they're greyed out
+21. Cannot upload photos
+22. Should go through and set all nodes pictureURLs to empty string so it doesnt crash at some point
+23. I should absolutely reconcile a lot of the code so its not being repeated
+24. I think sometimes deleting nodes takes you to the account screen when it hsould take you to home... not sure whats up with it
+25. There should be a little image loading thing but I didnt wanna deal with it
+26. Image alt texts should be something significant
+27. Should put the API stuff in a env file instead of a private js file

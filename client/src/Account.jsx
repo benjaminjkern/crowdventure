@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
 import Cookies from "universal-cookie";
 import {
@@ -16,7 +16,7 @@ import {
 } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 
-import { app_fetch, escape, palette } from "./index";
+import { app_fetch, escape, palette, SearchImage } from "./index";
 
 const Account = (props) => {
   const [redirect, setRedirect] = useState(undefined);
@@ -26,13 +26,15 @@ const Account = (props) => {
   const [showCreateNode, setShowCreateNode] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [picture, setPicture] = useState("");
   const [info, setInfo] = useState("");
+  const [showChangePic, setShowChangePic] = useState(false);
 
   const [showEditPage, setShowEditPage] = useState(false);
   const [bio, setBio] = useState("");
 
   const [showConfirm, setShowConfirm] = useState(false);
-  const [picture, setPicture] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
 
   const [showPicture, setShowPicture] = useState(false);
 
@@ -68,7 +70,7 @@ const Account = (props) => {
 
   const editPage = () => {
     const esBio = escape(bio, true);
-    const esPicture = escape(picture);
+    const esPicture = escape(profilePicture);
     app_fetch({
       query: `mutation{editAccount(screenName:"${account.screenName}",bio:"""${esBio}""",profilePicURL:"${esPicture}"){bio,screenName,suggestedChoices{action, from{title}, to{title}},totalNodeViews,totalSuggestionScore, nodes{featured,ID,title,views}}}`,
     }).then((res, err) => {
@@ -84,13 +86,14 @@ const Account = (props) => {
   const createNode = () => {
     const esTitle = escape(title);
     const esContent = escape(content);
+    const esPicture = escape(picture);
     app_fetch({
-      query: `mutation{createNode(accountScreenName:"${account.screenName}",title:"${esTitle}",content:"${esContent}",featured:true){ID}}`,
+      query: `mutation{createNode(accountScreenName:"${account.screenName}",title:"${esTitle}",content:"${esContent}",featured:true,pictureURL:"${esPicture}"){ID}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data && res.data.createNode) {
         setShowCreateNode(false);
-        window.location.reload(false);
+        setRedirect(<Redirect to={`/node/${res.data.createNode.ID}`} />);
       } else alert("Something went wrong when creating node");
     });
   };
@@ -112,7 +115,6 @@ const Account = (props) => {
   };
 
   const featurePage = (node, alreadyFeatured) => {
-    alert(alreadyFeatured);
     app_fetch({
       query: `mutation{editNode(nodeID:"${
         node.ID
@@ -154,6 +156,7 @@ const Account = (props) => {
               ? account.profilePicURL
               : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
           }
+          alt={account.screenName + " Profile Pic"}
           onError={(e) => {
             e.target.src = process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
           }}
@@ -189,7 +192,7 @@ const Account = (props) => {
             variant="light"
             onClick={() => {
               setBio(account.bio);
-              setPicture(account.profilePicURL);
+              setProfilePicture(account.profilePicURL);
               setShowEditPage(true);
               setInfo("");
             }}
@@ -213,6 +216,7 @@ const Account = (props) => {
             setShowCreateNode(true);
             setTitle("");
             setContent("");
+            setPicture("");
             setInfo("");
           }}
           style={{
@@ -321,6 +325,7 @@ const Account = (props) => {
                         ? account.profilePicURL
                         : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
                     }
+                    alt={account.screenName + " Profile Pic"}
                     onError={(e) => {
                       e.target.src =
                         process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
@@ -353,6 +358,7 @@ const Account = (props) => {
               ? account.profilePicURL
               : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
           }
+          alt={account.screenName + " Profile Pic"}
           onError={(e) => {
             e.target.src = process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
           }}
@@ -379,18 +385,94 @@ const Account = (props) => {
             </Modal.Header>
             <Form>
               <Modal.Body>
+                {picture ? (
+                  <>
+                    <div
+                      style={{
+                        border: "1px solid #eee",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      <img
+                        src={picture}
+                        onError={(e) => {
+                          setInfo(
+                            <span style={{ color: "red" }}>
+                              Picture not found!
+                            </span>
+                          );
+                          setPicture("");
+                        }}
+                        alt="New Image"
+                        style={{
+                          padding: "1px",
+                          width: "100%",
+                          "object-fit": "contain",
+                          borderRadius: "8px",
+                        }}
+                      />
+                      <span
+                        class="fa fa-times"
+                        style={{
+                          position: "absolute",
+                          top: "1.5em",
+                          right: "1.5em",
+                          color: "#888",
+                          cursor: "pointer",
+                          textShadow:
+                            "-1px 0 2px white, 0 1px 2px white, 1px 0 2px white, 0 -1px 2px white",
+                        }}
+                        onMouseEnter={(e) => (e.target.style.color = "#555")}
+                        onMouseLeave={(e) => (e.target.style.color = "#888")}
+                        onClick={() => {
+                          setPicture("");
+                        }}
+                      />
+                    </div>
+
+                    <br />
+                  </>
+                ) : (
+                  ""
+                )}
+
+                <div class="row no-gutters">
+                  <div class="col">Picture:</div>
+                  <div class="col small text-muted text-center">
+                    {!picture ? "(Don't use any picture)" : "(Use new picture)"}
+                  </div>
+                  <div class="col text-right">
+                    <Button
+                      variant="light"
+                      size="sm"
+                      onClick={() => setShowChangePic(true)}
+                    >
+                      {picture ? "Change" : "Select"} Picture
+                    </Button>
+                  </div>
+                </div>
+                {showChangePic ? (
+                  <SearchImage
+                    callback={(url) => {
+                      setPicture(url);
+                      setShowChangePic(false);
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
                 <Form.Label>Title:</Form.Label>
                 <Form.Control
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                ></Form.Control>
+                />
                 <Form.Label>Content:</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows="3"
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                ></Form.Control>
+                />
                 {info ? info : ""}
               </Modal.Body>
               <Modal.Footer>
@@ -425,6 +507,7 @@ const Account = (props) => {
                 {account.profilePicURL ? (
                   <img
                     src={account.profilePicURL}
+                    alt={account.screenName + " Profile Pic"}
                     onError={(e) => {
                       e.target.style.display = "none";
                       setInfo(
@@ -442,8 +525,8 @@ const Account = (props) => {
                 )}
                 <Form.Label>Profile Pic URL:</Form.Label>
                 <Form.Control
-                  value={picture}
-                  onChange={(e) => setPicture(e.target.value)}
+                  value={profilePicture}
+                  onChange={(e) => setProfilePicture(e.target.value)}
                 />
                 <Form.Label>Bio:</Form.Label>
                 <Form.Control

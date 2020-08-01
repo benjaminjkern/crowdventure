@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
 import Cookies from "universal-cookie";
 import {
@@ -14,15 +14,13 @@ import {
   OverlayTrigger,
   Tooltip,
 } from "react-bootstrap";
-import { Redirect } from "react-router-dom";
 
 import { Typeahead } from "react-bootstrap-typeahead";
-
-import { app_fetch, escape, palette } from "./index";
+import { app_fetch, escape, palette, SearchImage } from "./index";
 
 const Node = (props) => {
   const { history, match } = props;
-  const [redirect, setRedirect] = useState(undefined);
+  const [redirect] = useState(undefined);
   const [account, setAccount] = useState(undefined);
   const [node, setNode] = useState(undefined);
 
@@ -35,13 +33,10 @@ const Node = (props) => {
   const [showCreateNode, setShowCreateNode] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [picture, setPicture] = useState("");
+  const [picture, setPicture] = useState(undefined);
   const [createNodeCallback, setCreateNodeCallback] = useState(undefined);
 
   const [showEditNode, setShowEditNode] = useState(false);
-  const [editTitle, setEditTitle] = useState("");
-  const [editContent, setEditContent] = useState("");
-  const [editURL, setEditURL] = useState("");
 
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -49,6 +44,7 @@ const Node = (props) => {
   const [choiceID, setChoiceID] = useState("");
 
   const [showPicture, setShowPicture] = useState(false);
+  const [showChangePic, setShowChangePic] = useState(false);
 
   const createNode = () => {
     const esTitle = escape(title);
@@ -65,11 +61,11 @@ const Node = (props) => {
   };
 
   const editNode = () => {
-    const esTitle = escape(editTitle);
-    const esContent = escape(editContent, true);
-    const esURL = escape(editURL);
+    const esTitle = escape(title);
+    const esContent = escape(content, true);
+    const esPicture = escape(picture);
     app_fetch({
-      query: `mutation{editNode(nodeID:"${node.ID}",title:"${esTitle}",content:"""${esContent}""",pictureURL:"${esURL}"){ID}}`,
+      query: `mutation{editNode(nodeID:"${node.ID}",title:"${esTitle}",content:"""${esContent}""",pictureURL:"${esPicture}"){ID}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data && res.data.editNode) {
@@ -86,7 +82,7 @@ const Node = (props) => {
       setTitle("");
       setContent("");
       setInfo("");
-      setPicture(node.pictureURL ? node.pictureURL : "");
+      setPicture(node.pictureURL || "");
       setCreateNodeCallback([createNewAction]);
     } else {
       const escaped = escape(suggestAction);
@@ -108,8 +104,10 @@ const Node = (props) => {
       query: `mutation{deleteNode(nodeID:"${node.ID}")}`,
     }).then((res, err) => {
       if (err) alert(err);
-      if (res.data) setRedirect(<Redirect to="/" />);
-      else alert("Something went wrong when deleting node");
+      if (res.data) {
+        history.back();
+        setTimeout(() => window.location.reload(false), 100);
+      } else alert("Something went wrong when deleting node");
     });
   };
 
@@ -120,7 +118,7 @@ const Node = (props) => {
       setInfo("");
       setTitle("");
       setContent("");
-      setPicture(node.pictureURL ? node.pictureURL : "");
+      setPicture(node.pictureURL || "");
       setCreateNodeCallback([editChoice]);
     } else {
       let escaped = escape(suggestAction);
@@ -151,7 +149,7 @@ const Node = (props) => {
         } else setNode(null);
       });
 
-    if (!account) {
+    if (account === undefined) {
       const cookies = new Cookies();
       const loggedInAs = escape(cookies.get("account"));
       if (loggedInAs)
@@ -312,9 +310,9 @@ const Node = (props) => {
                 variant="light"
                 size="sm"
                 onClick={() => {
-                  setEditTitle(node.title);
-                  setEditContent(node.content);
-                  setEditURL(node.pictureURL);
+                  setTitle(node.title);
+                  setContent(node.content);
+                  setPicture(node.pictureURL || "");
                   setShowEditNode(true);
                   setInfo("");
                 }}
@@ -461,31 +459,82 @@ const Node = (props) => {
         <Form>
           <Modal.Body>
             {picture ? (
-              <img
-                src={picture}
-                onError={(e) => {
-                  e.target.style.display = "none";
-                  setInfo(
-                    <span style={{ color: "red" }}>Picture not found!</span>
-                  );
-                }}
-                style={{
-                  padding: "1px",
-                  border: "1px solid #eee",
-                  borderRadius: "8px",
-                  width: "100%",
-                  "object-fit": "contain",
+              <>
+                <div
+                  style={{
+                    border: "1px solid #eee",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <img
+                    src={picture}
+                    onError={(e) => {
+                      setInfo(
+                        <span style={{ color: "red" }}>Picture not found!</span>
+                      );
+                      setPicture("");
+                    }}
+                    style={{
+                      padding: "1px",
+                      width: "100%",
+                      "object-fit": "contain",
+                      borderRadius: "8px",
+                    }}
+                  />
+                  <span
+                    class="fa fa-times"
+                    style={{
+                      position: "absolute",
+                      top: "1.5em",
+                      right: "1.5em",
+                      color: "#888",
+                      cursor: "pointer",
+                      textShadow:
+                        "-1px 0 2px white, 0 1px 2px white, 1px 0 2px white, 0 -1px 2px white",
+                    }}
+                    onMouseEnter={(e) => (e.target.style.color = "#555")}
+                    onMouseLeave={(e) => (e.target.style.color = "#888")}
+                    onClick={() => {
+                      setPicture("");
+                    }}
+                  />
+                </div>
+
+                <br />
+              </>
+            ) : (
+              ""
+            )}
+
+            <div class="row no-gutters">
+              <div class="col">Picture:</div>
+              <div class="col small text-muted text-center">
+                {!picture
+                  ? "(Don't use any picture)"
+                  : picture === node.pictureURL
+                  ? "(Use existing picture)"
+                  : "(Use new picture)"}
+              </div>
+              <div class="col text-right">
+                <Button
+                  variant="light"
+                  size="sm"
+                  onClick={() => setShowChangePic(true)}
+                >
+                  {picture ? "Change" : "Select"} Picture
+                </Button>
+              </div>
+            </div>
+            {showChangePic ? (
+              <SearchImage
+                callback={(url) => {
+                  setPicture(url);
+                  setShowChangePic(false);
                 }}
               />
             ) : (
               ""
             )}
-            <Form.Label>Picture:</Form.Label>
-            <Form.File
-              onChange={(e) => {
-                setPicture(URL.createObjectURL(e.target.files[0]));
-              }}
-            />
             <Form.Label>Title:</Form.Label>
             <Form.Control
               value={title}
@@ -526,23 +575,82 @@ const Node = (props) => {
 
       <Modal show={showEditNode} onHide={() => setShowEditNode(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Edit Page</Modal.Title>
+          <Modal.Title>Editing Page</Modal.Title>
         </Modal.Header>
         <Form>
           <Modal.Body>
-            {node.pictureURL ? (
-              <img
-                src={node.pictureURL}
-                onError={(e) => {
-                  e.target.style.display = "none";
-                  setInfo(
-                    <span style={{ color: "red" }}>Picture not found!</span>
-                  );
-                }}
-                style={{
-                  opacity: node.pictureURL === editURL ? 1 : 0.2,
-                  width: "100%",
-                  "object-fit": "contain",
+            {picture ? (
+              <>
+                <div
+                  style={{
+                    border: "1px solid #eee",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <img
+                    src={picture}
+                    onError={(e) => {
+                      setInfo(
+                        <span style={{ color: "red" }}>Picture not found!</span>
+                      );
+                      setPicture("");
+                    }}
+                    style={{
+                      padding: "1px",
+                      width: "100%",
+                      "object-fit": "contain",
+                      borderRadius: "8px",
+                    }}
+                  />
+                  <span
+                    class="fa fa-times"
+                    style={{
+                      position: "absolute",
+                      top: "1.5em",
+                      right: "1.5em",
+                      color: "#888",
+                      cursor: "pointer",
+                      textShadow:
+                        "-1px 0 2px white, 0 1px 2px white, 1px 0 2px white, 0 -1px 2px white",
+                    }}
+                    onMouseEnter={(e) => (e.target.style.color = "#555")}
+                    onMouseLeave={(e) => (e.target.style.color = "#888")}
+                    onClick={() => {
+                      setPicture("");
+                    }}
+                  />
+                </div>
+
+                <br />
+              </>
+            ) : (
+              ""
+            )}
+
+            <div class="row no-gutters">
+              <div class="col">Picture:</div>
+              <div class="col small text-muted text-center">
+                {!picture
+                  ? "(Don't use any picture)"
+                  : picture === node.pictureURL
+                  ? "(Use existing picture)"
+                  : "(Use new picture)"}
+              </div>
+              <div class="col text-right">
+                <Button
+                  variant="light"
+                  size="sm"
+                  onClick={() => setShowChangePic(true)}
+                >
+                  {picture ? "Change" : "Select"} Picture
+                </Button>
+              </div>
+            </div>
+            {showChangePic ? (
+              <SearchImage
+                callback={(url) => {
+                  setPicture(url);
+                  setShowChangePic(false);
                 }}
               />
             ) : (
@@ -550,25 +658,15 @@ const Node = (props) => {
             )}
             <Form.Label>Title:</Form.Label>
             <Form.Control
-              value={editTitle}
-              onChange={(e) => setEditTitle(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
             <Form.Label>Content:</Form.Label>
             <Form.Control
               as="textarea"
               rows="3"
-              value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
-            />
-            <Form.Label>Picture URL:</Form.Label>
-            <Form.Control
-              required
-              value={editURL}
-              onChange={(e) => {
-                setEditURL(e.target.value);
-                setInfo("");
-              }}
-              placeholder="(Leave empty to not use a picture)"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
             />
             {info ? info : ""}
           </Modal.Body>

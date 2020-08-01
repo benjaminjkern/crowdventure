@@ -30,11 +30,14 @@
 - Fixed bug where warning info is not reset for modals
 - Made all data reset whenever you open a modal
 - Fixed bug where old nodes would return null pictureURLs
-
-WIP:
-
-- Uploading pictures instead of having to find a picture online
-- Put a picture with a brand new node (created from home screen or account screen)
+- Updated serverless
+- Deleting a page takes you back one page now, instead of just back to the home page
+- You can now search for pictures through the pixabay API
+- You can no longer directly insert URLs for images, although you still have to input URL for a profile pic
+- I'm not sure how I feel about only being able to use pixabay pictures, but it is safe for now
+- You can now upload images when creating a brand new node
+- Cleaned out unneccessary comments
+- Cleaned out (some) React warnings
 
 > Note: All changelogs before version 0.1.5 are approximated, as the changelog was not actually implemented until version 0.1.5
 
@@ -51,6 +54,7 @@ WIP:
 - Moved edit account button to be above all pages
 - Added ability to count size of the story
 - You can click on pictures and they will tell you they are either cool or neat!
+- Better Favicon that actually makes sense lol
 
 ### Version 0.1.3
 
@@ -63,6 +67,7 @@ WIP:
 - Added a back button - much easier to navigate between nodes now
 - Escaping text and bug fixing
 - Centered all text on cards
+- A Favicon!
 
 ### Version 0.1.2
 

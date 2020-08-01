@@ -15,20 +15,19 @@ import { Redirect } from "react-router-dom";
 
 import "react-aspect-ratio/aspect-ratio.css";
 
-import { app_fetch, escape, palette } from "./index";
+import { app_fetch, escape, palette, SearchImage } from "./index";
 
 const Home = () => {
   const [topNodes, setTopNodes] = useState(undefined);
-  const [topAccounts, setTopAccounts] = useState(undefined);
-  const [allNodes, setAllNodes] = useState(undefined);
-  const [searchNodes, setSearchNodes] = useState("");
-  const [searchNodesList, setSearchNodesList] = useState(undefined);
   const [account, setAccount] = useState(false);
 
   const [showCreateNode, setShowCreateNode] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [picture, setPicture] = useState("");
   const [info, setInfo] = useState("");
+
+  const [showChangePic, setShowChangePic] = useState(false);
 
   const [redirect, setRedirect] = useState(undefined);
 
@@ -41,14 +40,6 @@ const Home = () => {
         setTopNodes(res.data.featuredNodes);
       else alert("Something went wrong when retrieving featured nodes");
     });
-
-    // app_fetch({
-    //   query: `query{allNodes{ID,title,owner{screenName},views}}`,
-    // }).then((res, err) => {
-    //   if (err) alert(err);
-    //   if (res.data && res.data.allNodes) setAllNodes(res.data.allNodes);
-    //   else alert("Something went wrong when retrieving nodes");
-    // });
 
     const cookies = new Cookies();
     const loggedInAs = escape(cookies.get("account"));
@@ -63,22 +54,14 @@ const Home = () => {
         cookies.set("account", "", { path: "/" });
       }
     });
-
-    // app_fetch({
-    //   query: `query{allAccounts{screenName,totalNodeViews,totalSuggestionScore}}`,
-    // }).then((res, err) => {
-    //   if (err) alert(err);
-    //   if (res.data && res.data.allAccounts)
-    //     setTopAccounts(res.data.allAccounts);
-    //   else alert("Something went wrong when retrieving accounts");
-    // });
   }, []);
 
   const createNode = () => {
     const esTitle = escape(title);
     const esContent = escape(content);
+    const esPicture = escape(picture);
     app_fetch({
-      query: `mutation{createNode(accountScreenName:"${account.screenName}",title:"${esTitle}",content:"${esContent}",featured:true){ID}}`,
+      query: `mutation{createNode(accountScreenName:"${account.screenName}",title:"${esTitle}",content:"${esContent}",featured:true,pictureURL:"${esPicture}"){ID}}`,
     }).then((res, err) => {
       if (err) alert(err);
       if (res.data && res.data.createNode) {
@@ -112,6 +95,9 @@ const Home = () => {
           <Button
             onClick={() => {
               setShowCreateNode(true);
+              setTitle("");
+              setContent("");
+              setPicture("");
               setInfo("");
             }}
             disabled={!account}
@@ -171,6 +157,7 @@ const Home = () => {
                           ? node.owner.profilePicURL
                           : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
                       }
+                      alt={node.owner.screenName + " Profile Pic"}
                       onError={(e) => {
                         e.target.src =
                           process.env.PUBLIC_URL + "/defaultProfilePic.jpg";
@@ -197,45 +184,98 @@ const Home = () => {
           <Alert.Heading>Loading...</Alert.Heading>
         </Alert>
       )}
-      {/* <h3>Featured Accounts:</h3>
-      {topAccounts ? (
-        <CardColumns>
-          {topAccounts.map((account) => (
-            <Card>
-              <a href={`/crowdventure/#/account/${account.screenName}`}>
-                <Card.Body>
-                  <Card.Title>{account.screenName}</Card.Title>
-                </Card.Body>
-              </a>
-              <Card.Footer>
-                Total Views:{account.totalNodeViews}
-                <br />
-                Total Score:{account.totalSuggestionScore}
-              </Card.Footer>
-            </Card>
-          ))}
-        </CardColumns>
-      ) : (
-        ""
-      )} */}
       <Modal show={showCreateNode} onHide={() => setShowCreateNode(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Creating New Page</Modal.Title>
         </Modal.Header>
         <Form>
           <Modal.Body>
+            {picture ? (
+              <>
+                <div
+                  style={{
+                    border: "1px solid #eee",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <img
+                    src={picture}
+                    onError={(e) => {
+                      setInfo(
+                        <span style={{ color: "red" }}>Picture not found!</span>
+                      );
+                      setPicture("");
+                    }}
+                    alt="This shouldn't have happened"
+                    style={{
+                      padding: "1px",
+                      width: "100%",
+                      "object-fit": "contain",
+                      borderRadius: "8px",
+                    }}
+                  />
+                  <span
+                    class="fa fa-times"
+                    style={{
+                      position: "absolute",
+                      top: "1.5em",
+                      right: "1.5em",
+                      color: "#888",
+                      cursor: "pointer",
+                      textShadow:
+                        "-1px 0 2px white, 0 1px 2px white, 1px 0 2px white, 0 -1px 2px white",
+                    }}
+                    onMouseEnter={(e) => (e.target.style.color = "#555")}
+                    onMouseLeave={(e) => (e.target.style.color = "#888")}
+                    onClick={() => {
+                      setPicture("");
+                    }}
+                  />
+                </div>
+
+                <br />
+              </>
+            ) : (
+              ""
+            )}
+
+            <div class="row no-gutters">
+              <div class="col">Picture:</div>
+              <div class="col small text-muted text-center">
+                {!picture ? "(Don't use any picture)" : "(Use new picture)"}
+              </div>
+              <div class="col text-right">
+                <Button
+                  variant="light"
+                  size="sm"
+                  onClick={() => setShowChangePic(true)}
+                >
+                  {picture ? "Change" : "Select"} Picture
+                </Button>
+              </div>
+            </div>
+            {showChangePic ? (
+              <SearchImage
+                callback={(url) => {
+                  setPicture(url);
+                  setShowChangePic(false);
+                }}
+              />
+            ) : (
+              ""
+            )}
             <Form.Label>Title:</Form.Label>
             <Form.Control
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-            ></Form.Control>
+            />
             <Form.Label>Content:</Form.Label>
             <Form.Control
               as="textarea"
               rows="3"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-            ></Form.Control>
+            />
             {info ? info : ""}
           </Modal.Body>
           <Modal.Footer>
