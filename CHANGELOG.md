@@ -4,6 +4,14 @@
 
 > Release Date: TBD
 
+##### TLDR:
+- Pictures are done through Pixabay now, meaning you don't have to go find a URL for each image
+- Switching between pages is a lot faster and smoother now
+- Lots of aesthetic changes to be a little bit more intuitive and consistent
+- Bug fixes that should've been done long ago
+- This Changelog is now public!
+
+##### Full list of changes:
 - Added Changelog as well as link to changelog in the version text, also reads the version from the package.json instead of manually putting it in every time
 - Adjusted Picture height for page links on home screen as well as on each page so that they feel more intuitive
 - Added profile pic to navbar at top of screen if you are logged in
