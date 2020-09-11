@@ -10,6 +10,7 @@ const ACCOUNT_TABLE = "Accounts";
 const NODE_TABLE = "Nodes";
 const CHOICE_TABLE = "Choices";
 const FEEDBACK_TABLE = "Feedback";
+const DBON = true;
 
 const databaseCalls = {
     filterFeatured: async() => await filter(NODE_TABLE, "featured", true),
@@ -50,13 +51,13 @@ const getFullTable = async(tableName, lastEvaluatedKey) => {
         .catch((err) => console.log(err));
 
     if (items.LastEvaluatedKey === undefined) return items.Items;
-    return [
+    return DBON ? [
         ...items.Items,
         ...(await scanTable(tableName, items.LastEvaluatedKey)),
-    ];
+    ] : [];
 };
 
-const getItem = async(tableName, key) =>
+const getItem = async(tableName, key) => DBON ?
     await docClient
     .get({
         TableName: tableName,
@@ -67,7 +68,7 @@ const getItem = async(tableName, key) =>
     .catch((err) => {
         console.log(err);
         return err;
-    });
+    }) : undefined;
 
 const addItem = async(tableName, item) =>
     await docClient
@@ -89,7 +90,7 @@ const removeItem = async(tableName, key) =>
         return err;
     });
 
-const filter = async(tableName, arg, value) =>
+const filter = async(tableName, arg, value) => DBON ?
     await docClient
     .scan({
         TableName: tableName,
@@ -103,6 +104,6 @@ const filter = async(tableName, arg, value) =>
     .catch((err) => {
         console.log(err);
         return err;
-    });
+    }) : [];
 
 module.exports = { databaseCalls };

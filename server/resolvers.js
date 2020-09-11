@@ -336,9 +336,32 @@ const resolvers = {
 
             console.log(`Editing Account ${account.screenName}`);
 
-            if (args.password) account.encryptedPassword = encrypt(args.password);
+            if (args.newPassword) account.encryptedPassword = encrypt(args.newPassword);
             if (args.bio) account.bio = args.bio;
             if (args.profilePicURL) account.profilePicURL = args.profilePicURL;
+            if (args.newScreenName) {
+                if (await databaseCalls.getAccount(args.newScreenName)) throw new UserInputError(`That account already exists!`, {
+                    invalidArgs: Object.keys(args),
+                });
+                let nodes = await resolvers.Account.nodes(account);
+                nodes.forEach(node =>
+                    databaseCalls.addNode({...node, owner: args.newScreenName }));
+                let choices = await resolvers.Account.suggestedChoices(account);
+                choices.forEach(choice => {
+                    const newLikes = choice.likedBy;
+                    if (newLikes[account.screenName]) {
+                        delete newLikes[account.screenName];
+                        newLikes[args.newScreenName] = args.newScreenName;
+                    }
+                    const newDislikes = choice.dislikedBy;
+                    if (newDislikes[account.screenName]) {
+                        delete newDislikes[account.screenName];
+                        newDislikes[args.newScreenName] = args.newScreenName;
+                    }
+                    databaseCalls.addChoice({...choice, suggestedBy: args.newScreenName, likedBy: newLikes, dislikedBy: newDislikes })
+                });
+                account.screenName = args.newScreenName;
+            }
 
             return await databaseCalls.addAccount(account);
         },

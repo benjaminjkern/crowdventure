@@ -1,6 +1,6 @@
 # Non-essential cool future features
 
-1. Report choices and nodes that are inappropriate / mature content filter4. A chart feature to view all connected nodes, this could blend well into the local history idea, since a massive chart displaying all potential nodes would be really bad
+1. Report choices and nodes that are inappropriate / mature content filter. A chart feature to view all connected nodes, this could blend well into the local history idea, since a massive chart displaying all potential nodes would be really bad
 2. Ability to Sort choices to be in order of best or worst
 3. Static header and Footer with contact information / patreon as well as advertisements
 4. Ability to Set/delete variables, either save them per user or save pass them from node to node, I feel like passing from node to node is cooler and easier to deal with but will be weird if a back tracking system is set up. This is a really cool idea in general and I definitely want to implement it eventually since this will give a shit ton of power to creators.
@@ -44,3 +44,6 @@
 26. Image alt texts should be something significant
 27. Should put the API stuff in a env file instead of a private js file
 28. The titles being done per page was so that I could send a link and it would show up, not so that I cold send a link and have it not show up
+29. When going to an account that doesnt exist it should say that it doesnt exist
+30. Going forward or back should scroll to top of page or something, it looks weird at the moment
+31. Still some bugs with picking the images

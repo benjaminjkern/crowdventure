@@ -1,10 +1,18 @@
 # Crowdventure Changelog
 
+### Version 0.1.6 (In Progress)
+
+- I can disable the backend whenever I want
+- Switched from Pixabay to Bing images because Pixabay is lame and the images only stay alive for 24 hours (I hope bing does the same), also Pixabay images are lame anyways
+- Images in search bar display as blurry if bing tagged them as "not family friendly", right now it still just lets you select them though
+- Goals for this update: Mature content filter, ability to be in NSFW mode (hide everything thats bad), the ability to report stuff and send comments or messages to me, also of course bug fixes. I wanna put this out on a public website and let it go wild
+
 ### Version 0.1.5 (Current)
 
 > Release Date: 7/31/20
 
 ##### TLDR:
+
 - Pictures are done through Pixabay now, meaning you don't have to go find a URL for each image!
 - Switching between pages is a lot faster and smoother now!
 - Lots of aesthetic changes to be a little bit more intuitive and consistent!
@@ -12,6 +20,7 @@
 - This Changelog is now public!
 
 ##### Full list of changes:
+
 - Added Changelog as well as link to changelog in the version text, also reads the version from the package.json instead of manually putting it in every time
 - Adjusted Picture height for page links on home screen as well as on each page so that they feel more intuitive
 - Added profile pic to navbar at top of screen if you are logged in

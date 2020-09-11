@@ -84,9 +84,10 @@ const typeDefs = gql `
     deleteAccount(screenName: String!): Boolean
     editAccount(
       screenName: String!
-      password: String
+      newPassword: String
       bio: String
       profilePicURL: String
+      newScreenName: String
     ): Account
     loginAccount(screenName: String!, password: String): Account
 

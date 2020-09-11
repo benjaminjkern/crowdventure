@@ -6,6 +6,8 @@ import { AsyncTypeahead } from "react-bootstrap-typeahead";
 
 const { createApolloFetch } = require("apollo-fetch");
 
+const { API_KEY } = require("./apolloURL");
+
 const app_fetch = createApolloFetch({
   uri: require("./apolloURL.js").backendURL,
 });
@@ -25,42 +27,51 @@ const palette = [
 
 const SearchImage = (props) => {
   const { callback } = props;
-  const { API_KEY } = require("./apolloURL.js");
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [lastQuery, setLastQuery] = useState("");
+
+  const BLURAMOUNT = 10;
 
   const handleSearch = (query) => {
     setIsLoading(true);
 
     fetch(
-      "https://pixabay.com/api/?key=" +
-        API_KEY +
-        "&q=" +
+      "https://api.cognitive.microsoft.com/bing/v7.0/images/search?q=" +
         encodeURIComponent(query) +
-        "&page=" +
-        (query !== lastQuery ? 1 : page)
+        "&count=20&safeSearch=off&offset=" +
+        (query !== lastQuery ? 0 : page * 20),
+      {
+        headers: {
+          "Ocp-Apim-Subscription-Key": API_KEY,
+        },
+      }
     )
       .then((data) => data.json())
-      .then(({ hits }) => {
-        const newOptions = hits.reduce(
+      .then((data) => {
+        const newOptions = data.value.reduce(
           (p, hit, i) =>
             (i + options.length) % 2 == 0
               ? [
                   ...p,
                   {
                     id: "(Image Selected)",
-                    urls: [hit.previewURL],
-                    longUrls: [hit.largeImageURL],
+                    urls: [hit.thumbnailUrl],
+                    longUrls: [hit.contentUrl],
+                    isFamilyFriendly: [hit.isFamilyFriendly],
                   },
                 ]
               : [
                   ...p.slice(0, p.length - 1),
                   {
                     id: "(Image Selected)",
-                    urls: [p[p.length - 1].urls[0], hit.previewURL],
-                    longUrls: [p[p.length - 1].longUrls[0], hit.largeImageURL],
+                    urls: [p[p.length - 1].urls[0], hit.thumbnailUrl],
+                    longUrls: [p[p.length - 1].longUrls[0], hit.contentUrl],
+                    isFamilyFriendly: [
+                      p[p.length - 1].isFamilyFriendly[0],
+                      hit.isFamilyFriendly,
+                    ],
                   },
                 ],
           query !== lastQuery ? [] : options
@@ -68,14 +79,14 @@ const SearchImage = (props) => {
         setOptions(newOptions);
 
         if (query !== lastQuery) {
-          setPage(2);
+          setPage(1);
         } else {
           setPage(page + 1);
         }
         setLastQuery(query);
         setIsLoading(false);
       })
-      .catch(alert);
+      .catch(console.log);
   };
 
   return (
@@ -101,6 +112,12 @@ const SearchImage = (props) => {
               borderRadius: "4px",
               width: "50%",
               height: "auto",
+              ...(option.isFamilyFriendly[0]
+                ? {}
+                : {
+                    "-webkit-filter": "blur(" + BLURAMOUNT + "px)",
+                    filter: "blur(" + BLURAMOUNT + "px)",
+                  }),
             }}
           />
           {option.urls.length === 2 ? (
@@ -112,6 +129,12 @@ const SearchImage = (props) => {
                 borderRadius: "4px",
                 width: "50%",
                 height: "auto",
+                ...(option.isFamilyFriendly[1]
+                  ? {}
+                  : {
+                      "-webkit-filter": "blur(" + BLURAMOUNT + "px)",
+                      filter: "blur(" + BLURAMOUNT + "px)",
+                    }),
               }}
             />
           ) : (
