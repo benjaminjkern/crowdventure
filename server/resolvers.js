@@ -129,6 +129,11 @@ const resolvers = {
                 }))
             );
         },
+        dateCreated: (parent, args, context, info) => {
+            if (!parent.dateCreated) parent.dateCreated = "Before September 16, 2020";
+            databaseCalls.addAccount(parent);
+            return parent.dateCreated;
+        },
     },
     Node: {
         content: (parent, args, context, info) => {
@@ -167,6 +172,11 @@ const resolvers = {
                         a.score === b.score ? 0 : a.score > b.score ? -1 : 1
                     )
                 );
+        },
+        dateCreated: (parent, args, context, info) => {
+            if (!parent.dateCreated) parent.dateCreated = "Before September 16, 2020";
+            databaseCalls.addNode(parent);
+            return parent.dateCreated;
         },
         // should return the total number of nodes it is connected to
         size: async(parent, args, context, info) => {
@@ -211,6 +221,11 @@ const resolvers = {
                 )
             );
         },
+        dateCreated: (parent, args, context, info) => {
+            if (!parent.dateCreated) parent.dateCreated = "Before September 16, 2020";
+            databaseCalls.addChoice(parent);
+            return parent.dateCreated;
+        }
     },
     Feedback: {
         submittedBy: async(parent, args, context, info) =>
@@ -301,6 +316,7 @@ const resolvers = {
                 encryptedPassword: encrypt(args.password),
                 lastIP: IP,
                 profilePicURL: args.profilePicURL,
+                dateCreated: new Date().toJSON(),
                 nodes: [],
                 suggestedChoices: [],
                 liked: {},
@@ -404,6 +420,7 @@ const resolvers = {
                 fgColor: args.fgColor || "auto",
                 bgColor: args.fgColor || "white",
                 featured: args.featured || false,
+                dateCreated: new Date().toJSON(),
                 views: {},
                 canonChoices: [],
                 nonCanonChoices: [],
@@ -486,6 +503,7 @@ const resolvers = {
                 ID: `${node.ID}-${Math.random().toString(36).substring(2, 12)}`,
                 from: node.ID,
                 action: args.action,
+                dateCreated: new Date().toJSON(),
                 to: toNode.ID,
                 likedBy: {},
                 dislikedBy: {},

@@ -5,6 +5,7 @@
 - I can disable the backend whenever I want
 - Switched from Pixabay to Bing images because Pixabay is lame and the images only stay alive for 24 hours (I hope bing does the same), also Pixabay images are lame anyways
 - Images in search bar display as blurry if bing tagged them as "not family friendly", right now it still just lets you select them though
+- Added date created for nodes, choices, and accounts. If created before September 16, 2020, then they just get put as
 - Goals for this update: Mature content filter, ability to be in NSFW mode (hide everything thats bad), the ability to report stuff and send comments or messages to me, also of course bug fixes. I wanna put this out on a public website and let it go wild
 
 ### Version 0.1.5 (Current)

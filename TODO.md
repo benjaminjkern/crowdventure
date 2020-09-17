@@ -47,3 +47,4 @@
 29. When going to an account that doesnt exist it should say that it doesnt exist
 30. Going forward or back should scroll to top of page or something, it looks weird at the moment
 31. Still some bugs with picking the images
+32. Deleting from database didnt delete from database

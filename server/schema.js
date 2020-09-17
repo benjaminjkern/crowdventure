@@ -3,6 +3,7 @@ const { gql } = require("apollo-server-lambda");
 const typeDefs = gql `
   type Account {
     screenName: String!
+    dateCreated: String!
     bio: String
     profilePicURL: String
 
@@ -18,6 +19,7 @@ const typeDefs = gql `
     ID: String!
     title: String!
     content: String!
+    dateCreated: String!
     pictureURL: String
     bgColor: String
     fgColor: String
@@ -34,6 +36,7 @@ const typeDefs = gql `
   type Choice {
     ID: String!
     action: String!
+    dateCreated: String!
 
     likedBy: [Account!]
     dislikedBy: [Account!]
