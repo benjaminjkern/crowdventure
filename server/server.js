@@ -6,7 +6,7 @@
 
 const { ApolloServer } = require("apollo-server-lambda");
 const SCHEMA = require("./schema.js");
-const RESOLVERS = require("./resolvers.js");
+const RESOLVERS = require("./resolvers/resolvers.js");
 
 const server = new ApolloServer({
     typeDefs: SCHEMA.typeDefs,

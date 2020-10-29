@@ -24,6 +24,7 @@ const typeDefs = gql `
     bgColor: String
     fgColor: String
     featured: Boolean
+    hidden: Boolean
 
     owner: Account!
     canonChoices: [Choice!]
@@ -37,6 +38,7 @@ const typeDefs = gql `
     ID: String!
     action: String!
     dateCreated: String!
+    hidden: Boolean
 
     likedBy: [Account!]
     dislikedBy: [Account!]
@@ -56,13 +58,6 @@ const typeDefs = gql `
 
     submittedBy: Account
     reporting: String
-  }
-
-  type File {
-    URL: String!
-    filename: String!
-    mimetype: String!
-    encoding: String!
   }
 
   type Query {
@@ -136,8 +131,6 @@ const typeDefs = gql `
       info: String!
     ): Feedback
     removeFeedback(feedbackID: String!): Boolean
-
-    uploadFile(file: Upload!): File!
   }
 `;
 
