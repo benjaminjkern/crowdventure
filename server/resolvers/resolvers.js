@@ -4,7 +4,6 @@ const ChoiceResolvers = require("./choiceResolvers.js");
 const FeedbackResolvers = require("./feedbackResolvers.js");
 const QueryResolvers = require("./queryResolvers.js");
 const MutationResolvers = require("./mutationResolvers.js");
-const { inspect } = require("util");
 require("dotenv").config();
 
 /*

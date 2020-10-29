@@ -404,6 +404,7 @@ module.exports = {
             submittedBy: args.accountScreenName || "",
             IP,
             reporting: reporting || "",
+            dateCreated: new Date().toJSON(),
             info: args.info,
         });
     },

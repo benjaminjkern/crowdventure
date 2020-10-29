@@ -1,4 +1,4 @@
-const { gql } = require("apollo-server-lambda");
+const { gql } = require('apollo-server-lambda');
 
 const typeDefs = gql `
   type Account {
@@ -55,6 +55,7 @@ const typeDefs = gql `
   type Feedback {
     ID: String!
     info: String!
+    dateCreated: String!
 
     submittedBy: Account
     reporting: String
