@@ -1,4 +1,5 @@
 const { databaseCalls } = require("./databaseCalls.js");
+const { sort, allConnected } = require("./resolverUtils.js");
 
 module.exports = {
     content: (parent, args, context, info) => {

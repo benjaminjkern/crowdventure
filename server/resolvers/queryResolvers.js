@@ -1,5 +1,6 @@
 const { databaseCalls } = require("./databaseCalls.js");
 const { UserInputError } = require("apollo-server-lambda");
+const { scramble } = require("./resolverUtils.js");
 
 module.exports = {
     featuredNodes: async() => scramble(await databaseCalls.filterFeatured()),

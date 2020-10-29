@@ -1,5 +1,6 @@
 const { databaseCalls } = require("./databaseCalls.js");
 const { UserInputError } = require("apollo-server-lambda");
+const { encrypt } = require("./resolverUtils.js");
 
 module.exports = {
     createAccount: async(parent, args, context, info) => {
