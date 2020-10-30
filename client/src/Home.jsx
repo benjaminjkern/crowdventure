@@ -9,6 +9,8 @@ import {
   OverlayTrigger,
   Tooltip,
   Alert,
+  DropdownButton,
+  Dropdown,
 } from "react-bootstrap";
 import Cookies from "universal-cookie";
 import { Redirect } from "react-router-dom";
@@ -55,6 +57,17 @@ const Home = () => {
       }
     });
   }, []);
+
+  const reportNode = (nodeID) => {
+    app_fetch({
+      query: `mutation{createFeedback(${account?`accountScreenName:"${account.screenName}",`:""}info:"This is inappropriate",reportingObjectType:"Node",reportingObjectID:"${nodeID}"){info,reporting}}`,
+    }).then((res, err) => {
+      if (err) alert(err);
+      if (res.data && res.data.createFeedback) {
+        alert("Successfully reported the page");
+      } else alert("Something went wrong when reporting node");
+    });
+  }
 
   const createNode = () => {
     const esTitle = escape(title);
@@ -147,6 +160,18 @@ const Home = () => {
                   <Card.Title>{node.title}</Card.Title>
                 </Card.Body>
               </a>
+              <DropdownButton
+                variant="light"
+                style={{ position: "absolute", top: "0px", right: "0px" }}
+                size="sm"
+                drop="right"
+                title={<span class="fa">&#xf013;</span>}
+              >
+                <Dropdown.Item 
+                  onClick={() =>
+                    reportNode(node.ID)
+                  }>Report</Dropdown.Item>
+              </DropdownButton>
               <Card.Footer>
                 <small className="text-muted">
                   Author:{" "}

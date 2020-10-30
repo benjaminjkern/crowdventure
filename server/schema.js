@@ -57,7 +57,7 @@ const typeDefs = gql `
     info: String!
     dateCreated: String!
 
-    submittedBy: Account
+    submittedBy: String
     reporting: String
   }
 
