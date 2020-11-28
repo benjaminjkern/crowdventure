@@ -1,6 +1,6 @@
 {
     "name": "client",
-    "version": "0.1.6",
+    "version": "0.1.7-Pre",
     "private": true,
     "homepage": "http://benjaminjkern.github.io/crowdventure",
     "dependencies": {
@@ -69,8 +69,9 @@
     },
     "devDependencies": {
         "babel-eslint": "^10.1.0",
+        "eslint": "^7.14.0",
         "eslint-config-prettier": "^6.10.1",
-        "eslint-plugin-react": "^7.19.0",
+        "eslint-plugin-react": "^7.21.5",
         "gh-pages": "^3.1.0",
         "prettier": "^2.0.4"
     }

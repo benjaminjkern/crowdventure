@@ -1,21 +1,61 @@
-import React, { useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
-import App from "./App";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { AsyncTypeahead } from "react-bootstrap-typeahead";
+import App from "./App";
 
 const { createApolloFetch } = require("apollo-fetch");
-
-const { API_KEY } = require("./apolloURL");
 
 const app_fetch = createApolloFetch({
   uri: require("./apolloURL.js").backendURL,
 });
 
+const query_call = (query, parameters, attributes, callback) => {
+  app_fetch({
+    query: `query{${query}${formatParameters(parameters)}${formatAttributes(
+      attributes
+    )}}`,
+  }).then((res, err) => {
+    if (err) alert(err);
+    if (res.data) callback(res.data[query]);
+    else alert("Something went wrong when calling query");
+  });
+};
+
+const mutation_call = (query, parameters, attributes, callback) => {
+  app_fetch({
+    query: `mutation{${query}${formatParameters(parameters)}${formatAttributes(
+      attributes
+    )}}`,
+  }).then((res, err) => {
+    if (err) alert(err);
+    if (res.data) callback(res.data[query]);
+    else alert("Something went wrong when calling mutation");
+  });
+};
+
+const formatParameters = (parameters) =>
+  Object.keys(parameters).length > 0
+    ? `(${Object.keys(parameters)
+        .map(
+          (param) =>
+            `${param}:${typeof parameters[param] === "string" ? '"' : ""}${
+              parameters[param]
+            }${typeof parameters[param] === "string" ? '"' : ""}`
+        )
+        .join(",")})`
+    : "";
+
+const formatAttributes = (attributes) =>
+  Object.keys(attributes).length > 0
+    ? `{${Object.keys(attributes)
+        .map((attribute) => attribute + formatAttributes(attributes[attribute]))
+        .join(",")}}`
+    : "";
+
 const escape = (text, newlines = false) =>
   text
     ? newlines
-      ? text.replace(/"""/g, ` "" " `)
+      ? text.replace(/"$/, ' " ').replace(/^"/, ' " ').replace(/"""/g, ` "" " `)
       : text.replace(/\n/g, "").replace(/\\/g, `\\\\`).replace(/"/g, `\\"`)
     : text;
 
@@ -25,129 +65,8 @@ const palette = [
   "rgb(80, 160, 224)",
 ];
 
-const SearchImage = (props) => {
-  const { callback } = props;
-  const [isLoading, setIsLoading] = useState(false);
-  const [options, setOptions] = useState([]);
-  const [page, setPage] = useState(0);
-  const [lastQuery, setLastQuery] = useState("");
-
-  const BLURAMOUNT = 10;
-
-  const handleSearch = (query) => {
-    setIsLoading(true);
-
-    fetch(
-      "https://api.cognitive.microsoft.com/bing/v7.0/images/search?q=" +
-        encodeURIComponent(query) +
-        "&count=20&safeSearch=off&offset=" +
-        (query !== lastQuery ? 0 : page * 20),
-      {
-        headers: {
-          "Ocp-Apim-Subscription-Key": API_KEY,
-        },
-      }
-    )
-      .then((data) => data.json())
-      .then((data) => {
-        const newOptions = data.value.reduce(
-          (p, hit, i) =>
-            (i + options.length) % 2 == 0
-              ? [
-                  ...p,
-                  {
-                    id: "(Image Selected)",
-                    urls: [hit.thumbnailUrl],
-                    longUrls: [hit.contentUrl],
-                    isFamilyFriendly: [hit.isFamilyFriendly],
-                  },
-                ]
-              : [
-                  ...p.slice(0, p.length - 1),
-                  {
-                    id: "(Image Selected)",
-                    urls: [p[p.length - 1].urls[0], hit.thumbnailUrl],
-                    longUrls: [p[p.length - 1].longUrls[0], hit.contentUrl],
-                    isFamilyFriendly: [
-                      p[p.length - 1].isFamilyFriendly[0],
-                      hit.isFamilyFriendly,
-                    ],
-                  },
-                ],
-          query !== lastQuery ? [] : options
-        );
-        setOptions(newOptions);
-
-        if (query !== lastQuery) {
-          setPage(1);
-        } else {
-          setPage(page + 1);
-        }
-        setLastQuery(query);
-        setIsLoading(false);
-      })
-      .catch(console.log);
-  };
-
-  return (
-    <AsyncTypeahead
-      id="async-example"
-      isLoading={isLoading}
-      filterBy={() => true}
-      labelKey="id"
-      minLength={2}
-      onSearch={handleSearch}
-      maxResults={9}
-      onPaginate={() => handleSearch(lastQuery)}
-      useCache={false}
-      options={options}
-      placeholder="Search for an image..."
-      renderMenuItemChildren={(option, props) => (
-        <div>
-          <img
-            onClick={() => callback(option.longUrls[0])}
-            src={option.urls[0]}
-            style={{
-              marginRight: "10px",
-              borderRadius: "4px",
-              width: "50%",
-              height: "auto",
-              ...(option.isFamilyFriendly[0]
-                ? {}
-                : {
-                    "-webkit-filter": "blur(" + BLURAMOUNT + "px)",
-                    filter: "blur(" + BLURAMOUNT + "px)",
-                  }),
-            }}
-          />
-          {option.urls.length === 2 ? (
-            <img
-              onClick={() => callback(option.longUrls[1])}
-              src={option.urls[1]}
-              style={{
-                marginRight: "10px",
-                borderRadius: "4px",
-                width: "50%",
-                height: "auto",
-                ...(option.isFamilyFriendly[1]
-                  ? {}
-                  : {
-                      "-webkit-filter": "blur(" + BLURAMOUNT + "px)",
-                      filter: "blur(" + BLURAMOUNT + "px)",
-                    }),
-              }}
-            />
-          ) : (
-            ""
-          )}
-        </div>
-      )}
-    />
-  );
-};
-
 // ========================================
 
 ReactDOM.render(<App />, document.getElementById("root"));
 
-export { app_fetch, escape, palette, SearchImage };
+export { app_fetch, escape, palette, query_call, mutation_call };
