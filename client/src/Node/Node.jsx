@@ -55,7 +55,7 @@ const Node = (props) => {
 
   if (node === undefined) {
     return (
-      <Alert variant="light">
+      <Alert variant={loggedInAs && loggedInAs.unsafeMode ? "dark" : "light"}>
         <title>Loading Page...</title>
         <Alert.Heading>Loading...</Alert.Heading>
       </Alert>
@@ -194,7 +194,13 @@ const Node = (props) => {
         <div class="col text-right" style={{ paddingRight: "0px" }}>
           <small class="text-muted">
             Author:{" "}
-            <a href={`/crowdventure/#/account/${node.owner.screenName}`}>
+            <a
+              href={`/crowdventure/#/account/${node.owner.screenName}`}
+              style={{
+                color:
+                  loggedInAs && loggedInAs.unsafeMode ? palette[0] : palette[2],
+              }}
+            >
               <img
                 src={
                   node.owner.profilePicURL
@@ -221,7 +227,7 @@ const Node = (props) => {
           {loggedInAs && node.owner.screenName === loggedInAs.screenName ? (
             <p>
               <Button
-                variant="light"
+                variant="secondary"
                 size="sm"
                 onClick={() => {
                   showModal(

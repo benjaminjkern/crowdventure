@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 
 import Cookies from "universal-cookie";
-import { Container, Button, Alert } from "react-bootstrap";
+import {
+  Container,
+  Button,
+  Alert,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
+import BootstrapSwitchButton from "bootstrap-switch-button-react";
 
 import { escape, query_call, palette } from "./index";
 import CreateNodeModal from "./Modals/CreateNodeModal";
@@ -13,7 +20,7 @@ import NodeViewer from "./NodeViewer";
 import { Redirect } from "react-router-dom";
 
 const Account = (props) => {
-  const { loggedInAs } = props;
+  const { loggedInAs, setLoggedInAs } = props;
 
   const [redirect, setRedirect] = useState(undefined);
   const [account, setAccount] = useState(undefined);
@@ -48,7 +55,7 @@ const Account = (props) => {
 
   if (account === undefined) {
     return (
-      <Alert variant="light">
+      <Alert variant={loggedInAs && loggedInAs.unsafeMode ? "dark" : "light"}>
         <title>Loading Account...</title>
         <Alert.Heading>Loading...</Alert.Heading>
       </Alert>
@@ -103,11 +110,54 @@ const Account = (props) => {
         <span className="display-4 align-middle">{account.screenName}</span>
       </h1>
 
-      {account.bio ? (
+      {account.bio ||
+      (loggedInAs && loggedInAs.screenName === account.screenName) ? (
         <Container>
           {account.bio.split("\n").map((line) => (
             <p style={{ textIndent: "5%" }}>{line}</p>
           ))}
+          {loggedInAs && loggedInAs.screenName === account.screenName ? (
+            <p style={{ textIndent: "1%" }} class="text-muted">
+              Unsafe Mode:{" "}
+              <BootstrapSwitchButton
+                checked={loggedInAs.unsafeMode}
+                onstyle="secondary"
+                size="sm"
+                onChange={(checked) => {
+                  new Cookies().set("unsafeMode", checked, {
+                    path: "/",
+                  });
+                  setLoggedInAs({
+                    ...loggedInAs,
+                    unsafeMode: checked,
+                  });
+                }}
+              />
+              <OverlayTrigger
+                overlay={
+                  <Tooltip id="tooltip-unsafe">
+                    Unsafe mode allows you to see all content on Crowdventure,
+                    including content that has been flagged as unsafe for the
+                    general public!
+                  </Tooltip>
+                }
+              >
+                <Button
+                  style={{
+                    backgroundColor: "#00000000",
+                    borderColor: "#00000000",
+                    borderRadius: "50%",
+                    color: loggedInAs.unsafeMode ? "white" : "black",
+                  }}
+                  size="xs"
+                >
+                  <span className="fa fa-info-circle" />
+                </Button>
+              </OverlayTrigger>
+            </p>
+          ) : (
+            ""
+          )}
         </Container>
       ) : (
         ""
@@ -117,7 +167,7 @@ const Account = (props) => {
         {loggedInAs && loggedInAs.screenName === account.screenName ? (
           <span>
             <Button
-              variant="light"
+              variant="secondary"
               onClick={() => {
                 showModal(
                   <EditAccountModal
@@ -143,7 +193,7 @@ const Account = (props) => {
               variant="secondary"
             >
               Log out
-            </Button>
+            </Button>{" "}
           </span>
         ) : (
           ""

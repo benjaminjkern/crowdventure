@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 import {
   CardColumns,
@@ -10,7 +10,7 @@ import {
 
 import EditChoiceModal from "../Modals/EditChoiceModal";
 
-import { mutation_call, query_call } from "../index";
+import { mutation_call, query_call, palette } from "../index";
 
 const ChoiceColumns = (props) => {
   const { node, loggedInAs, canon } = props;
@@ -95,6 +95,23 @@ const ChoiceColumns = (props) => {
     );
   };
 
+  const reportSuggestion = (choiceID) => {
+    mutation_call(
+      "createFeedback",
+      {
+        ...(loggedInAs ? { accountScreenName: loggedInAs.screenName } : {}),
+        info: "This is inappropriate",
+        reportingObjectType: "Choice",
+        reportingObjectID: choiceID,
+      },
+      { info: 0, reporting: 0 },
+      () => {
+        alert("Successfully reported action!");
+        window.location.reload(false);
+      }
+    );
+  };
+
   useEffect(() => {
     if (
       choices.length !==
@@ -161,7 +178,7 @@ const ChoiceColumns = (props) => {
 
   if (!choices)
     return (
-      <Alert variant="light">
+      <Alert variant={loggedInAs && loggedInAs.unsafeMode ? "dark" : "light"}>
         <title>Loading Page...</title>
         <Alert.Heading>Loading...</Alert.Heading>
       </Alert>
@@ -173,19 +190,38 @@ const ChoiceColumns = (props) => {
         {choices.map((choice, idx) => {
           if (choice === null)
             return (
-              <Card className="text-center">
+              <Card
+                className="text-center"
+                {...(loggedInAs && loggedInAs.unsafeMode
+                  ? { style: { backgroundColor: palette[4] } }
+                  : {})}
+              >
                 <Card.Body style={{ paddingTop: "2em" }}>
                   <Card.Title>Loading...</Card.Title>
                 </Card.Body>
               </Card>
             );
           return (
-            <Card className="text-center">
+            <Card
+              className="text-center"
+              {...(loggedInAs && loggedInAs.unsafeMode
+                ? { style: { backgroundColor: palette[4] } }
+                : {})}
+            >
               <a
-                href={choice.to ? `/crowdventure/#/node/${choice.to.ID}` : ""}
+                href={
+                  choice.to && !choice.hidden
+                    ? `/crowdventure/#/node/${choice.to.ID}`
+                    : ""
+                }
                 style={{
-                  pointerEvents: choice.to ? "auto" : "none",
-                  color: choice.to ? undefined : "grey",
+                  pointerEvents: choice.to && !choice.hidden ? "auto" : "none",
+                  color:
+                    choice.to && !choice.hidden
+                      ? loggedInAs && loggedInAs.unsafeMode
+                        ? palette[0]
+                        : palette[2]
+                      : "grey",
                 }}
               >
                 <Card.Body style={{ cursor: "pointer", paddingTop: "2em" }}>
@@ -193,8 +229,14 @@ const ChoiceColumns = (props) => {
                 </Card.Body>
               </a>
               <DropdownButton
-                variant="light"
-                style={{ position: "absolute", top: "0px", right: "0px" }}
+                variant={
+                  loggedInAs && loggedInAs.unsafeMode ? "secondary" : "light"
+                }
+                style={{
+                  position: "absolute",
+                  top: "0px",
+                  right: "0px",
+                }}
                 size="sm"
                 drop="right"
                 title={<span class="fa">&#xf013;</span>}
@@ -245,9 +287,15 @@ const ChoiceColumns = (props) => {
                   Edit
                 </Dropdown.Item>
                 <Dropdown.Divider />
-                <Dropdown.Item disabled>Report</Dropdown.Item>
+                <Dropdown.Item onClick={() => reportSuggestion(choice.ID)}>
+                  Report
+                </Dropdown.Item>
               </DropdownButton>
-              <Card.Footer>
+              <Card.Footer
+                {...(loggedInAs && loggedInAs.unsafeMode
+                  ? { style: { backgroundColor: palette[5] } }
+                  : {})}
+              >
                 <a
                   href={`/crowdventure/#/node/${node.ID}`}
                   style={{
@@ -255,6 +303,8 @@ const ChoiceColumns = (props) => {
                     color: loggedInAs
                       ? choice.disliked
                         ? "red"
+                        : loggedInAs.unsafeMode
+                        ? "white"
                         : "black"
                       : "grey",
                   }}
@@ -269,6 +319,8 @@ const ChoiceColumns = (props) => {
                     color: loggedInAs
                       ? choice.liked
                         ? "green"
+                        : loggedInAs.unsafeMode
+                        ? "white"
                         : "black"
                       : "grey",
                   }}
@@ -280,6 +332,12 @@ const ChoiceColumns = (props) => {
                   Suggested By:{" "}
                   <a
                     href={`/crowdventure/#/account/${choice.suggestedBy.screenName}`}
+                    style={{
+                      color:
+                        loggedInAs && loggedInAs.unsafeMode
+                          ? palette[0]
+                          : palette[2],
+                    }}
                   >
                     <img
                       src={

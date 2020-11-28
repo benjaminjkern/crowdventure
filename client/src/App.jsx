@@ -11,7 +11,7 @@ import { Navbar, Container } from "react-bootstrap";
 import Cookies from "universal-cookie";
 import history from "history/browser";
 
-import { mutation_call } from "./index";
+import { mutation_call, palette } from "./index";
 const packageJson = require("../package.json");
 
 const App = () => {
@@ -28,12 +28,33 @@ const App = () => {
         { screenName: 0, profilePicURL: 0 },
         (res) => {
           if (res) {
+            res.unsafeMode = cookies.get("unsafeMode") === "true";
             setLoggedInAs(res);
           } else {
             cookies.set("account", "", { path: "/" });
           }
         }
       );
+    }
+
+    if (loggedInAs && loggedInAs.unsafeMode) {
+      document.getElementById("root").style.backgroundImage = `linear-gradient(
+      to right,
+      rgb(158, 232, 255),
+      ${palette[3]} 10%,
+      ${palette[3]} 90%,
+      rgb(158, 232, 255)
+    )`;
+      document.getElementById("root").style.color = "rgb(225, 240, 255)";
+    } else {
+      document.getElementById("root").style.backgroundImage = `linear-gradient(
+        to right,
+        rgb(158, 232, 255),
+        white 10%,
+        white 90%,
+        rgb(158, 232, 255)
+      )`;
+      document.getElementById("root").style.color = "";
     }
   });
 
@@ -74,7 +95,13 @@ const App = () => {
           />
           <Route
             path="/account/:id"
-            render={(props) => <Account {...props} loggedInAs={loggedInAs} />}
+            render={(props) => (
+              <Account
+                {...props}
+                loggedInAs={loggedInAs}
+                setLoggedInAs={setLoggedInAs}
+              />
+            )}
           />
         </Switch>
       </HashRouter>

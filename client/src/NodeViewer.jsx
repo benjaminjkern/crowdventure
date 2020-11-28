@@ -1,6 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-import { mutation_call } from "./index";
+import { mutation_call, palette } from "./index";
 
 import {
   CardColumns,
@@ -63,12 +63,27 @@ const NodeViewer = (props) => {
         )
         .map((node) => {
           return (
-            <Card>
-              <a href={`/crowdventure/#/node/${node.ID}`}>
+            <Card
+              {...(loggedInAs && loggedInAs.unsafeMode
+                ? { style: { backgroundColor: palette[4] } }
+                : {})}
+            >
+              <a
+                href={`/crowdventure/#/node/${node.ID}`}
+                style={{
+                  color:
+                    loggedInAs && loggedInAs.unsafeMode
+                      ? palette[0]
+                      : palette[2],
+                }}
+              >
                 {node.pictureURL ? (
                   <Card.Header
                     style={{
-                      "background-color": "white",
+                      backgroundColor:
+                        loggedInAs && loggedInAs.unsafeMode
+                          ? palette[5]
+                          : "white",
                       padding: "1px",
                     }}
                   >
@@ -127,7 +142,15 @@ const NodeViewer = (props) => {
 
               {node.hidden ? (
                 <OverlayTrigger
-                  overlay={<Tooltip>This page is hidden!</Tooltip>}
+                  overlay={
+                    <Tooltip>
+                      This page is hidden, because it has been marked as unsafe!
+                      You can see it because you are{" "}
+                      {loggedInAs && loggedInAs.unsafeMode
+                        ? "in Unsafe Mode."
+                        : "the owner."}
+                    </Tooltip>
+                  }
                 >
                   <div
                     style={{
@@ -153,7 +176,9 @@ const NodeViewer = (props) => {
               )}
 
               <DropdownButton
-                variant="light"
+                variant={
+                  loggedInAs && loggedInAs.unsafeMode ? "secondary" : "light"
+                }
                 style={{ position: "absolute", top: "0px", right: "0px" }}
                 size="sm"
                 drop="right"
@@ -192,10 +217,23 @@ const NodeViewer = (props) => {
                   Report
                 </Dropdown.Item>
               </DropdownButton>
-              <Card.Footer className="text-muted text-center">
+              <Card.Footer
+                className="text-muted text-center"
+                {...(loggedInAs && loggedInAs.unsafeMode
+                  ? { style: { backgroundColor: palette[5] } }
+                  : {})}
+              >
                 <small>
                   Author:{" "}
-                  <a href={`/crowdventure/#/account/${node.owner.screenName}`}>
+                  <a
+                    href={`/crowdventure/#/account/${node.owner.screenName}`}
+                    style={{
+                      color:
+                        loggedInAs && loggedInAs.unsafeMode
+                          ? palette[0]
+                          : palette[2],
+                    }}
+                  >
                     <img
                       src={
                         node.owner.profilePicURL
@@ -227,7 +265,7 @@ const NodeViewer = (props) => {
       {showingModal || ""}
     </CardColumns>
   ) : (
-    <Alert variant="light">
+    <Alert variant={loggedInAs && loggedInAs.unsafeMode ? "dark" : "light"}>
       <Alert.Heading>Loading...</Alert.Heading>
     </Alert>
   );

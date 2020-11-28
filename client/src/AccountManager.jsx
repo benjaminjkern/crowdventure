@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Navbar, Button } from "react-bootstrap";
 
 import LoginModal from "./Modals/LoginModal";
@@ -49,11 +49,14 @@ const AccountManager = (props) => {
   }
 
   return (
-    <Navbar.Text>
+    <Navbar.Text
+      style={{ color: loggedInAs && loggedInAs.unsafeMode ? "grey" : "" }}
+    >
       You are logged in as:{" "}
       <a
         href={`/crowdventure/#/account/${loggedInAs.screenName}`}
         onClick={() => setTimeout(() => window.location.reload(false), 100)}
+        style={{ color: loggedInAs && loggedInAs.unsafeMode ? "white" : "" }}
       >
         <img
           src={

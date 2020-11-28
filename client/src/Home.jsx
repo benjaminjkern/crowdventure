@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 
 import NodeViewer from "./NodeViewer";
@@ -82,7 +82,7 @@ const Home = (props) => {
       <p />
 
       <h3>Featured Pages:</h3>
-      <NodeViewer nodes={topNodes} />
+      <NodeViewer nodes={topNodes} loggedInAs={loggedInAs} />
       {showingModal || ""}
       {redirect || ""}
     </Container>
