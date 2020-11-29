@@ -214,6 +214,9 @@ const ChoiceColumns = (props) => {
                     ? `/crowdventure/#/node/${choice.to.ID}`
                     : ""
                 }
+                onClick={() =>
+                  window.scrollTo({ top: 0, left: 0, behavior: "smooth" })
+                }
                 style={{
                   pointerEvents: choice.to && !choice.hidden ? "auto" : "none",
                   color:

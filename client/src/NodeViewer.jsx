@@ -184,7 +184,7 @@ const NodeViewer = (props) => {
                 drop="right"
                 title={<span class="fa">&#xf013;</span>}
               >
-                {loggedInAs ? (
+                {loggedInAs && node.featured !== undefined ? (
                   <>
                     <Dropdown.Item
                       onClick={() => featurePage(node, node.featured)}

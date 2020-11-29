@@ -190,6 +190,7 @@ const Account = (props) => {
               size="sm"
               onClick={() => {
                 new Cookies().set("account", "", { path: "/" });
+                new Cookies().set("unsafeMode", "false", { path: "/" });
                 window.location.reload(false);
               }}
               variant="secondary"

@@ -37,7 +37,10 @@ const App = () => {
       );
     }
 
-    if (loggedInAs && loggedInAs.unsafeMode) {
+    if (
+      new Cookies().get("unsafeMode") === "true" ||
+      (loggedInAs && loggedInAs.unsafeMode)
+    ) {
       document.getElementById("root").style.backgroundImage = `linear-gradient(
       to right,
       rgb(158, 232, 255),
