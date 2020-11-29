@@ -19,6 +19,8 @@ const EditNodeModal = (props) => {
   const [picture, setPicture] = useState(node.pictureURL);
   const [showChangePic, setShowChangePic] = useState(false);
 
+  const [shouldHide, setShouldHide] = useState(false);
+
   const deletePage = () => {
     mutation_call("deleteNode", { nodeID: node.ID }, 0, () => {
       history.back();
@@ -38,6 +40,7 @@ const EditNodeModal = (props) => {
         title: esTitle,
         content: `""${esContent}""`,
         pictureURL: esPicture,
+        ...(shouldHide ? { hidden: true } : {}),
       },
       { ID: 0 },
       (res) => {
@@ -85,6 +88,7 @@ const EditNodeModal = (props) => {
                       <span style={{ color: "red" }}>Picture not found!</span>
                     );
                     setPicture("");
+                    setShouldHide(false);
                   }}
                   style={{
                     padding: "1px",
@@ -108,6 +112,7 @@ const EditNodeModal = (props) => {
                   onMouseLeave={(e) => (e.target.style.color = "#888")}
                   onClick={() => {
                     setPicture("");
+                    setShouldHide(false);
                   }}
                 />
               </div>
@@ -141,9 +146,11 @@ const EditNodeModal = (props) => {
           </div>
           {showChangePic ? (
             <SearchImage
-              callback={(url) => {
+              loggedInAs={loggedInAs}
+              callback={(url, familyFriendly) => {
                 setPicture(url);
                 setShowChangePic(false);
+                setShouldHide(!familyFriendly);
               }}
             />
           ) : (
@@ -168,6 +175,15 @@ const EditNodeModal = (props) => {
             onChange={(e) => setContent(e.target.value)}
           />
           {info ? info : ""}
+          {shouldHide ? (
+            <span style={{ color: "red" }}>
+              The image chosen will cause the page to automatically be hidden.
+              If you would like to not have this happen, change or remove the
+              image.
+            </span>
+          ) : (
+            ""
+          )}
         </Modal.Body>
         <Modal.Footer
           {...(loggedInAs && loggedInAs.unsafeMode

@@ -12,6 +12,7 @@ import {
   Alert,
 } from "react-bootstrap";
 
+import Cookies from "universal-cookie";
 import ConfirmModal from "./Modals/ConfirmModal";
 
 const NodeViewer = (props) => {
@@ -196,6 +197,7 @@ const NodeViewer = (props) => {
                       onClick={() =>
                         showModal(
                           <ConfirmModal
+                            loggedInAs={loggedInAs}
                             close={() => showModal(undefined)}
                             onConfirm={() => deletePage(node)}
                             title="Delete Page"
@@ -265,7 +267,14 @@ const NodeViewer = (props) => {
       {showingModal || ""}
     </CardColumns>
   ) : (
-    <Alert variant={loggedInAs && loggedInAs.unsafeMode ? "dark" : "light"}>
+    <Alert
+      variant={
+        (loggedInAs && loggedInAs.unsafeMode) ||
+        new Cookies().get("unsafeMode") === "true"
+          ? "dark"
+          : "light"
+      }
+    >
       <Alert.Heading>Loading...</Alert.Heading>
     </Alert>
   );

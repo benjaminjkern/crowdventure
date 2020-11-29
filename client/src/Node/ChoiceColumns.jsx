@@ -6,8 +6,11 @@ import {
   DropdownButton,
   Dropdown,
   Alert,
+  OverlayTrigger,
+  Tooltip,
 } from "react-bootstrap";
 
+import Cookies from "universal-cookie";
 import EditChoiceModal from "../Modals/EditChoiceModal";
 
 import { mutation_call, query_call, palette } from "../index";
@@ -146,6 +149,9 @@ const ChoiceColumns = (props) => {
               },
               hidden: 0,
               to: {
+                owner: {
+                  screenName: 0,
+                },
                 ID: 0,
                 hidden: 0,
               },
@@ -178,7 +184,14 @@ const ChoiceColumns = (props) => {
 
   if (!choices)
     return (
-      <Alert variant={loggedInAs && loggedInAs.unsafeMode ? "dark" : "light"}>
+      <Alert
+        variant={
+          (loggedInAs && loggedInAs.unsafeMode) ||
+          new Cookies().get("unsafeMode") === "true"
+            ? "dark"
+            : "light"
+        }
+      >
         <title>Loading Page...</title>
         <Alert.Heading>Loading...</Alert.Heading>
       </Alert>
@@ -201,6 +214,23 @@ const ChoiceColumns = (props) => {
                 </Card.Body>
               </Card>
             );
+
+          if (
+            (choice.hidden && !loggedInAs) ||
+            (choice.hidden &&
+              !loggedInAs.unsafeMode &&
+              loggedInAs.screenName !== choice.suggestedBy.screenName &&
+              (loggedInAs.screenName !== node.owner.screenName || !canon))
+          )
+            return <span />;
+
+          const disabled =
+            !choice.to ||
+            (choice.to.hidden && !loggedInAs) ||
+            (choice.to.hidden &&
+              !loggedInAs.unsafeMode &&
+              choice.to.owner.screenName !== loggedInAs.screenName);
+
           return (
             <Card
               className="text-center"
@@ -209,28 +239,92 @@ const ChoiceColumns = (props) => {
                 : {})}
             >
               <a
-                href={
-                  choice.to && !choice.hidden
-                    ? `/crowdventure/#/node/${choice.to.ID}`
-                    : ""
-                }
+                href={!disabled ? `/crowdventure/#/node/${choice.to.ID}` : ""}
                 onClick={() =>
                   window.scrollTo({ top: 0, left: 0, behavior: "smooth" })
                 }
                 style={{
-                  pointerEvents: choice.to && !choice.hidden ? "auto" : "none",
-                  color:
-                    choice.to && !choice.hidden
-                      ? loggedInAs && loggedInAs.unsafeMode
-                        ? palette[0]
-                        : palette[2]
-                      : "grey",
+                  pointerEvents: !disabled ? "auto" : "none",
+                  color: !disabled
+                    ? loggedInAs && loggedInAs.unsafeMode
+                      ? palette[0]
+                      : palette[2]
+                    : "grey",
                 }}
               >
                 <Card.Body style={{ cursor: "pointer", paddingTop: "2em" }}>
                   <Card.Title>{choice.action}</Card.Title>
                 </Card.Body>
               </a>
+              {choice.hidden ? (
+                <OverlayTrigger
+                  overlay={
+                    <Tooltip>
+                      This action is hidden, because it has been marked as
+                      unsafe! You can see it because you are{" "}
+                      {loggedInAs && loggedInAs.unsafeMode
+                        ? "in Unsafe Mode."
+                        : "the owner."}
+                    </Tooltip>
+                  }
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "5px",
+                      left: "6.5px",
+                      color: "red",
+                      "-webkit-touch-callout": "none",
+                      "-webkit-user-select": "none",
+                      "-khtml-user-select": "none",
+                      "-moz-user-select": "none",
+                      "-ms-user-select": "none",
+                      "user-select": "none",
+                      "text-shadow": "0 0 1px black",
+                    }}
+                    class="fa"
+                  >
+                    &#xf056;
+                  </div>
+                </OverlayTrigger>
+              ) : (
+                ""
+              )}
+              {!choice.hidden && choice.to.hidden && !disabled ? (
+                <OverlayTrigger
+                  overlay={
+                    <Tooltip>
+                      This page this action leads to is hidden, because it has
+                      been marked as unsafe! You will be able to see it because
+                      you are
+                      {loggedInAs && loggedInAs.unsafeMode
+                        ? "in Unsafe Mode."
+                        : "the owner."}
+                    </Tooltip>
+                  }
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "5px",
+                      left: "6.5px",
+                      color: "red",
+                      "-webkit-touch-callout": "none",
+                      "-webkit-user-select": "none",
+                      "-khtml-user-select": "none",
+                      "-moz-user-select": "none",
+                      "-ms-user-select": "none",
+                      "user-select": "none",
+                      "text-shadow": "0 0 1px black",
+                    }}
+                    class="fa"
+                  >
+                    &#xf056;
+                  </div>
+                </OverlayTrigger>
+              ) : (
+                ""
+              )}
               <DropdownButton
                 variant={
                   loggedInAs && loggedInAs.unsafeMode ? "secondary" : "light"

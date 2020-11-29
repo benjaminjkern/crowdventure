@@ -55,7 +55,14 @@ const Account = (props) => {
 
   if (account === undefined) {
     return (
-      <Alert variant={loggedInAs && loggedInAs.unsafeMode ? "dark" : "light"}>
+      <Alert
+        variant={
+          (loggedInAs && loggedInAs.unsafeMode) ||
+          new Cookies().get("unsafeMode") === "true"
+            ? "dark"
+            : "light"
+        }
+      >
         <title>Loading Account...</title>
         <Alert.Heading>Loading...</Alert.Heading>
       </Alert>
@@ -114,9 +121,11 @@ const Account = (props) => {
       {account.bio ||
       (loggedInAs && loggedInAs.screenName === account.screenName) ? (
         <Container>
-          {account.bio.split("\n").map((line) => (
-            <p style={{ textIndent: "5%" }}>{line}</p>
-          ))}
+          {account.bio
+            ? account.bio
+                .split("\n")
+                .map((line) => <p style={{ textIndent: "5%" }}>{line}</p>)
+            : ""}
           {loggedInAs && loggedInAs.screenName === account.screenName ? (
             <p style={{ textIndent: "1%" }} class="text-muted">
               Unsafe Mode:{" "}

@@ -15,6 +15,7 @@ const CreateNodeModal = (props) => {
 
   const [show, setShow] = useState(true);
   const [info, setInfo] = useState("");
+  const [shouldHide, setShouldHide] = useState(false);
 
   const createNode = () => {
     const esTitle = escape(title);
@@ -28,6 +29,7 @@ const CreateNodeModal = (props) => {
         content: `""${esContent}""`,
         pictureURL: esPicture,
         featured: featured || false,
+        ...(shouldHide ? { hidden: true } : {}),
       },
       { ID: 0 },
       callback ||
@@ -71,6 +73,7 @@ const CreateNodeModal = (props) => {
                   src={pictureField}
                   onError={() => {
                     setPictureField("");
+                    setShouldHide(false);
                   }}
                   alt="This shouldn't have happened"
                   style={{
@@ -95,6 +98,7 @@ const CreateNodeModal = (props) => {
                   onMouseLeave={(e) => (e.target.style.color = "#888")}
                   onClick={() => {
                     setPictureField("");
+                    setShouldHide(false);
                   }}
                 />
               </div>
@@ -108,7 +112,7 @@ const CreateNodeModal = (props) => {
           <div class="row no-gutters">
             <div class="col">Picture:</div>
             <div class="col small text-muted text-center">
-              {!picture ? "(Don't use any picture)" : "(Use new picture)"}
+              {!pictureField ? "(Don't use any picture)" : "(Use new picture)"}
             </div>
             <div class="col text-right">
               <Button
@@ -125,9 +129,10 @@ const CreateNodeModal = (props) => {
           {showChangePic ? (
             <SearchImage
               loggedInAs={loggedInAs}
-              callback={(url) => {
+              callback={(url, familyFriendly) => {
                 setPictureField(url);
                 setShowChangePic(false);
+                setShouldHide(!familyFriendly);
               }}
             />
           ) : (
@@ -152,6 +157,15 @@ const CreateNodeModal = (props) => {
             onChange={(e) => setContent(e.target.value)}
           />
           {info || ""}
+          {shouldHide ? (
+            <span style={{ color: "red" }}>
+              The image chosen will cause the page to automatically be hidden.
+              If you would like to not have this happen, change or remove the
+              image.
+            </span>
+          ) : (
+            ""
+          )}
         </Modal.Body>
         <Modal.Footer
           {...(loggedInAs && loggedInAs.unsafeMode

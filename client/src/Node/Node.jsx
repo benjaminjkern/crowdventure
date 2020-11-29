@@ -7,6 +7,7 @@ import {
   OverlayTrigger,
   Tooltip,
 } from "react-bootstrap";
+import Cookies from "universal-cookie";
 
 import PictureModal from "../Modals/PictureModal";
 import EditNodeModal from "../Modals/EditNodeModal";
@@ -55,7 +56,14 @@ const Node = (props) => {
 
   if (node === undefined) {
     return (
-      <Alert variant={loggedInAs && loggedInAs.unsafeMode ? "dark" : "light"}>
+      <Alert
+        variant={
+          (loggedInAs && loggedInAs.unsafeMode) ||
+          new Cookies().get("unsafeMode") === "true"
+            ? "dark"
+            : "light"
+        }
+      >
         <title>Loading Page...</title>
         <Alert.Heading>Loading...</Alert.Heading>
       </Alert>
@@ -81,6 +89,7 @@ const Node = (props) => {
   )
     return (
       <Alert variant="danger">
+        <title>Crowdventure! - {node.title}</title>
         <Alert.Heading>Unsafe!</Alert.Heading>
         <p>
           This page has been hidden from general users, because the content has
@@ -97,7 +106,13 @@ const Node = (props) => {
       {node.hidden &&
       loggedInAs &&
       node.owner.screenName === loggedInAs.screenName ? (
-        <Alert variant="danger">
+        <Alert
+          variant="danger"
+          dismissible
+          onClose={() => {
+            setNode({ ...node, hidden: false });
+          }}
+        >
           <Alert.Heading>Unsafe!</Alert.Heading>
           <p>
             This page has been hidden from general users, because the content

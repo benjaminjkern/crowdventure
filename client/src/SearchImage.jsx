@@ -21,7 +21,9 @@ const SearchImage = (props) => {
     fetch(
       "https://api.cognitive.microsoft.com/bing/v7.0/images/search?q=" +
         encodeURIComponent(query) +
-        "&count=20&safeSearch=off&offset=" +
+        `&count=20&safeSearch=${
+          loggedInAs && loggedInAs.unsafeMode ? "Off" : "Strict"
+        }&offset=` +
         (query !== lastQuery ? 0 : page * 20),
       {
         headers: {
@@ -86,7 +88,9 @@ const SearchImage = (props) => {
       renderMenuItemChildren={(option) => (
         <div>
           <img
-            onClick={() => callback(option.longUrls[0])}
+            onClick={() =>
+              callback(option.longUrls[0], option.isFamilyFriendly[0])
+            }
             src={option.urls[0]}
             style={{
               marginRight: "10px",
@@ -103,7 +107,9 @@ const SearchImage = (props) => {
           />
           {option.urls.length === 2 ? (
             <img
-              onClick={() => callback(option.longUrls[1])}
+              onClick={() =>
+                callback(option.longUrls[1], option.isFamilyFriendly[1])
+              }
               src={option.urls[1]}
               style={{
                 marginRight: "10px",
