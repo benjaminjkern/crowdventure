@@ -100,6 +100,7 @@ const Account = (props) => {
           onClick={() => {
             showModal(
               <PictureModal
+                loggedInAs={loggedInAs}
                 title={account.screenName}
                 pictureURL={account.profilePicURL}
                 close={() => showModal(undefined)}
@@ -171,6 +172,7 @@ const Account = (props) => {
               onClick={() => {
                 showModal(
                   <EditAccountModal
+                    loggedInAs={loggedInAs}
                     screenName={account.screenName}
                     bio={account.bio}
                     profilePicture={account.profilePicURL}

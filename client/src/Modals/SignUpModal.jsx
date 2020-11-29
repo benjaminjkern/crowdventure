@@ -63,11 +63,20 @@ const SignUpModal = (props) => {
         close();
       }}
     >
-      <Modal.Header closeButton>
+      <Modal.Header
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: palette[5] } }
+          : {})}
+        closeButton
+      >
         <Modal.Title>Sign Up for Crowdventure!</Modal.Title>
       </Modal.Header>
       <Form>
-        <Modal.Body>
+        <Modal.Body
+          {...(loggedInAs && loggedInAs.unsafeMode
+            ? { style: { backgroundColor: palette[4] } }
+            : {})}
+        >
           <Form.Group>
             <Form.Label>Screen Name:</Form.Label>
             <Form.Control
@@ -76,12 +85,18 @@ const SignUpModal = (props) => {
             />
             <Form.Label>Create Password:</Form.Label>
             <Form.Control
+              {...(loggedInAs && loggedInAs.unsafeMode
+                ? { style: { backgroundColor: palette[5], color: "white" } }
+                : {})}
               type="password"
               value={pass1}
               onChange={(e) => setPass1(e.target.value)}
             />
             <Form.Label>Confirm Password:</Form.Label>
             <Form.Control
+              {...(loggedInAs && loggedInAs.unsafeMode
+                ? { style: { backgroundColor: palette[5], color: "white" } }
+                : {})}
               type="password"
               value={pass2}
               onChange={(e) => setPass2(e.target.value)}
@@ -89,7 +104,11 @@ const SignUpModal = (props) => {
           </Form.Group>
           {info ? info : ""}
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer
+          {...(loggedInAs && loggedInAs.unsafeMode
+            ? { style: { backgroundColor: palette[5] } }
+            : {})}
+        >
           <Button
             variant="primary"
             style={{

@@ -5,7 +5,7 @@ import { Modal, Button } from "react-bootstrap";
 import { palette } from "../index";
 
 const ConfirmModal = (props) => {
-  const { title, content, onConfirm, close } = props;
+  const { title, content, onConfirm, close, loggedInAs } = props;
   const [show, setShow] = useState(true);
   return (
     <Modal
@@ -15,11 +15,26 @@ const ConfirmModal = (props) => {
         close();
       }}
     >
-      <Modal.Header closeButton>
+      <Modal.Header
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: palette[5] } }
+          : {})}
+        closeButton
+      >
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>{content}</Modal.Body>
-      <Modal.Footer>
+      <Modal.Body
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: palette[4] } }
+          : {})}
+      >
+        {content}
+      </Modal.Body>
+      <Modal.Footer
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: palette[5] } }
+          : {})}
+      >
         <Button
           variant="danger"
           onClick={() => {

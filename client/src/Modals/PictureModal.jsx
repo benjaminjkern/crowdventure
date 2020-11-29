@@ -4,7 +4,7 @@ import { Modal, Button } from "react-bootstrap";
 import { palette } from "../index";
 
 const PictureModal = (props) => {
-  const { title, pictureURL, close } = props;
+  const { title, pictureURL, close, loggedInAs } = props;
   const [show, setShow] = useState(true);
   const [info, setInfo] = useState("");
 
@@ -16,23 +16,38 @@ const PictureModal = (props) => {
         close();
       }}
     >
-      <Modal.Header closeButton>
+      <Modal.Header
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: palette[5] } }
+          : {})}
+        closeButton
+      >
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
-      <img
-        src={pictureURL}
-        onError={(e) => {
-          e.target.style.display = "none";
-          setInfo(<span style={{ color: "red" }}>Picture not found!</span>);
-        }}
-        style={{
-          width: "100%",
-          maxHeight: "70vh",
-          "object-fit": "contain",
-        }}
-      />
-      {info ? info : ""}
-      <Modal.Footer>
+      <Modal.Body
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: palette[4] } }
+          : {})}
+      >
+        <img
+          src={pictureURL}
+          onError={(e) => {
+            e.target.style.display = "none";
+            setInfo(<span style={{ color: "red" }}>Picture not found!</span>);
+          }}
+          style={{
+            width: "100%",
+            maxHeight: "70vh",
+            "object-fit": "contain",
+          }}
+        />
+        {info ? info : ""}
+      </Modal.Body>
+      <Modal.Footer
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: palette[5] } }
+          : {})}
+      >
         <Button
           size="sm"
           onClick={() => {

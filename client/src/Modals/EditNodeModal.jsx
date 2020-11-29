@@ -56,11 +56,20 @@ const EditNodeModal = (props) => {
         close();
       }}
     >
-      <Modal.Header closeButton>
+      <Modal.Header
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: palette[5] } }
+          : {})}
+        closeButton
+      >
         <Modal.Title>Editing Page</Modal.Title>
       </Modal.Header>
       <Form>
-        <Modal.Body>
+        <Modal.Body
+          {...(loggedInAs && loggedInAs.unsafeMode
+            ? { style: { backgroundColor: palette[4] } }
+            : {})}
+        >
           {picture ? (
             <>
               <div
@@ -120,9 +129,11 @@ const EditNodeModal = (props) => {
             </div>
             <div class="col text-right">
               <Button
-                variant="light"
+                variant={
+                  loggedInAs && loggedInAs.unsafeMode ? "secondary" : "light"
+                }
                 size="sm"
-                onClick={() => setShowChangePic(true)}
+                onClick={() => setShowChangePic(!showChangePic)}
               >
                 {picture ? "Change" : "Select"} Picture
               </Button>
@@ -140,11 +151,17 @@ const EditNodeModal = (props) => {
           )}
           <Form.Label>Title:</Form.Label>
           <Form.Control
+            {...(loggedInAs && loggedInAs.unsafeMode
+              ? { style: { backgroundColor: palette[5], color: "white" } }
+              : {})}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
           <Form.Label>Content:</Form.Label>
           <Form.Control
+            {...(loggedInAs && loggedInAs.unsafeMode
+              ? { style: { backgroundColor: palette[5], color: "white" } }
+              : {})}
             as="textarea"
             rows="3"
             value={content}
@@ -152,7 +169,11 @@ const EditNodeModal = (props) => {
           />
           {info ? info : ""}
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer
+          {...(loggedInAs && loggedInAs.unsafeMode
+            ? { style: { backgroundColor: palette[5] } }
+            : {})}
+        >
           <Button
             onClick={() =>
               title
@@ -181,6 +202,7 @@ const EditNodeModal = (props) => {
             onClick={() => {
               showModal(
                 <ConfirmModal
+                  loggedInAs={loggedInAs}
                   close={() => showModal(undefined)}
                   onConfirm={deletePage}
                   title="Delete Page"

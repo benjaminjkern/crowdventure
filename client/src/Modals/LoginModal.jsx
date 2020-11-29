@@ -47,25 +47,44 @@ const LoginModal = (props) => {
         close();
       }}
     >
-      <Modal.Header closeButton>
+      <Modal.Header
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: palette[5] } }
+          : {})}
+        closeButton
+      >
         <Modal.Title>Log in</Modal.Title>
       </Modal.Header>
       <Form>
-        <Modal.Body>
+        <Modal.Body
+          {...(loggedInAs && loggedInAs.unsafeMode
+            ? { style: { backgroundColor: palette[4] } }
+            : {})}
+        >
           <Form.Label>Screen Name:</Form.Label>
           <Form.Control
+            {...(loggedInAs && loggedInAs.unsafeMode
+              ? { style: { backgroundColor: palette[5], color: "white" } }
+              : {})}
             value={screenName}
             onChange={(e) => setScreenName(e.target.value)}
           />
           <Form.Label>Password:</Form.Label>
           <Form.Control
+            {...(loggedInAs && loggedInAs.unsafeMode
+              ? { style: { backgroundColor: palette[5], color: "white" } }
+              : {})}
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           {info ? info : ""}
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer
+          {...(loggedInAs && loggedInAs.unsafeMode
+            ? { style: { backgroundColor: palette[5] } }
+            : {})}
+        >
           <Button
             variant="primary"
             style={{

@@ -18,6 +18,7 @@ const EditAccountModal = (props) => {
     close,
     setAccount,
     setRedirect,
+    loggedInAs,
   } = props;
   const [show, setShow] = useState(true);
   const [info, setInfo] = useState("");
@@ -74,11 +75,20 @@ const EditAccountModal = (props) => {
         close();
       }}
     >
-      <Modal.Header closeButton>
+      <Modal.Header
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: palette[5] } }
+          : {})}
+        closeButton
+      >
         <Modal.Title>Editing Account</Modal.Title>
       </Modal.Header>
       <Form>
-        <Modal.Body>
+        <Modal.Body
+          {...(loggedInAs && loggedInAs.unsafeMode
+            ? { style: { backgroundColor: palette[4] } }
+            : {})}
+        >
           {profilePicture ? (
             <img
               src={profilePicture}
@@ -102,6 +112,9 @@ const EditAccountModal = (props) => {
           <Form.Control
             value={profilePictureField}
             onChange={(e) => setProfilePictureField(e.target.value)}
+            {...(loggedInAs && loggedInAs.unsafeMode
+              ? { style: { backgroundColor: palette[5], color: "white" } }
+              : {})}
           />
           <Form.Label>Bio:</Form.Label>
           <Form.Control
@@ -109,10 +122,17 @@ const EditAccountModal = (props) => {
             rows="3"
             value={bioField}
             onChange={(e) => setBioField(e.target.value)}
+            {...(loggedInAs && loggedInAs.unsafeMode
+              ? { style: { backgroundColor: palette[5], color: "white" } }
+              : {})}
           />
           {info ? info : ""}
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer
+          {...(loggedInAs && loggedInAs.unsafeMode
+            ? { style: { backgroundColor: palette[5] } }
+            : {})}
+        >
           <Button
             onClick={editPage}
             style={{
@@ -128,6 +148,7 @@ const EditAccountModal = (props) => {
             onClick={() => {
               showModal(
                 <ConfirmModal
+                  loggedInAs={loggedInAs}
                   title="Delete Account"
                   content="This will erase all content created by this account, including all pages and suggested choices, and liked and disliked content. Are you sure you wish to continue?"
                   onConfirm={() => deleteAccount()}

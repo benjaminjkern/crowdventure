@@ -48,13 +48,25 @@ const EditChoiceModal = (props) => {
         close();
       }}
     >
-      <Modal.Header closeButton>
+      <Modal.Header
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: palette[5] } }
+          : {})}
+        closeButton
+      >
         <Modal.Title>Editing Choice</Modal.Title>
       </Modal.Header>
       <Form>
-        <Modal.Body>
+        <Modal.Body
+          {...(loggedInAs && loggedInAs.unsafeMode
+            ? { style: { backgroundColor: palette[4] } }
+            : {})}
+        >
           <Form.Label>Action:</Form.Label>
           <Form.Control
+            {...(loggedInAs && loggedInAs.unsafeMode
+              ? { style: { backgroundColor: palette[5], color: "white" } }
+              : {})}
             value={suggestAction}
             onChange={(e) => setSuggestAction(e.target.value)}
           ></Form.Control>
@@ -62,7 +74,11 @@ const EditChoiceModal = (props) => {
           <SearchPage callback={(nodeID) => setToPage(nodeID)} toID={toPage} />
           {info ? info : ""}
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer
+          {...(loggedInAs && loggedInAs.unsafeMode
+            ? { style: { backgroundColor: palette[5] } }
+            : {})}
+        >
           <Button
             onClick={() =>
               suggestAction

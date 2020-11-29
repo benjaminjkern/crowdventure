@@ -135,6 +135,7 @@ const Node = (props) => {
           onClick={() =>
             showModal(
               <PictureModal
+                loggedInAs={loggedInAs}
                 pictureURL={node.pictureURL}
                 title={node.title}
                 close={() => showModal(undefined)}

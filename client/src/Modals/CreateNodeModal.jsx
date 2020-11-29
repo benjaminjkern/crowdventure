@@ -45,11 +45,20 @@ const CreateNodeModal = (props) => {
         close();
       }}
     >
-      <Modal.Header closeButton>
+      <Modal.Header
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: palette[5] } }
+          : {})}
+        closeButton
+      >
         <Modal.Title>Creating New Page</Modal.Title>
       </Modal.Header>
       <Form>
-        <Modal.Body>
+        <Modal.Body
+          {...(loggedInAs && loggedInAs.unsafeMode
+            ? { style: { backgroundColor: palette[4] } }
+            : {})}
+        >
           {pictureField ? (
             <>
               <div
@@ -103,9 +112,11 @@ const CreateNodeModal = (props) => {
             </div>
             <div class="col text-right">
               <Button
-                variant="light"
+                variant={
+                  loggedInAs && loggedInAs.unsafeMode ? "secondary" : "light"
+                }
                 size="sm"
-                onClick={() => setShowChangePic(true)}
+                onClick={() => setShowChangePic(!showChangePic)}
               >
                 {pictureField ? "Change" : "Select"} Picture
               </Button>
@@ -113,6 +124,7 @@ const CreateNodeModal = (props) => {
           </div>
           {showChangePic ? (
             <SearchImage
+              loggedInAs={loggedInAs}
               callback={(url) => {
                 setPictureField(url);
                 setShowChangePic(false);
@@ -125,17 +137,27 @@ const CreateNodeModal = (props) => {
           <Form.Control
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            {...(loggedInAs && loggedInAs.unsafeMode
+              ? { style: { backgroundColor: palette[5], color: "white" } }
+              : {})}
           />
           <Form.Label>Content:</Form.Label>
           <Form.Control
             as="textarea"
             rows="3"
             value={content}
+            {...(loggedInAs && loggedInAs.unsafeMode
+              ? { style: { backgroundColor: palette[5], color: "white" } }
+              : {})}
             onChange={(e) => setContent(e.target.value)}
           />
           {info || ""}
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer
+          {...(loggedInAs && loggedInAs.unsafeMode
+            ? { style: { backgroundColor: palette[5] } }
+            : {})}
+        >
           <Button
             onClick={() =>
               title

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 
-import { AsyncTypeahead } from "react-bootstrap-typeahead";
+import { AsyncTypeahead, TypeaheadMenu } from "react-bootstrap-typeahead";
+
+import { palette } from "./index";
 
 const { BING_API_KEY } = require("./apolloURL");
 
 const SearchImage = (props) => {
-  const { callback } = props;
+  const { callback, loggedInAs } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState([]);
   const [page, setPage] = useState(0);
