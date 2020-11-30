@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 import BootstrapSwitchButton from "bootstrap-switch-button-react";
 
-import { escape, query_call, palette } from "./index";
+import { escape, query_call, palette, mutation_call } from "./index";
 import CreateNodeModal from "./Modals/CreateNodeModal";
 import EditAccountModal from "./Modals/EditAccountModal";
 import PictureModal from "./Modals/PictureModal";
@@ -20,14 +20,32 @@ import NodeViewer from "./NodeViewer";
 import { Redirect } from "react-router-dom";
 
 const Account = (props) => {
-  const { loggedInAs, setLoggedInAs } = props;
+  const { loggedInAs, setLoggedInAs, match } = props;
 
   const [redirect, setRedirect] = useState(undefined);
   const [account, setAccount] = useState(undefined);
   const [showingModal, showModal] = useState(undefined);
 
+  const reportAccount = () => {
+    if (account)
+      mutation_call(
+        "createFeedback",
+        {
+          ...(loggedInAs ? { accountScreenName: loggedInAs.screenName } : {}),
+          info: "This is inappropriate",
+          reportingObjectType: "Account",
+          reportingObjectID: account.screenName,
+        },
+        { info: 0, reporting: 0 },
+        () => {
+          alert("Successfully reported account!");
+          window.location.reload(false);
+        }
+      );
+  };
+
   useEffect(() => {
-    const pageID = escape(props.match.params.id);
+    const pageID = escape(match.params.id);
     if (!account || pageID !== account.screenName) {
       query_call(
         "getAccount",
@@ -38,6 +56,7 @@ const Account = (props) => {
           profilePicURL: 0,
           totalNodeViews: 0,
           totalSuggestionScore: 0,
+          hidden: 0,
           nodes: {
             owner: { screenName: 0, profilePicURL: 0 },
             featured: 0,
@@ -72,6 +91,7 @@ const Account = (props) => {
   if (account === null)
     return (
       <Alert variant="danger">
+        <title>Error! Account: {match.params.id}</title>
         <Alert.Heading>Oh snap! You ran into an error</Alert.Heading>
         <p>
           This page does not exist, or maybe our database is down. Who knows?
@@ -80,9 +100,48 @@ const Account = (props) => {
       </Alert>
     );
 
+  if (
+    account.hidden &&
+    (!loggedInAs ||
+      (account.screenName !== loggedInAs.screenName && !loggedInAs.unsafeMode))
+  )
+    return (
+      <Alert variant="danger">
+        <title>{account.screenName} on Crowdventure!</title>
+        <Alert.Heading>Unsafe!</Alert.Heading>
+        <p>
+          This page has been hidden from general users, because the content has
+          been deemed unsafe. If you would like to see it, log in and turn on{" "}
+          <b>Unsafe mode</b>!
+        </p>
+      </Alert>
+    );
+
   return (
     <Container>
       <title>{account.screenName} on Crowdventure!</title>
+      {account.hidden &&
+      loggedInAs &&
+      account.screenName === loggedInAs.screenName &&
+      !loggedInAs.unsafeMode ? (
+        <Alert
+          variant="danger"
+          dismissible
+          onClose={() => {
+            setAccount({ ...node, hidden: false });
+          }}
+        >
+          <Alert.Heading>Unsafe!</Alert.Heading>
+          <p>
+            This page has been hidden from general users, because the content
+            has been deemed unsafe. Users in unsafe mode can see this page and
+            its content. Since you own this page, you can see it. If you believe
+            this page should be considered safe, click <a href="">Here</a>.
+          </p>
+        </Alert>
+      ) : (
+        ""
+      )}
 
       <h1>
         <img
@@ -249,6 +308,17 @@ const Account = (props) => {
 
       <h3>Featured Pages:</h3>
       <NodeViewer nodes={account.nodes} loggedInAs={loggedInAs} />
+
+      <Container>
+        <Button
+          style={{ marginRight: "0", marginLeft: "auto", display: "block" }}
+          variant="danger"
+          size="sm"
+          onClick={reportAccount}
+        >
+          Report Account
+        </Button>
+      </Container>
 
       {showingModal || ""}
       {redirect || ""}

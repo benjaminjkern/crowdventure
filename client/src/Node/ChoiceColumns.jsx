@@ -144,6 +144,7 @@ const ChoiceColumns = (props) => {
               dislikedBy: { screenName: 0 },
               score: 0,
               suggestedBy: {
+                hidden: 0,
                 screenName: 0,
                 profilePicURL: 0,
               },
@@ -151,6 +152,7 @@ const ChoiceColumns = (props) => {
               to: {
                 owner: {
                   screenName: 0,
+                  hidden: 0,
                 },
                 ID: 0,
                 hidden: 0,
@@ -216,20 +218,20 @@ const ChoiceColumns = (props) => {
             );
 
           if (
-            (choice.hidden && !loggedInAs) ||
-            (choice.hidden &&
-              !loggedInAs.unsafeMode &&
-              loggedInAs.screenName !== choice.suggestedBy.screenName &&
-              (loggedInAs.screenName !== node.owner.screenName || !canon))
+            (choice.hidden || choice.suggestedBy.hidden) &&
+            (!loggedInAs ||
+              (!loggedInAs.unsafeMode &&
+                loggedInAs.screenName !== choice.suggestedBy.screenName &&
+                (loggedInAs.screenName !== node.owner.screenName || !canon)))
           )
             return <span />;
 
           const disabled =
             !choice.to ||
-            (choice.to.hidden && !loggedInAs) ||
-            (choice.to.hidden &&
-              !loggedInAs.unsafeMode &&
-              choice.to.owner.screenName !== loggedInAs.screenName);
+            ((choice.to.hidden || choice.to.owner.hidden) &&
+              (!loggedInAs ||
+                (!loggedInAs.unsafeMode &&
+                  choice.to.owner.screenName !== loggedInAs.screenName)));
 
           return (
             <Card
@@ -256,7 +258,7 @@ const ChoiceColumns = (props) => {
                   <Card.Title>{choice.action}</Card.Title>
                 </Card.Body>
               </a>
-              {choice.hidden ? (
+              {choice.hidden || choice.suggestedBy.hidden ? (
                 <OverlayTrigger
                   overlay={
                     <Tooltip>
@@ -290,7 +292,9 @@ const ChoiceColumns = (props) => {
               ) : (
                 ""
               )}
-              {!choice.hidden && choice.to.hidden && !disabled ? (
+              {!choice.hidden &&
+              (choice.to.hidden || choice.to.owner.hidden) &&
+              !disabled ? (
                 <OverlayTrigger
                   overlay={
                     <Tooltip>

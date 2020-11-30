@@ -110,7 +110,7 @@ const NodeViewer = (props) => {
                 </Card.Body>
               </a>
 
-              {node.featured ? (
+              {node.featured && node && node.owner ? (
                 <OverlayTrigger
                   overlay={
                     <Tooltip>

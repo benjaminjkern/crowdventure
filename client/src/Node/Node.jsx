@@ -15,12 +15,29 @@ import SuggestChoiceModal from "../Modals/SuggestChoiceModal";
 
 import ChoiceColumns from "./ChoiceColumns";
 
-import { escape, palette, query_call } from "../index";
+import { escape, palette, query_call, mutation_call } from "../index";
 
 const Node = (props) => {
   const { history, match, loggedInAs } = props;
   const [showingModal, showModal] = useState(undefined);
   const [node, setNode] = useState(undefined);
+
+  const reportNode = () => {
+    mutation_call(
+      "createFeedback",
+      {
+        ...(loggedInAs ? { accountScreenName: loggedInAs.screenName } : {}),
+        info: "This is inappropriate",
+        reportingObjectType: "Node",
+        reportingObjectID: node.ID,
+      },
+      { info: 0, reporting: 0 },
+      () => {
+        alert("Successfully reported page!");
+        window.location.reload(false);
+      }
+    );
+  };
 
   useEffect(() => {
     const pageID = escape(match.params.id);
@@ -38,7 +55,7 @@ const Node = (props) => {
           title: 0,
           content: 0,
           views: 0,
-          owner: { screenName: 0, profilePicURL: 0 },
+          owner: { screenName: 0, profilePicURL: 0, hidden: 0 },
           canonChoices: {
             ID: 0,
           },
@@ -73,6 +90,7 @@ const Node = (props) => {
   if (node === null)
     return (
       <Alert variant="danger">
+        <title>Error! Node: {match.params.id}</title>
         <Alert.Heading>Oh snap! You ran into an error</Alert.Heading>
         <p>
           This page does not exist, or maybe our database is down. Who knows?
@@ -99,13 +117,32 @@ const Node = (props) => {
       </Alert>
     );
 
+  if (
+    node.owner.hidden &&
+    (!loggedInAs ||
+      (node.owner.screenName !== loggedInAs.screenName &&
+        !loggedInAs.unsafeMode))
+  )
+    return (
+      <Alert variant="danger">
+        <title>Crowdventure! - {node.title}</title>
+        <Alert.Heading>Unsafe!</Alert.Heading>
+        <p>
+          This page has been hidden from general users, because the author has
+          been flagged as unsafe for the general public. If you would like to
+          see it, log in and turn on <b>Unsafe mode</b>!
+        </p>
+      </Alert>
+    );
+
   return (
     <Container>
       <title>Crowdventure! - {node.title}</title>
 
-      {node.hidden &&
+      {(node.hidden || node.owner.hidden) &&
       loggedInAs &&
-      node.owner.screenName === loggedInAs.screenName ? (
+      node.owner.screenName === loggedInAs.screenName &&
+      !loggedInAs.unsafeMode ? (
         <Alert
           variant="danger"
           dismissible
@@ -309,6 +346,17 @@ const Node = (props) => {
           adding to it!
         </p>
       )}
+
+      <Container>
+        <Button
+          style={{ marginRight: "0", marginLeft: "auto", display: "block" }}
+          variant="danger"
+          size="sm"
+          onClick={reportNode}
+        >
+          Report Page
+        </Button>
+      </Container>
 
       {showingModal ? showingModal : ""}
     </Container>
