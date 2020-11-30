@@ -6,6 +6,7 @@ const typeDefs = gql `
     dateCreated: String!
     bio: String
     profilePicURL: String
+    hidden: Boolean
 
     nodes: [Node!]
     suggestedChoices: [Choice!]
@@ -87,6 +88,7 @@ const typeDefs = gql `
       bio: String
       profilePicURL: String
       newScreenName: String
+      hidden: Boolean
     ): Account
     loginAccount(screenName: String!, password: String): Account
 
@@ -98,6 +100,7 @@ const typeDefs = gql `
       bgColor: String
       fgColor: String
       featured: Boolean
+      hidden: Boolean
     ): Node
     deleteNode(nodeID: String!): Boolean
     editNode(
@@ -108,6 +111,7 @@ const typeDefs = gql `
       bgColor: String
       fgColor: String
       featured: Boolean
+      hidden: Boolean
     ): Node
 
     suggestChoice(
@@ -116,7 +120,7 @@ const typeDefs = gql `
       action: String!
       toID: String!
     ): Choice
-    editSuggestion(choiceID: String!, action: String, toID: String): Choice
+    editSuggestion(choiceID: String!, action: String, toID: String, hidden: Boolean): Choice
     removeSuggestion(choiceID: String!): Boolean
 
     makeCanon(choiceID: String!): Choice
@@ -132,6 +136,7 @@ const typeDefs = gql `
       info: String!
     ): Feedback
     removeFeedback(feedbackID: String!): Boolean
+    removeAllFeedback(accountScreenName: String, reportingObjectType: String, reportingObjectID: String, info: String): Boolean
   }
 `;
 

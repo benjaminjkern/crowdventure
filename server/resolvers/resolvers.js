@@ -11,7 +11,12 @@ require('dotenv').config();
  */
 
 const resolvers = {
-  Account: AccountResolvers, Node: NodeResolvers, Choice: ChoiceResolvers, Feedback: FeedbackResolvers, Query: QueryResolvers, Mutation: MutationResolvers,
+    Account: AccountResolvers,
+    Node: NodeResolvers,
+    Choice: ChoiceResolvers,
+    Feedback: FeedbackResolvers,
+    Query: QueryResolvers,
+    Mutation: MutationResolvers,
 };
 
 module.exports = { resolvers };

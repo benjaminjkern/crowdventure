@@ -18,6 +18,7 @@ module.exports = {
                 return inspect(
                     await databaseCalls.getChoice(parent.reporting.ID),
                 ).replace(/\n/g, '');
+            default:
         }
 
         throw new UserInputError(

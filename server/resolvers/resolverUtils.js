@@ -40,4 +40,5 @@ const scramble = (list) => {
     }
     return newList;
 };
+
 module.exports = { encrypt, sort, scramble };

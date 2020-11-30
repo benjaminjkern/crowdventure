@@ -1,14 +1,49 @@
 # Crowdventure Changelog
 
-### Version 0.1.6 (In Progress)
+### Version 0.1.7 (In Progress)
+
+- Nodes and choices can be hidden
+- If a node or choice is unchecked, anyone reporting a node automatically hides it, otherwise it just sends a feedback for review
+- I can remove all feedback, with optional filters
+- Cleanup backend into different files for each type of resolver
+- Moved log out button to not be in the edit account page
+- Changed buttons within modals to match the light blue of crowdventure
+- Cleanup frontend into different folders and files based on screens and frequently reused elements such as modals and node views
+- Can delete nodes from account page
+- Fixed a backend bug with editing suggested choices
+- Can no longer edit a suggestion that has been made canon by the owner
+- A featured page now says "This page has been starred by (Account name)" as a tooltip
+- If you own a page that is hidden, it shows, and says that it was marked as unsafe
+- Unsafe mode acts as kind of a dark mode and I like how it looks
+- Unless you are logged in on the frontend and set to "Unsafe mode", you cannot view hidden nodes, choices, and accounts
+- Going from node to node scrolls you back to top of page
+- Can report nodes and choices
+- When a page throws an error, it shows in the title of the page
+- Accounts can be reported and hidden, which hides all nodes and choices they created, it does not hide the choices they have liked and nodes they have viewed though.
+- Can report accounts
+- Ability to Report a page that you are on
+
+##### To add:
+
+- Change your password or screen name
+- Can create non-reportative feedback
+- Reporting should be done through a modal
+- Hide API behind a key or osmething
+- Automatic content filter for titles, names, and pictures that flags things as hidden by default
+- Easily remove hidden nodes and choices and whatnot
+- Cap the number of reports to like 5 per day per ip address
+- Should show a modal and a license agreement when switching to unsafe mode
+
+### Version 0.1.6
+
+> Release date: 9/16/20
 
 - I can disable the backend whenever I want
 - Switched from Pixabay to Bing images because Pixabay is lame and the images only stay alive for 24 hours (I hope bing does the same), also Pixabay images are lame anyways
 - Images in search bar display as blurry if bing tagged them as "not family friendly", right now it still just lets you select them though
 - Added date created for nodes, choices, and accounts. If created before September 16, 2020, then they just get put as
-- Goals for this update: Mature content filter, ability to be in NSFW mode (hide everything thats bad), the ability to report stuff and send comments or messages to me, also of course bug fixes. I wanna put this out on a public website and let it go wild
 
-### Version 0.1.5 (Current)
+### Version 0.1.5
 
 > Release Date: 7/31/20
 

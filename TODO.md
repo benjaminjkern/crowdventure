@@ -10,21 +10,17 @@
 8. A better tutorial
 9. I still don't love how the choices look
 10. Page colors are implemented but its not possible to edit them on the front end, I dont even know if I want them to be a thing anyways
-11. You should be able to upload photos or maybe search giphy library
-    - Maybe if you dont put a picture in it does an auto search of the giphy library based on the title of the node
-12. Maybe owner catch phrases / Taglines?? Could be fun hahaha
+11. Maybe owner catch phrases / Taglines?? Could be fun hahaha
 
 # Bugs / Unwanted features
 
-1. Report button doesnt work
-2. API isnt even blocked by an API Key or anything, that should be fixed before it gets too big but its fine for now
 3. It should be made clear that screen names and passwords are case sensitive
 4. Something I did while editing node deleted it - not sure what
 5. On iPhone the go to page search bar goes off the side and you can’t scroll to read it
 6. They should probably be a limit on the size of the content and titles
 7. The search bar shouldn’t load everything at once
 8. I’m not sure if total node views on accounts even matters, and the more nodes a person has the slower this will be
-9. You can't edit your account screenname or password
+9. You can't edit your account screenname or password on the frontend
 10. There are tons of react warnings that should be fixed
 11. There aren't tests
 12. Story size doesnt work at the moment because it is too slow
@@ -49,3 +45,13 @@
 31. Still some bugs with picking the images
 32. Deleting from database didnt delete from database
 33. Figure out how to make the image api safer
+34. Make stuff not have to reload pages all the time
+35. Pagination
+36. Fix the eslint stuff on both frontend and backend, its a bit of a hassle to not have it check for trivial things
+37. If possible find a way to standardize the modal system, because theres a lot of repeated code as is for each of them
+    - for example you should never be able to escape in the shitty way lol
+    - all buttons should use my overwritten palette
+      - I can probably do this using css
+38. Dont let things get edited unless the contents have changed
+39. Hilight the text you're searching for in the searchpage tab
+40. I dont love the flickering of the actions but it works
