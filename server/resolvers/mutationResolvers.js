@@ -93,6 +93,7 @@ const MutationResolvers = {
                     dislikedBy: newDislikes,
                 });
             });
+            databaseCalls.removeAccount(account.screenName);
             account.screenName = args.newScreenName;
         }
 
@@ -106,7 +107,10 @@ const MutationResolvers = {
             });
         }
         const IP = context.headers['X-Forwarded-For'].split(',')[0];
-        if (args.password && encrypt(args.password) === account.encryptedPassword) account.lastIP = IP;
+        if (args.password) {
+            if (encrypt(args.password) === account.encryptedPassword) account.lastIP = IP;
+            else return null;
+        }
         if (account.lastIP === IP) return await databaseCalls.addAccount(account);
         return null;
     },
@@ -153,7 +157,7 @@ const MutationResolvers = {
     deleteNode: async(parent, args, context, info) => {
         const node = await databaseCalls.getNode(args.nodeID);
         if (!node) {
-            throw new UserInputError('That account doesnt exist!', {
+            throw new UserInputError('That node doesnt exist!', {
                 invalidArgs: Object.keys(args),
             });
         }

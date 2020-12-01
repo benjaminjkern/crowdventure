@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createRef } from "react";
 
 import {
   CardColumns,
@@ -21,6 +21,8 @@ const ChoiceColumns = (props) => {
   const [choices, setChoices] = useState(
     (canon ? node.canonChoices : node.nonCanonChoices).map(() => null)
   );
+
+  const refs = [];
 
   const [showingModal, showModal] = useState(undefined);
 
@@ -203,13 +205,19 @@ const ChoiceColumns = (props) => {
     return (
       <CardColumns>
         {choices.map((choice, idx) => {
+          refs.push(createRef());
           if (choice === null)
             return (
               <Card
-                className="text-center"
-                {...(loggedInAs && loggedInAs.unsafeMode
-                  ? { style: { backgroundColor: palette[4] } }
-                  : {})}
+                className="mt-2 text-center"
+                style={{
+                  boxShadow: `0 0 3px ${palette[0]}`,
+                  overflow: "hidden",
+                  ...(loggedInAs && loggedInAs.unsafeMode
+                    ? { backgroundColor: palette[4] }
+                    : {}),
+                }}
+                ref={refs[idx]}
               >
                 <Card.Body style={{ paddingTop: "2em" }}>
                   <Card.Title>Loading...</Card.Title>
@@ -235,10 +243,15 @@ const ChoiceColumns = (props) => {
 
           return (
             <Card
-              className="text-center"
-              {...(loggedInAs && loggedInAs.unsafeMode
-                ? { style: { backgroundColor: palette[4] } }
-                : {})}
+              className="text-center mt-2"
+              style={{
+                boxShadow: `0 0 3px ${palette[0]}`,
+                overflow: "hidden",
+                ...(loggedInAs && loggedInAs.unsafeMode
+                  ? { backgroundColor: palette[4] }
+                  : {}),
+              }}
+              ref={refs[idx]}
             >
               <a
                 href={!disabled ? `/crowdventure/#/node/${choice.to.ID}` : ""}
@@ -252,6 +265,12 @@ const ChoiceColumns = (props) => {
                       ? palette[0]
                       : palette[2]
                     : "grey",
+                }}
+                onMouseEnter={(e) => {
+                  refs[idx].current.style.boxShadow = `0 0 6px ${palette[2]}`;
+                }}
+                onMouseLeave={(e) => {
+                  refs[idx].current.style.boxShadow = `0 0 3px ${palette[0]}`;
                 }}
               >
                 <Card.Body style={{ cursor: "pointer", paddingTop: "2em" }}>

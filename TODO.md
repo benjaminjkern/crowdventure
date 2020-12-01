@@ -1,57 +1,59 @@
-# Non-essential cool future features
+# Feature ideas
 
-1. Report choices and nodes that are inappropriate / mature content filter. A chart feature to view all connected nodes, this could blend well into the local history idea, since a massive chart displaying all potential nodes would be really bad
-2. Ability to Sort choices to be in order of best or worst
-3. Static header and Footer with contact information / patreon as well as advertisements
-4. Ability to Set/delete variables, either save them per user or save pass them from node to node, I feel like passing from node to node is cooler and easier to deal with but will be weird if a back tracking system is set up. This is a really cool idea in general and I definitely want to implement it eventually since this will give a shit ton of power to creators.
-5. Ability to hide Nodes instead of deleting them, i.e. make them private
-6. Notifications when someone adds a suggestion on your nodes
-7. Subscriptions - not sure how this will work at all or If I wanna do it
-8. A better tutorial
-9. I still don't love how the choices look
-10. Page colors are implemented but its not possible to edit them on the front end, I dont even know if I want them to be a thing anyways
-11. Maybe owner catch phrases / Taglines?? Could be fun hahaha
+- Decide on a mature content filter and how to go about that
+- A chart feature to view all connected nodes, this could blend well into the local history idea, since a massive chart displaying all potential nodes would be really bad
+- Ability to Sort choices to be in order of best or worst
+- Static header and Footer with contact information / patreon as well as advertisements
+- Ability to Set/delete variables, either save them per user or save pass them from node to node, I feel like passing from node to node is cooler and easier to deal with but will be weird if a back tracking system is set up. This is a really cool idea in general and I definitely want to implement it eventually since this will give a shit ton of power to creators.
+- Ability to hide Nodes instead of deleting them, i.e. make them private
+- Notifications when someone adds a suggestion on your nodes
+- Subscriptions
+  - Maybe only subscribers can see certain content and they get notified whenever you make new content
+- A better tutorial
+  - Also consider forcing people to at least skim the tutorial to begin with
+- I still don't love how the choices look
+- Page colors are implemented but its not possible to edit them on the front end, I dont even know if I want them to be a thing anyways
+- Owner catch phrases / Taglines?? Could be fun hahaha
+- Ability Favorite pages and your favorites can show up on your account
+- A general Search bar for pages
+- A random page function
+- Tests (lol) (but also honestly might be useful in the future)
+- Ability to upload photos
+- Hilight the text you're searching for in the searchpage tab
 
-# Bugs / Unwanted features
+# Importante Things to fix
 
-3. It should be made clear that screen names and passwords are case sensitive
-4. Something I did while editing node deleted it - not sure what
-5. On iPhone the go to page search bar goes off the side and you can’t scroll to read it
-6. They should probably be a limit on the size of the content and titles
-7. The search bar shouldn’t load everything at once
-8. I’m not sure if total node views on accounts even matters, and the more nodes a person has the slower this will be
-9. You can't edit your account screenname or password on the frontend
-10. There are tons of react warnings that should be fixed
-11. There aren't tests
-12. Story size doesnt work at the moment because it is too slow
-13. Featuring a page shouldnt have to reload it
-14. Pictures should show what part of them will show or have some sort of indication that it is going to be a banner
-15. There should probably be a limit on the amount of photos people can upload so that it doesnt get overrun, not a huge deal for now though -- doesnt matter rn because you cant upload hehe
-16. Oh my god there is a fucking react apollo I am so dumb I should switch to that
-17. Pressing enter when a modal is open submits the form (which doesnt do anything at the moment but I need to either make it submit for real or figure out a way so that submitting doesnt reload the page)
-18. The picture is a little bit too tall on the creating new page screen
-19. Figure out how to get it to show something if they have a script blocker
-20. Grayed out actions should have a tooltip that say why they're greyed out
-21. Cannot upload photos
-22. Should go through and set all nodes pictureURLs to empty string so it doesnt crash at some point
-23. I should absolutely reconcile a lot of the code so its not being repeated
-24. I think sometimes deleting nodes takes you to the account screen when it hsould take you to home... not sure whats up with it
-25. There should be a little image loading thing but I didnt wanna deal with it
-26. Image alt texts should be something significant
-27. Should put the API stuff in a env file instead of a private js file
-28. The titles being done per page was so that I could send a link and it would show up, not so that I cold send a link and have it not show up
-29. When going to an account that doesnt exist it should say that it doesnt exist
-30. Going forward or back should scroll to top of page or something, it looks weird at the moment
-31. Still some bugs with picking the images
-32. Deleting from database didnt delete from database
-33. Figure out how to make the image api safer
-34. Make stuff not have to reload pages all the time
-35. Pagination
-36. Fix the eslint stuff on both frontend and backend, its a bit of a hassle to not have it check for trivial things
-37. If possible find a way to standardize the modal system, because theres a lot of repeated code as is for each of them
-    - for example you should never be able to escape in the shitty way lol
-    - all buttons should use my overwritten palette
-      - I can probably do this using css
-38. Dont let things get edited unless the contents have changed
-39. Hilight the text you're searching for in the searchpage tab
-40. I dont love the flickering of the actions but it works
+- On iPhone the go to page search bar goes off the side and you can’t scroll to read it **TEST**
+- Pressing enter when a modal is open submits the form (which doesnt do anything at the moment but I need to either make it submit for real or figure out a way so that submitting doesnt reload the page)
+- Figure out how to get it to show something if they have a script blocker
+- Should go through and set all nodes pictureURLs to empty string so it doesnt crash at some point **TEST**
+- Sometimes typing new things on the image search does not reload the image search
+- If possible find a way to standardize the code base, because theres a lot of repeated code as is for each of them
+  - for example you should never be able to escape in the shitty way lol
+  - all buttons should use my overwritten palette
+    - I can probably do this using css
+  - THe modals are kinda a mess and resuse a lot of the same code
+
+# Less Importante bugs / THings I should do but dont wanna rn
+
+- Search for family friendly option when you are in unsafe mode
+- The edit account things autofills username and password with google chrome, it shold probably be a separate modal
+- It should be made clear that screen names and passwords are case sensitive
+- Featuring a page shouldnt have to reload the whole window
+- SHould be able to feature a page from the page itself, instead of having to do so from the account menu
+- Consider database limitations
+  - The search bar shouldn’t load everything at once
+  - I’m not sure if total node views on accounts even matters, and the more nodes a person has the slower this will be
+  - Story size doesnt work at the moment because it is too slow
+  - They should probably be a limit on the size of the content and titles and account names
+- Pictures should show what part of them will show or have some sort of indication that it is going to be a banner
+  - Actually I wish there was a way to relayout all of it so that the pictures aren't so janky
+- The picture is sometimes a little bit too tall on the creating new page screen
+- Grayed out actions should have a tooltip that say why they're greyed out
+- Image alt texts should be something significant
+- Should put the API stuff in a env file instead of a private js file
+- Make stuff not have to reload pages all the time in general
+- Find out how to get it so titles show up properly when sending a link
+- Fix the eslint stuff on both frontend and backend, its a bit of a hassle to not have it check for trivial things
+- Dont let things get edited unless the contents have changed
+- I dont love the flickering of the actions but it works for now

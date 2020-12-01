@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { Modal, Button, Form } from "react-bootstrap";
 
-import { mutation_call, escape, palette } from "../index";
+import { mutation_call, query_call, escape, palette } from "../index";
 
 import ConfirmModal from "./ConfirmModal";
 
@@ -29,8 +29,15 @@ const EditAccountModal = (props) => {
   const [profilePictureField, setProfilePictureField] = useState(
     profilePicture || ""
   );
+  const [nameField, setNameField] = useState("");
+  const [pass1, setPass1] = useState("");
+  const [pass2, setPass2] = useState("");
 
-  const editPage = () => {
+  const editPage = (checkedIfExists = false) => {
+    if (pass1 && pass1 !== pass2) {
+      setInfo(<div style={{ color: "red" }}>Passwords must match!</div>);
+      return;
+    }
     const esBio = escape(bioField, true);
     const esPicture = escape(profilePictureField);
 
@@ -38,6 +45,29 @@ const EditAccountModal = (props) => {
     if (bioField !== bio) params.bio = `""${esBio}""`;
     if (profilePictureField !== profilePicture)
       params.profilePicURL = esPicture;
+    if (nameField !== screenName && !nameField.match(/^\s*$/)) {
+      if (!checkedIfExists) {
+        const esScreenName = escape(nameField);
+        query_call(
+          "getAccount",
+          { screenName: esScreenName },
+          { screenName: 0 },
+          (res) => {
+            if (res) {
+              setInfo(
+                <div style={{ color: "red" }}>That account already exists!</div>
+              );
+            } else {
+              editPage(true);
+            }
+          }
+        );
+        return;
+      } else {
+        params.newScreenName = escape(nameField);
+      }
+    }
+    if (pass1) params.newPassword = escape(pass1);
 
     mutation_call(
       "editAccount",
@@ -48,10 +78,24 @@ const EditAccountModal = (props) => {
         profilePicURL: 0,
         totalNodeViews: 0,
         totalSuggestionScore: 0,
-        nodes: { featured: 0, ID: 0, title: 0, views: 0, pictureURL: 0 },
+        hidden: 0,
+        nodes: {
+          owner: { screenName: 0, profilePicURL: 0 },
+          featured: 0,
+          hidden: 0,
+          ID: 0,
+          title: 0,
+          views: 0,
+          pictureURL: 0,
+        },
       },
       // I shouldnt need any of the parameters if it just reloads the page
       (res) => {
+        if (params.newScreenName) {
+          setRedirect(<Redirect to={`/account/${params.newScreenName}`} />);
+          new Cookies().set("account", params.newScreenName, { path: "/" });
+          window.location.reload(false);
+        }
         setAccount(res);
         setShow(false);
         close();
@@ -126,6 +170,44 @@ const EditAccountModal = (props) => {
               ? { style: { backgroundColor: palette[5], color: "white" } }
               : {})}
           />
+
+          <Form.Label>Change your screen name:</Form.Label>
+          <Form.Control
+            placeholder={screenName}
+            value={nameField}
+            onChange={(e) => setNameField(e.target.value)}
+            {...(loggedInAs && loggedInAs.unsafeMode
+              ? { style: { backgroundColor: palette[5], color: "white" } }
+              : {})}
+          />
+
+          <Form.Label>Change your password:</Form.Label>
+          <Form.Control
+            type="password"
+            placeholder="••••••••"
+            value={pass1}
+            onChange={(e) => setPass1(e.target.value)}
+            {...(loggedInAs && loggedInAs.unsafeMode
+              ? { style: { backgroundColor: palette[5], color: "white" } }
+              : {})}
+          />
+          {pass1 ? (
+            <>
+              <Form.Label>Confirm password:</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="••••••••"
+                value={pass2}
+                onChange={(e) => setPass2(e.target.value)}
+                {...(loggedInAs && loggedInAs.unsafeMode
+                  ? { style: { backgroundColor: palette[5], color: "white" } }
+                  : {})}
+              />
+            </>
+          ) : (
+            ""
+          )}
+
           {info ? info : ""}
         </Modal.Body>
         <Modal.Footer
@@ -134,7 +216,7 @@ const EditAccountModal = (props) => {
             : {})}
         >
           <Button
-            onClick={editPage}
+            onClick={() => editPage()}
             style={{
               border: `1px solid ${palette[2]}`,
               backgroundColor: palette[0],

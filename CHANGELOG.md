@@ -22,17 +22,22 @@
 - Accounts can be reported and hidden, which hides all nodes and choices they created, it does not hide the choices they have liked and nodes they have viewed though.
 - Can report accounts
 - Ability to Report a page that you are on
+- Change your password or screen name from account page
+- Fixed a bug where you could log in sometimes with the wrong password lol
+- Changed default font to be arial rounded cuz its neat and feels a bit more adventure/childlike
+- Added a neat glow around each card
+- Shows a modal and a license agreement when switching to unsafe mode
+- On the account page, it now shows only featured nodes and then it allows you to search for nodes authored by a particular user
 
 ##### To add:
 
-- Change your password or screen name
 - Can create non-reportative feedback
 - Reporting should be done through a modal
 - Hide API behind a key or osmething
-- Automatic content filter for titles, names, and pictures that flags things as hidden by default
-- Easily remove hidden nodes and choices and whatnot
+- Easily remove hidden nodes and choices and whatnot - Admin panel/admin permissions maybe
 - Cap the number of reports to like 5 per day per ip address
-- Should show a modal and a license agreement when switching to unsafe mode
+  - Or Figure out how to verify they're a human or something when reporting
+  - I just feel like it will be too easy to report things and screw them up if reporting once gets them hidden into unsafe mode
 
 ### Version 0.1.6
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, createRef } from "react";
 
 import { mutation_call, palette } from "./index";
 
@@ -10,6 +10,7 @@ import {
   DropdownButton,
   Dropdown,
   Alert,
+  Container,
 } from "react-bootstrap";
 
 import Cookies from "universal-cookie";
@@ -19,6 +20,7 @@ const NodeViewer = (props) => {
   const { nodes, loggedInAs } = props;
 
   const [showingModal, showModal] = useState(undefined);
+  const refs = [];
 
   const reportNode = (nodeID) => {
     mutation_call(
@@ -53,7 +55,8 @@ const NodeViewer = (props) => {
   };
 
   return nodes ? (
-    <CardColumns>
+    <CardColumns style={{ marginTop: "5px", marginBottom: "5px" }}>
+      <Container />
       {nodes
         .filter(
           (node) =>
@@ -62,12 +65,19 @@ const NodeViewer = (props) => {
                 loggedInAs.screenName === node.owner.screenName)) ||
             !node.hidden
         )
-        .map((node) => {
+        .map((node, i) => {
+          refs.push(createRef());
           return (
             <Card
-              {...(loggedInAs && loggedInAs.unsafeMode
-                ? { style: { backgroundColor: palette[4] } }
-                : {})}
+              className="mt-2"
+              style={{
+                boxShadow: `0 0 3px ${palette[0]}`,
+                overflow: "hidden",
+                ...(loggedInAs && loggedInAs.unsafeMode
+                  ? { backgroundColor: palette[4] }
+                  : {}),
+              }}
+              ref={refs[i]}
             >
               <a
                 href={`/crowdventure/#/node/${node.ID}`}
@@ -76,6 +86,12 @@ const NodeViewer = (props) => {
                     loggedInAs && loggedInAs.unsafeMode
                       ? palette[0]
                       : palette[2],
+                }}
+                onMouseEnter={(e) => {
+                  refs[i].current.style.boxShadow = `0 0 6px ${palette[2]}`;
+                }}
+                onMouseLeave={(e) => {
+                  refs[i].current.style.boxShadow = `0 0 3px ${palette[0]}`;
                 }}
               >
                 {node.pictureURL ? (

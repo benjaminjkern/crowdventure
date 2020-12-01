@@ -22,6 +22,9 @@ const App = () => {
       const cookies = new Cookies();
       const savedAccount = escape(cookies.get("account"));
 
+      if (!savedAccount || savedAccount === "")
+        cookies.set("unsafeMode", "false", { path: "/" });
+
       mutation_call(
         "loginAccount",
         { screenName: savedAccount },
@@ -32,6 +35,7 @@ const App = () => {
             setLoggedInAs(res);
           } else {
             cookies.set("account", "", { path: "/" });
+            cookies.set("unsafeMode", "false", { path: "/" });
           }
         }
       );

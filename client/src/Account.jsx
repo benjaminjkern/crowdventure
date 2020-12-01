@@ -7,6 +7,7 @@ import {
   Alert,
   OverlayTrigger,
   Tooltip,
+  Form,
 } from "react-bootstrap";
 import BootstrapSwitchButton from "bootstrap-switch-button-react";
 
@@ -14,6 +15,7 @@ import { escape, query_call, palette, mutation_call } from "./index";
 import CreateNodeModal from "./Modals/CreateNodeModal";
 import EditAccountModal from "./Modals/EditAccountModal";
 import PictureModal from "./Modals/PictureModal";
+import UnsafeModal from "./Modals/UnsafeModal";
 
 import NodeViewer from "./NodeViewer";
 
@@ -25,6 +27,9 @@ const Account = (props) => {
   const [redirect, setRedirect] = useState(undefined);
   const [account, setAccount] = useState(undefined);
   const [showingModal, showModal] = useState(undefined);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchedNodes, setSearchedNodes] = useState([]);
 
   const reportAccount = () => {
     if (account)
@@ -57,7 +62,7 @@ const Account = (props) => {
           totalNodeViews: 0,
           totalSuggestionScore: 0,
           hidden: 0,
-          nodes: {
+          featuredNodes: {
             owner: { screenName: 0, profilePicURL: 0 },
             featured: 0,
             hidden: 0,
@@ -66,8 +71,22 @@ const Account = (props) => {
             views: 0,
             pictureURL: 0,
           },
+          nodes: {
+            owner: { screenName: 0, profilePicURL: 0 },
+            featured: 0,
+            hidden: 0,
+            ID: 0,
+            title: 0,
+            content: 0,
+            views: 0,
+            pictureURL: 0,
+          },
         },
-        (res) => setAccount(res)
+        (res) => {
+          setAccount(res);
+          setSearchQuery("");
+          setSearchedNodes([]);
+        }
       );
     }
   });
@@ -168,7 +187,11 @@ const Account = (props) => {
               <PictureModal
                 loggedInAs={loggedInAs}
                 title={account.screenName}
-                pictureURL={account.profilePicURL}
+                pictureURL={
+                  account.profilePicURL
+                    ? account.profilePicURL
+                    : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
+                }
                 close={() => showModal(undefined)}
               />
             );
@@ -193,13 +216,32 @@ const Account = (props) => {
                 onstyle="secondary"
                 size="sm"
                 onChange={(checked) => {
-                  new Cookies().set("unsafeMode", checked, {
-                    path: "/",
-                  });
-                  setLoggedInAs({
-                    ...loggedInAs,
-                    unsafeMode: checked,
-                  });
+                  if (checked) {
+                    showModal(
+                      <UnsafeModal
+                        close={() => showModal(undefined)}
+                        loggedInAs={loggedInAs}
+                        onConfirm={() => {
+                          new Cookies().set("unsafeMode", true, {
+                            path: "/",
+                          });
+                          setLoggedInAs({
+                            ...loggedInAs,
+                            unsafeMode: true,
+                          });
+                          showModal(undefined);
+                        }}
+                      />
+                    );
+                  } else {
+                    new Cookies().set("unsafeMode", false, {
+                      path: "/",
+                    });
+                    setLoggedInAs({
+                      ...loggedInAs,
+                      unsafeMode: false,
+                    });
+                  }
                 }}
               />
               <OverlayTrigger
@@ -307,7 +349,45 @@ const Account = (props) => {
       <p />
 
       <h3>Featured Pages:</h3>
-      <NodeViewer nodes={account.nodes} loggedInAs={loggedInAs} />
+      <NodeViewer nodes={account.featuredNodes} loggedInAs={loggedInAs} />
+      <h3>Search All Pages Authored by {account.screenName}:</h3>
+      <Form>
+        <Form.Control
+          {...(loggedInAs && loggedInAs.unsafeMode
+            ? { style: { backgroundColor: palette[5], color: "white" } }
+            : {})}
+          value={searchQuery}
+          placeholder={"Search for a page..."}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            if (e.target.value.length >= 2) {
+              setSearchedNodes([
+                ...account.nodes.filter((node) =>
+                  node.title
+                    .toLowerCase()
+                    .includes(e.target.value.toLowerCase())
+                ),
+                ...account.nodes.filter(
+                  (node) =>
+                    !node.title
+                      .toLowerCase()
+                      .includes(e.target.value.toLowerCase()) &&
+                    node.content
+                      .toLowerCase()
+                      .includes(e.target.value.toLowerCase())
+                ),
+              ]);
+            } else {
+              setSearchedNodes([]);
+            }
+          }}
+        />
+      </Form>
+      {searchQuery ? (
+        <NodeViewer nodes={searchedNodes} loggedInAs={loggedInAs} />
+      ) : (
+        ""
+      )}
 
       <Container>
         <Button

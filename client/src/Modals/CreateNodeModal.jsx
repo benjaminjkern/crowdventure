@@ -27,9 +27,9 @@ const CreateNodeModal = (props) => {
         accountScreenName: loggedInAs.screenName,
         title: esTitle,
         content: `""${esContent}""`,
-        pictureURL: esPicture,
         featured: featured || false,
         ...(shouldHide ? { hidden: true } : {}),
+        ...(esPicture && esPicture.length ? { pictureURL: esPicture } : {}),
       },
       { ID: 0 },
       callback ||
