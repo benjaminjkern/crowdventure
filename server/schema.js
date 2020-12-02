@@ -22,6 +22,7 @@ const typeDefs = gql `
     content: String!
     dateCreated: String!
     pictureURL: String
+    pictureUnsafe: Boolean
     bgColor: String
     fgColor: String
     featured: Boolean
@@ -89,6 +90,7 @@ const typeDefs = gql `
       profilePicURL: String
       newScreenName: String
       hidden: Boolean
+      isAdmin: Boolean
     ): Account
     loginAccount(screenName: String!, password: String): Account
 
@@ -101,6 +103,7 @@ const typeDefs = gql `
       fgColor: String
       featured: Boolean
       hidden: Boolean
+      pictureUnsafe: Boolean
     ): Node
     deleteNode(nodeID: String!): Boolean
     editNode(
@@ -112,6 +115,7 @@ const typeDefs = gql `
       fgColor: String
       featured: Boolean
       hidden: Boolean
+      pictureUnsafe: Boolean
     ): Node
 
     suggestChoice(

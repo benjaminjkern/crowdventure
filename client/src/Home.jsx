@@ -26,6 +26,7 @@ const Home = (props) => {
         views: 0,
         size: 0,
         pictureURL: 0,
+        pictureUnsafe: 0,
       },
       (res) => setTopNodes(res)
     );

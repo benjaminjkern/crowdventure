@@ -141,6 +141,7 @@ const MutationResolvers = {
             title: args.title,
             content: args.content,
             pictureURL: args.pictureURL,
+            pictureUnsafe: args.pictureUnsafe || false,
             fgColor: args.fgColor || 'auto',
             bgColor: args.fgColor || 'white',
             featured: args.featured || false,
@@ -191,6 +192,7 @@ const MutationResolvers = {
         if (args.pictureURL) node.pictureURL = args.pictureURL;
         if (args.bgColor) node.bgColor = args.bgColor;
         if (args.fgColor) node.fgColor = args.fgColor;
+        if (args.pictureUnsafe !== undefined) node.pictureUnsafe = args.pictureUnsafe;
         if (args.hidden !== undefined) node.hidden = args.hidden;
         if (args.featured !== undefined) node.featured = args.featured;
 

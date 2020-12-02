@@ -21,6 +21,7 @@ const NodeViewer = (props) => {
 
   const [showingModal, showModal] = useState(undefined);
   const refs = [];
+  const BLURAMOUNT = 20;
 
   const reportNode = (nodeID) => {
     mutation_call(
@@ -109,6 +110,12 @@ const NodeViewer = (props) => {
                       style={{
                         "max-height": "30vh",
                         "object-fit": "cover",
+                        ...(node.pictureUnsafe
+                          ? {
+                              "-webkit-filter": "blur(" + BLURAMOUNT + "px)",
+                              filter: "blur(" + BLURAMOUNT + "px)",
+                            }
+                          : {}),
                       }}
                       onError={(e) => {
                         e.target.parentNode.style.display = "none";

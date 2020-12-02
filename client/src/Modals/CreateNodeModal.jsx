@@ -28,7 +28,7 @@ const CreateNodeModal = (props) => {
         title: esTitle,
         content: `""${esContent}""`,
         featured: featured || false,
-        ...(shouldHide ? { hidden: true } : {}),
+        ...(shouldHide ? { hidden: true, pictureUnsafe: true } : {}),
         ...(esPicture && esPicture.length ? { pictureURL: esPicture } : {}),
       },
       { ID: 0 },

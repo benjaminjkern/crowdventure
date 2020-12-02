@@ -70,6 +70,7 @@ const Account = (props) => {
             title: 0,
             views: 0,
             pictureURL: 0,
+            pictureUnsafe: 0,
           },
           nodes: {
             owner: { screenName: 0, profilePicURL: 0 },
@@ -80,6 +81,7 @@ const Account = (props) => {
             content: 0,
             views: 0,
             pictureURL: 0,
+            pictureUnsafe: 0,
           },
         },
         (res) => {

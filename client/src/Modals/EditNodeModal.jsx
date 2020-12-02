@@ -40,7 +40,7 @@ const EditNodeModal = (props) => {
         title: esTitle,
         content: `""${esContent}""`,
         pictureURL: esPicture,
-        ...(shouldHide ? { hidden: true } : {}),
+        ...(shouldHide ? { hidden: true, pictureUnsafe: true } : {}),
       },
       { ID: 0 },
       (res) => {

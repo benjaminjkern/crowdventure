@@ -28,9 +28,12 @@
 - Added a neat glow around each card
 - Shows a modal and a license agreement when switching to unsafe mode
 - On the account page, it now shows only featured nodes and then it allows you to search for nodes authored by a particular user
+- Lewd images are blurred, unless you really wanna see them
+- Choices and other options texts are smaller and greyed a little
 
 ##### To add:
 
+- Reporting a page only hides it if it is featured
 - Can create non-reportative feedback
 - Reporting should be done through a modal
 - Hide API behind a key or osmething

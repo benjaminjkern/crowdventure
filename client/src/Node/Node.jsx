@@ -21,6 +21,7 @@ const Node = (props) => {
   const { history, match, loggedInAs } = props;
   const [showingModal, showModal] = useState(undefined);
   const [node, setNode] = useState(undefined);
+  const BLURAMOUNT = 40;
 
   const reportNode = () => {
     mutation_call(
@@ -49,6 +50,7 @@ const Node = (props) => {
         {
           hidden: 0,
           pictureURL: 0,
+          pictureUnsafe: 0,
           fgColor: 0,
           bgColor: 0,
           ID: 0,
@@ -183,6 +185,12 @@ const Node = (props) => {
             maxHeight: "30vh",
             "object-fit": "cover",
             cursor: "pointer",
+            ...(node.pictureUnsafe
+              ? {
+                  "-webkit-filter": "blur(" + BLURAMOUNT + "px)",
+                  filter: "blur(" + BLURAMOUNT + "px)",
+                }
+              : {}),
           }}
           onClick={() =>
             showModal(
@@ -209,7 +217,7 @@ const Node = (props) => {
         style={{ paddingRight: "0px", paddingBottom: "5px" }}
       >
         <div class="col">
-          <h3>Choices:</h3>
+          <h3 class="text-muted">Choices:</h3>
         </div>
         <div class="col" style={{ paddingRight: "0px" }}>
           <Button
@@ -242,7 +250,7 @@ const Node = (props) => {
 
       <Container className="row" style={{ paddingRight: "0px" }}>
         <div class="col align-bottom">
-          <h3 class="align-bottom">Other options:</h3>
+          <h3 class="align-bottom text-muted">Other options:</h3>
         </div>
         <div class="col text-right" style={{ paddingRight: "0px" }}>
           <small class="text-muted">
