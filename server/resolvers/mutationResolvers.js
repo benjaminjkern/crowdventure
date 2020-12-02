@@ -1,6 +1,6 @@
 const { UserInputError } = require('apollo-server-lambda');
 const { databaseCalls } = require('./databaseCalls.js');
-const { encrypt } = require('./resolverUtils.js');
+const { encrypt, flagContent } = require('./resolverUtils.js');
 const AccountResolvers = require('./accountResolvers.js');
 
 const MutationResolvers = {
@@ -21,10 +21,15 @@ const MutationResolvers = {
                 invalidArgs: Object.keys(args),
             });
         }
+        if (flagContent(args.screenName)) {
+            throw new UserInputError('Bad word', {
+                invalidArgs: Object.keys(args),
+            });
+        }
         const IP = context.headers['X-Forwarded-For'].split(',')[0];
         return await databaseCalls.addAccount({
             screenName: args.screenName,
-            bio: args.bio,
+            bio: flagContent(args.bio) ? null : args.bio,
             encryptedPassword: encrypt(args.password),
             lastIP: IP,
             profilePicURL: args.profilePicURL,
@@ -63,11 +68,11 @@ const MutationResolvers = {
         console.log(`Editing Account ${account.screenName}`);
 
         if (args.newPassword) account.encryptedPassword = encrypt(args.newPassword);
-        if (args.bio !== undefined) account.bio = args.bio;
+        if (args.bio !== undefined && !flagContent(args.bio)) account.bio = args.bio;
         if (args.profilePicURL !== undefined) account.profilePicURL = args.profilePicURL;
         if (args.hidden !== undefined) account.hidden = args.hidden;
         if (args.isAdmin !== undefined) account.isAdmin = args.isAdmin;
-        if (args.newScreenName) {
+        if (args.newScreenName && !flagContent(args.newScreenName)) {
             if (await databaseCalls.getAccount(args.newScreenName)) {
                 throw new UserInputError('That account already exists!', {
                     invalidArgs: Object.keys(args),
@@ -146,7 +151,7 @@ const MutationResolvers = {
             fgColor: args.fgColor || 'auto',
             bgColor: args.fgColor || 'white',
             featured: args.featured || false,
-            hidden: args.hidden || undefined,
+            hidden: args.hidden || flagContent(args.title) || flagContent(args.content) || undefined,
             dateCreated: new Date().toJSON(),
             views: {},
             canonChoices: [],
@@ -188,8 +193,14 @@ const MutationResolvers = {
 
         console.log(`Editing node ${node.ID} (${node.title})`);
 
-        if (args.title) node.title = args.title;
-        if (args.content) node.content = args.content;
+        if (args.title) {
+            node.title = args.title;
+            if (flagContent(args.title)) node.hidden = true;
+        }
+        if (args.content) {
+            node.content = args.content;
+            if (flagContent(args.content)) node.hidden = true;
+        }
         if (args.pictureURL !== undefined) node.pictureURL = args.pictureURL;
         if (args.bgColor) node.bgColor = args.bgColor;
         if (args.fgColor) node.fgColor = args.fgColor;
@@ -239,6 +250,7 @@ const MutationResolvers = {
             likedBy: {},
             dislikedBy: {},
             suggestedBy: account.screenName,
+            hidden: flagContent(args.content) || undefined,
         };
 
         account.suggestedChoices.push(newChoice.ID);
@@ -261,7 +273,10 @@ const MutationResolvers = {
         console.log(`Editing suggestion ${choice.ID} (${choice.action})`);
 
         if (args.toID) choice.to = args.toID;
-        if (args.action) choice.action = args.action;
+        if (args.action) {
+            choice.action = args.action;
+            if (flagContent(args.action)) choice.hidden = true;
+        }
         if (args.hidden !== undefined) choice.hidden = args.hidden;
 
         return await databaseCalls.addChoice(choice);
@@ -451,12 +466,6 @@ const MutationResolvers = {
                     databaseCalls.getChoice(args.reportingObjectID).then((reporting) => {
                         if (reporting.hidden === undefined || reporting.hidden === null) reporting.hidden = true;
                         databaseCalls.addChoice(reporting);
-                    });
-                    break;
-                case 'Account':
-                    databaseCalls.getAccount(args.reportingObjectID).then((reporting) => {
-                        if (reporting.hidden === undefined || reporting.hidden === null) reporting.hidden = true;
-                        databaseCalls.addAccount(reporting);
                     });
                     break;
             }

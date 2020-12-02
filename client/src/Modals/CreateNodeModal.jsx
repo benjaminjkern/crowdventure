@@ -72,6 +72,9 @@ const CreateNodeModal = (props) => {
                 <img
                   src={pictureField}
                   onError={() => {
+                    setInfo(
+                      <span style={{ color: "red" }}>Picture not found!</span>
+                    );
                     setPictureField("");
                     setShouldHide(false);
                   }}

@@ -44,6 +44,7 @@
 - Choices and other options texts are smaller and greyed a little
 - Accounts can be admins
 - Admins can edit all nodes and choices and accounts, as well as hide and unhide nodes, accounts, and choices, and make other accounts admins
+- Nodes and choices will be automatically flagged if they contain certain bad words
 
 ### Version 0.1.6
 
