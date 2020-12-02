@@ -18,8 +18,9 @@ const EditNodeModal = (props) => {
   const [content, setContent] = useState(node.content);
   const [picture, setPicture] = useState(node.pictureURL);
   const [showChangePic, setShowChangePic] = useState(false);
+  const [hidden, setHidden] = useState(node.hidden);
 
-  const [shouldHide, setShouldHide] = useState(false);
+  const [shouldHide, setShouldHide] = useState(node.pictureUnsafe || false);
 
   const deletePage = () => {
     mutation_call("deleteNode", { nodeID: node.ID }, 0, () => {
@@ -31,7 +32,7 @@ const EditNodeModal = (props) => {
   const editNode = () => {
     const esTitle = escape(title);
     const esContent = escape(content, true);
-    const esPicture = escape(picture);
+    const esPicture = picture.length > 0 ? escape(picture) : null;
 
     mutation_call(
       "editNode",
@@ -40,7 +41,12 @@ const EditNodeModal = (props) => {
         title: esTitle,
         content: `""${esContent}""`,
         pictureURL: esPicture,
-        ...(shouldHide ? { hidden: true, pictureUnsafe: true } : {}),
+        ...(shouldHide
+          ? { hidden: true, pictureUnsafe: true }
+          : { pictureUnsafe: false }),
+        ...(!shouldHide && hidden !== undefined && !node.pictureUnsafe
+          ? { hidden }
+          : {}),
       },
       { ID: 0 },
       (res) => {
@@ -149,6 +155,7 @@ const EditNodeModal = (props) => {
               loggedInAs={loggedInAs}
               callback={(url, familyFriendly) => {
                 setPicture(url);
+                setInfo("");
                 setShowChangePic(false);
                 setShouldHide(!familyFriendly);
               }}
@@ -174,9 +181,24 @@ const EditNodeModal = (props) => {
             value={content}
             onChange={(e) => setContent(e.target.value)}
           />
+          {loggedInAs && loggedInAs.isAdmin ? (
+            <>
+              <Form.Label>Admin Controls:</Form.Label>
+              <Form.Check
+                type="checkbox"
+                checked={hidden || false}
+                onChange={(e) => setHidden(e.target.checked)}
+                label="Page should be hidden"
+                id="hide"
+              />
+            </>
+          ) : (
+            ""
+          )}
           {info ? info : ""}
           {shouldHide ? (
             <span style={{ color: "red" }}>
+              <br />
               The image chosen will cause the page to automatically be hidden.
               If you would like to not have this happen, change or remove the
               image.

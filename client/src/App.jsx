@@ -28,7 +28,7 @@ const App = () => {
       mutation_call(
         "loginAccount",
         { screenName: savedAccount },
-        { screenName: 0, profilePicURL: 0 },
+        { screenName: 0, profilePicURL: 0, isAdmin: 0 },
         (res) => {
           if (res) {
             res.unsafeMode = cookies.get("unsafeMode") === "true";

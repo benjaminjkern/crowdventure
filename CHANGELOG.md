@@ -1,6 +1,18 @@
 # Crowdventure Changelog
 
-### Version 0.1.7 (In Progress)
+### Version 0.1.7
+
+> Release Date: 12/1/20
+
+##### TLDR:
+
+- Nodes, choices, and accounts can now be reported and hidden, to be visible only if you are in unsafe mode.
+- You can get to unsafe mode if you have an account and you agree to the terms of service, simply stating we are not responsible for the hidden content.
+- Unsafe mode has a cool dark color!
+- A good amount of Aesthetic changes! I like how it looks even more now
+- A good amount of quality of life changes for both the user and the programmer (me)!
+
+##### Full List of changes:
 
 - Nodes and choices can be hidden
 - If a node or choice is unchecked, anyone reporting a node automatically hides it, otherwise it just sends a feedback for review
@@ -30,17 +42,8 @@
 - On the account page, it now shows only featured nodes and then it allows you to search for nodes authored by a particular user
 - Lewd images are blurred, unless you really wanna see them
 - Choices and other options texts are smaller and greyed a little
-
-##### To add:
-
-- Reporting a page only hides it if it is featured
-- Can create non-reportative feedback
-- Reporting should be done through a modal
-- Hide API behind a key or osmething
-- Easily remove hidden nodes and choices and whatnot - Admin panel/admin permissions maybe
-- Cap the number of reports to like 5 per day per ip address
-  - Or Figure out how to verify they're a human or something when reporting
-  - I just feel like it will be too easy to report things and screw them up if reporting once gets them hidden into unsafe mode
+- Accounts can be admins
+- Admins can edit all nodes and choices and accounts, as well as hide and unhide nodes, accounts, and choices, and make other accounts admins
 
 ### Version 0.1.6
 

@@ -63,9 +63,10 @@ const MutationResolvers = {
         console.log(`Editing Account ${account.screenName}`);
 
         if (args.newPassword) account.encryptedPassword = encrypt(args.newPassword);
-        if (args.bio) account.bio = args.bio;
-        if (args.profilePicURL) account.profilePicURL = args.profilePicURL;
+        if (args.bio !== undefined) account.bio = args.bio;
+        if (args.profilePicURL !== undefined) account.profilePicURL = args.profilePicURL;
         if (args.hidden !== undefined) account.hidden = args.hidden;
+        if (args.isAdmin !== undefined) account.isAdmin = args.isAdmin;
         if (args.newScreenName) {
             if (await databaseCalls.getAccount(args.newScreenName)) {
                 throw new UserInputError('That account already exists!', {
@@ -189,7 +190,7 @@ const MutationResolvers = {
 
         if (args.title) node.title = args.title;
         if (args.content) node.content = args.content;
-        if (args.pictureURL) node.pictureURL = args.pictureURL;
+        if (args.pictureURL !== undefined) node.pictureURL = args.pictureURL;
         if (args.bgColor) node.bgColor = args.bgColor;
         if (args.fgColor) node.fgColor = args.fgColor;
         if (args.pictureUnsafe !== undefined) node.pictureUnsafe = args.pictureUnsafe;

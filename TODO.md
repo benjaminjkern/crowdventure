@@ -57,3 +57,12 @@
 - Fix the eslint stuff on both frontend and backend, its a bit of a hassle to not have it check for trivial things
 - Dont let things get edited unless the contents have changed
 - I dont love the flickering of the actions but it works for now
+
+- Reporting a page only hides it if it is featured
+- Can create non-reportative feedback
+- Reporting should be done through a modal
+- Hide API behind a key or osmething
+- Easily remove hidden nodes and choices and whatnot - Admin panel/admin permissions maybe
+- Cap the number of reports to like 5 per day per ip address
+  - Or Figure out how to verify they're a human or something when reporting
+  - I just feel like it will be too easy to report things and screw them up if reporting once gets them hidden into unsafe mode

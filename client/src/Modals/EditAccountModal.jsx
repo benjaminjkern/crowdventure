@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { Modal, Button, Form } from "react-bootstrap";
 
@@ -16,6 +16,7 @@ const EditAccountModal = (props) => {
     bio,
     profilePicture,
     close,
+    account,
     setAccount,
     setRedirect,
     loggedInAs,
@@ -32,17 +33,20 @@ const EditAccountModal = (props) => {
   const [nameField, setNameField] = useState("");
   const [pass1, setPass1] = useState("");
   const [pass2, setPass2] = useState("");
+  const [hidden, setHidden] = useState(account.hidden);
+  const [isAdmin, setAdmin] = useState(account.isAdmin);
 
   const editPage = (checkedIfExists = false) => {
     if (pass1 && pass1 !== pass2) {
       setInfo(<div style={{ color: "red" }}>Passwords must match!</div>);
       return;
     }
-    const esBio = escape(bioField, true);
-    const esPicture = escape(profilePictureField);
+    const esBio = bioField.length > 0 ? `""${escape(bioField, true)}""` : null;
+    const esPicture =
+      profilePictureField.length > 0 ? escape(profilePictureField) : null;
 
     const params = { screenName };
-    if (bioField !== bio) params.bio = `""${esBio}""`;
+    if (bioField !== bio) params.bio = esBio;
     if (profilePictureField !== profilePicture)
       params.profilePicURL = esPicture;
     if (nameField !== screenName && !nameField.match(/^\s*$/)) {
@@ -68,6 +72,8 @@ const EditAccountModal = (props) => {
       }
     }
     if (pass1) params.newPassword = escape(pass1);
+    if (hidden !== undefined) params.hidden = hidden;
+    if (isAdmin !== undefined) params.isAdmin = isAdmin;
 
     mutation_call(
       "editAccount",
@@ -79,7 +85,8 @@ const EditAccountModal = (props) => {
         totalNodeViews: 0,
         totalSuggestionScore: 0,
         hidden: 0,
-        nodes: {
+        isAdmin: 0,
+        featuredNodes: {
           owner: { screenName: 0, profilePicURL: 0 },
           featured: 0,
           hidden: 0,
@@ -87,6 +94,18 @@ const EditAccountModal = (props) => {
           title: 0,
           views: 0,
           pictureURL: 0,
+          pictureUnsafe: 0,
+        },
+        nodes: {
+          owner: { screenName: 0, profilePicURL: 0 },
+          featured: 0,
+          hidden: 0,
+          ID: 0,
+          title: 0,
+          content: 0,
+          views: 0,
+          pictureURL: 0,
+          pictureUnsafe: 0,
         },
       },
       // I shouldnt need any of the parameters if it just reloads the page
@@ -94,6 +113,9 @@ const EditAccountModal = (props) => {
         if (params.newScreenName) {
           setRedirect(<Redirect to={`/account/${params.newScreenName}`} />);
           new Cookies().set("account", params.newScreenName, { path: "/" });
+          window.location.reload(false);
+        }
+        if (params.isAdmin !== account.isAdmin) {
           window.location.reload(false);
         }
         setAccount(res);
@@ -110,6 +132,13 @@ const EditAccountModal = (props) => {
       window.location.reload(false);
     });
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      setPass1("");
+      setNameField("");
+    }, 1000);
+  }, []);
 
   return (
     <Modal
@@ -202,6 +231,27 @@ const EditAccountModal = (props) => {
                 {...(loggedInAs && loggedInAs.unsafeMode
                   ? { style: { backgroundColor: palette[5], color: "white" } }
                   : {})}
+              />
+            </>
+          ) : (
+            ""
+          )}
+          {loggedInAs && loggedInAs.isAdmin ? (
+            <>
+              <Form.Label>Admin Controls:</Form.Label>
+              <Form.Check
+                type="checkbox"
+                checked={hidden || false}
+                onChange={(e) => setHidden(e.target.checked)}
+                label="Account should be hidden"
+                id="hide"
+              />
+              <Form.Check
+                type="checkbox"
+                checked={isAdmin || false}
+                onChange={(e) => setAdmin(e.target.checked)}
+                label="Account is an admin"
+                id="adm"
               />
             </>
           ) : (

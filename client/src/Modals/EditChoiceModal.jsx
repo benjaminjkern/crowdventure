@@ -17,6 +17,7 @@ const EditChoiceModal = (props) => {
   const [toPage, setToPage] = useState(choice.to.ID);
   const [suggestAction, setSuggestAction] = useState(choice.action);
   const [showingModal, showModal] = useState("");
+  const [hidden, setHidden] = useState(choice.hidden);
 
   const editChoice = (toID) => {
     if (!toID) {
@@ -32,7 +33,12 @@ const EditChoiceModal = (props) => {
       const escaped = escape(suggestAction);
       mutation_call(
         "editSuggestion",
-        { choiceID: choice.ID, action: escaped, toID: toID },
+        {
+          choiceID: choice.ID,
+          action: escaped,
+          toID: toID,
+          ...(hidden !== undefined ? { hidden } : {}),
+        },
         { ID: 0 },
         () => {
           window.location.reload(false);
@@ -72,6 +78,21 @@ const EditChoiceModal = (props) => {
           ></Form.Control>
           <Form.Label>Go to Page:</Form.Label>
           <SearchPage callback={(nodeID) => setToPage(nodeID)} toID={toPage} />
+
+          {loggedInAs && loggedInAs.isAdmin ? (
+            <>
+              <Form.Label>Admin Controls:</Form.Label>
+              <Form.Check
+                type="checkbox"
+                checked={hidden || false}
+                onChange={(e) => setHidden(e.target.checked)}
+                label="Choice should be hidden"
+                id="hide"
+              />
+            </>
+          ) : (
+            ""
+          )}
           {info ? info : ""}
         </Modal.Body>
         <Modal.Footer

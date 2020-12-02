@@ -7,6 +7,7 @@ const typeDefs = gql `
     bio: String
     profilePicURL: String
     hidden: Boolean
+    isAdmin: Boolean
 
     nodes: [Node!]
     suggestedChoices: [Choice!]

@@ -364,7 +364,8 @@ const ChoiceColumns = (props) => {
                 <Dropdown.Item
                   disabled={
                     !loggedInAs ||
-                    loggedInAs.screenName !== node.owner.screenName
+                    (loggedInAs.screenName !== node.owner.screenName &&
+                      !loggedInAs.isAdmin)
                   }
                   onClick={() =>
                     canon ? makeNonCanon(choice.ID) : makeCanon(choice.ID)
@@ -376,7 +377,8 @@ const ChoiceColumns = (props) => {
                   disabled={
                     !loggedInAs ||
                     (loggedInAs.screenName !== choice.suggestedBy.screenName &&
-                      loggedInAs.screenName !== node.owner.screenName)
+                      loggedInAs.screenName !== node.owner.screenName &&
+                      !loggedInAs.isAdmin)
                   }
                   onClick={() => removeSuggestion(choice.ID)}
                 >
@@ -396,8 +398,9 @@ const ChoiceColumns = (props) => {
                   disabled={
                     !(
                       loggedInAs &&
-                      ((canon &&
-                        loggedInAs.screenName === node.owner.screenName) ||
+                      (loggedInAs.isAdmin ||
+                        (canon &&
+                          loggedInAs.screenName === node.owner.screenName) ||
                         (!canon &&
                           loggedInAs.screenName ===
                             choice.suggestedBy.screenName))

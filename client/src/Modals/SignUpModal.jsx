@@ -43,7 +43,7 @@ const SignUpModal = (props) => {
     mutation_call(
       "createAccount",
       { screenName: esScreenName, password: esPass },
-      { screenName: 0, profilePicURL: 0 },
+      { screenName: 0, profilePicURL: 0, isAdmin: 0 },
       (res) => {
         if (res) {
           new Cookies().set("account", screenName, { path: "/" });

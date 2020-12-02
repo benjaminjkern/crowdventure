@@ -40,6 +40,15 @@ const NodeViewer = (props) => {
     );
   };
 
+  const hidePage = (node) => {
+    mutation_call(
+      "editNode",
+      { nodeID: node.ID, hidden: !node.hidden },
+      { title: 0 },
+      () => window.location.reload(false)
+    );
+  };
+
   const featurePage = (node, alreadyFeatured) => {
     mutation_call(
       "editNode",
@@ -241,6 +250,16 @@ const NodeViewer = (props) => {
                 <Dropdown.Item onClick={() => reportNode(node.ID)}>
                   Report
                 </Dropdown.Item>
+                {loggedInAs && loggedInAs.isAdmin ? (
+                  <>
+                    <Dropdown.Divider />
+                    <Dropdown.Item onClick={() => hidePage(node)}>
+                      {node.hidden ? "Un-h" : "H"}ide page
+                    </Dropdown.Item>
+                  </>
+                ) : (
+                  ""
+                )}
               </DropdownButton>
               <Card.Footer
                 className="text-muted text-center"

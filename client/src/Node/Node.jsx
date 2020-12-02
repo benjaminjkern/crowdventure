@@ -285,7 +285,9 @@ const Node = (props) => {
             <br />
             Views: {node.views}
           </small>
-          {loggedInAs && node.owner.screenName === loggedInAs.screenName ? (
+          {loggedInAs &&
+          (node.owner.screenName === loggedInAs.screenName ||
+            loggedInAs.isAdmin) ? (
             <p>
               <Button
                 variant="secondary"

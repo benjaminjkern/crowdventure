@@ -62,6 +62,7 @@ const Account = (props) => {
           totalNodeViews: 0,
           totalSuggestionScore: 0,
           hidden: 0,
+          isAdmin: 0,
           featuredNodes: {
             owner: { screenName: 0, profilePicURL: 0 },
             featured: 0,
@@ -277,39 +278,43 @@ const Account = (props) => {
       )}
 
       <Container>
+        {loggedInAs &&
+        (loggedInAs.screenName === account.screenName || loggedInAs.isAdmin) ? (
+          <Button
+            variant="secondary"
+            onClick={() => {
+              showModal(
+                <EditAccountModal
+                  account={account}
+                  loggedInAs={loggedInAs}
+                  screenName={account.screenName}
+                  bio={account.bio}
+                  profilePicture={account.profilePicURL}
+                  setAccount={setAccount}
+                  setRedirect={setRedirect}
+                  close={() => showModal(undefined)}
+                />
+              );
+            }}
+            size="sm"
+          >
+            Edit Account
+          </Button>
+        ) : (
+          ""
+        )}{" "}
         {loggedInAs && loggedInAs.screenName === account.screenName ? (
-          <span>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                showModal(
-                  <EditAccountModal
-                    loggedInAs={loggedInAs}
-                    screenName={account.screenName}
-                    bio={account.bio}
-                    profilePicture={account.profilePicURL}
-                    setAccount={setAccount}
-                    setRedirect={setRedirect}
-                    close={() => showModal(undefined)}
-                  />
-                );
-              }}
-              size="sm"
-            >
-              Edit Account
-            </Button>{" "}
-            <Button
-              size="sm"
-              onClick={() => {
-                new Cookies().set("account", "", { path: "/" });
-                new Cookies().set("unsafeMode", "false", { path: "/" });
-                window.location.reload(false);
-              }}
-              variant="secondary"
-            >
-              Log out
-            </Button>{" "}
-          </span>
+          <Button
+            size="sm"
+            onClick={() => {
+              new Cookies().set("account", "", { path: "/" });
+              new Cookies().set("unsafeMode", "false", { path: "/" });
+              window.location.reload(false);
+            }}
+            variant="secondary"
+          >
+            Log out
+          </Button>
         ) : (
           ""
         )}
