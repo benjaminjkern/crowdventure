@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.js": "/crowdventure/static/js/main.1fe28769.chunk.js",
-    "main.js.map": "/crowdventure/static/js/main.1fe28769.chunk.js.map",
+    "main.js": "/crowdventure/static/js/main.027b1e84.chunk.js",
+    "main.js.map": "/crowdventure/static/js/main.027b1e84.chunk.js.map",
     "runtime-main.js": "/crowdventure/static/js/runtime-main.1b710123.js",
     "runtime-main.js.map": "/crowdventure/static/js/runtime-main.1b710123.js.map",
     "static/css/2.87ae5899.chunk.css": "/crowdventure/static/css/2.87ae5899.chunk.css",
-    "static/js/2.97a07d52.chunk.js": "/crowdventure/static/js/2.97a07d52.chunk.js",
-    "static/js/2.97a07d52.chunk.js.map": "/crowdventure/static/js/2.97a07d52.chunk.js.map",
+    "static/js/2.d159b1b5.chunk.js": "/crowdventure/static/js/2.d159b1b5.chunk.js",
+    "static/js/2.d159b1b5.chunk.js.map": "/crowdventure/static/js/2.d159b1b5.chunk.js.map",
     "index.html": "/crowdventure/index.html",
     "static/css/2.87ae5899.chunk.css.map": "/crowdventure/static/css/2.87ae5899.chunk.css.map",
-    "static/js/2.97a07d52.chunk.js.LICENSE.txt": "/crowdventure/static/js/2.97a07d52.chunk.js.LICENSE.txt"
+    "static/js/2.d159b1b5.chunk.js.LICENSE.txt": "/crowdventure/static/js/2.d159b1b5.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.1b710123.js",
     "static/css/2.87ae5899.chunk.css",
-    "static/js/2.97a07d52.chunk.js",
-    "static/js/main.1fe28769.chunk.js"
+    "static/js/2.d159b1b5.chunk.js",
+    "static/js/main.027b1e84.chunk.js"
   ]
 }
