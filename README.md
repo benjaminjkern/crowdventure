@@ -1,4 +1,4 @@
-![Logo](Logo.png)
+![Logo](NewLogo.png)
 
 # Crowdventure
 
