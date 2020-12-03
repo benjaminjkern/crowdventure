@@ -57,8 +57,8 @@ const App = () => {
       document.getElementById("root").style.backgroundImage = `linear-gradient(
         to right,
         rgb(158, 232, 255),
-        white 10%,
-        white 90%,
+        rgb(245,250,255) 10%,
+        rgb(245,250,255) 90%,
         rgb(158, 232, 255)
       )`;
       document.getElementById("root").style.color = "";

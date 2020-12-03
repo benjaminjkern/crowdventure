@@ -223,6 +223,7 @@ const Node = (props) => {
           <Button
             onClick={() => {
               history.back();
+              window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
             }}
             size="lg"
             className="float-right"

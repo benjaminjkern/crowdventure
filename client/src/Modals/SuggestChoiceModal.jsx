@@ -24,6 +24,7 @@ const SuggestChoiceModal = (props) => {
         <CreateNodeModal
           loggedInAs={loggedInAs}
           picture={fromNode.pictureURL}
+          pictureUnsafe={fromNode.pictureUnsafe}
           callback={(node) => createNewAction(node.ID)}
           close={() => showModal(undefined)}
         />

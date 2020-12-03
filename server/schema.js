@@ -32,6 +32,7 @@ const typeDefs = gql `
     owner: Account!
     canonChoices: [Choice!]
     nonCanonChoices: [Choice!]
+    parents: [Node!]
 
     views: Int!
     size: Int!

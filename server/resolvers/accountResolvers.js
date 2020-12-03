@@ -17,9 +17,8 @@ const AccountResolvers = {
         parent.suggestedChoices.map((id) => databaseCalls.getChoice(id)),
     ),
     totalNodeViews: async(parent, args, context, info) => await Promise.all(
-        parent.nodes.map((id) => databaseCalls.getNode(id)),
+        parent.nodes.map((id) => databaseCalls.getNode(id).then(node => NodeResolvers.views(node))),
     ).then((nodes) => nodes
-        .map((node) => NodeResolvers.views(node))
         .reduce((x, y) => x + y, 0)),
     totalSuggestionScore: async(parent, args, context, info) => (parent.suggestedChoices ?
         await Promise.all(
@@ -39,9 +38,13 @@ const AccountResolvers = {
             })),
         );
     },
-    dateCreated: (parent, args, context, info) => {
-        if (!parent.dateCreated) parent.dateCreated = 'Before September 16, 2020';
-        databaseCalls.addAccount(parent);
+    dateCreated: async(parent, args, context, info) => {
+        const newParent = await databaseCalls.getAccount(parent.ID);
+        if (!newParent.dateCreated) {
+            parent.dateCreated = 'Before September 16, 2020';
+            newParent.dateCreated = 'Before September 16, 2020';
+        }
+        databaseCalls.addAccount(newParent);
         return parent.dateCreated;
     },
 };

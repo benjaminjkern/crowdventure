@@ -21,7 +21,13 @@ const query_call = (query, parameters, attributes, callback) => {
   });
 };
 
-const mutation_call = (query, parameters, attributes, callback) => {
+const mutation_call = (query, parameters, attributes, callback, setInfo) => {
+  if (setInfo)
+    setInfo(
+      `mutation{${query}${formatParameters(parameters)}${formatAttributes(
+        attributes
+      )}}`
+    );
   app_fetch({
     query: `mutation{${query}${formatParameters(parameters)}${formatAttributes(
       attributes

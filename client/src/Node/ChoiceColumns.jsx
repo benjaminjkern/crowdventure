@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createRef } from "react";
+import React, { useState, useEffect, createRef, forceUpdate } from "react";
 
 import {
   CardColumns,
@@ -174,11 +174,8 @@ const ChoiceColumns = (props) => {
                 choice.dislikedBy.some(
                   (account) => account.screenName === loggedInAs.screenName
                 );
-              setChoices([
-                ...choices.slice(0, i),
-                choice,
-                ...choices.slice(i + 1, choices.length),
-              ]);
+              choices[i] = choice;
+              showModal({});
             }
           );
         }
@@ -487,7 +484,9 @@ const ChoiceColumns = (props) => {
             </Card>
           );
         })}
-        {showingModal || ""}
+        {showingModal && Object.keys(showingModal).length > 0
+          ? showingModal
+          : ""}
       </CardColumns>
     );
 

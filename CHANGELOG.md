@@ -1,10 +1,22 @@
 # Crowdventure Changelog
 
-### Version 0.1.7
+## Version 0.1.8 (In Progress)
+
+- Ability to find parents of any node
+- Fixed a decently big bug with node views, they weren't counting up for the most part (more of a backend fix, it affects the current frontend but whatever)
+- Changed this changelog to be a bit more organized, lol
+
+#### Planned
+
+- Notification system
+- Feedback Modal, reporting done through that modal, and non-reportative feedback
+- Pagination
+
+## Version 0.1.7
 
 > Release Date: 12/1/20
 
-##### TLDR:
+#### TLDR:
 
 - Nodes, choices, and accounts can now be reported and hidden, to be visible only if you are in unsafe mode.
 - You can get to unsafe mode if you have an account and you agree to the terms of service, simply stating we are not responsible for the hidden content.
@@ -12,7 +24,7 @@
 - A good amount of Aesthetic changes! I like how it looks even more now
 - A good amount of quality of life changes for both the user and the programmer (me)!
 
-##### Full List of changes:
+#### Full List of changes:
 
 - Nodes and choices can be hidden
 - If a node or choice is unchecked, anyone reporting a node automatically hides it, otherwise it just sends a feedback for review
@@ -45,8 +57,9 @@
 - Accounts can be admins
 - Admins can edit all nodes and choices and accounts, as well as hide and unhide nodes, accounts, and choices, and make other accounts admins
 - Nodes and choices will be automatically flagged if they contain certain bad words
+- Changed the background color of normal mode very slightly
 
-### Version 0.1.6
+## Version 0.1.6
 
 > Release date: 9/16/20
 
@@ -55,11 +68,11 @@
 - Images in search bar display as blurry if bing tagged them as "not family friendly", right now it still just lets you select them though
 - Added date created for nodes, choices, and accounts. If created before September 16, 2020, then they just get put as
 
-### Version 0.1.5
+## Version 0.1.5
 
 > Release Date: 7/31/20
 
-##### TLDR:
+#### TLDR:
 
 - Pictures are done through Pixabay now, meaning you don't have to go find a URL for each image!
 - Switching between pages is a lot faster and smoother now!
@@ -67,7 +80,7 @@
 - Bug fixes that should've been done long ago!
 - This Changelog is now public!
 
-##### Full list of changes:
+#### Full list of changes:
 
 - Added Changelog as well as link to changelog in the version text, also reads the version from the package.json instead of manually putting it in every time
 - Adjusted Picture height for page links on home screen as well as on each page so that they feel more intuitive
@@ -106,7 +119,7 @@
 
 > Note: All changelogs before version 0.1.5 are approximated, as the changelog was not actually implemented until version 0.1.5
 
-### Version 0.1.4
+## Version 0.1.4
 
 > Release Date: 7/13/20
 
@@ -122,7 +135,7 @@
 - Better Favicon that actually makes sense lol
 - Titles are done per page now
 
-### Version 0.1.3
+## Version 0.1.3
 
 > Release Date: 6/30/20
 
@@ -135,7 +148,7 @@
 - Centered all text on cards
 - A Favicon!
 
-### Version 0.1.2
+## Version 0.1.2
 
 > Release Date: 6/25/20
 
@@ -145,7 +158,7 @@
 - Made backend a bit more secure
 - Home screen sorts featured nodes (which is just all nodes rn) by views
 
-### Version 0.1.1
+## Version 0.1.1
 
 > Release Date: 6/24/20
 
@@ -154,7 +167,7 @@
 - Ability to edit nodes and choices so that you don't have to delete them
 - Hook nodes up to other nodes with choices by using node IDs, I'll change this later so that you can just search for the nodes by title or author
 
-### Version 0.1.0
+## Version 0.1.0
 
 > Release Date: 6/23/20
 

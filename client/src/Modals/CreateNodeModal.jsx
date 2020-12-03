@@ -6,7 +6,14 @@ import { escape, mutation_call, palette } from "../index";
 import SearchImage from "../SearchImage";
 
 const CreateNodeModal = (props) => {
-  const { loggedInAs, callback, picture, close, featured } = props;
+  const {
+    loggedInAs,
+    callback,
+    picture,
+    pictureUnsafe,
+    close,
+    featured,
+  } = props;
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -15,7 +22,7 @@ const CreateNodeModal = (props) => {
 
   const [show, setShow] = useState(true);
   const [info, setInfo] = useState("");
-  const [shouldHide, setShouldHide] = useState(false);
+  const [shouldHide, setShouldHide] = useState(pictureUnsafe);
 
   const createNode = () => {
     const esTitle = escape(title);

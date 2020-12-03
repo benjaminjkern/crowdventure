@@ -15,6 +15,7 @@ const DBON = true;
 
 const databaseCalls = {
     filterFeatured: async() => await filter(NODE_TABLE, 'featured', true),
+    filterParents: async(nodeID) => await filter(CHOICE_TABLE, 'to', nodeID),
 
     allAccounts: async() => await getFullTable(ACCOUNT_TABLE),
     allNodes: async() => await getFullTable(NODE_TABLE),
@@ -91,7 +92,10 @@ const filter = async(tableName, arg, value) => (DBON ?
         ExpressionAttributeValues: {
             ':r': value,
         },
-        FilterExpression: `${arg} = :r`,
+        ExpressionAttributeNames: {
+            '#a': arg
+        },
+        FilterExpression: `#a = :r`,
     })
     .promise()
     .then((data) => data.Items)

@@ -16,9 +16,13 @@ const ChoiceResolvers = {
     dislikedBy: async(parent, args, context, info) => await Promise.all(
         Object.keys(parent.dislikedBy).map((accountScreenName) => databaseCalls.getAccount(accountScreenName)),
     ),
-    dateCreated: (parent, args, context, info) => {
-        if (!parent.dateCreated) parent.dateCreated = 'Before September 16, 2020';
-        databaseCalls.addChoice(parent);
+    dateCreated: async(parent, args, context, info) => {
+        const newParent = await databaseCalls.getChoice(parent.ID);
+        if (!newParent.dateCreated) {
+            parent.dateCreated = 'Before September 16, 2020';
+            newParent.dateCreated = 'Before September 16, 2020';
+        }
+        databaseCalls.addChoice(newParent);
         return parent.dateCreated;
     },
 };

@@ -19,17 +19,36 @@ const allConnected = async(node, visited = {}) => {
 };
 
 const NodeResolvers = {
-    content: (parent, args, context, info) => {
+    content: async(parent, args, context, info) => {
         const IP = context.headers['X-Forwarded-For'].split(',')[0];
-        if (!parent.views[IP]) {
-            parent.views[IP] = IP;
-            databaseCalls.addNode(parent);
+        const newParent = await databaseCalls.getNode(parent.ID);
+        if (typeof newParent.views !== 'object') {
+            newParent.views = { previouslySaved: newParent.views };
         }
+        if (!newParent.views[IP]) {
+            newParent.views[IP] = IP;
+            databaseCalls.addNode(newParent);
+        }
+        parent.views = newParent.views;
         return parent.content;
     },
-    views: (parent, args, context, info) => (typeof parent.views === 'object' ?
-        Object.keys(parent.views).length :
-        parent.views),
+    views: async(parent, args, context, info) => {
+        if (typeof parent.views === 'object') {
+            const newParent = await databaseCalls.getNode(parent.ID);
+            while (typeof newParent.views.previouslySaved === 'object') {
+                newParent.views.previouslySaved = newParent.views.previouslySaved.previouslySaved;
+            }
+            databaseCalls.addNode(newParent);
+            parent.views = newParent.views;
+            return Object.keys(parent.views).filter(key => key !== 'previouslySaved').length + (parent.views.previouslySaved || 0);
+        } else {
+            const newParent = await databaseCalls.getNode(parent.ID);
+            newParent.views = { previouslySaved: parent.views };
+            databaseCalls.addNode(newParent);
+            parent.views = newParent.views;
+            return newParent.views.previouslySaved;
+        }
+    },
     owner: async(parent, args, context, info) => await databaseCalls.getAccount(parent.owner),
     canonChoices: async(parent, args, context, info) => await Promise.all(
         parent.canonChoices.map((id) => databaseCalls.getChoice(id)),
@@ -42,9 +61,13 @@ const NodeResolvers = {
             score: ChoiceResolvers.score(choice),
         })))
         .then((choices) => sort(choices, (a, b) => (a.score === b.score ? 0 : a.score > b.score ? -1 : 1))),
-    dateCreated: (parent, args, context, info) => {
-        if (!parent.dateCreated) parent.dateCreated = 'Before September 16, 2020';
-        databaseCalls.addNode(parent);
+    dateCreated: async(parent, args, context, info) => {
+        const newParent = await databaseCalls.getNode(parent.ID);
+        if (!newParent.dateCreated) {
+            parent.dateCreated = 'Before September 16, 2020';
+            newParent.dateCreated = 'Before September 16, 2020';
+            databaseCalls.addNode(newParent);
+        }
         return parent.dateCreated;
     },
     // should return the total number of nodes it is connected to
@@ -53,6 +76,10 @@ const NodeResolvers = {
         if (parent.size) return parent.size;
         return Object.keys(await allConnected(parent)).length;
     },
+    parents: async(parent, args, content, info) => {
+        const choices = await databaseCalls.filterParents(parent.ID);
+        return await Promise.all(choices.map(choice => databaseCalls.getNode(choice.from)));
+    }
 };
 
 module.exports = NodeResolvers;
