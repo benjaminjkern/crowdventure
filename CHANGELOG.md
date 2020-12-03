@@ -10,7 +10,7 @@
 
 - Notification system
 - Feedback Modal, reporting done through that modal, and non-reportative feedback
-- Pagination
+- Pagination + removal of async functions where unecessary (to speed up backend)
 
 ## Version 0.1.7
 
