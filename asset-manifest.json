@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.js": "/crowdventure/static/js/main.d615a4d6.chunk.js",
-    "main.js.map": "/crowdventure/static/js/main.d615a4d6.chunk.js.map",
-    "runtime-main.js": "/crowdventure/static/js/runtime-main.1b710123.js",
-    "runtime-main.js.map": "/crowdventure/static/js/runtime-main.1b710123.js.map",
-    "static/css/2.87ae5899.chunk.css": "/crowdventure/static/css/2.87ae5899.chunk.css",
-    "static/js/2.d159b1b5.chunk.js": "/crowdventure/static/js/2.d159b1b5.chunk.js",
-    "static/js/2.d159b1b5.chunk.js.map": "/crowdventure/static/js/2.d159b1b5.chunk.js.map",
-    "index.html": "/crowdventure/index.html",
-    "static/css/2.87ae5899.chunk.css.map": "/crowdventure/static/css/2.87ae5899.chunk.css.map",
-    "static/js/2.d159b1b5.chunk.js.LICENSE.txt": "/crowdventure/static/js/2.d159b1b5.chunk.js.LICENSE.txt"
+    "main.js": "/static/js/main.e6a2d068.chunk.js",
+    "main.js.map": "/static/js/main.e6a2d068.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.8f49b074.js",
+    "runtime-main.js.map": "/static/js/runtime-main.8f49b074.js.map",
+    "static/css/2.87ae5899.chunk.css": "/static/css/2.87ae5899.chunk.css",
+    "static/js/2.d159b1b5.chunk.js": "/static/js/2.d159b1b5.chunk.js",
+    "static/js/2.d159b1b5.chunk.js.map": "/static/js/2.d159b1b5.chunk.js.map",
+    "index.html": "/index.html",
+    "static/css/2.87ae5899.chunk.css.map": "/static/css/2.87ae5899.chunk.css.map",
+    "static/js/2.d159b1b5.chunk.js.LICENSE.txt": "/static/js/2.d159b1b5.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.1b710123.js",
+    "static/js/runtime-main.8f49b074.js",
     "static/css/2.87ae5899.chunk.css",
     "static/js/2.d159b1b5.chunk.js",
-    "static/js/main.d615a4d6.chunk.js"
+    "static/js/main.e6a2d068.chunk.js"
   ]
 }
