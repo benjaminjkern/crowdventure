@@ -251,7 +251,7 @@ const ChoiceColumns = (props) => {
               ref={refs[idx]}
             >
               <a
-                href={!disabled ? `/crowdventure/#/node/${choice.to.ID}` : ""}
+                href={!disabled ? `/node/${choice.to.ID}` : ""}
                 onClick={() =>
                   window.scrollTo({ top: 0, left: 0, behavior: "smooth" })
                 }
@@ -417,7 +417,7 @@ const ChoiceColumns = (props) => {
                   : {})}
               >
                 <a
-                  href={`/crowdventure/#/node/${node.ID}`}
+                  href={`/node/${node.ID}`}
                   style={{
                     pointerEvents: loggedInAs ? "auto" : "none",
                     color: loggedInAs
@@ -433,7 +433,7 @@ const ChoiceColumns = (props) => {
                 ></a>
                 {" " + (choice.score || 0) + " "}
                 <a
-                  href={`/crowdventure/#/node/${node.ID}`}
+                  href={`/node/${node.ID}`}
                   style={{
                     pointerEvents: loggedInAs ? "auto" : "none",
                     color: loggedInAs
@@ -451,7 +451,7 @@ const ChoiceColumns = (props) => {
                 <small className="text-muted">
                   Suggested By:{" "}
                   <a
-                    href={`/crowdventure/#/account/${choice.suggestedBy.screenName}`}
+                    href={`/account/${choice.suggestedBy.screenName}`}
                     style={{
                       color:
                         loggedInAs && loggedInAs.unsafeMode

@@ -257,7 +257,7 @@ const Node = (props) => {
           <small class="text-muted">
             Author:{" "}
             <a
-              href={`/crowdventure/#/account/${node.owner.screenName}`}
+              href={`/account/${node.owner.screenName}`}
               style={{
                 color:
                   loggedInAs && loggedInAs.unsafeMode ? palette[0] : palette[2],
