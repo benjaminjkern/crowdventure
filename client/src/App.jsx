@@ -68,9 +68,9 @@ const App = () => {
   return (
     <Container>
       <Navbar expand="lg">
-        <Navbar.Brand href="/crowdventure">
+        <Navbar.Brand href="/">
           <img
-            href="/crowdventure"
+            href="/"
             src={process.env.PUBLIC_URL + "/logo.png"}
             alt="Crowdventure Logo"
             style={{ width: "100%" }}

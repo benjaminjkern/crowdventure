@@ -90,7 +90,7 @@ const NodeViewer = (props) => {
               ref={refs[i]}
             >
               <a
-                href={`/crowdventure/#/node/${node.ID}`}
+                href={`/#/node/${node.ID}`}
                 style={{
                   color:
                     loggedInAs && loggedInAs.unsafeMode
@@ -270,7 +270,7 @@ const NodeViewer = (props) => {
                 <small>
                   Author:{" "}
                   <a
-                    href={`/crowdventure/#/account/${node.owner.screenName}`}
+                    href={`/#/account/${node.owner.screenName}`}
                     style={{
                       color:
                         loggedInAs && loggedInAs.unsafeMode

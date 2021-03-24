@@ -2,7 +2,7 @@
     "name": "client",
     "version": "0.1.7",
     "private": true,
-    "homepage": "http://benjaminjkern.github.io/crowdventure",
+    "homepage": "http://crowdventure.me/",
     "dependencies": {
         "@azure/cognitiveservices-imagesearch": "^3.0.1",
         "@tensorflow/tfjs": "^2.7.0",

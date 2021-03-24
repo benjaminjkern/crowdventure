@@ -54,7 +54,7 @@ const AccountManager = (props) => {
     >
       You are logged in as:{" "}
       <a
-        href={`/crowdventure/#/account/${loggedInAs.screenName}`}
+        href={`/#/account/${loggedInAs.screenName}`}
         style={{ color: loggedInAs && loggedInAs.unsafeMode ? "white" : "" }}
       >
         <img
