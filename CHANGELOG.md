@@ -4,22 +4,13 @@
 
 ## Version 0.2.0 (In Progress)
 
-- Ability to find parents of any node (on backend, will use this later)
-  - Used for now to update pages
-  - Will be used later to start from any point and track both up and down the tree
-- Fixed bug with node views not counting up
-  - Still appears to be slow at times but it definitely counts up now
-- Changed this changelog to be a bit more organized, lol
-- Pages with blurred images won't show up at all unless you are in unsafe mode
-  - Before: a page could be considered safe but have an unsafe image
-    - This probably can be reconciled a bit on the backend but it works
+> Release Date: 6/3/21
+
+- I'm using a real domain now! (https://crowdventure.me/)
 - Made frontend a bit less cluttered and more optimized for different screen sizes (Mobile users)
   - Stuff doesnt go off the screen quite as often
   - Profile pic is bigger and centered
   - Unsafe mode can be accessed any time (As long as you are logged in)
-- Image search
-  - In unsafe mode, choosing pictures allows you to see blurred pictures by hovering over them, also they have a tool tip explaining why they are blurred
-  - Can no longer choose an image that doesn't actually exist (Sometimes the thumbnails would show up but the actual image url didn't work)
 - Notification system
   - You get notified whenever someone adds to the story of your page, likes / dislikes your page, or edits something you own
   - You can also send messages to people (Right now they are literally just notifications)
@@ -31,19 +22,19 @@
 - A random page button
   - Again, right now this goes to any page but I want it to be able to only go to top-level nodes
     - The infrastructure is in at the moment, there just aren't enough top-level nodes for this to be interesting at the moment lol
+- Image search
+  - In unsafe mode, choosing pictures allows you to see blurred pictures by hovering over them, also they have a tool tip explaining why they are blurred
+  - Can no longer choose an image that doesn't actually exist (Sometimes the thumbnails would show up but the actual image url didn't work)
+- Pages with blurred images won't show up at all unless you are in unsafe mode
+  - Before: a page could be considered safe but have an unsafe image
+    - This probably can be reconciled a bit on the backend but it works
 - Pages, choices, and accounts now track when they were created
 - Pagination and corralling of some stray async functions that were slowing things down and causing a ruckus
+- Ability to find parents of any node (on backend, will use this later)
+  - Used for now to update pages
+  - Will be used later to start from any point and track both up and down the tree
 - Bug fixs
-
-#### Planned
-
-- Fix bug where looking at accounts too much causes server to slow down
-  - Might be related to:
-    - In general: Fix the whole update the entire account object every time I want to update a list of things thing, it screws stuff up if multiple calls are made at once
-    - Async search for pages, it's not that big and it's already slowing down
-- Feedback Modal, reporting done through that modal, and non-reportative feedback
-  - These should send an email to me personally so I can look at it
-- Look into temporary local logout of account in between major pages
+- Changed this changelog to be a bit more organized, lol
 
 # 0.1 - Alpha / Proof of concept
 
