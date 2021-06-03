@@ -2,7 +2,7 @@
 
 # 0.2 - Beta / Streamlining and bug fixing
 
-## Version 0.2.0 (In Progress)
+## Version 0.2.0
 
 > Release Date: 6/3/21
 
