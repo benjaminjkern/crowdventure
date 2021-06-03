@@ -2,6 +2,7 @@ const { databaseCalls } = require('./databaseCalls.js');
 const { sort } = require('./resolverUtils.js');
 const ChoiceResolvers = require('./choiceResolvers.js');
 
+// all nodes that can possible be reached from this node
 const allConnected = async(node, visited = {}) => {
     const children = await NodeResolvers.canonChoices(node).then((choices) => Promise.all(choices.map((choice) => ChoiceResolvers.to(choice))));
     let newVisited = {...visited, [node.ID]: node.ID };

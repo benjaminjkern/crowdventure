@@ -44,6 +44,10 @@ const Node = (props) => {
     const pageID = escape(match.params.id);
 
     if (!node || pageID !== node.ID) {
+      if (node !== undefined) {
+        window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+        setTimeout(() => setNode(undefined), 500);
+      }
       query_call(
         "getNode",
         { ID: pageID },
@@ -75,16 +79,9 @@ const Node = (props) => {
 
   if (node === undefined) {
     return (
-      <Alert
-        variant={
-          (loggedInAs && loggedInAs.unsafeMode) ||
-          new Cookies().get("unsafeMode") === "true"
-            ? "dark"
-            : "light"
-        }
-      >
+      <Alert variant={loggedInAs && loggedInAs.unsafeMode ? "dark" : "light"}>
         <title>Loading Page...</title>
-        <Alert.Heading>Loading...</Alert.Heading>
+        <Alert.Heading>Loading Page...</Alert.Heading>
       </Alert>
     );
   }
@@ -110,6 +107,7 @@ const Node = (props) => {
     return (
       <Alert variant="danger">
         <title>Crowdventure! - {node.title}</title>
+        <meta property="og:title" content={`Crowdventure! - ${node.title}`} />
         <Alert.Heading>Unsafe!</Alert.Heading>
         <p>
           This page has been hidden from general users, because the content has
@@ -128,6 +126,7 @@ const Node = (props) => {
     return (
       <Alert variant="danger">
         <title>Crowdventure! - {node.title}</title>
+        <meta property="og:title" content={`Crowdventure! - ${node.title}`} />
         <Alert.Heading>Unsafe!</Alert.Heading>
         <p>
           This page has been hidden from general users, because the author has
@@ -140,7 +139,7 @@ const Node = (props) => {
   return (
     <Container>
       <title>Crowdventure! - {node.title}</title>
-
+      <meta property="og:title" content={`Crowdventure! - ${node.title}`} />
       {(node.hidden || node.owner.hidden) &&
       loggedInAs &&
       node.owner.screenName === loggedInAs.screenName &&
@@ -166,52 +165,61 @@ const Node = (props) => {
 
       <h1 class="display-4 text-center">{node.title}</h1>
       {node.pictureURL ? (
-        <img
-          src={node.pictureURL}
-          onLoad={(e) => {
-            e.target.style.display = "block";
-          }}
-          onError={(e) => {
-            e.target.style.display = "none";
-          }}
-          style={{
-            display: "block",
-            marginLeft: "auto",
-            marginRight: "auto",
-            padding: "1px",
-            border: "1px solid #eee",
-            "border-radius": "8px",
-            width: "90%",
-            maxHeight: "30vh",
-            "object-fit": "cover",
-            cursor: "pointer",
-            ...(node.pictureUnsafe
-              ? {
-                  "-webkit-filter": "blur(" + BLURAMOUNT + "px)",
-                  filter: "blur(" + BLURAMOUNT + "px)",
-                }
-              : {}),
-          }}
-          onClick={() =>
-            showModal(
-              <PictureModal
-                loggedInAs={loggedInAs}
-                pictureURL={node.pictureURL}
-                title={node.title}
-                close={() => showModal(undefined)}
-              />
-            )
-          }
-        />
+        <>
+          <meta property="og:image" content={node.pictureURL} />
+          <img
+            src={node.pictureURL}
+            onLoad={(e) => {
+              e.target.style.display = "block";
+            }}
+            onError={(e) => {
+              e.target.style.display = "none";
+            }}
+            style={{
+              display: "block",
+              marginLeft: "auto",
+              marginRight: "auto",
+              padding: "1px",
+              border: "1px solid #eee",
+              "border-radius": "8px",
+              width: "90%",
+              maxHeight: "30vh",
+              "object-fit": "cover",
+              cursor: "pointer",
+              ...(node.pictureUnsafe
+                ? {
+                    "-webkit-filter": "blur(" + BLURAMOUNT + "px)",
+                    filter: "blur(" + BLURAMOUNT + "px)",
+                  }
+                : {}),
+            }}
+            onClick={() =>
+              showModal(
+                <PictureModal
+                  loggedInAs={loggedInAs}
+                  pictureURL={node.pictureURL}
+                  title={node.title}
+                  close={() => showModal(undefined)}
+                />
+              )
+            }
+          />
+        </>
       ) : (
         ""
       )}
+
       <br />
       <Container>
         {node.content.split("\n").map((line) => (
           <p style={{ textIndent: "5%" }}>{line}</p>
         ))}
       </Container>
+      <hr
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: "rgb(225, 240, 255)" } }
+          : {})}
+      />
       <Container
         className="row"
         style={{ paddingRight: "0px", paddingBottom: "5px" }}
@@ -223,7 +231,6 @@ const Node = (props) => {
           <Button
             onClick={() => {
               history.back();
-              window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
             }}
             size="lg"
             className="float-right"
@@ -247,7 +254,11 @@ const Node = (props) => {
         </p>
       )}
 
-      <p />
+      <hr
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: "rgb(225, 240, 255)" } }
+          : {})}
+      />
 
       <Container className="row" style={{ paddingRight: "0px" }}>
         <div class="col align-bottom">
@@ -257,7 +268,7 @@ const Node = (props) => {
           <small class="text-muted">
             Author:{" "}
             <a
-              href={`/account/${node.owner.screenName}`}
+              href={`/#/account/${node.owner.screenName}`}
               style={{
                 color:
                   loggedInAs && loggedInAs.unsafeMode ? palette[0] : palette[2],

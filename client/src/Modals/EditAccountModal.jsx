@@ -176,6 +176,8 @@ const EditAccountModal = (props) => {
                 opacity: profilePicture === profilePictureField ? 1 : 0.2,
                 width: "100%",
                 "object-fit": "contain",
+                padding: "1px",
+                borderRadius: "8px",
               }}
             />
           ) : (

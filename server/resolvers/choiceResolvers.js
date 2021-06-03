@@ -7,8 +7,8 @@ const ChoiceResolvers = {
     likes: (parent, args, context, info) => Object.keys(parent.likedBy).length,
     dislikes: (parent, args, context, info) => Object.keys(parent.dislikedBy).length,
     score: (parent, args, context, info) => (
-        parent.score ||
-        ChoiceResolvers.likes(parent) - ChoiceResolvers.dislikes(parent)
+        parent ? parent.score ||
+        ChoiceResolvers.likes(parent) - ChoiceResolvers.dislikes(parent) : 0
     ),
     likedBy: async(parent, args, context, info) => await Promise.all(
         Object.keys(parent.likedBy).map((accountScreenName) => databaseCalls.getAccount(accountScreenName)),

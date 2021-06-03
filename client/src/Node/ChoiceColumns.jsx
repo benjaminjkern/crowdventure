@@ -185,14 +185,7 @@ const ChoiceColumns = (props) => {
 
   if (!choices)
     return (
-      <Alert
-        variant={
-          (loggedInAs && loggedInAs.unsafeMode) ||
-          new Cookies().get("unsafeMode") === "true"
-            ? "dark"
-            : "light"
-        }
-      >
+      <Alert variant={loggedInAs && loggedInAs.unsafeMode ? "dark" : "light"}>
         <title>Loading Page...</title>
         <Alert.Heading>Loading...</Alert.Heading>
       </Alert>
@@ -251,7 +244,7 @@ const ChoiceColumns = (props) => {
               ref={refs[idx]}
             >
               <a
-                href={!disabled ? `/node/${choice.to.ID}` : ""}
+                href={!disabled ? `/#/node/${choice.to.ID}` : ""}
                 onClick={() =>
                   window.scrollTo({ top: 0, left: 0, behavior: "smooth" })
                 }
@@ -309,6 +302,7 @@ const ChoiceColumns = (props) => {
                 ""
               )}
               {!choice.hidden &&
+              choice.to &&
               (choice.to.hidden || choice.to.owner.hidden) &&
               !disabled ? (
                 <OverlayTrigger
@@ -416,42 +410,72 @@ const ChoiceColumns = (props) => {
                   ? { style: { backgroundColor: palette[5] } }
                   : {})}
               >
-                <a
-                  href={`/node/${node.ID}`}
-                  style={{
-                    pointerEvents: loggedInAs ? "auto" : "none",
-                    color: loggedInAs
-                      ? choice.disliked
-                        ? "red"
-                        : loggedInAs.unsafeMode
-                        ? "white"
-                        : "black"
-                      : "grey",
-                  }}
-                  className="fa fa-thumbs-down"
-                  onClick={() => dislike(idx)}
-                ></a>
+                <OverlayTrigger
+                  overlay={
+                    !loggedInAs ? (
+                      <Tooltip id="tooltip-disabled">
+                        You must be signed in!
+                      </Tooltip>
+                    ) : (
+                      <p />
+                    )
+                  }
+                  style={{ width: "100%" }}
+                >
+                  <span>
+                    <a
+                      href={`/#/node/${node.ID}`}
+                      style={{
+                        pointerEvents: loggedInAs ? "auto" : "none",
+                        color: loggedInAs
+                          ? choice.disliked
+                            ? "red"
+                            : loggedInAs.unsafeMode
+                            ? "white"
+                            : "black"
+                          : "grey",
+                      }}
+                      className="fa fa-thumbs-down"
+                      onClick={() => dislike(idx)}
+                    ></a>
+                  </span>
+                </OverlayTrigger>
                 {" " + (choice.score || 0) + " "}
-                <a
-                  href={`/node/${node.ID}`}
-                  style={{
-                    pointerEvents: loggedInAs ? "auto" : "none",
-                    color: loggedInAs
-                      ? choice.liked
-                        ? "green"
-                        : loggedInAs.unsafeMode
-                        ? "white"
-                        : "black"
-                      : "grey",
-                  }}
-                  className="fa fa-thumbs-up"
-                  onClick={() => like(idx)}
-                ></a>
+                <OverlayTrigger
+                  overlay={
+                    !loggedInAs ? (
+                      <Tooltip id="tooltip-disabled">
+                        You must be signed in!
+                      </Tooltip>
+                    ) : (
+                      <p />
+                    )
+                  }
+                  style={{ width: "100%" }}
+                >
+                  <span>
+                    <a
+                      href={`/#/node/${node.ID}`}
+                      style={{
+                        pointerEvents: loggedInAs ? "auto" : "none",
+                        color: loggedInAs
+                          ? choice.liked
+                            ? "green"
+                            : loggedInAs.unsafeMode
+                            ? "white"
+                            : "black"
+                          : "grey",
+                      }}
+                      className="fa fa-thumbs-up"
+                      onClick={() => like(idx)}
+                    ></a>
+                  </span>
+                </OverlayTrigger>
                 <br />
                 <small className="text-muted">
                   Suggested By:{" "}
                   <a
-                    href={`/account/${choice.suggestedBy.screenName}`}
+                    href={`/#/account/${choice.suggestedBy.screenName}`}
                     style={{
                       color:
                         loggedInAs && loggedInAs.unsafeMode

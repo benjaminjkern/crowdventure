@@ -2,6 +2,21 @@ const { UserInputError } = require('apollo-server-lambda');
 const { databaseCalls } = require('./databaseCalls.js');
 const { encrypt, flagContent } = require('./resolverUtils.js');
 const AccountResolvers = require('./accountResolvers.js');
+const NodeResolvers = require('./nodeResolvers.js');
+
+const MAX_NOTIFICATIONS = 50;
+
+const updateTime = async(node, time = new Date().getTime(), seen = {}, first = true) => {
+    if (seen[node.ID]) return;
+    console.log("Updating " + node.ID);
+    seen[node.ID] = true;
+    node.lastUpdated = time;
+    if (!first) databaseCalls.addNode(node);
+    const parents = await NodeResolvers.parents(node);
+    for (const parent of parents) {
+        updateTime(parent, time, seen, false);
+    }
+}
 
 const MutationResolvers = {
     createAccount: async(parent, args, context, info) => {
@@ -102,6 +117,7 @@ const MutationResolvers = {
             databaseCalls.removeAccount(account.screenName);
             account.screenName = args.newScreenName;
         }
+        MutationResolvers.createNotification(account, { content: `Your account was edited by an administrator.`, link: `/node/${account.screenName}` }, context);
 
         return await databaseCalls.addAccount(account);
     },
@@ -141,8 +157,13 @@ const MutationResolvers = {
                 invalidArgs: Object.keys(args),
             });
         }
+        const now = new Date();
+
+        let ID = Math.random().toString(36).substring(2, 12).toUpperCase();
+        while (await databaseCalls.getNode(ID)) ID = Math.random().toString(36).substring(2, 12).toUpperCase();
+
         const newNode = {
-            ID: Math.random().toString(36).substring(2, 12).toUpperCase(),
+            ID,
             owner: args.accountScreenName,
             title: args.title,
             content: args.content,
@@ -152,7 +173,8 @@ const MutationResolvers = {
             bgColor: args.fgColor || 'white',
             featured: args.featured || false,
             hidden: args.hidden || flagContent(args.title) || flagContent(args.content) || undefined,
-            dateCreated: new Date().toJSON(),
+            dateCreated: now.toJSON(),
+            lastUpdated: now.getTime(),
             views: {},
             canonChoices: [],
             nonCanonChoices: [],
@@ -180,6 +202,7 @@ const MutationResolvers = {
             account.nodes = account.nodes.filter((nodeID) => nodeID !== node.ID);
             databaseCalls.addAccount(account);
         }
+        MutationResolvers.createNotification(undefined, { accountScreenName: node.owner, content: `Your page titled "${node.title}" was deleted by an administrator.`, link: `/node/${node.ID}` }, context);
 
         return await databaseCalls.removeNode(node.ID);
     },
@@ -205,8 +228,12 @@ const MutationResolvers = {
         if (args.bgColor) node.bgColor = args.bgColor;
         if (args.fgColor) node.fgColor = args.fgColor;
         if (args.pictureUnsafe !== undefined) node.pictureUnsafe = args.pictureUnsafe;
-        if (args.hidden !== undefined) node.hidden = args.hidden;
+        if (args.hidden !== undefined) {
+            node.hidden = args.hidden;
+        }
         if (args.featured !== undefined) node.featured = args.featured;
+
+        MutationResolvers.createNotification(undefined, { accountScreenName: node.owner, content: `Your page titled "${node.title}" was edited by an administrator.`, link: `/node/${node.ID}` }, context);
 
         return await databaseCalls.addNode(node);
     },
@@ -241,8 +268,11 @@ const MutationResolvers = {
             });
         }
 
+        let ID = `${node.ID}-${Math.random().toString(36).substring(2, 12)}`;
+        while (await databaseCalls.getChoice(ID)) ID = `${node.ID}-${Math.random().toString(36).substring(2, 12)}`;
+
         const newChoice = {
-            ID: `${node.ID}-${Math.random().toString(36).substring(2, 12)}`,
+            ID,
             from: node.ID,
             action: args.action,
             dateCreated: new Date().toJSON(),
@@ -255,8 +285,17 @@ const MutationResolvers = {
 
         account.suggestedChoices.push(newChoice.ID);
 
-        if (account.screenName === node.owner) node.canonChoices.push(newChoice.ID);
-        else node.nonCanonChoices.push(newChoice.ID);
+        if (account.screenName === node.owner) {
+            node.canonChoices.push(newChoice.ID);
+            updateTime(node);
+        } else {
+            node.nonCanonChoices.push(newChoice.ID);
+            MutationResolvers.createNotification(undefined, { accountScreenName: node.owner, content: `${account.screenName} suggested a new choice for your page "${node.title}"!`, link: `/node/${node.ID}` }, context);
+        }
+
+        // MutationResolvers.createNotification(undefined, { accountScreenName: toNode.owner, content: `${account.screenName} suggested a new choice that leads to your page "${toNode.title}"!`, link: `/node/${node.ID}` }, context);
+
+        console.log(node);
 
         databaseCalls.addAccount(account);
         databaseCalls.addNode(node);
@@ -272,12 +311,23 @@ const MutationResolvers = {
 
         console.log(`Editing suggestion ${choice.ID} (${choice.action})`);
 
-        if (args.toID) choice.to = args.toID;
+        const daddy = await databaseCalls.getNode(choice.from);
+
+        if (args.hidden !== undefined) {
+            choice.hidden = args.hidden;
+        }
+        if (args.toID && choice.to !== args.toID) {
+            choice.to = args.toID;
+            if (daddy.canonChoices.includes(choice.ID)) {
+                updateTime(daddy);
+            }
+        }
         if (args.action) {
             choice.action = args.action;
             if (flagContent(args.action)) choice.hidden = true;
         }
-        if (args.hidden !== undefined) choice.hidden = args.hidden;
+
+        MutationResolvers.createNotification(undefined, { accountScreenName: choice.suggestedBy, content: `Your suggested choice "${choice.action}" stemming from page titled "${daddy.title}" has been edited!`, link: `/node/${daddy.ID}` }, context);
 
         return await databaseCalls.addChoice(choice);
     },
@@ -293,13 +343,18 @@ const MutationResolvers = {
 
         console.log(`Removing suggestion ${choice.ID} (${choice.action})`);
 
-        if (account) {
+        if (account) { // idk how either of these can be null but whatever
             account.suggestedChoices = account.suggestedChoices.filter(
                 (choiceID) => choiceID !== choice.ID,
             );
+
+            if (node) MutationResolvers.createNotification(account, { content: `Your suggested choice "${choice.action}" stemming from page titled "${node.title}" was deleted.`, link: `/node/${node.ID}` }, context);
             databaseCalls.addAccount(account);
         }
         if (node) {
+            if (node.canonChoices.includes(choice.ID)) {
+                updateTime(node);
+            }
             node.canonChoices = node.canonChoices.filter(
                 (choiceID) => choiceID !== choice.ID,
             );
@@ -324,17 +379,20 @@ const MutationResolvers = {
             });
         }
 
+        if (node.canonChoices.includes(choice.ID)) return choice;
+
         console.log(
             `Making choice ${choice.ID} (${choice.action}) in node ${node.ID} (${node.title}) canon`,
         );
 
+        updateTime(node);
+
         node.canonChoices.push(choice.ID);
-        node.canonChoices = node.canonChoices.filter(
-            (item, pos) => node.canonChoices.indexOf(item) === pos,
-        );
         node.nonCanonChoices = node.nonCanonChoices.filter(
             (id) => id !== choice.ID,
         );
+
+        MutationResolvers.createNotification(undefined, { accountScreenName: choice.suggestedBy, content: `Your suggested choice "${choice.action}" stemming from page titled "${node.title}" was made canon!`, link: `/node/${node.ID}` }, context);
 
         databaseCalls.addNode(node);
         return choice;
@@ -352,16 +410,18 @@ const MutationResolvers = {
                 invalidArgs: Object.keys(args),
             });
         }
+        if (node.nonCanonChoices.includes(choice.ID)) return choice;
 
         console.log(
             `Making choice ${choice.ID} (${choice.action}) in node ${node.ID} (${node.title}) non-canon`,
         );
 
+        updateTime(node);
+
         node.nonCanonChoices.push(choice.ID);
-        node.nonCanonChoices = node.nonCanonChoices.filter(
-            (item, pos) => node.nonCanonChoices.indexOf(item) === pos,
-        );
         node.canonChoices = node.canonChoices.filter((id) => id !== choice.ID);
+
+        MutationResolvers.createNotification(undefined, { accountScreenName: choice.suggestedBy, content: `Your suggested choice "${choice.action}" stemming from page titled "${node.title}" was made non-canon!`, link: `/node/${node.ID}` }, context);
 
         databaseCalls.addNode(node);
         return choice;
@@ -379,14 +439,18 @@ const MutationResolvers = {
                 invalidArgs: Object.keys(args),
             });
         }
+        const node = await databaseCalls.getNode(choice.from);
+
         console.log(
             `${account.screenName} is liking choice ${choice.ID} (${choice.action})`,
         );
 
         delete choice.dislikedBy[account.screenName];
 
-        if (!choice.likedBy[account.screenName]) choice.likedBy[account.screenName] = account.screenName;
-        else delete choice.likedBy[account.screenName];
+        if (!choice.likedBy[account.screenName]) {
+            choice.likedBy[account.screenName] = account.screenName;
+            if (node) MutationResolvers.createNotification(undefined, { accountScreenName: choice.suggestedBy, content: `${account.screenName} liked your choice ${choice.action} on page titled "${node.title}"!`, link: `/account/${account.screenName}` }, context);
+        } else delete choice.likedBy[account.screenName];
 
         databaseCalls.addAccount(account);
         return await databaseCalls.addChoice(choice);
@@ -439,9 +503,12 @@ const MutationResolvers = {
             );
         }
 
+        let ID = Math.random().toString(36).substring(2, 12).toUpperCase();
+        while (await databaseCalls.getFeedback(ID)) ID = Math.random().toString(36).substring(2, 12).toUpperCase();
+
         const IP = context.headers['X-Forwarded-For'].split(',')[0];
         const feedback = {
-            ID: Math.random().toString(36).substring(2, 12).toUpperCase(),
+            ID,
             submittedBy: args.accountScreenName || '',
             IP,
             reporting: '',
@@ -501,7 +568,113 @@ const MutationResolvers = {
             databaseCalls.removeFeedback(feedback.ID);
         });
         return true;
-    }
+    },
+
+    createNotification: async(parent, args, context, info) => {
+        let account;
+        if (parent) {
+            account = parent;
+        } else {
+            account = await databaseCalls.getAccount(args.accountScreenName);
+            if (!account) {
+                throw new UserInputError(
+                    `Account doesn't exist!`, {
+                        invalidArgs: Object.keys(args),
+                    },
+                );
+            }
+        }
+
+        if (!account.notifications) account.notifications = [];
+
+        const newNotification = {
+            time: new Date().getTime(),
+            content: args.content,
+            link: args.link,
+            seen: false,
+        };
+
+        account.notifications = [newNotification, ...account.notifications].slice(0, MAX_NOTIFICATIONS);
+        if (!parent) databaseCalls.addAccount(account);
+
+        return newNotification;
+    },
+    removeNotification: async(parent, args, context, info) => {
+        let account;
+        if (parent) {
+            account = parent;
+        } else {
+            account = await databaseCalls.getAccount(args.accountScreenName);
+            if (!account) {
+                throw new UserInputError(
+                    `Account doesn't exist!`, {
+                        invalidArgs: Object.keys(args),
+                    },
+                );
+            }
+        }
+
+        if (!account.notifications) account.notifications = [];
+
+        if (!account.notifications[args.index]) return false;
+
+        account.notifications = [...account.notifications.slice(0, args.index), ...account.notifications.slice(args.index + 1)];
+        databaseCalls.addAccount(account);
+
+        return true;
+    },
+    seeNotification: async(parent, args, context, info) => {
+        let account;
+        if (parent) {
+            account = parent;
+        } else {
+            account = await databaseCalls.getAccount(args.accountScreenName);
+            if (!account) {
+                throw new UserInputError(
+                    `Account doesn't exist!`, {
+                        invalidArgs: Object.keys(args),
+                    },
+                );
+            }
+        }
+
+        if (!account.notifications) account.notifications = [];
+
+        if (args.index === -1) {
+            for (const notification of account.notifications) {
+                notification.seen = true;
+            }
+        } else if (!account.notifications[args.index]) return false;
+        else {
+            if (args.force === undefined)
+                account.notifications[args.index].seen = !account.notifications[args.index].seen;
+            else account.notifications[args.index].seen = args.force;
+        }
+        databaseCalls.addAccount(account);
+
+        return true;
+    },
+    clearNotifications: async(parent, args, context, info) => {
+        let account;
+        if (parent) {
+            account = parent;
+        } else {
+            account = await databaseCalls.getAccount(args.accountScreenName);
+            if (!account) {
+                throw new UserInputError(
+                    `Account doesn't exist!`, {
+                        invalidArgs: Object.keys(args),
+                    },
+                );
+            }
+        }
+
+        if (args.onlyClearSeen && account.notifications) account.notifications = account.notifications.filter(notification => !notification.seen);
+        else account.notifications = [];
+        databaseCalls.addAccount(account);
+
+        return true;
+    },
 };
 
-module.exports = MutationResolvers;
+module.exports = { MutationResolvers, updateTime };

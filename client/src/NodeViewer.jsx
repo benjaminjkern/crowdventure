@@ -309,15 +309,8 @@ const NodeViewer = (props) => {
       {showingModal || ""}
     </CardColumns>
   ) : (
-    <Alert
-      variant={
-        (loggedInAs && loggedInAs.unsafeMode) ||
-        new Cookies().get("unsafeMode") === "true"
-          ? "dark"
-          : "light"
-      }
-    >
-      <Alert.Heading>Loading...</Alert.Heading>
+    <Alert variant={loggedInAs && loggedInAs.unsafeMode ? "dark" : "light"}>
+      <Alert.Heading>Loading Page...</Alert.Heading>
     </Alert>
   );
 };

@@ -5,13 +5,12 @@
       "name": "apollo-lambda"
     },
     "provider": {
-      "stage": "dev",
-      "variableSyntax": "\\${([^{}]+?)}",
       "name": "aws",
       "runtime": "nodejs12.x",
+      "stage": "dev",
+      "variableSyntax": "\\${([^{}:]+?(?:\\(|:)(?:[^:{}][^{}]*?)?)}",
       "region": "us-east-1",
       "versionFunctions": true,
-      "remoteFunctionData": null,
       "compiledCloudFormationTemplate": {
         "AWSTemplateFormatVersion": "2010-09-09",
         "Description": "The AWS CloudFormation template for this Serverless application",
@@ -56,6 +55,21 @@
                               "Ref": "ServerlessDeploymentBucket"
                             },
                             "/*"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            }
                           ]
                         ]
                       }
@@ -160,32 +174,32 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/apollo-lambda/dev/1606982263919-2020-12-03T07:57:43.919Z/apollo-lambda.zip"
+                "S3Key": "serverless/apollo-lambda/dev/1622696655925-2021-06-03T05:04:15.925Z/apollo-lambda.zip"
               },
-              "FunctionName": "apollo-lambda-dev-graphql",
               "Handler": "server.graphqlHandler",
+              "Runtime": "nodejs12.x",
+              "FunctionName": "apollo-lambda-dev-graphql",
               "MemorySize": 1024,
+              "Timeout": 6,
               "Role": {
                 "Fn::GetAtt": [
                   "IamRoleLambdaExecution",
                   "Arn"
                 ]
-              },
-              "Runtime": "nodejs12.x",
-              "Timeout": 6
+              }
             },
             "DependsOn": [
               "GraphqlLogGroup"
             ]
           },
-          "GraphqlLambdaVersionFNH36bmIXydmAh4yP6WiJzLdAQ68AovwvdOFcLfZB4": {
+          "GraphqlLambdaVersionbUu2FHmlbDM4XIfxEa8Fm0Fc839M1SgED2DLyn1VwM": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "GraphqlLambdaFunction"
               },
-              "CodeSha256": "EIsq9LHP4EF3lKLaRQtA47gKDy6HM1FO12X0Mz3HJeg="
+              "CodeSha256": "lpjZdQDriqTV8j95gf0gAw9qfT21P/naw7aLVzMLo8w="
             }
           },
           "ApiGatewayRestApi": {
@@ -346,7 +360,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1606982245045": {
+          "ApiGatewayDeployment1622696641797": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -402,12 +416,18 @@
           "ServerlessDeploymentBucketName": {
             "Value": {
               "Ref": "ServerlessDeploymentBucket"
+            },
+            "Export": {
+              "Name": "sls-apollo-lambda-dev-ServerlessDeploymentBucketName"
             }
           },
           "GraphqlLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "GraphqlLambdaVersionFNH36bmIXydmAh4yP6WiJzLdAQ68AovwvdOFcLfZB4"
+              "Ref": "GraphqlLambdaVersionbUu2FHmlbDM4XIfxEa8Fm0Fc839M1SgED2DLyn1VwM"
+            },
+            "Export": {
+              "Name": "sls-apollo-lambda-dev-GraphqlLambdaFunctionQualifiedArn"
             }
           },
           "ServiceEndpoint": {
@@ -431,6 +451,9 @@
                   "/dev"
                 ]
               ]
+            },
+            "Export": {
+              "Name": "sls-apollo-lambda-dev-ServiceEndpoint"
             }
           }
         }
@@ -479,6 +502,21 @@
                               "Ref": "ServerlessDeploymentBucket"
                             },
                             "/*"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            }
                           ]
                         ]
                       }
@@ -568,16 +606,28 @@
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "GraphqlLambdaVersionFNH36bmIXydmAh4yP6WiJzLdAQ68AovwvdOFcLfZB4"
+        "versionLogicalId": "GraphqlLambdaVersionbUu2FHmlbDM4XIfxEa8Fm0Fc839M1SgED2DLyn1VwM"
       }
     },
+    "configValidationMode": "warn",
     "serviceFilename": "serverless.yml",
     "layers": {},
+    "initialServerlessConfig": {
+      "service": {
+        "$ref": "$[\"service\"][\"serviceObject\"]"
+      },
+      "provider": {
+        "$ref": "$[\"service\"][\"provider\"]"
+      },
+      "functions": {
+        "$ref": "$[\"service\"][\"functions\"]"
+      }
+    },
     "isDashboardMonitoringPreconfigured": false,
     "artifact": "/Users/benkern/Documents/crowdventure/server/.serverless/apollo-lambda.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/apollo-lambda/dev/1606982263919-2020-12-03T07:57:43.919Z",
+    "artifactDirectoryName": "serverless/apollo-lambda/dev/1622696655925-2021-06-03T05:04:15.925Z",
     "artifact": "apollo-lambda.zip"
   }
 }

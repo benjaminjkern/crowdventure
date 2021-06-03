@@ -5,14 +5,14 @@ const ChoiceResolvers = require('./choiceResolvers.js');
 
 const AccountResolvers = {
     nodes: async(parent, args, context, info) => await Promise.all(
-            parent.nodes.map((id) => databaseCalls.getNode(id)),
-        )
-        .then((nodes) => nodes.map((node) => ({...node, views: NodeResolvers.views(node) })))
-        .then((nodes) => sort(nodes, (a, b) => {
-            if (a.featured) return b.featured ? 0 : -1;
-            if (b.featured) return 1;
-            return a.views === b.views ? 0 : a.views > b.views ? -1 : 1;
-        })),
+        parent.nodes.map((id) => databaseCalls.getNode(id)),
+    ),
+    // .then((nodes) => nodes.map((node) => ({...node, views: NodeResolvers.views(node) })))
+    // .then((nodes) => sort(nodes, (a, b) => {
+    //     if (a.featured) return b.featured ? 0 : -1;
+    //     if (b.featured) return 1;
+    //     return a.views === b.views ? 0 : a.views > b.views ? -1 : 1;
+    // })),
     suggestedChoices: async(parent, args, context, info) => await Promise.all(
         parent.suggestedChoices.map((id) => databaseCalls.getChoice(id)),
     ),

@@ -137,17 +137,26 @@ const CreateNodeModal = (props) => {
             </div>
           </div>
           {showChangePic ? (
-            <SearchImage
-              loggedInAs={loggedInAs}
-              callback={(url, familyFriendly) => {
-                setPictureField(url);
-                setShowChangePic(false);
-                setShouldHide(!familyFriendly);
-              }}
-            />
+            <>
+              <br />
+              <SearchImage
+                loggedInAs={loggedInAs}
+                callback={(url, familyFriendly) => {
+                  setPictureField(url);
+                  setShowChangePic(false);
+                  setShouldHide(!familyFriendly);
+                }}
+              />
+            </>
           ) : (
             ""
           )}
+
+          <hr
+            {...(loggedInAs && loggedInAs.unsafeMode
+              ? { style: { backgroundColor: "rgb(225, 240, 255)" } }
+              : {})}
+          />
           <Form.Label>Title:</Form.Label>
           <Form.Control
             value={title}

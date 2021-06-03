@@ -1,30 +1,64 @@
 import React, { useState } from "react";
 
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+
 import { AsyncTypeahead, TypeaheadMenu } from "react-bootstrap-typeahead";
 
 import { palette } from "./index";
 
 const { BING_API_KEY } = require("./apolloURL");
 
+let targets = {};
+let queries = {};
+
+let displayed = 0;
+let lastQuery;
+let tempRows = [];
+
 const SearchImage = (props) => {
   const { callback, loggedInAs } = props;
   const [isLoading, setIsLoading] = useState(false);
-  const [options, setOptions] = useState([]);
-  const [page, setPage] = useState(0);
-  const [lastQuery, setLastQuery] = useState("");
+  const [rows, setRows] = useState([]);
 
   const BLURAMOUNT = 10;
+  const PAGESIZE = 20;
+  const MAXROWLENGTH = 2;
 
-  const handleSearch = (query) => {
+  const checkImage = (path) =>
+    new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        resolve(true);
+      };
+      img.onerror = () => {
+        resolve(false);
+      };
+      img.src = path;
+    });
+
+  const handleSearch = (
+    query,
+    amount = PAGESIZE,
+    offset = query !== lastQuery ? 0 : displayed
+  ) => {
     setIsLoading(true);
+    if (query !== lastQuery) {
+      Object.keys(queries).forEach((key) => (queries[key].cancelled = true));
+      tempRows = [];
+      setRows([]);
+      displayed = 0;
+      offset = 0;
+      lastQuery = query;
+    }
+    queries[query] = { query }; // the query attribute is pointless but whatever
 
     fetch(
       "https://api.cognitive.microsoft.com/bing/v7.0/images/search?q=" +
         encodeURIComponent(query) +
-        `&count=20&safeSearch=${
+        `&count=${amount}&safeSearch=${
           loggedInAs && loggedInAs.unsafeMode ? "Off" : "Strict"
         }&offset=` +
-        (query !== lastQuery ? 0 : page * 20),
+        offset,
       {
         headers: {
           "Ocp-Apim-Subscription-Key": BING_API_KEY,
@@ -32,44 +66,110 @@ const SearchImage = (props) => {
       }
     )
       .then((data) => data.json())
-      .then((data) => {
-        const newOptions = data.value.reduce(
-          (p, hit, i) =>
-            (i + options.length) % 2 == 0
-              ? [
-                  ...p,
-                  {
-                    id: "(Image Selected)",
-                    urls: [hit.thumbnailUrl],
-                    longUrls: [hit.contentUrl],
-                    isFamilyFriendly: [hit.isFamilyFriendly],
-                  },
-                ]
-              : [
-                  ...p.slice(0, p.length - 1),
-                  {
-                    id: "(Image Selected)",
-                    urls: [p[p.length - 1].urls[0], hit.thumbnailUrl],
-                    longUrls: [p[p.length - 1].longUrls[0], hit.contentUrl],
-                    isFamilyFriendly: [
-                      p[p.length - 1].isFamilyFriendly[0],
-                      hit.isFamilyFriendly,
-                    ],
-                  },
-                ],
-          query !== lastQuery ? [] : options
-        );
-        setOptions(newOptions);
+      .then(async (data) => {
+        const fullpage = data.value.length === amount;
 
-        if (query !== lastQuery) {
-          setPage(1);
-        } else {
-          setPage(page + 1);
+        let filteredOptions = data.value.filter(
+          (hit) => hit.isFamilyFriendly || (loggedInAs && loggedInAs.unsafeMode)
+        );
+
+        if (queries[query].cancelled) {
+          delete queries[query];
+          return;
         }
-        setLastQuery(query);
+
+        const imagesExist = await Promise.all(
+          data.value.map((hit) => checkImage(hit.contentUrl))
+        );
+
+        filteredOptions = filteredOptions.filter((_, i) => imagesExist[i]);
+
+        const newRows = tempRows.filter((row) => row.id !== "buffer");
+
+        for (const hit of filteredOptions) {
+          if (
+            newRows.length === 0 ||
+            newRows[newRows.length - 1].images.length === MAXROWLENGTH
+          ) {
+            newRows.push({
+              id: "(Image Selected)",
+              images: [hit],
+            });
+          } else {
+            newRows[newRows.length - 1].images.push(hit);
+          }
+          displayed++;
+        }
+
+        if (queries[query].cancelled) {
+          delete queries[query];
+          return;
+        }
+
+        if (fullpage) {
+          if (filteredOptions.length < amount) {
+            tempRows = newRows;
+            handleSearch(query, amount - filteredOptions.length);
+            return;
+          } else {
+            newRows.push({ id: "buffer", images: [] });
+          }
+        }
+        tempRows = newRows;
+        setRows(newRows);
+
+        delete queries[query];
+
         setIsLoading(false);
       })
-      .catch(console.log);
+      .catch(() => {});
+  };
+
+  const startunblur = (component, id) => {
+    Object.keys(targets).forEach((key) => {
+      if (key !== id + "") {
+        startreblur(key);
+      }
+    });
+    targets[id] = {
+      component,
+      currentblur: BLURAMOUNT,
+      unblurring: true,
+    };
+    unblur(id);
+  };
+  const unblur = (id) => {
+    if (!targets[id]) return;
+    targets[id].currentblur -= 0.1;
+    if (targets[id].currentblur >= 0 && targets[id].unblurring) {
+      targets[id].component.style["-webkit-filter"] =
+        "blur(" + targets[id].currentblur + "px)";
+      targets[id].component.style.filter =
+        "blur(" + targets[id].currentblur + "px)";
+      setTimeout(() => unblur(id), 1);
+    } else {
+      targets[id].unblurring = false;
+    }
+  };
+
+  const startreblur = (id) => {
+    if (!targets[id]) return;
+    targets[id].unblurring = false;
+    reblur(id);
+  };
+
+  const reblur = (id) => {
+    if (!targets[id]) return;
+    targets[id].currentblur += 0.1;
+    if (targets[id].currentblur <= BLURAMOUNT && !targets[id].unblurring) {
+      targets[id].component.style["-webkit-filter"] =
+        "blur(" + targets[id].currentblur + "px)";
+      targets[id].component.style.filter =
+        "blur(" + targets[id].currentblur + "px)";
+      setTimeout(() => reblur(id), 1);
+    } else {
+      delete targets[id];
+    }
   };
 
   return (
@@ -80,53 +180,71 @@ const SearchImage = (props) => {
       labelKey="id"
       minLength={2}
       onSearch={handleSearch}
-      maxResults={9}
+      maxResults={10}
       onPaginate={() => handleSearch(lastQuery)}
       useCache={false}
-      options={options}
+      options={rows}
       placeholder="Search for an image..."
-      renderMenuItemChildren={(option) => (
-        <div>
-          <img
-            onClick={() =>
-              callback(option.longUrls[0], option.isFamilyFriendly[0])
-            }
-            src={option.urls[0]}
-            style={{
-              marginRight: "10px",
-              borderRadius: "4px",
-              width: "50%",
-              height: "auto",
-              ...(option.isFamilyFriendly[0]
-                ? {}
-                : {
-                    "-webkit-filter": "blur(" + BLURAMOUNT + "px)",
-                    filter: "blur(" + BLURAMOUNT + "px)",
-                  }),
-            }}
-          />
-          {option.urls.length === 2 ? (
-            <img
-              onClick={() =>
-                callback(option.longUrls[1], option.isFamilyFriendly[1])
-              }
-              src={option.urls[1]}
-              style={{
-                marginRight: "10px",
-                borderRadius: "4px",
-                width: "50%",
-                height: "auto",
-                ...(option.isFamilyFriendly[1]
-                  ? {}
-                  : {
-                      "-webkit-filter": "blur(" + BLURAMOUNT + "px)",
-                      filter: "blur(" + BLURAMOUNT + "px)",
-                    }),
-              }}
-            />
-          ) : (
-            ""
-          )}
+      renderMenuItemChildren={(row, _, index) => (
+        <div class="row align-items-center">
+          {row.images.map((image, i) => (
+            <div class="col">
+              <img
+                onClick={() =>
+                  callback(image.contentUrl, image.isFamilyFriendly)
+                }
+                src={image.thumbnailUrl}
+                style={{
+                  marginRight: "10px",
+                  borderRadius: "4px",
+                  width: "100%",
+                  ...(image.isFamilyFriendly
+                    ? {}
+                    : {
+                        "-webkit-filter": "blur(" + BLURAMOUNT + "px)",
+                        filter: "blur(" + BLURAMOUNT + "px)",
+                      }),
+                }}
+                onMouseEnter={(e) => {
+                  if (!image.isFamilyFriendly)
+                    startunblur(e.target, 2 * index + i);
+                }}
+                onMouseLeave={(e) => {
+                  if (!image.isFamilyFriendly) startreblur(2 * index + i);
+                }}
+              />
+              {image.isFamilyFriendly ? (
+                ""
+              ) : (
+                <OverlayTrigger
+                  overlay={
+                    <Tooltip>
+                      This picture will automatically flag this page as hidden!
+                    </Tooltip>
+                  }
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "5px",
+                      left: "6.5px",
+                      color: "red",
+                      "-webkit-touch-callout": "none",
+                      "-webkit-user-select": "none",
+                      "-khtml-user-select": "none",
+                      "-moz-user-select": "none",
+                      "-ms-user-select": "none",
+                      "user-select": "none",
+                      "text-shadow": "0 0 1px black",
+                    }}
+                    class="fa"
+                  >
+                    &#xf056;
+                  </div>
+                </OverlayTrigger>
+              )}
+            </div>
+          ))}
         </div>
       )}
     />

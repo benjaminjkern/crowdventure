@@ -1,21 +1,13 @@
 import React, { useState, useEffect } from "react";
 
 import Cookies from "universal-cookie";
-import {
-  Container,
-  Button,
-  Alert,
-  OverlayTrigger,
-  Tooltip,
-  Form,
-} from "react-bootstrap";
-import BootstrapSwitchButton from "bootstrap-switch-button-react";
+import { Container, Button, Alert, Form } from "react-bootstrap";
 
 import { escape, query_call, palette, mutation_call } from "./index";
 import CreateNodeModal from "./Modals/CreateNodeModal";
 import EditAccountModal from "./Modals/EditAccountModal";
 import PictureModal from "./Modals/PictureModal";
-import UnsafeModal from "./Modals/UnsafeModal";
+import MessageModal from "./Modals/MessageModal";
 
 import NodeViewer from "./NodeViewer";
 
@@ -96,16 +88,9 @@ const Account = (props) => {
 
   if (account === undefined) {
     return (
-      <Alert
-        variant={
-          (loggedInAs && loggedInAs.unsafeMode) ||
-          new Cookies().get("unsafeMode") === "true"
-            ? "dark"
-            : "light"
-        }
-      >
+      <Alert variant={loggedInAs && loggedInAs.unsafeMode ? "dark" : "light"}>
         <title>Loading Account...</title>
-        <Alert.Heading>Loading...</Alert.Heading>
+        <Alert.Heading>Loading Account...</Alert.Heading>
       </Alert>
     );
   }
@@ -130,6 +115,10 @@ const Account = (props) => {
     return (
       <Alert variant="danger">
         <title>{account.screenName} on Crowdventure!</title>
+        <meta
+          property="og:title"
+          content={`${account.screenName} on Crowdventure!`}
+        />
         <Alert.Heading>Unsafe!</Alert.Heading>
         <p>
           This page has been hidden from general users, because the content has
@@ -142,6 +131,10 @@ const Account = (props) => {
   return (
     <Container>
       <title>{account.screenName} on Crowdventure!</title>
+      <meta
+        property="og:title"
+        content={`${account.screenName} on Crowdventure!`}
+      />
       {account.hidden &&
       loggedInAs &&
       account.screenName === loggedInAs.screenName &&
@@ -166,6 +159,14 @@ const Account = (props) => {
       )}
 
       <h1>
+        <meta
+          property="og:image"
+          content={
+            account.profilePicURL
+              ? account.profilePicURL
+              : process.env.PUBLIC_URL + "/defaultProfilePic.jpg"
+          }
+        />
         <img
           src={
             account.profilePicURL
@@ -211,67 +212,6 @@ const Account = (props) => {
                 .split("\n")
                 .map((line) => <p style={{ textIndent: "5%" }}>{line}</p>)
             : ""}
-          {loggedInAs && loggedInAs.screenName === account.screenName ? (
-            <p style={{ textIndent: "1%" }} class="text-muted">
-              Unsafe Mode:{" "}
-              <BootstrapSwitchButton
-                checked={loggedInAs.unsafeMode}
-                onstyle="secondary"
-                size="sm"
-                onChange={(checked) => {
-                  if (checked) {
-                    showModal(
-                      <UnsafeModal
-                        close={() => showModal(undefined)}
-                        loggedInAs={loggedInAs}
-                        onConfirm={() => {
-                          new Cookies().set("unsafeMode", true, {
-                            path: "/",
-                          });
-                          setLoggedInAs({
-                            ...loggedInAs,
-                            unsafeMode: true,
-                          });
-                          showModal(undefined);
-                        }}
-                      />
-                    );
-                  } else {
-                    new Cookies().set("unsafeMode", false, {
-                      path: "/",
-                    });
-                    setLoggedInAs({
-                      ...loggedInAs,
-                      unsafeMode: false,
-                    });
-                  }
-                }}
-              />
-              <OverlayTrigger
-                overlay={
-                  <Tooltip id="tooltip-unsafe">
-                    Unsafe mode allows you to see all content on Crowdventure,
-                    including content that has been flagged as unsafe for the
-                    general public!
-                  </Tooltip>
-                }
-              >
-                <Button
-                  style={{
-                    backgroundColor: "#00000000",
-                    borderColor: "#00000000",
-                    borderRadius: "50%",
-                    color: loggedInAs.unsafeMode ? "white" : "black",
-                  }}
-                  size="xs"
-                >
-                  <span className="fa fa-info-circle" />
-                </Button>
-              </OverlayTrigger>
-            </p>
-          ) : (
-            ""
-          )}
         </Container>
       ) : (
         ""
@@ -304,16 +244,70 @@ const Account = (props) => {
           ""
         )}{" "}
         {loggedInAs && loggedInAs.screenName === account.screenName ? (
+          <>
+            <Button
+              size="sm"
+              onClick={() => {
+                new Cookies().set("account", "", { path: "/" });
+                new Cookies().set("unsafeMode", "false", { path: "/" });
+                window.location.reload(false);
+              }}
+              variant="secondary"
+            >
+              Log out
+            </Button>{" "}
+            <Button
+              size="sm"
+              onClick={() => {
+                setRedirect(<Redirect to="/notifications"></Redirect>);
+              }}
+              style={{
+                border: `1px solid ${palette[2]}`,
+                backgroundColor: palette[0],
+              }}
+              onMouseEnter={(e) =>
+                (e.target.style.backgroundColor = palette[2])
+              }
+              onMouseLeave={(e) =>
+                (e.target.style.backgroundColor = palette[0])
+              }
+            >
+              Notifications{" "}
+              {loggedInAs.notifications &&
+              loggedInAs.notifications.filter((notif) => !notif.seen).length ? (
+                <span style={{ color: "red" }}>
+                  (
+                  {
+                    loggedInAs.notifications.filter((notif) => !notif.seen)
+                      .length
+                  }{" "}
+                  New)
+                </span>
+              ) : (
+                ""
+              )}
+            </Button>
+          </>
+        ) : loggedInAs ? (
           <Button
             size="sm"
             onClick={() => {
-              new Cookies().set("account", "", { path: "/" });
-              new Cookies().set("unsafeMode", "false", { path: "/" });
-              window.location.reload(false);
+              showModal(
+                <MessageModal
+                  account={account}
+                  loggedInAs={loggedInAs}
+                  close={() => showModal(undefined)}
+                />
+              );
             }}
-            variant="secondary"
+            style={{
+              border: `1px solid ${palette[2]}`,
+              backgroundColor: palette[0],
+            }}
+            onMouseEnter={(e) => (e.target.style.backgroundColor = palette[2])}
+            onMouseLeave={(e) => (e.target.style.backgroundColor = palette[0])}
           >
-            Log out
+            Send Message
           </Button>
         ) : (
           ""
@@ -353,10 +347,21 @@ const Account = (props) => {
         ""
       )}
 
-      <p />
+      <hr
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: "rgb(225, 240, 255)" } }
+          : {})}
+      />
 
-      <h3>Featured Pages:</h3>
+      <h3>Featured Stories:</h3>
       <NodeViewer nodes={account.featuredNodes} loggedInAs={loggedInAs} />
+
+      <hr
+        {...(loggedInAs && loggedInAs.unsafeMode
+          ? { style: { backgroundColor: "rgb(225, 240, 255)" } }
+          : {})}
+      />
+
       <h3>Search All Pages Authored by {account.screenName}:</h3>
       <Form>
         <Form.Control
@@ -396,6 +401,7 @@ const Account = (props) => {
         ""
       )}
 
+      <p />
       <Container>
         <Button
           style={{ marginRight: "0", marginLeft: "auto", display: "block" }}

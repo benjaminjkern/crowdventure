@@ -21,7 +21,12 @@ const LoginModal = (props) => {
     mutation_call(
       "loginAccount",
       { screenName: esScreenName, password: esPass },
-      { screenName: 0, profilePicURL: 0, isAdmin: 0 },
+      {
+        screenName: 0,
+        profilePicURL: 0,
+        isAdmin: 0,
+        notifications: { seen: 0 },
+      },
       (res) => {
         if (res) {
           new Cookies().set("account", screenName, { path: "/" });
@@ -38,6 +43,17 @@ const LoginModal = (props) => {
       }
     );
   };
+
+  const tryToLogin = () =>
+    screenName
+      ? password
+        ? login()
+        : setInfo(
+            <span style={{ color: "red" }}>Please enter your screenName!</span>
+          )
+      : setInfo(
+          <span style={{ color: "red" }}>Please enter your password!</span>
+        );
 
   return (
     <Modal
@@ -93,21 +109,7 @@ const LoginModal = (props) => {
             }}
             onMouseEnter={(e) => (e.target.style.backgroundColor = palette[2])}
             onMouseLeave={(e) => (e.target.style.backgroundColor = palette[0])}
-            onClick={() =>
-              screenName
-                ? password
-                  ? login()
-                  : setInfo(
-                      <span style={{ color: "red" }}>
-                        Please enter your screenName!
-                      </span>
-                    )
-                : setInfo(
-                    <span style={{ color: "red" }}>
-                      Please enter your password!
-                    </span>
-                  )
-            }
+            onClick={tryToLogin}
           >
             Log in
           </Button>

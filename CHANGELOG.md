@@ -1,16 +1,51 @@
 # Crowdventure Changelog
 
-## Version 0.1.8 (In Progress)
+# 0.2 - Beta / Streamlining and bug fixing
 
-- Ability to find parents of any node
-- Fixed a decently big bug with node views, they weren't counting up for the most part (more of a backend fix, it affects the current frontend but whatever)
+## Version 0.2.0 (In Progress)
+
+- Ability to find parents of any node (on backend, will use this later)
+  - Used for now to update pages
+  - Will be used later to start from any point and track both up and down the tree
+- Fixed bug with node views not counting up
+  - Still appears to be slow at times but it definitely counts up now
 - Changed this changelog to be a bit more organized, lol
+- Pages with blurred images won't show up at all unless you are in unsafe mode
+  - Before: a page could be considered safe but have an unsafe image
+    - This probably can be reconciled a bit on the backend but it works
+- Made frontend a bit less cluttered and more optimized for different screen sizes (Mobile users)
+  - Stuff doesnt go off the screen quite as often
+  - Profile pic is bigger and centered
+  - Unsafe mode can be accessed any time (As long as you are logged in)
+- Image search
+  - In unsafe mode, choosing pictures allows you to see blurred pictures by hovering over them, also they have a tool tip explaining why they are blurred
+  - Can no longer choose an image that doesn't actually exist (Sometimes the thumbnails would show up but the actual image url didn't work)
+- Notification system
+  - You get notified whenever someone adds to the story of your page, likes / dislikes your page, or edits something you own
+  - You can also send messages to people (Right now they are literally just notifications)
+- Front page has a section for newly updated pages as well as featured pages
+  - Featured is still just a random selection of top-level nodes, while newly updated is literally every new / updated page that comes through
+  - In the future i would like this to be:
+    - Featured pages = algorithmically decided based on recent activity
+    - Recently updated = in order of most recently added / updated of only top-level nodes
+- A random page button
+  - Again, right now this goes to any page but I want it to be able to only go to top-level nodes
+    - The infrastructure is in at the moment, there just aren't enough top-level nodes for this to be interesting at the moment lol
+- Pages, choices, and accounts now track when they were created
+- Pagination and corralling of some stray async functions that were slowing things down and causing a ruckus
+- Bug fixs
 
 #### Planned
 
-- Notification system
+- Fix bug where looking at accounts too much causes server to slow down
+  - Might be related to:
+    - In general: Fix the whole update the entire account object every time I want to update a list of things thing, it screws stuff up if multiple calls are made at once
+    - Async search for pages, it's not that big and it's already slowing down
 - Feedback Modal, reporting done through that modal, and non-reportative feedback
-- Pagination + removal of async functions where unecessary (to speed up backend)
+  - These should send an email to me personally so I can look at it
+- Look into temporary local logout of account in between major pages
+
+# 0.1 - Alpha / Proof of concept
 
 ## Version 0.1.7
 
@@ -66,7 +101,7 @@
 - I can disable the backend whenever I want
 - Switched from Pixabay to Bing images because Pixabay is lame and the images only stay alive for 24 hours (I hope bing does the same), also Pixabay images are lame anyways
 - Images in search bar display as blurry if bing tagged them as "not family friendly", right now it still just lets you select them though
-- Added date created for nodes, choices, and accounts. If created before September 16, 2020, then they just get put as
+- Added date created for nodes, choices, and accounts. If created before September 16, 2020, then they just get put as "Before September 16, 2020"
 
 ## Version 0.1.5
 

@@ -1,14 +1,13 @@
 # Feature ideas
 
-- Decide on a mature content filter and how to go about that
 - A chart feature to view all connected nodes, this could blend well into the local history idea, since a massive chart displaying all potential nodes would be really bad
 - Ability to Sort choices to be in order of best or worst
 - Static header and Footer with contact information / patreon as well as advertisements
 - Ability to Set/delete variables, either save them per user or save pass them from node to node, I feel like passing from node to node is cooler and easier to deal with but will be weird if a back tracking system is set up. This is a really cool idea in general and I definitely want to implement it eventually since this will give a shit ton of power to creators.
 - Ability to hide Nodes instead of deleting them, i.e. make them private
 - Notifications when someone adds a suggestion on your nodes
-- Subscriptions
-  - Maybe only subscribers can see certain content and they get notified whenever you make new content
+- Subscriptions / followers
+  - Maybe only subscribers / followers can see certain content and they get notified whenever you make new content
 - A better tutorial
   - Also consider forcing people to at least skim the tutorial to begin with
 - I still don't love how the choices look
@@ -26,7 +25,10 @@
 - On iPhone the go to page search bar goes off the side and you can’t scroll to read it **TEST**
 - Pressing enter when a modal is open submits the form (which doesnt do anything at the moment but I need to either make it submit for real or figure out a way so that submitting doesnt reload the page)
 - Figure out how to get it to show something if they have a script blocker
-- Should go through and set all nodes pictureURLs to empty string so it doesnt crash at some point **TEST**
+- Hide API behind a key or osmething
+
+# Verify fixed
+
 - Sometimes typing new things on the image search does not reload the image search
 - If possible find a way to standardize the code base, because theres a lot of repeated code as is for each of them
   - for example you should never be able to escape in the shitty way lol
@@ -61,8 +63,17 @@
 - Reporting a page only hides it if it is featured
 - Can create non-reportative feedback
 - Reporting should be done through a modal
-- Hide API behind a key or osmething
-- Easily remove hidden nodes and choices and whatnot - Admin panel/admin permissions maybe
 - Cap the number of reports to like 5 per day per ip address
   - Or Figure out how to verify they're a human or something when reporting
   - I just feel like it will be too easy to report things and screw them up if reporting once gets them hidden into unsafe mode
+- Hitting enter on any of the forms will submit it, makes it easier
+
+#### Planned
+
+- Fix bug where looking at accounts too much causes server to slow down
+  - Might be related to:
+    - In general: Fix the whole update the entire account object every time I want to update a list of things thing, it screws stuff up if multiple calls are made at once
+    - Async search for pages, it's not that big and it's already slowing down
+- Feedback Modal, reporting done through that modal, and non-reportative feedback
+  - These should send an email to me personally so I can look at it
+- Look into temporary local logout of account in between major pages

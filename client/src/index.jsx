@@ -10,6 +10,11 @@ const app_fetch = createApolloFetch({
 });
 
 const query_call = (query, parameters, attributes, callback) => {
+  console.log(
+    `query{${query}${formatParameters(parameters)}${formatAttributes(
+      attributes
+    )}}`
+  );
   app_fetch({
     query: `query{${query}${formatParameters(parameters)}${formatAttributes(
       attributes
@@ -22,12 +27,11 @@ const query_call = (query, parameters, attributes, callback) => {
 };
 
 const mutation_call = (query, parameters, attributes, callback, setInfo) => {
-  if (setInfo)
-    setInfo(
-      `mutation{${query}${formatParameters(parameters)}${formatAttributes(
-        attributes
-      )}}`
-    );
+  console.log(
+    `mutation{${query}${formatParameters(parameters)}${formatAttributes(
+      attributes
+    )}}`
+  );
   app_fetch({
     query: `mutation{${query}${formatParameters(parameters)}${formatAttributes(
       attributes
@@ -71,7 +75,9 @@ const palette = [
   "rgb(80, 160, 224)", //dark
   "rgb(34,34,34)", // darker grey
   "rgb(41,41,41)", // original grey
-  "rgb(50,50,50)",
+  "rgb(50,50,50)", // lighter grey
+
+  "rgb(80, 150, 200)", // darkest blue
 ];
 
 // ========================================

@@ -1,6 +1,8 @@
 const { gql } = require('apollo-server-lambda');
 
 const typeDefs = gql `
+  scalar GraphQLLong
+
   type Account {
     screenName: String!
     dateCreated: String!
@@ -11,10 +13,18 @@ const typeDefs = gql `
 
     nodes: [Node!]
     suggestedChoices: [Choice!]
+    notifications: [Notification!]
 
     totalNodeViews: Int!
     totalSuggestionScore: Int!
     featuredNodes: [Node!]
+  }
+
+  type Notification {
+    time: GraphQLLong!
+    content: String!
+    link: String
+    seen: Boolean
   }
 
   type Node {
@@ -22,6 +32,7 @@ const typeDefs = gql `
     title: String!
     content: String!
     dateCreated: String!
+    lastUpdated: GraphQLLong
     pictureURL: String
     pictureUnsafe: Boolean
     bgColor: String
@@ -71,7 +82,9 @@ const typeDefs = gql `
     allChoices: [Choice!]
     allFeedback: [Feedback!]
 
-    featuredNodes: [Node!]
+    featuredNodes(allowHidden: Boolean, count: Int): [Node!]
+    recentlyUpdatedNodes(allowHidden: Boolean, pageSize: Int, pageNum: Int): [Node!]
+    randomNode(allowHidden: Boolean, chooseFromLast: Int): Node!
 
     getAccount(screenName: String!): Account
     getNode(ID: String!): Node
@@ -143,6 +156,21 @@ const typeDefs = gql `
     ): Feedback
     removeFeedback(feedbackID: String!): Boolean
     removeAllFeedback(accountScreenName: String, reportingObjectType: String, reportingObjectID: String, info: String): Boolean
+  
+    createNotification(
+      accountScreenName: String!
+      content: String!
+      link: String
+    ): Notification!
+    seeNotification(
+      accountScreenName: String!,
+      index: Int!
+      force: Boolean,
+    ): Boolean
+    removeNotification(
+      accountScreenName: String!,
+      index: Int!): Boolean
+    clearNotifications(accountScreenName: String!, onlyClearSeen: Boolean): Boolean
   }
 `;
 

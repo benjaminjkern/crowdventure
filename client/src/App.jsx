@@ -4,6 +4,7 @@ import { HashRouter, Route, Switch } from "react-router-dom";
 import Node from "./Node/Node";
 import Account from "./Account";
 import Home from "./Home";
+import Notifications from "./Notifications";
 import AccountManager from "./AccountManager";
 
 import { Navbar, Container } from "react-bootstrap";
@@ -28,7 +29,14 @@ const App = () => {
       mutation_call(
         "loginAccount",
         { screenName: savedAccount },
-        { screenName: 0, profilePicURL: 0, isAdmin: 0 },
+        {
+          screenName: 0,
+          profilePicURL: 0,
+          isAdmin: 0,
+          notifications: {
+            seen: 0,
+          },
+        },
         (res) => {
           if (res) {
             res.unsafeMode = cookies.get("unsafeMode") === "true";
@@ -41,10 +49,7 @@ const App = () => {
       );
     }
 
-    if (
-      new Cookies().get("unsafeMode") === "true" ||
-      (loggedInAs && loggedInAs.unsafeMode)
-    ) {
+    if (loggedInAs && loggedInAs.unsafeMode) {
       document.getElementById("root").style.backgroundImage = `linear-gradient(
       to right,
       rgb(158, 232, 255),
@@ -67,8 +72,8 @@ const App = () => {
 
   return (
     <Container>
-      <Navbar expand="lg">
-        <Navbar.Brand href="/">
+      <Navbar expand="lg" className="row border-bottom">
+        <Navbar.Brand href="/" style={{ maxWidth: "60%" }}>
           <img
             href="/"
             src={process.env.PUBLIC_URL + "/logo.png"}
@@ -76,22 +81,29 @@ const App = () => {
             style={{ width: "100%" }}
           />
         </Navbar.Brand>
-        <a href="https://github.com/benjaminjkern/crowdventure/blob/master/CHANGELOG.md">
-          <small class="text-muted">Version: {packageJson.version}</small>
-        </a>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" className="bg-light" />
+        <Navbar.Toggle
+          aria-controls="basic-navbar-nav"
+          className="bg-light"
+          style={{ marginRight: "20px" }}
+        />
+
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
-          <AccountManager
-            loggedInAs={loggedInAs}
-            setLoggedInAs={setLoggedInAs}
-          />
+          <div class="text-center">
+            <AccountManager
+              loggedInAs={loggedInAs}
+              setLoggedInAs={setLoggedInAs}
+            />
+          </div>
         </Navbar.Collapse>
       </Navbar>
+      <br />
       <HashRouter>
         <Switch>
           <Route
             path="/"
-            render={(props) => <Home {...props} loggedInAs={loggedInAs} />}
+            render={(props) => (
+              <Home {...props} loggedInAs={loggedInAs} history={history} />
+            )}
             exact
           />
           <Route
@@ -110,10 +122,31 @@ const App = () => {
               />
             )}
           />
+          <Route
+            path="/notifications"
+            render={(props) => (
+              <Notifications
+                {...props}
+                loggedInAs={loggedInAs}
+                setLoggedInAs={setLoggedInAs}
+              />
+            )}
+          />
         </Switch>
       </HashRouter>
-      <Navbar className="text-right">
-        <small class="text-muted">@ 2020 Copyright: (MIT) Benjamin Kern</small>
+      <br />
+      <Navbar className="row border-top">
+        <div class="col">
+          <small class="text-muted">
+            @ 2020 Copyright: (MIT) Benjamin Kern
+          </small>
+        </div>
+
+        <div class="col text-right" style={{ paddingRight: "20px" }}>
+          <a href="https://github.com/benjaminjkern/crowdventure/blob/master/CHANGELOG.md">
+            <small class="text-muted">Version: {packageJson.version}</small>
+          </a>
+        </div>
       </Navbar>
       <title>Crowdventure! - Page not found!</title>
     </Container>

@@ -3,11 +3,43 @@ const { databaseCalls } = require('./databaseCalls.js');
 const { scramble } = require('./resolverUtils.js');
 
 module.exports = {
-    featuredNodes: async() => scramble(await databaseCalls.filterFeatured()),
+    // TODO: For now, featured is a random selection of 10 top-level nodes
+    // Eventually I want to make this actually some sort of algorithmic selection based on recent activity
+    featuredNodes: async(parent, args, context, info) => scramble(await databaseCalls.filterFeatured(args.allowHidden)).slice(0, args.count || 10),
+    recentlyUpdatedNodes: async(parent, args, context, info) =>
+        await databaseCalls.sortedNodes(args.pageSize ? Math.min(args.pageSize, 100) : 10, args.pageNum || 0, args.allowHidden)
+        .then(nodes => Promise.all(nodes.map(node => databaseCalls.getNode(node.ID)))),
+    randomNode: async(parent, args, context, info) => await databaseCalls.randomNode(args.chooseFromLast || 1000, args.allowHidden),
+
     allAccounts: async() => await databaseCalls.allAccounts(),
-    allNodes: async() => await databaseCalls.allNodes(),
-    allChoices: async() => await databaseCalls.allChoices(),
+    allNodes: async() => {
+        const allNodes = await databaseCalls.allNodes();
+        // (async() => {
+        //     for (const node of allNodes) {
+        //         node.canonChoices = await Promise.all(node.canonChoices.map(choiceID => databaseCalls.getChoice(choiceID))).then(choices => choices.filter(choice => choice).map(choice => choice.ID));
+        //         node.nonCanonChoices = await Promise.all(node.nonCanonChoices.map(choiceID => databaseCalls.getChoice(choiceID))).then(choices => choices.filter(choice => choice).map(choice => choice.ID));
+        //         databaseCalls.addNode(node);
+        //     }
+        // })();
+        return allNodes;
+    },
+    allChoices: async() => {
+        const allChoices = await databaseCalls.allChoices();
+        // (async() => {
+        //     for (const choice of allChoices) {
+        //         const daddy = await databaseCalls.getNode(choice.from);
+        //         if (daddy.canonChoices.includes(choice.ID)) continue;
+        //         if (daddy.nonCanonChoices.includes(choice.ID)) continue;
+        //         if (choice.ID) {
+        //             daddy.nonCanonChoices.push(choice.ID);
+        //             await databaseCalls.addNode(daddy);
+        //         }
+        //     }
+        // })();
+        return allChoices;
+    },
     allFeedback: async() => await databaseCalls.allFeedback(),
+
     getAccount: async(parent, args, context, info) => {
         const account = await databaseCalls.getAccount(args.screenName);
         if (!account) {
