@@ -9,7 +9,7 @@
   "dependencies": {
     "apollo-server": "^2.16.1",
     "apollo-server-lambda": "^2.15.0",
-    "aws-sdk": "^2.703.0",
+    "aws-sdk": "^2.814.0",
     "cloudinary": "^1.22.0",
     "color-thief-node": "^1.0.3",
     "crypto-js": "^4.0.0",
