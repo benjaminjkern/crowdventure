@@ -5,41 +5,42 @@ import { Modal, Button, Form } from "react-bootstrap";
 import { palette } from "../index";
 
 const ConfirmModal = (props) => {
-  const { onConfirm, close, loggedInAs } = props;
-  const [show, setShow] = useState(true);
+    const { onConfirm, close, loggedInAs } = props;
+    const [show, setShow] = useState(true);
 
-  const [understand, setUnderstand] = useState(false);
-  return (
-    <Modal
-      show={show}
-      onHide={() => {
-        setShow(false);
-        close();
-      }}
-    >
-      <Modal.Header
-        {...(loggedInAs && loggedInAs.unsafeMode
-          ? { style: { backgroundColor: palette[5] } }
-          : {})}
-        closeButton
-      >
-        <Modal.Title>Turn on Unsafe Mode</Modal.Title>
-      </Modal.Header>
-      <Modal.Body
-        {...(loggedInAs && loggedInAs.unsafeMode
-          ? { style: { backgroundColor: palette[4] } }
-          : {})}
-      >
-        Unsafe Mode allows you to see <b>ALL</b> of the content on Crowdventure,
-        including content that has been classified as "unsafe". Before you can
-        continue, you must acknowledge and agree to the terms of service:
-        <p />
-        <Form>
-          <Form.Control
-            disabled
-            as="textarea"
-            rows="5"
-            value={`Please read these terms of service ("terms", "terms of service") carefully before using the Crowdventure website (the "service").
+    const [understand, setUnderstand] = useState(false);
+    return (
+        <Modal
+            show={show}
+            onHide={() => {
+                setShow(false);
+                close();
+            }}
+        >
+            <Modal.Header
+                {...(loggedInAs && loggedInAs.unsafeMode
+                    ? { style: { backgroundColor: palette[5] } }
+                    : {})}
+                closeButton
+            >
+                <Modal.Title>Turn on Unsafe Mode</Modal.Title>
+            </Modal.Header>
+            <Modal.Body
+                {...(loggedInAs && loggedInAs.unsafeMode
+                    ? { style: { backgroundColor: palette[4] } }
+                    : {})}
+            >
+                Unsafe Mode allows you to see <b>ALL</b> of the content on
+                Crowdventure, including content that has been classified as
+                &quot;unsafe&quot;. Before you can continue, you must
+                acknowledge and agree to the terms of service:
+                <p />
+                <Form>
+                    <Form.Control
+                        disabled
+                        as="textarea"
+                        rows="5"
+                        value={`Please read these terms of service ("terms", "terms of service") carefully before using the Crowdventure website (the "service").
             
 I. Conditions of Use
   We will provide their services to you, which are subject to the conditions stated below in this document. Every time you visit this website, use its services or make a purchase, you accept the following conditions. This is why we urge you to read them carefully.
@@ -69,40 +70,44 @@ VIII. License and Site Access
 IX. User Account
   If you are an owner of an account on this website, you are solely responsible for maintaining the confidentiality of your private user details (username and password). You are responsible for all activities that occur under your account or password.
   We reserve all rights to terminate accounts, edit or remove content and cancel orders in their sole discretion.`}
-          />
-          <Form.Check
-            style={{ float: "right" }}
-            type="checkbox"
-            label="I agree to the terms of service."
-            checked={understand}
-            id="check"
-            onChange={(e) => {
-              setUnderstand(e.target.checked);
-            }}
-          />
-        </Form>
-      </Modal.Body>
-      <Modal.Footer
-        {...(loggedInAs && loggedInAs.unsafeMode
-          ? { style: { backgroundColor: palette[5] } }
-          : {})}
-      >
-        <Button
-          variant="primary"
-          onClick={onConfirm}
-          disabled={!understand}
-          style={{
-            border: `1px solid ${palette[2]}`,
-            backgroundColor: palette[0],
-          }}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = palette[2])}
-          onMouseLeave={(e) => (e.target.style.backgroundColor = palette[0])}
-        >
-          Turn on Unsafe Mode
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
+                    />
+                    <Form.Check
+                        style={{ float: "right" }}
+                        type="checkbox"
+                        label="I agree to the terms of service."
+                        checked={understand}
+                        id="check"
+                        onChange={(e) => {
+                            setUnderstand(e.target.checked);
+                        }}
+                    />
+                </Form>
+            </Modal.Body>
+            <Modal.Footer
+                {...(loggedInAs && loggedInAs.unsafeMode
+                    ? { style: { backgroundColor: palette[5] } }
+                    : {})}
+            >
+                <Button
+                    variant="primary"
+                    onClick={onConfirm}
+                    disabled={!understand}
+                    style={{
+                        border: `1px solid ${palette[2]}`,
+                        backgroundColor: palette[0],
+                    }}
+                    onMouseEnter={(e) =>
+                        (e.target.style.backgroundColor = palette[2])
+                    }
+                    onMouseLeave={(e) =>
+                        (e.target.style.backgroundColor = palette[0])
+                    }
+                >
+                    Turn on Unsafe Mode
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    );
 };
 
 export default ConfirmModal;

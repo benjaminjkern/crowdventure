@@ -41,8 +41,12 @@ const scramble = (list) => {
     return newList;
 };
 
-const BAD_WORDS = new RegExp(['nigg', 'fag'].map(word => word.split('').join('.{0,4}')).join('|'));
+const BAD_WORDS = new RegExp(
+    ["nigg", "fag"].map((word) => word.split("").join(".{0,4}")).join("|")
+);
 
-const flagContent = (content) => typeof content === 'string' && content.toLowerCase().match(BAD_WORDS) !== null;
+const flagContent = (content) =>
+    typeof content === "string" &&
+    content.toLowerCase().match(BAD_WORDS) !== null;
 
 module.exports = { encrypt, sort, scramble, flagContent };

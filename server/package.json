@@ -1,25 +1,24 @@
 {
-  "name": "dventure_server",
-  "version": "1.0.0",
-  "description": "yeuh",
-  "main": "server.js",
-  "author": "Ben Kern",
-  "license": "MIT",
-  "repository": "https://github.com/benjaminjkern/dventure.online",
-  "dependencies": {
-    "apollo-server": "^2.16.1",
-    "apollo-server-lambda": "^2.15.0",
-    "aws-sdk": "^2.703.0",
-    "cloudinary": "^1.22.0",
-    "color-thief-node": "^1.0.3",
-    "crypto-js": "^4.0.0",
-    "dotenv": "^8.2.0",
-    "graphql-type-long": "^0.1.1",
-    "graphql-upload": "^11.0.0"
-  },
-  "devDependencies": {
-    "eslint": "^7.12.1",
-    "eslint-config-airbnb-base": "^14.2.0",
-    "eslint-plugin-import": "^2.22.1"
-  }
+    "name": "dventure_server",
+    "version": "1.0.0",
+    "description": "yeuh",
+    "main": "server.js",
+    "author": "Ben Kern",
+    "license": "MIT",
+    "repository": "https://github.com/benjaminjkern/dventure.online",
+    "dependencies": {
+        "apollo-server": "^2.16.1",
+        "apollo-server-lambda": "^2.15.0",
+        "aws-sdk": "^2.703.0",
+        "cloudinary": "^1.22.0",
+        "color-thief-node": "^1.0.3",
+        "crypto-js": "^4.0.0",
+        "dotenv": "^8.2.0",
+        "graphql-type-long": "^0.1.1",
+        "graphql-upload": "^11.0.0"
+    },
+    "devDependencies": {
+        "eslint": "^7.12.1",
+        "prettier": "^2.8.1"
+    }
 }

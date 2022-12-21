@@ -4,9 +4,9 @@
  * that's what we're gonna be using for the final product anyways
  */
 
-const { ApolloServer } = require('apollo-server-lambda');
-const SCHEMA = require('./schema.js');
-const RESOLVERS = require('./resolvers/resolvers.js');
+const { ApolloServer } = require("apollo-server-lambda");
+const SCHEMA = require("./schema.js");
+const RESOLVERS = require("./resolvers/resolvers.js");
 
 const server = new ApolloServer({
     typeDefs: SCHEMA.typeDefs,
@@ -18,13 +18,13 @@ const server = new ApolloServer({
         context,
     }),
     playground: {
-        endpoint: '/dev/graphql',
+        endpoint: "/dev/graphql",
     },
 });
 
 exports.graphqlHandler = server.createHandler({
     cors: {
-        origin: '*',
+        origin: "*",
         credentials: true,
     },
 });
