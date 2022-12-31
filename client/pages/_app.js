@@ -8,7 +8,7 @@ import Footer from "../lib/base/Footer";
 import Navbar from "../lib/base/Navbar";
 import { palette } from "../lib/colorPalette";
 
-const UserContext = createContext();
+export const UserContext = createContext();
 
 // THESE NEED TO BE HIDDEN BETTER
 const backendURL =
@@ -27,7 +27,7 @@ const App = ({ Component, pageProps }) => {
     const [user, setUser] = useState();
 
     useEffect(() => {
-        const loggedInUser = localStorage.getItem("account");
+        const loggedInUser = localStorage.getItem("user");
         if (!loggedInUser) {
             localStorage.setItem("unsafeMode", false);
             return;
@@ -59,6 +59,9 @@ const App = ({ Component, pageProps }) => {
 
     const { pageTitle, ...otherPageProps } = pageProps;
 
+    // const [showingModal, showModal] = useState(undefined);
+    // const [redirect, setRedirect] = useState(undefined);
+
     return (
         <>
             <Head>
@@ -83,10 +86,11 @@ const App = ({ Component, pageProps }) => {
                 <link rel="icon" href="/favicon.png" />
             </Head>
             <ApolloProvider client={client}>
-                <UserContext.Provider user={user}>
+                <UserContext.Provider value={{ user }}>
                     <Navbar />
                     <Component {...otherPageProps} />
                     <Footer />
+                    {/* Modal stuff */}
                 </UserContext.Provider>
             </ApolloProvider>
         </>
