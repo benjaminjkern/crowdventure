@@ -1,8 +1,62 @@
+import React, { createContext, useEffect, useState } from "react";
 import Head from "next/head";
 
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+
 import "../styles/globals.css";
+import Footer from "../lib/base/Footer";
+import Navbar from "../lib/base/Navbar";
+import { palette } from "../lib/colorPalette";
+
+const UserContext = createContext();
+
+// THESE NEED TO BE HIDDEN BETTER
+const backendURL =
+    "https://3yfp7ejc0m.execute-api.us-east-1.amazonaws.com/dev/graphql";
+
+// const BING_API_KEY = "8300cebe5f0d452a9ccb4bca67af4659";
+
+const client = new ApolloClient({
+    uri: backendURL,
+    cache: new InMemoryCache(),
+});
+
+// Crowdventure! - Page not found! - for 404 page (NONEXISTENT RIGHT NOW)
 
 const App = ({ Component, pageProps }) => {
+    const [user, setUser] = useState();
+
+    useEffect(() => {
+        const loggedInUser = localStorage.getItem("account");
+        if (!loggedInUser) {
+            localStorage.setItem("unsafeMode", false);
+            return;
+        }
+
+        // Should do some sort of verification here
+        setUser(JSON.parse(loggedInUser));
+
+        if (localStorage.getItem("unsafeMode")) {
+            document.body.style.backgroundImage = `linear-gradient(
+                to right,
+                rgb(158, 232, 255),
+                ${palette[3]} 10%,
+                ${palette[3]} 90%,
+                rgb(158, 232, 255)
+            )`;
+            document.body.style.color = "rgb(225, 240, 255)";
+        } else {
+            document.body.style.backgroundImage = `linear-gradient(
+                to right,
+                rgb(158, 232, 255),
+                rgb(245,250,255) 10%,
+                rgb(245,250,255) 90%,
+                rgb(158, 232, 255)
+            )`;
+            document.body.style.color = "";
+        }
+    }, []);
+
     const { pageTitle, ...otherPageProps } = pageProps;
 
     return (
@@ -28,7 +82,13 @@ const App = ({ Component, pageProps }) => {
                 <title>{pageTitle || "Crowdventure"}</title>
                 <link rel="icon" href="/favicon.png" />
             </Head>
-            <Component {...otherPageProps} />
+            <ApolloProvider client={client}>
+                <UserContext.Provider user={user}>
+                    <Navbar />
+                    <Component {...otherPageProps} />
+                    <Footer />
+                </UserContext.Provider>
+            </ApolloProvider>
         </>
     );
 };

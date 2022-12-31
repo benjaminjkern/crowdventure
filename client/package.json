@@ -6,6 +6,8 @@
     "author": "benjaminjkern <bkern1@lion.lmu.edu>",
     "license": "MIT",
     "dependencies": {
+        "@apollo/client": "^3.7.3",
+        "graphql": "^16.6.0",
         "next": "^12.2.5",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"
@@ -18,10 +20,6 @@
         "lint": "next lint"
     },
     "devDependencies": {
-        "@babel/core": "^7.18.10",
-        "@babel/eslint-parser": "^7.18.9",
-        "@babel/preset-env": "^7.18.10",
-        "@babel/preset-react": "^7.18.6",
         "eslint": "^8.22.0",
         "eslint-config-next": "12.2.5",
         "eslint-plugin-react": "^7.30.1"
