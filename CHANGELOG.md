@@ -1,5 +1,7 @@
 # Crowdventure Changelog
 
+# 1.0 - Move frontend to next and redesign/optimize where necessary
+
 # 0.2 - Beta / Streamlining and bug fixing
 
 ## Version 0.2.0
