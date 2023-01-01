@@ -1,7 +1,9 @@
 import React, { useContext } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { PaletteContext } from "../colorPalette";
 
-const AccountPreview = ({ account }) => {
+const AccountPreview = ({ account, imgSide = "left" }) => {
     const { foregroundColor } = useContext(PaletteContext);
     return (
         <Link
@@ -10,8 +12,12 @@ const AccountPreview = ({ account }) => {
                 color: foregroundColor,
             }}
         >
-            <img
-                src={account.profilePicURL || require("/defaultProfilePic.jpg")}
+            {imgSide === "right" && `${account.screenName} `}
+            <Image
+                src={
+                    account.profilePicURL ||
+                    require("../../public/defaultProfilePic.jpg")
+                }
                 alt={`${account.screenName} Profile Pic`}
                 // onError={(e) => {
                 //     e.target.src =
@@ -24,8 +30,8 @@ const AccountPreview = ({ account }) => {
                     objectFit: "cover",
                     borderRadius: "50%",
                 }}
-            />{" "}
-            {account.screenName}
+            />
+            {imgSide === "left" && ` ${account.screenName}`}
         </Link>
     );
 };

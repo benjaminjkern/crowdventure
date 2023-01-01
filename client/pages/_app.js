@@ -6,7 +6,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import "../styles/globals.css";
 import Footer from "../lib/base/Footer";
 import Navbar from "../lib/base/Navbar";
-import { palette } from "../lib/colorPalette";
+import PaletteProvider, { palette } from "../lib/colorPalette";
 
 export const UserContext = createContext();
 
@@ -87,10 +87,12 @@ const App = ({ Component, pageProps }) => {
             </Head>
             <ApolloProvider client={client}>
                 <UserContext.Provider value={{ user }}>
-                    <Navbar />
-                    <Component {...otherPageProps} />
-                    <Footer />
-                    {/* Modal stuff */}
+                    <PaletteProvider>
+                        <Navbar />
+                        <Component {...otherPageProps} />
+                        <Footer />
+                        {/* Modal stuff */}
+                    </PaletteProvider>
                 </UserContext.Provider>
             </ApolloProvider>
         </>

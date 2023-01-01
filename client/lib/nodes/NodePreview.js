@@ -1,13 +1,15 @@
-import Link from "next/link";
-import React, { useRef } from "react";
+import React, { useContext } from "react";
+import { UserContext } from "../../pages/_app";
 import AccountPreview from "../accounts/AccountPreview";
-import { palette } from "../colorPalette";
 import CrowdventureCard from "../components/CrowdventureCard";
-import TooltipWrapper from "../components/TooltipWrapper";
 
 // import ConfirmModal from "./Modals/ConfirmModal";
 
 const NodePreview = ({ node }) => {
+    const { user } = useContext(UserContext);
+
+    const unsafeMode = false;
+
     const reportNode = (nodeID) => {
         // mutation_call(
         //     "createFeedback",
@@ -55,7 +57,42 @@ const NodePreview = ({ node }) => {
             href={`/node/${node.ID}`}
             picture={node.pictureURL}
             pictureUnsafe={node.pictureUnsafe}
-            dropdownOptions={[]}
+            dropdownOptions={[
+                {
+                    active: user && node.featured,
+                    onClick: () => featurePage(node, node.featured),
+                    disabled: user.screenName !== node.owner.screenName,
+                    text: `${node.featured ? "Un-f" : "F"}eature page`,
+                },
+                {
+                    active: user && node.featured,
+                    onClick: () => {},
+                    // showModal(
+                    //     <ConfirmModal
+                    //         loggedInAs={loggedInAs}
+                    //         close={() => showModal(undefined)}
+                    //         onConfirm={() => deletePage(node)}
+                    //         title="Delete Page"
+                    //         content="This will erase all suggested choices of this page, and their associated scores. This will NOT delete sub-pages of this page. Are you sure you wish to continue?"
+                    //     />
+                    // ),
+                    disabled: user.screenName !== node.owner.screenName,
+                    text: "Delete",
+                },
+                {
+                    active: user && node.featured,
+                    disabled: true,
+                    text: "Make Private",
+                },
+                { active: user && node.featured },
+                { onClick: () => reportNode(node.ID), text: "Report" },
+                { active: user?.isAdmin },
+                {
+                    active: user?.isAdmin,
+                    onClick: () => hidePage(node),
+                    text: `${node.hidden ? "Un-h" : "H"}ide page`,
+                },
+            ]}
             text={node.title}
             overlayIcons={[
                 {

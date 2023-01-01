@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React, { useContext, useRef } from "react";
 import { PaletteContext } from "../colorPalette";
+import OptionsDropdown from "./OptionsDropdown";
 import TooltipWrapper from "./TooltipWrapper";
 
 const CrowdventureCard = ({
@@ -75,6 +76,7 @@ const CrowdventureCard = ({
                 ({ active, tooltip, icon, iconColor }, i) =>
                     active && (
                         <TooltipWrapper tooltip={tooltip} key={i}>
+                            {iconColor} {icon}
                             {/* <div
                     style={{
                         position: "absolute",
@@ -97,19 +99,7 @@ const CrowdventureCard = ({
                     )
             )}
 
-            <div
-                // variant={
-                //     loggedInAs && loggedInAs.unsafeMode ? "secondary" : "light"
-                // }
-                style={{
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                }}
-                // size="sm"
-                // drop="right"
-                // title={<span className="fa">&#xf013;</span>}
-            ></div>
+            <OptionsDropdown dropdownOptions={dropdownOptions} />
 
             <div
                 style={{
