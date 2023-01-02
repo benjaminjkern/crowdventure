@@ -16,7 +16,7 @@ const backendURL =
 
 // const BING_API_KEY = "8300cebe5f0d452a9ccb4bca67af4659";
 
-const client = new ApolloClient({
+export const graphqlClient = new ApolloClient({
     uri: backendURL,
     cache: new InMemoryCache(),
 });
@@ -85,7 +85,7 @@ const App = ({ Component, pageProps }) => {
                 <title>{pageTitle || "Crowdventure"}</title>
                 <link rel="icon" href="/favicon.png" />
             </Head>
-            <ApolloProvider client={client}>
+            <ApolloProvider client={graphqlClient}>
                 <UserContext.Provider value={{ user }}>
                     <PaletteProvider>
                         <Navbar />

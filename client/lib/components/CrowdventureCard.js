@@ -37,39 +37,42 @@ const CrowdventureCard = ({
                     ref.current.style.boxShadow = `0 0 3px ${rootColor[1]}`;
                 }}
             >
-                {picture && (
-                    <div
-                        style={{
-                            backgroundColor: "white",
-                            // loggedInAs && loggedInAs.unsafeMode
-                            //     ? palette[5]
-                            //     : "white",
-                            padding: "1px",
-                        }}
-                    >
-                        <img
-                            src={picture}
+                <a>
+                    {picture && (
+                        <div
                             style={{
-                                maxHeight: "30vh",
-                                objectFit: "cover",
-                                // Blur bad images
-                                ...(pictureUnsafe
-                                    ? {
-                                          "-webkit-filter":
-                                              "blur(" + BLURAMOUNT + "px)",
-                                          filter: "blur(" + BLURAMOUNT + "px)",
-                                      }
-                                    : {}),
+                                backgroundColor: "white",
+                                // loggedInAs && loggedInAs.unsafeMode
+                                //     ? palette[5]
+                                //     : "white",
+                                padding: "1px",
                             }}
-                            onError={(e) => {
-                                e.target.parentNode.style.display = "none";
-                            }}
-                        />
+                        >
+                            <img
+                                src={picture}
+                                style={{
+                                    maxHeight: "30vh",
+                                    objectFit: "cover",
+                                    // Blur bad images
+                                    ...(pictureUnsafe
+                                        ? {
+                                              "-webkit-filter":
+                                                  "blur(" + BLURAMOUNT + "px)",
+                                              filter:
+                                                  "blur(" + BLURAMOUNT + "px)",
+                                          }
+                                        : {}),
+                                }}
+                                onError={(e) => {
+                                    e.target.parentNode.style.display = "none";
+                                }}
+                            />
+                        </div>
+                    )}
+                    <div style={{ paddingTop: "2em", textAlign: "center" }}>
+                        {text}
                     </div>
-                )}
-                <div style={{ paddingTop: "2em", textAlign: "center" }}>
-                    {text}
-                </div>
+                </a>
             </Link>
 
             {overlayIcons.map(

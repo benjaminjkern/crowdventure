@@ -61,7 +61,7 @@ const NodePreview = ({ node }) => {
                 {
                     active: user && node.featured,
                     onClick: () => featurePage(node, node.featured),
-                    disabled: user.screenName !== node.owner.screenName,
+                    disabled: user?.screenName !== node.owner.screenName,
                     text: `${node.featured ? "Un-f" : "F"}eature page`,
                 },
                 {
@@ -76,7 +76,7 @@ const NodePreview = ({ node }) => {
                     //         content="This will erase all suggested choices of this page, and their associated scores. This will NOT delete sub-pages of this page. Are you sure you wish to continue?"
                     //     />
                     // ),
-                    disabled: user.screenName !== node.owner.screenName,
+                    disabled: user?.screenName !== node.owner.screenName,
                     text: "Delete",
                 },
                 {

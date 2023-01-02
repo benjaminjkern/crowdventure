@@ -1,39 +1,36 @@
+import { gql, useLazyQuery } from "@apollo/client";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import CrowdventureButton from "../lib/components/CrowdventureButton";
 import NodeViewer from "../lib/nodes/NodeViewer";
+import { graphqlClient } from "./_app";
 
-const Home = () => {
-    const [topNodes, setTopNodes] = useState(undefined);
-    const [recentNodes, setRecentNodes] = useState(undefined);
+const Home = ({ topNodes, recentNodes: initRecentNodes }) => {
+    const unsafeMode = false;
     const [page, setPage] = useState(1);
 
-    const getRecentNodes = () => {
-        // query_call(
-        //     "recentlyUpdatedNodes",
-        //     {
-        //         pageNum: page,
-        //         allowHidden:
-        //             (loggedInAs && loggedInAs.unsafeMode) ||
-        //             new Cookies().get("unsafeMode") === "true" ||
-        //             false,
-        //     },
-        //     {
-        //         hidden: 0,
-        //         ID: 0,
-        //         title: 0,
-        //         owner: { screenName: 0, profilePicURL: 0 },
-        //         views: 0,
-        //         size: 0,
-        //         pictureURL: 0,
-        //         pictureUnsafe: 0,
-        //     },
-        //     (res) => setRecentNodes(res)
-        // );
-    };
+    const router = useRouter();
+
+    const [
+        getRecentNodes,
+        { data: { recentlyUpdatedNodes: recentNodes = initRecentNodes } = {} },
+    ] = useLazyQuery(RECENT_NODES_QUERY);
+
+    const [goToRandomNode, { data: randomNodeData }] = useLazyQuery(gql`
+        query RandomNode($allowHidden: Boolean!) {
+            randomNode(allowHidden: $allowHidden) {
+                ID
+            }
+        }
+    `);
 
     useEffect(() => {
-        // Refresh on switch unsafe mode
-    }, []);
+        if (!randomNodeData) return;
+        router.push(`/node/${randomNodeData.randomNode.ID}`);
+    }, [randomNodeData]);
+
+    //allowHidden:
+    //             loggedInAs && loggedInAs.unsafeMode,
 
     return (
         <>
@@ -72,8 +69,13 @@ const Home = () => {
             <CrowdventureButton
                 // This needs to be off to the side
                 onClick={() => {
+                    getRecentNodes({
+                        variables: {
+                            pageNum: page + 1,
+                            allowHidden: unsafeMode,
+                        },
+                    });
                     setPage(page + 1);
-                    getRecentNodes();
                 }}
             >
                 Next &gt;
@@ -81,21 +83,7 @@ const Home = () => {
 
             <CrowdventureButton
                 onClick={() => {
-                    // query_call(
-                    //     "randomNode",
-                    //     {
-                    //         allowHidden:
-                    //             loggedInAs && loggedInAs.unsafeMode,
-                    //     },
-                    //     {
-                    //         ID: 0,
-                    //     },
-                    //     (res) => {
-                    //         setRedirect(
-                    //             <Redirect to={`/node/${res.ID}`} />
-                    //         );
-                    //     }
-                    // );
+                    goToRandomNode({ variables: { allowHidden: unsafeMode } });
                 }}
             >
                 Play a random adventure!
@@ -104,30 +92,57 @@ const Home = () => {
     );
 };
 
-// if (!topNodes) {
-//     query_call(
-//         "featuredNodes",
-//         {
-//             allowHidden:
-//                 (loggedInAs && loggedInAs.unsafeMode) ||
-//                 new Cookies().get("unsafeMode") === "true" ||
-//                 false,
-//         },
-//         {
-//             hidden: 0,
-//             ID: 0,
-//             title: 0,
-//             owner: { screenName: 0, profilePicURL: 0 },
-//             views: 0,
-//             size: 0,
-//             pictureURL: 0,
-//             pictureUnsafe: 0,
-//         },
-//         (res) => setTopNodes(res)
-//     );
-// }
-// export const getStaticProps = async () => {
-//     return {};
-// };
+const NODE_PREVIEW_GQL = `
+    hidden
+    ID
+    title
+    owner {
+        screenName
+        profilePicURL
+    }
+    views
+    size
+    pictureURL
+    pictureUnsafe
+`;
+
+const RECENT_NODES_QUERY = gql`
+query RecentNodes($pageNum: Int!, $allowHidden: Boolean!) {
+    recentlyUpdatedNodes(pageNum: $pageNum, allowHidden: $allowHidden) {
+        ${NODE_PREVIEW_GQL}
+    }
+}
+`;
+
+export const getStaticProps = async () => {
+    const unsafeMode = false;
+    const page = 1;
+
+    return {
+        props: {
+            topNodes: await graphqlClient
+                .query({
+                    query: gql`
+                        query TopNodes($allowHidden: Boolean!) {
+                            featuredNodes(allowHidden: $allowHidden) {
+                                ${NODE_PREVIEW_GQL}
+                            }
+                        }
+                    `,
+                    variables: { allowHidden: unsafeMode },
+                })
+                .then(({ data }) => data.featuredNodes),
+            recentNodes: await graphqlClient
+                .query({
+                    query: RECENT_NODES_QUERY,
+                    variables: {
+                        pageNum: page,
+                        allowHidden: unsafeMode,
+                    },
+                })
+                .then(({ data }) => data.recentlyUpdatedNodes),
+        },
+    };
+};
 
 export default Home;

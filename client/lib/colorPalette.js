@@ -21,6 +21,8 @@ const PaletteProvider = ({ children }) => {
             "rgb(100, 180, 244)",
             "rgb(158, 232, 255)",
         ],
+        foregroundColor: "black",
+        backgroundColor: ["white", "white", "white"],
     });
 
     useEffect(() => {
