@@ -8,7 +8,7 @@ import NodeViewer from "../lib/nodes/NodeViewer";
 import { graphqlClient } from "./_app";
 import CreateNodeModal from "../lib/nodes/CreateNodeModal";
 
-const Home = ({ topNodes, recentNodes: initRecentNodes }) => {
+const HomePage = ({ topNodes, recentNodes: initRecentNodes }) => {
     const unsafeMode = false;
     const [page, setPage] = useState(1);
 
@@ -119,6 +119,8 @@ export const getStaticProps = async () => {
                         }
                     `,
                     variables: { allowHidden: unsafeMode },
+                    // Always fetch new nodes
+                    fetchPolicy: "network-only",
                 })
                 .then(({ data }) => data.featuredNodes),
             recentNodes: await graphqlClient
@@ -128,10 +130,12 @@ export const getStaticProps = async () => {
                         pageNum: page,
                         allowHidden: unsafeMode,
                     },
+                    // Always fetch new nodes
+                    fetchPolicy: "network-only",
                 })
                 .then(({ data }) => data.recentlyUpdatedNodes),
         },
     };
 };
 
-export default Home;
+export default HomePage;

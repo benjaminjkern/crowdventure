@@ -20,10 +20,6 @@ const AccountPreview = ({ account, imgSide = "left" }) => {
                         require("../../public/defaultProfilePic.jpg")
                     }
                     alt={`${account.screenName} Profile Pic`}
-                    // onError={(e) => {
-                    //     e.target.src =
-                    //     require("/defaultProfilePic.jpg")
-                    // }}
                     width={20}
                     height={20}
                     style={{

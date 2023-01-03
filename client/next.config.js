@@ -11,6 +11,11 @@ module.exports = {
     //     ];
     // },
     images: {
-        domains: ["dmoini.github.io"],
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "**",
+            },
+        ],
     },
 };

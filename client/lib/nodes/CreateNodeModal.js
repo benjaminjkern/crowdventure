@@ -24,11 +24,29 @@ const CreateNodeModal = ({ callback, picture, pictureUnsafe, featured }) => {
     const router = useRouter();
 
     const [createNodeMutation, { data: { createNode: newNode } = {} }] =
-        useMutation(gql`mutation CreateNode($accountScreenName: String!, $title: String!, content: String!, featured: Boolean!, hidden: Boolean, pictureUnsafe: Boolean, pictureURL: String) {
-        createNode(accountScreenName: $accountScreenName, title: $title, content: $content, featured: $featured, hidden: $hidden, pictureUnsafe: $pictureUnsafe, pictureURL: $pictureURL) {
-            ID
-        }
-    }`);
+        useMutation(gql`
+            mutation CreateNode(
+                $accountScreenName: String!,
+                $title: String!,
+                content: String!,
+                featured: Boolean!,
+                hidden: Boolean,
+                pictureUnsafe: Boolean,
+                pictureURL: String
+            ) {
+                createNode(
+                    accountScreenName: $accountScreenName,
+                    title: $title,
+                    content: $content,
+                    featured: $featured,
+                    hidden: $hidden,
+                    pictureUnsafe: $pictureUnsafe,
+                    pictureURL: $pictureURL
+                ) {
+                    ID
+                }
+            }
+        `);
 
     const createNode = () => {
         if (!title)
@@ -78,7 +96,7 @@ const CreateNodeModal = ({ callback, picture, pictureUnsafe, featured }) => {
                         borderRadius: 8,
                     }}
                 >
-                    <Image
+                    <img
                         src={pictureField}
                         alt="This text shouldnt be showing!"
                         style={{
