@@ -1,13 +1,18 @@
+import React, { useContext, useEffect, useState } from "react";
 import { gql, useLazyQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+
 import CrowdventureButton from "../lib/components/CrowdventureButton";
+import { ModalContext } from "../lib/modal";
 import NodeViewer from "../lib/nodes/NodeViewer";
 import { graphqlClient } from "./_app";
+import CreateNodeModal from "../lib/nodes/CreateNodeModal";
 
 const Home = ({ topNodes, recentNodes: initRecentNodes }) => {
     const unsafeMode = false;
     const [page, setPage] = useState(1);
+
+    const { openModal } = useContext(ModalContext);
 
     const router = useRouter();
 
@@ -16,7 +21,7 @@ const Home = ({ topNodes, recentNodes: initRecentNodes }) => {
         { data: { recentlyUpdatedNodes: recentNodes = initRecentNodes } = {} },
     ] = useLazyQuery(RECENT_NODES_QUERY);
 
-    const [goToRandomNode, { data: randomNodeData }] = useLazyQuery(gql`
+    const [goToRandomNode, { data: { randomNode } = {} }] = useLazyQuery(gql`
         query RandomNode($allowHidden: Boolean!) {
             randomNode(allowHidden: $allowHidden) {
                 ID
@@ -25,31 +30,15 @@ const Home = ({ topNodes, recentNodes: initRecentNodes }) => {
     `);
 
     useEffect(() => {
-        if (!randomNodeData) return;
-        router.push(`/node/${randomNodeData.randomNode.ID}`);
-    }, [randomNodeData]);
-
-    //allowHidden:
-    //             loggedInAs && loggedInAs.unsafeMode,
+        if (!randomNode) return;
+        router.push(`/node/${randomNode.ID}`);
+    }, [randomNode]);
 
     return (
         <>
             <CrowdventureButton
                 requireSignedIn={true}
-                onClick={() => {
-                    // showModal(
-                    //     <CreateNodeModal
-                    //         featured={true}
-                    //         loggedInAs={loggedInAs}
-                    //         close={() => showModal(undefined)}
-                    //         callback={(res) =>
-                    //             setRedirect(
-                    //                 <Redirect to={`/node/${res.ID}`} />
-                    //             )
-                    //         }
-                    //     />
-                    // );
-                }}
+                onClick={() => openModal(<CreateNodeModal />)}
             >
                 Create a New Adventure!
             </CrowdventureButton>
@@ -67,7 +56,7 @@ const Home = ({ topNodes, recentNodes: initRecentNodes }) => {
             <hr />
 
             <CrowdventureButton
-                // This needs to be off to the side
+                // This button needs to be formatted off to the side
                 onClick={() => {
                     getRecentNodes({
                         variables: {

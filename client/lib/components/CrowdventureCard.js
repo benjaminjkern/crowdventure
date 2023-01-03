@@ -21,6 +21,7 @@ const CrowdventureCard = ({
     return (
         <div
             style={{
+                width: 200,
                 boxShadow: `0 0 3px ${rootColor[1]}`,
                 overflow: "hidden",
                 backgroundColor: backgroundColor[1],

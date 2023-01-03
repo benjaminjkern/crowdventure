@@ -1,12 +1,15 @@
 import React, { useContext } from "react";
 import { UserContext } from "../../pages/_app";
 import AccountPreview from "../accounts/AccountPreview";
+import ConfirmModal from "../components/ConfirmModal";
 import CrowdventureCard from "../components/CrowdventureCard";
+import { ModalContext } from "../modal";
 
 // import ConfirmModal from "./Modals/ConfirmModal";
 
 const NodePreview = ({ node }) => {
     const { user } = useContext(UserContext);
+    const { openModal } = useContext(ModalContext);
 
     const unsafeMode = false;
 
@@ -46,7 +49,7 @@ const NodePreview = ({ node }) => {
         //     () => window.location.reload(false)
         // );
     };
-    const deletePage = (node) => {
+    const deleteNode = (node) => {
         // mutation_call("deleteNode", { nodeID: node.ID }, 0, () => {
         //     window.location.reload(false);
         // });
@@ -66,15 +69,17 @@ const NodePreview = ({ node }) => {
                 },
                 {
                     active: user && node.featured,
-                    onClick: () => {},
+                    onClick: () => {
+                        openModal(
+                            <ConfirmModal
+                                onConfirm={() => deleteNode(node)}
+                                title="Delete Page"
+                                content="This will erase all suggested choices of this page, and their associated scores. This will NOT delete sub-pages of this page. Are you sure you wish to continue?"
+                            />
+                        );
+                    },
                     // showModal(
-                    //     <ConfirmModal
-                    //         loggedInAs={loggedInAs}
-                    //         close={() => showModal(undefined)}
-                    //         onConfirm={() => deletePage(node)}
-                    //         title="Delete Page"
-                    //         content="This will erase all suggested choices of this page, and their associated scores. This will NOT delete sub-pages of this page. Are you sure you wish to continue?"
-                    //     />
+                    //
                     // ),
                     disabled: user?.screenName !== node.owner.screenName,
                     text: "Delete",

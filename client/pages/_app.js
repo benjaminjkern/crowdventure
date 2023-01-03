@@ -7,6 +7,7 @@ import "../styles/globals.css";
 import Footer from "../lib/base/Footer";
 import Navbar from "../lib/base/Navbar";
 import PaletteProvider, { palette } from "../lib/colorPalette";
+import ModalProvider from "../lib/modal";
 
 export const UserContext = createContext();
 
@@ -88,10 +89,11 @@ const App = ({ Component, pageProps }) => {
             <ApolloProvider client={graphqlClient}>
                 <UserContext.Provider value={{ user }}>
                     <PaletteProvider>
-                        <Navbar />
-                        <Component {...otherPageProps} />
-                        <Footer />
-                        {/* Modal stuff */}
+                        <ModalProvider>
+                            <Navbar />
+                            <Component {...otherPageProps} />
+                            <Footer />
+                        </ModalProvider>
                     </PaletteProvider>
                 </UserContext.Provider>
             </ApolloProvider>

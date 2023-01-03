@@ -4,7 +4,14 @@ import NodePreview from "./NodePreview";
 
 const NodeViewer = ({ nodes }) => {
     return (
-        <div style={{ marginTop: "5px", marginBottom: "5px" }}>
+        <div
+            style={{
+                marginTop: "5px",
+                marginBottom: "5px",
+                flexDirection: "row",
+                flexWrap: "wrap",
+            }}
+        >
             {nodes
                 // .filter(
                 //     (node) =>
