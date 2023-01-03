@@ -13,6 +13,7 @@ const CrowdventureCard = ({
     overlayIcons,
     text,
     children,
+    disabled,
 }) => {
     const { rootColor, backgroundColor } = useContext(PaletteContext);
     const ref = useRef();
@@ -23,6 +24,7 @@ const CrowdventureCard = ({
         <div
             style={{
                 width: 200,
+                textAlign: "center",
                 boxShadow: `0 0 3px ${rootColor[1]}`,
                 overflow: "hidden",
                 backgroundColor: backgroundColor[1],
@@ -31,7 +33,10 @@ const CrowdventureCard = ({
         >
             <Link href={href}>
                 <a
-                    style={{ color: rootColor[1] }}
+                    style={{
+                        color: disabled ? "grey" : rootColor[1],
+                        pointerEvents: disabled ? "none" : "auto",
+                    }}
                     onMouseEnter={() => {
                         ref.current.style.boxShadow = `0 0 6px ${rootColor[0]}`;
                     }}

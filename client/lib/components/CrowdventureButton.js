@@ -32,8 +32,11 @@ const CrowdventureButton = ({
         <button
             style={{
                 border: `1px solid ${rootColor[0]}`,
+                padding: 5,
+                borderRadius: 5,
                 backgroundColor: rootColor[1],
-                cursor: requireSignedIn && !user && "pointer",
+                color: "white",
+                cursor: (!requireSignedIn || user) && "pointer",
                 ...style,
             }}
             disabled={requireSignedIn && !user}

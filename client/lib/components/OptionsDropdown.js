@@ -15,9 +15,11 @@ const OptionsDropdown = ({ dropdownOptions }) => {
             // drop="right"
             // title={<span className="fa">&#xf013;</span>}
         >
-            {dropdownOptions.map(({ active, disabled, onClick, text }, i) => (
-                <div key={i}>{text}</div>
-            ))}
+            {dropdownOptions.map(
+                ({ active = true, disabled = false, onClick, text }, i) => (
+                    <div key={i}>{text}</div>
+                )
+            )}
         </div>
     );
 };
