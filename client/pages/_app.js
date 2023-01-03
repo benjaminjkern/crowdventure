@@ -1,6 +1,7 @@
 import React from "react";
 import Head from "next/head";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import nextSession from "next-session";
 
 import "../styles/globals.css";
 
@@ -11,6 +12,8 @@ import PaletteProvider from "../lib/colorPalette";
 import ModalProvider from "../lib/modal";
 import UserProvider from "../lib/user";
 import UnsafeModeProvider from "../lib/unsafeMode";
+
+export const getSession = nextSession();
 
 // THESE NEED TO BE HIDDEN BETTER
 const backendURL =

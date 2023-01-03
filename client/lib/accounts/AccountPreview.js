@@ -23,10 +23,9 @@ const AccountPreview = ({ account, imgSide = "left", overlay }) => {
                     width={20}
                     height={20}
                     style={{
-                        border: "1px solid #bbb",
-                        height: "2em",
-                        width: "2em",
-                        objectFit: "cover",
+                        borderWidth: 1,
+                        borderStyle: "solid",
+                        borderColor: "#bbb",
                         borderRadius: "50%",
                     }}
                 />

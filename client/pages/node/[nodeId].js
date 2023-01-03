@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useContext } from "react";
 import AccountPreview from "../../lib/accounts/AccountPreview";
 import CrowdventureAlert from "../../lib/components/CrowdventureAlert";
 import CrowdventureButton from "../../lib/components/CrowdventureButton";
@@ -95,15 +95,12 @@ const NodePage = ({ node }) => {
                     height={200}
                     src={node.pictureURL}
                     style={{
-                        display: "block",
                         marginLeft: "auto",
                         marginRight: "auto",
-                        padding: "1px",
-                        border: "1px solid #eee",
+                        borderWidth: 1,
+                        borderStyle: "solid",
+                        borderColor: "#eee",
                         borderRadius: 8,
-                        width: "90%",
-                        maxHeight: "30vh",
-                        objectFit: "cover",
                         cursor: "pointer",
                         ...(node.pictureUnsafe
                             ? {

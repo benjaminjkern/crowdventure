@@ -103,8 +103,6 @@ const CreateNodeModal = ({ callback, picture, pictureUnsafe, featured }) => {
                         alt="This text shouldnt be showing!"
                         style={{
                             padding: 1,
-                            width: "100%",
-                            objectFit: "contain",
                             borderRadius: 8,
                         }}
                     />

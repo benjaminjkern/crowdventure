@@ -35,7 +35,9 @@ const CrowdventureModal = ({ modalTitle, children, modalButtons }) => {
             >
                 <div>
                     {modalTitle}
-                    <span onClick={closeModal}>X</span>
+                    <CrowdventureButton buttonType="text" onClick={closeModal}>
+                        X
+                    </CrowdventureButton>
                 </div>
                 {children}
                 {modalButtons.length && (

@@ -7,7 +7,7 @@ const Footer = () => {
         <>
             @ 2022 Copyright: (MIT) Benjamin Kern
             <Link href="https://github.com/benjaminjkern/crowdventure/blob/master/CHANGELOG.md">
-                <>Version: {packageJson.version}</>
+                <a>Version: {packageJson.version}</a>
             </Link>
         </>
     );

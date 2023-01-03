@@ -8,6 +8,7 @@ import NodeViewer from "../lib/nodes/NodeViewer";
 import { graphqlClient } from "./_app";
 import CreateNodeModal from "../lib/nodes/CreateNodeModal";
 import { UnsafeModeContext } from "../lib/unsafeMode";
+import { userSessionServerSideProps } from "../lib/utils";
 
 const HomePage = ({ topNodes: initTopNodes, recentNodes: initRecentNodes }) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
@@ -117,6 +118,8 @@ query TopNodes($allowHidden: Boolean!) {
     }
 }
 `;
+
+export const getServerSideProps = userSessionServerSideProps;
 
 export const getStaticProps = async () => {
     const unsafeMode = false;

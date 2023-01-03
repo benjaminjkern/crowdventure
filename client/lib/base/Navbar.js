@@ -7,12 +7,14 @@ const Navbar = () => {
     return (
         <div>
             <Link href="/">
-                <Image
-                    height={50}
-                    src={require("../../public/logo.png")}
-                    alt="Crowdventure Logo"
-                    style={{ width: "100%" }}
-                />
+                <a>
+                    <Image
+                        height={50}
+                        src={require("../../public/logo.png")}
+                        alt="Crowdventure Logo"
+                        style={{ width: "100%" }}
+                    />
+                </a>
             </Link>
 
             <AccountManager />

@@ -29,17 +29,16 @@ const CrowdventureCard = ({
             }}
             ref={ref}
         >
-            <Link
-                href={href}
-                style={{ color: rootColor[1] }}
-                onMouseEnter={() => {
-                    ref.current.style.boxShadow = `0 0 6px ${rootColor[0]}`;
-                }}
-                onMouseLeave={() => {
-                    ref.current.style.boxShadow = `0 0 3px ${rootColor[1]}`;
-                }}
-            >
-                <a>
+            <Link href={href}>
+                <a
+                    style={{ color: rootColor[1] }}
+                    onMouseEnter={() => {
+                        ref.current.style.boxShadow = `0 0 6px ${rootColor[0]}`;
+                    }}
+                    onMouseLeave={() => {
+                        ref.current.style.boxShadow = `0 0 3px ${rootColor[1]}`;
+                    }}
+                >
                     {picture && (
                         <div
                             style={{
@@ -55,8 +54,6 @@ const CrowdventureCard = ({
                                 width={200}
                                 src={picture}
                                 style={{
-                                    maxHeight: "30vh",
-                                    objectFit: "cover",
                                     // Blur bad images
                                     ...(pictureUnsafe
                                         ? {
