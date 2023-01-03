@@ -1,17 +1,17 @@
 import React, { useContext } from "react";
-import { UserContext } from "../../pages/_app";
 import AccountPreview from "../accounts/AccountPreview";
 import ConfirmModal from "../components/ConfirmModal";
 import CrowdventureCard from "../components/CrowdventureCard";
 import { ModalContext } from "../modal";
+import { UnsafeModeContext } from "../unsafeMode";
+import { UserContext } from "../user";
 
 // import ConfirmModal from "./Modals/ConfirmModal";
 
 const NodePreview = ({ node }) => {
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
-
-    const unsafeMode = false;
+    const { unsafeMode } = useContext(UnsafeModeContext);
 
     const reportNode = (nodeID) => {
         // mutation_call(

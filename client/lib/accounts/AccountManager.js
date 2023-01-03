@@ -1,16 +1,20 @@
 import React, { useState, createRef, useContext } from "react";
-import { UserContext } from "../../pages/_app";
 import CrowdventureButton from "../components/CrowdventureButton";
 import CrowdventureSwitch from "../components/CrowdventureSwitch";
 import TooltipWrapper from "../components/TooltipWrapper";
 import AccountPreview from "./AccountPreview";
 
-// import LoginModal from "./Modals/LoginModal";
+import LoginModal from "./LoginModal";
+import { ModalContext } from "../modal";
+import { UserContext } from "../user";
+import { UnsafeModeContext } from "../unsafeMode";
 // import SignUpModal from "./Modals/SignUpModal";
 // import UnsafeModal from "./Modals/UnsafeModal";
 
 const AccountManager = () => {
     const { user } = useContext(UserContext);
+    const { openModal } = useContext(ModalContext);
+    const { unsafeMode } = useContext(UnsafeModeContext);
 
     if (!user)
         return (
@@ -19,18 +23,12 @@ const AccountManager = () => {
                 <CrowdventureButton
                     buttonType="text"
                     onClick={() => {
-                        // showModal(
-                        //     <LoginModal
-                        //         loggedInAs={loggedInAs}
-                        //         setLoggedInAs={setLoggedInAs}
-                        //         close={() => showModal(undefined)}
-                        //     />
-                        // );
+                        openModal(<LoginModal />);
                     }}
                 >
                     Log In
-                </CrowdventureButton>{" "}
-                or{" "}
+                </CrowdventureButton>
+                or
                 <CrowdventureButton
                     buttonType="text"
                     onClick={() => {
@@ -51,8 +49,6 @@ const AccountManager = () => {
     const seenNotifications = user.notifications.filter(
         (notif) => !notif.seen
     ).length;
-
-    const unsafeMode = false;
 
     return (
         <div>

@@ -1,15 +1,16 @@
-import React, { createContext, useEffect, useState } from "react";
+import React from "react";
 import Head from "next/head";
-
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
 import "../styles/globals.css";
+
 import Footer from "../lib/base/Footer";
 import Navbar from "../lib/base/Navbar";
-import PaletteProvider, { palette } from "../lib/colorPalette";
-import ModalProvider from "../lib/modal";
 
-export const UserContext = createContext();
+import PaletteProvider from "../lib/colorPalette";
+import ModalProvider from "../lib/modal";
+import UserProvider from "../lib/user";
+import UnsafeModeProvider from "../lib/unsafeMode";
 
 // THESE NEED TO BE HIDDEN BETTER
 const backendURL =
@@ -25,39 +26,6 @@ export const graphqlClient = new ApolloClient({
 // Crowdventure! - Page not found! - for 404 page (NONEXISTENT RIGHT NOW)
 
 const App = ({ Component, pageProps }) => {
-    const [user, setUser] = useState();
-
-    useEffect(() => {
-        const loggedInUser = localStorage.getItem("user");
-        if (!loggedInUser) {
-            localStorage.setItem("unsafeMode", false);
-            return;
-        }
-
-        // Should do some sort of verification here
-        setUser(JSON.parse(loggedInUser));
-
-        if (localStorage.getItem("unsafeMode")) {
-            document.body.style.backgroundImage = `linear-gradient(
-                to right,
-                rgb(158, 232, 255),
-                ${palette[3]} 10%,
-                ${palette[3]} 90%,
-                rgb(158, 232, 255)
-            )`;
-            document.body.style.color = "rgb(225, 240, 255)";
-        } else {
-            document.body.style.backgroundImage = `linear-gradient(
-                to right,
-                rgb(158, 232, 255),
-                rgb(245,250,255) 10%,
-                rgb(245,250,255) 90%,
-                rgb(158, 232, 255)
-            )`;
-            document.body.style.color = "";
-        }
-    }, []);
-
     const { pageTitle, previewImage, ...otherPageProps } = pageProps;
 
     return (
@@ -88,15 +56,17 @@ const App = ({ Component, pageProps }) => {
                 <link rel="icon" href="/favicon.png" />
             </Head>
             <ApolloProvider client={graphqlClient}>
-                <UserContext.Provider value={{ user }}>
+                <UnsafeModeProvider>
                     <PaletteProvider>
-                        <ModalProvider>
-                            <Navbar />
-                            <Component {...otherPageProps} />
-                            <Footer />
-                        </ModalProvider>
+                        <UserProvider>
+                            <ModalProvider>
+                                <Navbar />
+                                <Component {...otherPageProps} />
+                                <Footer />
+                            </ModalProvider>
+                        </UserProvider>
                     </PaletteProvider>
-                </UserContext.Provider>
+                </UnsafeModeProvider>
             </ApolloProvider>
         </>
     );

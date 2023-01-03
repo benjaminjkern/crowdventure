@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
-import { UserContext } from "../../pages/_app";
 import { PaletteContext } from "../colorPalette";
+import { UserContext } from "../user";
 const CrowdventureButton = ({
     children,
     style,
@@ -12,13 +12,28 @@ const CrowdventureButton = ({
     const { user } = useContext(UserContext);
     const { rootColor } = useContext(PaletteContext);
 
-    if (buttonType === "text") return <a onClick={onClick}>{children}</a>;
+    if (buttonType === "text")
+        return (
+            <span
+                onClick={onClick}
+                style={{ cursor: "pointer" }}
+                onMouseEnter={(e) => {
+                    e.target.style.textDecoration = "underline";
+                }}
+                onMouseLeave={(e) => {
+                    e.target.style.textDecoration = "none";
+                }}
+            >
+                {children}
+            </span>
+        );
 
     return (
         <button
             style={{
                 border: `1px solid ${rootColor[0]}`,
                 backgroundColor: rootColor[1],
+                cursor: requireSignedIn && !user && "pointer",
                 ...style,
             }}
             disabled={requireSignedIn && !user}

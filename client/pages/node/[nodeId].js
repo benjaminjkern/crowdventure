@@ -5,6 +5,8 @@ import React, { useState, useEffect, useContext } from "react";
 import AccountPreview from "../../lib/accounts/AccountPreview";
 import CrowdventureAlert from "../../lib/components/CrowdventureAlert";
 import CrowdventureButton from "../../lib/components/CrowdventureButton";
+import { UnsafeModeContext } from "../../lib/unsafeMode";
+import { UserContext } from "../../lib/user";
 
 // import PictureModal from "../Modals/PictureModal";
 // import EditNodeModal from "../Modals/EditNodeModal";
@@ -12,10 +14,11 @@ import CrowdventureButton from "../../lib/components/CrowdventureButton";
 
 // import ChoiceColumns from "./ChoiceColumns";
 
-import { graphqlClient, UserContext } from "../_app";
+import { graphqlClient } from "../_app";
 
 const NodePage = ({ node }) => {
     const BLURAMOUNT = 40;
+    const { unsafeMode } = useContext(UnsafeModeContext);
 
     const { user } = useContext(UserContext);
 
@@ -51,8 +54,6 @@ const NodePage = ({ node }) => {
     //             </p>
     //         </Alert>
     //     );
-
-    const unsafeMode = false;
 
     if (!node) return <div>WTF</div>;
 

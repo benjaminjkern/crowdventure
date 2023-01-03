@@ -7,19 +7,32 @@ import { ModalContext } from "../lib/modal";
 import NodeViewer from "../lib/nodes/NodeViewer";
 import { graphqlClient } from "./_app";
 import CreateNodeModal from "../lib/nodes/CreateNodeModal";
+import { UnsafeModeContext } from "../lib/unsafeMode";
 
-const HomePage = ({ topNodes, recentNodes: initRecentNodes }) => {
-    const unsafeMode = false;
+const HomePage = ({ topNodes: initTopNodes, recentNodes: initRecentNodes }) => {
+    const { unsafeMode } = useContext(UnsafeModeContext);
+    const { openModal } = useContext(ModalContext);
     const [page, setPage] = useState(1);
 
-    const { openModal } = useContext(ModalContext);
-
     const router = useRouter();
+
+    const [
+        getTopNodes,
+        { data: { featuredNodes: topNodes = initTopNodes } = {} },
+    ] = useLazyQuery(TOP_NODES_QUERY);
+
+    useEffect(() => {
+        getTopNodes({ allowHidden: unsafeMode });
+    }, [unsafeMode]);
 
     const [
         getRecentNodes,
         { data: { recentlyUpdatedNodes: recentNodes = initRecentNodes } = {} },
     ] = useLazyQuery(RECENT_NODES_QUERY);
+
+    useEffect(() => {
+        getRecentNodes({ allowHidden: unsafeMode, pageNum: page });
+    }, [unsafeMode, page]);
 
     const [goToRandomNode, { data: { randomNode } = {} }] = useLazyQuery(gql`
         query RandomNode($allowHidden: Boolean!) {
@@ -58,12 +71,6 @@ const HomePage = ({ topNodes, recentNodes: initRecentNodes }) => {
             <CrowdventureButton
                 // This button needs to be formatted off to the side
                 onClick={() => {
-                    getRecentNodes({
-                        variables: {
-                            pageNum: page + 1,
-                            allowHidden: unsafeMode,
-                        },
-                    });
                     setPage(page + 1);
                 }}
             >
@@ -103,6 +110,14 @@ query RecentNodes($pageNum: Int!, $allowHidden: Boolean!) {
 }
 `;
 
+const TOP_NODES_QUERY = gql`
+query TopNodes($allowHidden: Boolean!) {
+    featuredNodes(allowHidden: $allowHidden) {
+        ${NODE_PREVIEW_GQL}
+    }
+}
+`;
+
 export const getStaticProps = async () => {
     const unsafeMode = false;
     const page = 1;
@@ -111,13 +126,7 @@ export const getStaticProps = async () => {
         props: {
             topNodes: await graphqlClient
                 .query({
-                    query: gql`
-                        query TopNodes($allowHidden: Boolean!) {
-                            featuredNodes(allowHidden: $allowHidden) {
-                                ${NODE_PREVIEW_GQL}
-                            }
-                        }
-                    `,
+                    query: TOP_NODES_QUERY,
                     variables: { allowHidden: unsafeMode },
                     // Always fetch new nodes
                     fetchPolicy: "network-only",

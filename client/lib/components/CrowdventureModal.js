@@ -1,9 +1,11 @@
 import React, { useContext } from "react";
+import { PaletteContext } from "../colorPalette";
 import { ModalContext } from "../modal";
 import CrowdventureButton from "./CrowdventureButton";
 
 const CrowdventureModal = ({ modalTitle, children, modalButtons }) => {
     const { closeModal } = useContext(ModalContext);
+    const { backgroundColor } = useContext(PaletteContext);
 
     return (
         <div
@@ -15,10 +17,17 @@ const CrowdventureModal = ({ modalTitle, children, modalButtons }) => {
                 height: "100%",
                 justifyContent: "center",
                 alignItems: "center",
+                zIndex: 1,
+                backgroundColor: "rgba(0,0,0,0.5)",
             }}
             onClick={closeModal}
         >
-            <div style={{ width: 200 }}>
+            <div
+                style={{
+                    width: 200,
+                    backgroundColor: backgroundColor[1],
+                }}
+            >
                 <div>
                     {modalTitle}
                     <span onClick={closeModal}>X</span>

@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import CrowdventureButton from "../components/CrowdventureButton";
 import CrowdventureModal from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
-import { UserContext } from "../../pages/_app";
+import { UserContext } from "../user";
 
 // import SearchImage from "../SearchImage";
 
