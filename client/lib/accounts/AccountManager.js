@@ -1,4 +1,4 @@
-import React, { useState, createRef, useContext } from "react";
+import React, { useContext } from "react";
 import CrowdventureButton from "../components/CrowdventureButton";
 import CrowdventureSwitch from "../components/CrowdventureSwitch";
 import TooltipWrapper from "../components/TooltipWrapper";
