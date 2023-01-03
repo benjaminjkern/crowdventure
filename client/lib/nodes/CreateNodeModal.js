@@ -96,7 +96,9 @@ const CreateNodeModal = ({ callback, picture, pictureUnsafe, featured }) => {
                         borderRadius: 8,
                     }}
                 >
-                    <img
+                    <Image
+                        width={100}
+                        height={100}
                         src={pictureField}
                         alt="This text shouldnt be showing!"
                         style={{

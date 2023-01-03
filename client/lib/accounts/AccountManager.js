@@ -1,0 +1,122 @@
+import React, { useState, createRef, useContext } from "react";
+import { UserContext } from "../../pages/_app";
+import CrowdventureButton from "../components/CrowdventureButton";
+import CrowdventureSwitch from "../components/CrowdventureSwitch";
+import TooltipWrapper from "../components/TooltipWrapper";
+import AccountPreview from "./AccountPreview";
+
+// import LoginModal from "./Modals/LoginModal";
+// import SignUpModal from "./Modals/SignUpModal";
+// import UnsafeModal from "./Modals/UnsafeModal";
+
+const AccountManager = () => {
+    const { user } = useContext(UserContext);
+
+    if (!user)
+        return (
+            <div>
+                You are not logged in.{" "}
+                <CrowdventureButton
+                    buttonType="text"
+                    onClick={() => {
+                        // showModal(
+                        //     <LoginModal
+                        //         loggedInAs={loggedInAs}
+                        //         setLoggedInAs={setLoggedInAs}
+                        //         close={() => showModal(undefined)}
+                        //     />
+                        // );
+                    }}
+                >
+                    Log In
+                </CrowdventureButton>{" "}
+                or{" "}
+                <CrowdventureButton
+                    buttonType="text"
+                    onClick={() => {
+                        // showModal(
+                        //     <SignUpModal
+                        //         loggedInAs={loggedInAs}
+                        //         setLoggedInAs={setLoggedInAs}
+                        //         close={() => showModal(undefined)}
+                        //     />
+                        // );
+                    }}
+                >
+                    Sign Up
+                </CrowdventureButton>
+            </div>
+        );
+
+    const seenNotifications = user.notifications.filter(
+        (notif) => !notif.seen
+    ).length;
+
+    const unsafeMode = false;
+
+    return (
+        <div>
+            <AccountPreview
+                account={user}
+                imgSide="right"
+                overlay={
+                    seenNotifications > 0 && (
+                        <div
+                            style={{
+                                position: "absolute",
+                                right: "1.5em",
+                                top: "-0.5em",
+                                borderRadius: "1em",
+                                backgroundColor: "red",
+                                width: "2em",
+                                height: "2em",
+                                lineHeight: "2em",
+                                fontSize: "0.5em",
+                                color: "white",
+                            }}
+                        >
+                            {seenNotifications}
+                        </div>
+                    )
+                }
+            />
+            Unsafe Mode:{" "}
+            <CrowdventureSwitch
+                value={unsafeMode}
+                onChange={(checked) => {
+                    if (checked) {
+                        // showModal(
+                        //     <UnsafeModal
+                        //         close={() => showModal(undefined)}
+                        //         loggedInAs={loggedInAs}
+                        //         onConfirm={() => {
+                        //             new Cookies().set("unsafeMode", true, {
+                        //                 path: "/",
+                        //             });
+                        //             setLoggedInAs({
+                        //                 ...loggedInAs,
+                        //                 unsafeMode: true,
+                        //             });
+                        //             showModal(undefined);
+                        //         }}
+                        //     />
+                        // );
+                    } else {
+                        // new Cookies().set("unsafeMode", false, {
+                        //     path: "/",
+                        // });
+                    }
+                }}
+            />
+            <TooltipWrapper
+                tooltip={
+                    "Unsafe mode allows you to see all content on Crowdventure, including content that has been flagged as unsafe for the general public!"
+                }
+            >
+                {/* <span className="fa fa-info-circle" /> */}
+            </TooltipWrapper>
+        </div>
+    );
+};
+
+export default AccountManager;

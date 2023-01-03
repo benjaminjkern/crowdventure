@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { PaletteContext } from "../colorPalette";
 
-const AccountPreview = ({ account, imgSide = "left" }) => {
+const AccountPreview = ({ account, imgSide = "left", overlay }) => {
     const { foregroundColor } = useContext(PaletteContext);
     return (
         <Link

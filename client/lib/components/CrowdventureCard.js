@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import React, { useContext, useRef } from "react";
 import { PaletteContext } from "../colorPalette";
@@ -49,7 +50,9 @@ const CrowdventureCard = ({
                                 padding: "1px",
                             }}
                         >
-                            <img
+                            <Image
+                                height={200}
+                                width={200}
                                 src={picture}
                                 style={{
                                     maxHeight: "30vh",
