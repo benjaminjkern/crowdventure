@@ -1,3 +1,4 @@
+import { gql, useLazyQuery } from "@apollo/client";
 import React, { createContext, useEffect, useState } from "react";
 
 export const UserContext = createContext();
@@ -5,15 +6,19 @@ export const UserContext = createContext();
 const UserProvider = ({ children }) => {
     const [user, setUser] = useState();
 
-    useEffect(() => {
-        const loggedInUser = localStorage.getItem("user");
-        if (!loggedInUser) {
-            localStorage.setItem("unsafeMode", false);
-            return;
-        }
+    const [relogin, { data: { loginUser: newUser } = {} }] = useLazyQuery(
+        gql``
+    );
 
-        // Should do some sort of verification here
-        setUser(JSON.parse(loggedInUser));
+    useEffect(() => {
+        if (newUser) setUser(newUser);
+    }, [newUser]);
+
+    useEffect(() => {
+        const screenName = localStorage.getItem("user");
+        if (!screenName) return;
+
+        relogin({ variables: { screenName } });
     }, []);
 
     return (

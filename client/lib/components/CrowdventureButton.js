@@ -44,6 +44,7 @@ const CrowdventureButton = ({
             onMouseLeave={(e) => {
                 e.target.style.backgroundColor = rootColor[1];
             }}
+            onClick={onClick}
             {...props}
         >
             {children}

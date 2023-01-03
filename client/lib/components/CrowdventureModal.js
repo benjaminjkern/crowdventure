@@ -26,6 +26,11 @@ const CrowdventureModal = ({ modalTitle, children, modalButtons }) => {
                 style={{
                     width: 200,
                     backgroundColor: backgroundColor[1],
+                    padding: 20,
+                    borderRadius: 20,
+                }}
+                onClick={(e) => {
+                    e.stopPropagation();
                 }}
             >
                 <div>

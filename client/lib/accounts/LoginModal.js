@@ -30,13 +30,13 @@ const LoginModal = () => {
 
     const login = () => {
         if (!screenName)
-            setInfo(
+            return setInfo(
                 <span style={{ color: "red" }}>
                     Please enter your password!
                 </span>
             );
         if (!password)
-            setInfo(
+            return setInfo(
                 <span style={{ color: "red" }}>
                     Please enter your screenName!
                 </span>
@@ -60,6 +60,10 @@ const LoginModal = () => {
         closeModal();
     }, [newUser]);
 
+    useEffect(() => {
+        setInfo("");
+    }, [screenName, password]);
+
     return (
         <CrowdventureModal
             modalTitle="Log in"
@@ -74,7 +78,7 @@ const LoginModal = () => {
             <CrowdventureTextInput
                 type="password"
                 value={password}
-                onChange={setPassword}
+                onChangeText={setPassword}
             />
             {info ? info : ""}
         </CrowdventureModal>
