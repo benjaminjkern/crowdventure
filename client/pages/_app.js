@@ -1,6 +1,5 @@
 import React from "react";
 import Head from "next/head";
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
 import "../styles/globals.css";
 
@@ -11,17 +10,6 @@ import PaletteProvider from "../lib/colorPalette";
 import ModalProvider from "../lib/modal";
 import UserProvider from "../lib/user";
 import UnsafeModeProvider from "../lib/unsafeMode";
-
-// THESE NEED TO BE HIDDEN BETTER
-const backendURL =
-    "https://3yfp7ejc0m.execute-api.us-east-1.amazonaws.com/dev/graphql";
-
-// const BING_API_KEY = "8300cebe5f0d452a9ccb4bca67af4659";
-
-export const graphqlClient = new ApolloClient({
-    uri: backendURL,
-    cache: new InMemoryCache(),
-});
 
 // Crowdventure! - Page not found! - for 404 page (NONEXISTENT RIGHT NOW)
 
@@ -55,19 +43,17 @@ const App = ({ Component, pageProps }) => {
                 <title>{pageTitle || "Crowdventure"}</title>
                 <link rel="icon" href="/favicon.png" />
             </Head>
-            <ApolloProvider client={graphqlClient}>
-                <UnsafeModeProvider>
-                    <PaletteProvider>
-                        <UserProvider>
-                            <ModalProvider>
-                                <Navbar />
-                                <Component {...otherPageProps} />
-                                <Footer />
-                            </ModalProvider>
-                        </UserProvider>
-                    </PaletteProvider>
-                </UnsafeModeProvider>
-            </ApolloProvider>
+            <UnsafeModeProvider>
+                <PaletteProvider>
+                    <UserProvider>
+                        <ModalProvider>
+                            <Navbar />
+                            <Component {...otherPageProps} />
+                            <Footer />
+                        </ModalProvider>
+                    </UserProvider>
+                </PaletteProvider>
+            </UnsafeModeProvider>
         </>
     );
 };

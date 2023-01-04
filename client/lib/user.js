@@ -1,37 +1,32 @@
 import React, { createContext, useEffect, useState } from "react";
 import { gql, useMutation } from "@apollo/client";
+import { mutationCall } from "./apiUtils";
 
 export const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
     const [user, setUser] = useState();
 
-    const [relogin, { data: { loginAccount: newUser } = {} }] = useMutation(
-        gql`
-            mutation ReLogin($screenName: String!) {
-                loginAccount(screenName: $screenName) {
-                    screenName
-                    profilePicURL
-                    isAdmin
-                    notifications {
-                        seen
-                    }
-                }
-            }
-        `
-    );
-
-    useEffect(() => {
-        if (newUser) setUser(newUser);
-
-        // localStorage.removeItem("screenName");
-    }, [newUser]);
+    const relogin = (screenName) => {
+        mutationCall(
+            "loginAccount",
+            {
+                screenName: 0,
+                profilePicURL: 0,
+                isAdmin: 0,
+                notifications: {
+                    seen: 0,
+                },
+            },
+            { screenName }
+        ).then(setUser);
+    };
 
     useEffect(() => {
         const screenName = localStorage.getItem("screenName");
         if (!screenName) return;
 
-        relogin({ variables: { screenName } });
+        relogin(screenName);
     }, []);
 
     return (

@@ -1,8 +1,8 @@
-import { gql } from "@apollo/client";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useContext } from "react";
 import AccountPreview from "../../lib/accounts/AccountPreview";
+import { queryCall } from "../../lib/apiUtils";
 import CrowdventureAlert from "../../lib/components/CrowdventureAlert";
 import CrowdventureButton from "../../lib/components/CrowdventureButton";
 import { UnsafeModeContext } from "../../lib/unsafeMode";
@@ -13,8 +13,6 @@ import { UserContext } from "../../lib/user";
 // import SuggestChoiceModal from "../Modals/SuggestChoiceModal";
 
 // import ChoiceColumns from "./ChoiceColumns";
-
-import { graphqlClient } from "../_app";
 
 const NodePage = ({ node }) => {
     const BLURAMOUNT = 40;
@@ -203,40 +201,52 @@ export const getStaticPaths = async () => {
     };
 };
 
+const FULL_CHOICE_GQL = {
+    ID: 0,
+    action: 0,
+    likedBy: { screenName: 0 },
+    dislikedBy: { screenName: 0 },
+    score: 0,
+    suggestedBy: {
+        hidden: 0,
+        screenName: 0,
+        profilePicURL: 0,
+    },
+    hidden: 0,
+    to: {
+        owner: {
+            screenName: 0,
+            hidden: 0,
+        },
+        ID: 0,
+        hidden: 0,
+    },
+    from: {
+        ID: 0,
+    },
+};
+
+const FULL_NODE_GQL = {
+    hidden: 0,
+    pictureURL: 0,
+    pictureUnsafe: 0,
+    fgColor: 0,
+    bgColor: 0,
+    ID: 0,
+    title: 0,
+    content: 0,
+    views: 0,
+    owner: {
+        screenName: 0,
+        profilePicURL: 0,
+        hidden: 0,
+    },
+    canonChoices: FULL_CHOICE_GQL,
+    nonCanonChoices: FULL_CHOICE_GQL,
+};
+
 export const getStaticProps = async ({ params: { nodeId } }) => {
-    const node = await graphqlClient
-        .query({
-            query: gql`
-                query GetNode($ID: String!) {
-                    getNode(ID: $ID) {
-                        hidden
-                        pictureURL
-                        pictureUnsafe
-                        fgColor
-                        bgColor
-                        ID
-                        title
-                        content
-                        views
-                        owner {
-                            screenName
-                            profilePicURL
-                            hidden
-                        }
-                        canonChoices {
-                            ID
-                        }
-                        nonCanonChoices {
-                            ID
-                        }
-                    }
-                }
-            `,
-            variables: { ID: nodeId },
-        })
-        .then(({ data = {} }) => {
-            return data.getNode;
-        });
+    const node = await queryCall("getNode", FULL_NODE_GQL, { ID: nodeId });
 
     if (!node) return { notFound: true };
 
