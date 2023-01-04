@@ -1,5 +1,4 @@
 import React, { createContext, useEffect, useState } from "react";
-import { gql, useMutation } from "@apollo/client";
 import { mutationCall } from "./apiUtils";
 
 export const UserContext = createContext();

@@ -1,12 +1,12 @@
 import Image from "next/image";
-import React, { useContext, useEffect, useState } from "react";
-import { gql, useMutation } from "@apollo/client";
+import React, { useContext, useState } from "react";
 import { useRouter } from "next/router";
 
 import CrowdventureButton from "../components/CrowdventureButton";
 import CrowdventureModal from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { UserContext } from "../user";
+import { mutationCall } from "../apiUtils";
 
 // import SearchImage from "../SearchImage";
 
@@ -23,31 +23,6 @@ const CreateNodeModal = ({ callback, picture, pictureUnsafe, featured }) => {
 
     const router = useRouter();
 
-    const [createNodeMutation, { data: { createNode: newNode } = {} }] =
-        useMutation(gql`
-            mutation CreateNode(
-                $accountScreenName: String!,
-                $title: String!,
-                content: String!,
-                featured: Boolean!,
-                hidden: Boolean,
-                pictureUnsafe: Boolean,
-                pictureURL: String
-            ) {
-                createNode(
-                    accountScreenName: $accountScreenName,
-                    title: $title,
-                    content: $content,
-                    featured: $featured,
-                    hidden: $hidden,
-                    pictureUnsafe: $pictureUnsafe,
-                    pictureURL: $pictureURL
-                ) {
-                    ID
-                }
-            }
-        `);
-
     const createNode = () => {
         if (!title)
             return setInfo(
@@ -59,21 +34,22 @@ const CreateNodeModal = ({ callback, picture, pictureUnsafe, featured }) => {
                 <span style={{ color: "red" }}>Title cannot be empty!</span>
             );
 
-        createNodeMutation({
-            variables: {
+        mutationCall(
+            "createNode",
+            {
+                ID: 0,
+            },
+            {
                 accountScreenName: user.screenName,
                 title,
                 content,
                 featured: featured || false,
                 pictureURL: pictureField,
-                ...(shouldHide ? { hidden: true, pictureUnsafe: true } : {}),
-            },
-        });
+                hidden: shouldHide || undefined,
+                pictureUnsafe: shouldHide || undefined,
+            }
+        ).then((newNode) => router.push(`/node/${newNode.ID}`));
     };
-
-    useEffect(() => {
-        if (newNode) router.push(`/node/${newNode.ID}`);
-    }, [newNode]);
 
     return (
         <CrowdventureModal

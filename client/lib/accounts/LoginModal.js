@@ -1,10 +1,10 @@
-import { gql, useMutation } from "@apollo/client";
 import React, { useContext, useEffect, useState } from "react";
 
 import { ModalContext } from "../modal";
 import CrowdventureModal from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { UserContext } from "../user";
+import { mutationCall } from "../apiUtils";
 
 const LoginModal = () => {
     const [info, setInfo] = useState("");
@@ -13,20 +13,6 @@ const LoginModal = () => {
 
     const { setUser } = useContext(UserContext);
     const { closeModal } = useContext(ModalContext);
-
-    const [loginAccount, { data: { loginAccount: newUser } = {} }] =
-        useMutation(gql`
-            mutation Login($screenName: String!, $password: String!) {
-                loginAccount(screenName: $screenName, password: $password) {
-                    screenName
-                    profilePicURL
-                    isAdmin
-                    notifications {
-                        seen
-                    }
-                }
-            }
-        `);
 
     const login = () => {
         if (!screenName)
@@ -42,23 +28,33 @@ const LoginModal = () => {
                 </span>
             );
 
-        loginAccount({ variables: { screenName, password } });
+        mutationCall(
+            "loginAccount",
+            {
+                screenName: 0,
+                profilePicURL: 0,
+                isAdmin: 0,
+                notifications: {
+                    seen: 0,
+                },
+            },
+            { screenName, password }
+        ).then((newUser) => {
+            if (!newUser) {
+                setInfo(
+                    <div style={{ color: "red" }}>
+                        That account does not exist or the password did not
+                        match!
+                    </div>
+                );
+                return;
+            }
+
+            localStorage.setItem("screenName", screenName);
+            setUser(newUser);
+            closeModal();
+        });
     };
-
-    useEffect(() => {
-        if (!newUser) {
-            setInfo(
-                <div style={{ color: "red" }}>
-                    That account does not exist or the password did not match!
-                </div>
-            );
-            return;
-        }
-
-        localStorage.setItem("screenName", screenName);
-        setUser(newUser);
-        closeModal();
-    }, [newUser]);
 
     useEffect(() => {
         setInfo("");
