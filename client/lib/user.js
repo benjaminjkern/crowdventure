@@ -14,7 +14,10 @@ const UserProvider = ({ children }) => {
                 profilePicURL: 0,
                 isAdmin: 0,
                 notifications: {
+                    time: 0,
                     seen: 0,
+                    content: 0,
+                    link: 0,
                 },
             },
             { screenName }
@@ -23,7 +26,10 @@ const UserProvider = ({ children }) => {
 
     useEffect(() => {
         const screenName = localStorage.getItem("screenName");
-        if (!screenName) return;
+        if (!screenName) {
+            setUser(null);
+            return;
+        }
 
         relogin(screenName);
     }, []);

@@ -16,7 +16,7 @@ import NodeViewer from "../../lib/nodes/NodeViewer";
 import CrowdventureButton from "../../lib/components/CrowdventureButton";
 import CrowdventureTextInput from "../../lib/components/CrowdventureTextInput";
 
-const Account = ({ account }) => {
+const AccountPage = ({ account }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchedNodes, setSearchedNodes] = useState([]);
     const { user, setUser } = useContext(UserContext);
@@ -271,4 +271,4 @@ export const getStaticProps = async ({ params: { accountId } }) => {
     };
 };
 
-export default Account;
+export default AccountPage;

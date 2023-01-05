@@ -17,18 +17,18 @@ export const queryCall = async (callName, parameters = {}, variables = {}) => {
     if (DEBUG_CALLS)
         console.log(`
     query${formatVariables(useVariables)} {
-        ${callName}${formatArguments(useVariables)} {
-            ${formatParameters(parameters)}
-        }
+        ${callName}${formatArguments(useVariables)}${formatParameters(
+            parameters
+        )}
     }
 `);
     return graphqlClient
         .query({
             query: gql`
                 query${formatVariables(useVariables)} {
-                    ${callName}${formatArguments(useVariables)} {
-                        ${formatParameters(parameters)}
-                    }
+                    ${callName}${formatArguments(
+                useVariables
+            )}${formatParameters(parameters)}
                 }
             `,
             variables: useVariables,
@@ -49,9 +49,9 @@ export const mutationCall = async (callName, parameters, variables) => {
     if (DEBUG_CALLS) {
         console.log(`
         mutation${formatVariables(useVariables)} {
-            ${callName}${formatArguments(useVariables)} {
-                ${formatParameters(parameters)}
-            }
+            ${callName}${formatArguments(useVariables)}${formatParameters(
+            parameters
+        )}
         }
     `);
     }
@@ -59,9 +59,9 @@ export const mutationCall = async (callName, parameters, variables) => {
         .mutate({
             mutation: gql`
                 mutation${formatVariables(useVariables)} {
-                    ${callName}${formatArguments(useVariables)} {
-                        ${formatParameters(parameters)}
-                    }
+                    ${callName}${formatArguments(
+                useVariables
+            )}${formatParameters(parameters)}
                 }
             `,
             variables: useVariables,
@@ -96,13 +96,13 @@ const formatArguments = (variables) => {
 const formatParameters = (parameters) => {
     const paramNames = Object.keys(parameters);
     if (paramNames.length === 0) return "";
-    return paramNames
+    return `{${paramNames
         .map((param) => {
             if (typeof parameters[param] === "object")
-                return `${param}{${formatParameters(parameters[param])}}`;
+                return `${param}${formatParameters(parameters[param])}`;
             return param;
         })
-        .join(",");
+        .join(",")}}`;
 };
 
 const scrubVariables = (variables) => {
