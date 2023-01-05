@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import AccountPreview from "../../lib/accounts/AccountPreview";
 import ActionCard from "../../lib/actions/ActionCard";
 import { queryCall } from "../../lib/apiUtils";

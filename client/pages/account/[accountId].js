@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useRouter } from "next/router";
 
-// import EditAccountModal from "./Modals/EditAccountModal";
 // import PictureModal from "./Modals/PictureModal";
 // import MessageModal from "./Modals/MessageModal";
 
@@ -15,13 +14,21 @@ import AccountPreview from "../../lib/accounts/AccountPreview";
 import NodeViewer from "../../lib/nodes/NodeViewer";
 import CrowdventureButton from "../../lib/components/CrowdventureButton";
 import CrowdventureTextInput from "../../lib/components/CrowdventureTextInput";
+import EditAccountModal from "../../lib/accounts/EditAccountModal";
+import { ModalContext } from "../../lib/modal";
 
-const AccountPage = ({ account }) => {
+const AccountPage = ({ account: initAccount }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchedNodes, setSearchedNodes] = useState([]);
+    const [account, setAccount] = useState(initAccount);
     const { user, setUser } = useContext(UserContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
+    const { openModal } = useContext(ModalContext);
     const router = useRouter();
+
+    useEffect(() => {
+        if (initAccount) setAccount(initAccount);
+    }, [initAccount]);
 
     const reportAccount = () => {
         mutationCall(
@@ -95,18 +102,12 @@ const AccountPage = ({ account }) => {
             {(user?.screenName === account.screenName || user?.isAdmin) && (
                 <CrowdventureButton
                     onClick={() => {
-                        // showModal(
-                        //     <EditAccountModal
-                        //         account={account}
-                        //         loggedInAs={loggedInAs}
-                        //         screenName={account.screenName}
-                        //         bio={account.bio}
-                        //         profilePicture={account.profilePicURL}
-                        //         setAccount={setAccount}
-                        //         setRedirect={setRedirect}
-                        //         close={() => showModal(undefined)}
-                        //     />
-                        // );
+                        openModal(
+                            <EditAccountModal
+                                account={account}
+                                setAccount={setAccount}
+                            />
+                        );
                     }}
                 >
                     Edit Account
@@ -117,7 +118,7 @@ const AccountPage = ({ account }) => {
                 <>
                     <CrowdventureButton
                         onClick={() => {
-                            localStorage.clearItem("screenName");
+                            localStorage.removeItem("screenName");
                             setUser();
                         }}
                     >
@@ -241,7 +242,7 @@ export const getStaticPaths = async () => {
     };
 };
 
-const FULL_ACCOUNT_GQL = {
+export const FULL_ACCOUNT_GQL = {
     bio: 0,
     screenName: 0,
     profilePicURL: 0,

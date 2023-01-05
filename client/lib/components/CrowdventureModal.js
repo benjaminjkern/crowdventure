@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { PaletteContext } from "../colorPalette";
 import { ModalContext } from "../modal";
+import CloseButton from "./CloseButton";
 import CrowdventureButton from "./CrowdventureButton";
 
 const CrowdventureModal = ({ modalTitle, children, modalButtons }) => {
@@ -35,9 +36,7 @@ const CrowdventureModal = ({ modalTitle, children, modalButtons }) => {
             >
                 <div>
                     {modalTitle}
-                    <CrowdventureButton buttonType="text" onClick={closeModal}>
-                        X
-                    </CrowdventureButton>
+                    <CloseButton onClick={closeModal} />
                 </div>
                 {children}
                 {modalButtons.length && (
