@@ -4,6 +4,8 @@ import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 const backendURL =
     "https://3yfp7ejc0m.execute-api.us-east-1.amazonaws.com/dev/graphql";
 
+const DEBUG_CALLS = false;
+
 // const BING_API_KEY = "8300cebe5f0d452a9ccb4bca67af4659";
 
 export const graphqlClient = new ApolloClient({
@@ -12,6 +14,14 @@ export const graphqlClient = new ApolloClient({
 });
 export const queryCall = async (callName, parameters = {}, variables = {}) => {
     const useVariables = scrubVariables(variables);
+    if (DEBUG_CALLS)
+        console.log(`
+    query${formatVariables(useVariables)} {
+        ${callName}${formatArguments(useVariables)} {
+            ${formatParameters(parameters)}
+        }
+    }
+`);
     return graphqlClient
         .query({
             query: gql`
@@ -22,6 +32,7 @@ export const queryCall = async (callName, parameters = {}, variables = {}) => {
                 }
             `,
             variables: useVariables,
+            fetchPolicy: "network-only",
         })
         .then(({ data, error }) => {
             if (error) throw error;
@@ -35,6 +46,15 @@ export const queryCall = async (callName, parameters = {}, variables = {}) => {
 
 export const mutationCall = async (callName, parameters, variables) => {
     const useVariables = scrubVariables(variables);
+    if (DEBUG_CALLS) {
+        console.log(`
+        mutation${formatVariables(useVariables)} {
+            ${callName}${formatArguments(useVariables)} {
+                ${formatParameters(parameters)}
+            }
+        }
+    `);
+    }
     return graphqlClient
         .mutate({
             mutation: gql`
@@ -45,6 +65,7 @@ export const mutationCall = async (callName, parameters, variables) => {
                 }
             `,
             variables: useVariables,
+            fetchPolicy: "network-only",
         })
         .then(({ data, error }) => {
             if (error) throw error;

@@ -22,32 +22,34 @@ const ActionCard = ({ choice: initChoice }) => {
     choice.disliked = choice.dislikedBy.some(
         (account) => account.screenName === user?.screenName
     );
+    choice.score = choice.likedBy.length - choice.dislikedBy.length;
 
     const like = () => {
         if (!user) return;
 
         const oChoice = { ...choice };
 
-        if (choice.liked) {
-            choice.liked = false;
-            choice.score--;
-        } else {
-            choice.liked = true;
-            choice.score++;
-            if (choice.disliked) choice.score++;
-        }
+        choice.dislikedBy = choice.dislikedBy.filter(
+            (account) => account.screenName !== user?.screenName
+        );
 
-        choice.disliked = false;
+        if (choice.liked) {
+            choice.likedBy = choice.likedBy.filter(
+                (account) => account.screenName !== user?.screenName
+            );
+        } else {
+            choice.likedBy.push(user);
+        }
 
         setChoice({ ...choice });
 
         mutationCall(
             "likeSuggestion",
+            { ID: 0 },
             {
                 accountScreenName: user.screenName,
                 choiceID: choice.ID,
-            },
-            { ID: 0 }
+            }
         ).catch(() => {
             setChoice(oChoice);
         });
@@ -58,25 +60,27 @@ const ActionCard = ({ choice: initChoice }) => {
 
         const oChoice = { ...choice };
 
+        choice.likedBy = choice.likedBy.filter(
+            (account) => account.screenName !== user?.screenName
+        );
+
         if (choice.disliked) {
-            choice.disliked = false;
-            choice.score++;
+            choice.dislikedBy = choice.dislikedBy.filter(
+                (account) => account.screenName !== user?.screenName
+            );
         } else {
-            choice.disliked = true;
-            choice.score--;
-            if (choice.liked) choice.score--;
+            choice.dislikedBy.push(user);
         }
-        choice.liked = false;
 
         setChoice({ ...choice });
 
         mutationCall(
             "dislikeSuggestion",
+            { ID: 0 },
             {
                 accountScreenName: user.screenName,
                 choiceID: choice.ID,
-            },
-            { ID: 0 }
+            }
         ).catch(() => {
             setChoice(oChoice);
         });
