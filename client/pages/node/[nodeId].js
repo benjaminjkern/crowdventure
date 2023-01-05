@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useContext, useState } from "react";
 import AccountPreview from "../../lib/accounts/AccountPreview";
-import ChoiceColumns from "../../lib/actions/ChoiceColumns";
+import ActionCard from "../../lib/actions/ActionCard";
 import { queryCall } from "../../lib/apiUtils";
 import CrowdventureAlert from "../../lib/components/CrowdventureAlert";
 import CrowdventureButton from "../../lib/components/CrowdventureButton";
@@ -151,16 +151,12 @@ const NodePage = ({ node: initNode }) => {
             >
                 Go back!
             </CrowdventureButton>
-            {node.canonChoices.length ? (
-                <ChoiceColumns choices={node.canonChoices} />
-            ) : (
+            {node.canonChoices.length === 0 && (
                 <p className="text-muted">
                     By decree of <strong>{node.owner.screenName}</strong>, this
                     journey ends here.
                 </p>
             )}
-            <hr />
-            <h3>Other options:</h3>
             Author: <AccountPreview account={node.owner} />
             Views: {node.views}
             {(node.owner.screenName === user?.screenName || user?.isAdmin) && (
@@ -171,6 +167,20 @@ const NodePage = ({ node: initNode }) => {
                 >
                     Edit Page
                 </CrowdventureButton>
+            )}
+            {node.canonChoices.length + node.nonCanonChoices.length > 0 ? (
+                <div>
+                    {[...node.canonChoices, ...node.nonCanonChoices].map(
+                        (choice, idx) => {
+                            return <ActionCard choice={choice} key={idx} />;
+                        }
+                    )}
+                </div>
+            ) : (
+                <p className="text-muted">
+                    There are currently no options! You can help expand the
+                    story by adding to it!
+                </p>
             )}
             <CrowdventureButton
                 requireSignedIn={true}
@@ -186,14 +196,6 @@ const NodePage = ({ node: initNode }) => {
             >
                 Suggest New Choice
             </CrowdventureButton>
-            {node.nonCanonChoices.length ? (
-                <ChoiceColumns choices={node.nonCanonChoices} />
-            ) : (
-                <p className="text-muted">
-                    There are currently no options! You can help expand the
-                    story by adding to it!
-                </p>
-            )}
             <CrowdventureButton onClick={reportNode}>
                 Report Page
             </CrowdventureButton>

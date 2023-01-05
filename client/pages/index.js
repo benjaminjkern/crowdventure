@@ -77,7 +77,7 @@ const HomePage = ({ topNodes: initTopNodes, recentNodes: initRecentNodes }) => {
     );
 };
 
-const NODE_PREVIEW_GQL = {
+export const NODE_PREVIEW_GQL = {
     hidden: 0,
     ID: 0,
     title: 0,
@@ -89,6 +89,9 @@ const NODE_PREVIEW_GQL = {
     size: 0,
     pictureURL: 0,
     pictureUnsafe: 0,
+    // These arent really used here but are on the account page
+    featured: 0,
+    content: 0,
 };
 
 export const getStaticProps = async () => {

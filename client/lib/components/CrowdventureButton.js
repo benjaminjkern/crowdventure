@@ -16,7 +16,7 @@ const CrowdventureButton = ({
         return (
             <span
                 onClick={onClick}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer", ...style }}
                 onMouseEnter={(e) => {
                     e.target.style.textDecoration = "underline";
                 }}

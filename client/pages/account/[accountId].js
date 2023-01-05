@@ -1,0 +1,274 @@
+import React, { useState, useEffect, useContext } from "react";
+import { useRouter } from "next/router";
+
+// import EditAccountModal from "./Modals/EditAccountModal";
+// import PictureModal from "./Modals/PictureModal";
+// import MessageModal from "./Modals/MessageModal";
+
+import { NODE_PREVIEW_GQL } from "..";
+import { mutationCall, queryCall } from "../../lib/apiUtils";
+import { UserContext } from "../../lib/user";
+import LoadingBox from "../../lib/components/LoadingBox";
+import { UnsafeModeContext } from "../../lib/unsafeMode";
+import CrowdventureAlert from "../../lib/components/CrowdventureAlert";
+import AccountPreview from "../../lib/accounts/AccountPreview";
+import NodeViewer from "../../lib/nodes/NodeViewer";
+import CrowdventureButton from "../../lib/components/CrowdventureButton";
+import CrowdventureTextInput from "../../lib/components/CrowdventureTextInput";
+
+const Account = ({ account }) => {
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchedNodes, setSearchedNodes] = useState([]);
+    const { user, setUser } = useContext(UserContext);
+    const { unsafeMode } = useContext(UnsafeModeContext);
+    const router = useRouter();
+
+    const reportAccount = () => {
+        mutationCall(
+            "createFeedback",
+            { info: 0, reporting: 0 },
+            {
+                accountScreenName: user?.screenName,
+                info: "This is inappropriate",
+                reportingObjectType: "Account",
+                reportingObjectID: account.screenName,
+            }
+        ).then(() => {
+            alert("Successfully reported account!");
+            // TODO: Check for unsafe now
+        });
+    };
+
+    if (!account) return <LoadingBox />;
+
+    if (
+        account.hidden &&
+        !unsafeMode &&
+        account.screenName !== user?.screenName
+    )
+        return (
+            <CrowdventureAlert title="Unsafe!">
+                This page has been hidden from general users, because the
+                content has been deemed unsafe. If you would like to see it, log
+                in and turn on <b>Unsafe mode</b>!
+            </CrowdventureAlert>
+        );
+
+    return (
+        <>
+            {account.hidden &&
+                !unsafeMode &&
+                account.screenName === user?.screenName && (
+                    <CrowdventureAlert title="Unsafe!">
+                        This page has been hidden from general users, because
+                        the content has been deemed unsafe. Users in unsafe mode
+                        can see this page and its content. Since you own this
+                        page, you can see it. If you believe this page should be
+                        considered safe, click <a href="">Here</a>.
+                    </CrowdventureAlert>
+                )}
+            <AccountPreview
+                account={account}
+                onClickImage={() => {
+                    // showModal(
+                    //     <PictureModal
+                    //         loggedInAs={loggedInAs}
+                    //         title={account.screenName}
+                    //         pictureURL={
+                    //             account.profilePicURL
+                    //                 ? account.profilePicURL
+                    //                 : process.env.PUBLIC_URL +
+                    //                   "/defaultProfilePic.jpg"
+                    //         }
+                    //         close={() => showModal(undefined)}
+                    //     />
+                    // );
+                }}
+            />
+
+            {account.bio?.split("\n").map((line, i) => (
+                <p key={i} style={{ textIndent: "5%" }}>
+                    {line}
+                </p>
+            ))}
+
+            {(user?.screenName === account.screenName || user?.isAdmin) && (
+                <CrowdventureButton
+                    onClick={() => {
+                        // showModal(
+                        //     <EditAccountModal
+                        //         account={account}
+                        //         loggedInAs={loggedInAs}
+                        //         screenName={account.screenName}
+                        //         bio={account.bio}
+                        //         profilePicture={account.profilePicURL}
+                        //         setAccount={setAccount}
+                        //         setRedirect={setRedirect}
+                        //         close={() => showModal(undefined)}
+                        //     />
+                        // );
+                    }}
+                >
+                    Edit Account
+                </CrowdventureButton>
+            )}
+
+            {user?.screenName === account.screenName ? (
+                <>
+                    <CrowdventureButton
+                        onClick={() => {
+                            localStorage.clearItem("screenName");
+                            setUser();
+                        }}
+                    >
+                        Log out
+                    </CrowdventureButton>
+                    <CrowdventureButton
+                        onClick={() => {
+                            router.push("/notifications");
+                        }}
+                    >
+                        Notifications{" "}
+                        {user.notifications.filter((notif) => !notif.seen)
+                            .length && (
+                            <span style={{ color: "red" }}>
+                                (
+                                {
+                                    user.notifications.filter(
+                                        (notif) => !notif.seen
+                                    ).length
+                                }{" "}
+                                New)
+                            </span>
+                        )}
+                    </CrowdventureButton>
+                </>
+            ) : (
+                user && (
+                    <CrowdventureButton
+                        onClick={() => {
+                            // showModal(
+                            //     <MessageModal
+                            //         account={account}
+                            //         loggedInAs={loggedInAs}
+                            //         close={() => showModal(undefined)}
+                            //     />
+                            // );
+                        }}
+                    >
+                        Send Message
+                    </CrowdventureButton>
+                )
+            )}
+            <div>
+                {/** float right */}
+                Total views: {account.totalNodeViews} Total score:{" "}
+                {account.totalSuggestionScore}
+            </div>
+
+            {user?.screenName === account.screenName && (
+                <CrowdventureButton
+                    onClick={() => {
+                        // showModal(
+                        //     <CreateNodeModal
+                        //         close={() => showModal(undefined)}
+                        //         loggedInAs={loggedInAs}
+                        //         featured={true}
+                        //         callback={(res) =>
+                        //             setRedirect(
+                        //                 <Redirect to={`/node/${res.ID}`} />
+                        //             )
+                        //         }
+                        //     />
+                        // );
+                    }}
+                >
+                    Create a New Adventure!
+                </CrowdventureButton>
+            )}
+
+            <hr />
+
+            <h3>Featured Stories:</h3>
+            <NodeViewer nodes={account.featuredNodes} />
+
+            <hr />
+
+            <h3>Search All Pages Authored by {account.screenName}:</h3>
+            <CrowdventureTextInput
+                value={searchQuery}
+                placeholder={"Search for a page..."}
+                onChangeText={(newQuery) => {
+                    console.log(account.nodes);
+                    setSearchQuery(newQuery);
+                    if (newQuery.length >= 2) {
+                        setSearchedNodes([
+                            ...account.nodes.filter((node) =>
+                                node.title
+                                    .toLowerCase()
+                                    .includes(newQuery.toLowerCase())
+                            ),
+                            ...account.nodes.filter(
+                                (node) =>
+                                    !node.title
+                                        .toLowerCase()
+                                        .includes(newQuery.toLowerCase()) &&
+                                    node.content
+                                        .toLowerCase()
+                                        .includes(newQuery.toLowerCase())
+                            ),
+                        ]);
+                    } else {
+                        setSearchedNodes([]);
+                    }
+                }}
+            />
+            {searchQuery && <NodeViewer nodes={searchedNodes} />}
+
+            {user?.screenName !== account.screenName && (
+                <CrowdventureButton onClick={reportAccount}>
+                    Report Account
+                </CrowdventureButton>
+            )}
+        </>
+    );
+};
+
+export const getStaticPaths = async () => {
+    return {
+        paths: [],
+        fallback: true,
+    };
+};
+
+const FULL_ACCOUNT_GQL = {
+    bio: 0,
+    screenName: 0,
+    profilePicURL: 0,
+    totalNodeViews: 0,
+    totalSuggestionScore: 0,
+    hidden: 0,
+    isAdmin: 0,
+    featuredNodes: NODE_PREVIEW_GQL,
+    nodes: NODE_PREVIEW_GQL,
+};
+
+export const getStaticProps = async ({ params: { accountId } }) => {
+    const account = await queryCall("getAccount", FULL_ACCOUNT_GQL, {
+        screenName: accountId,
+    });
+
+    if (!account) return { notFound: true };
+
+    return {
+        props: {
+            account,
+            pageTitle: `${account.screenName} on Crowdventure!`,
+            previewImage:
+                account.profilePicURL ||
+                require("../../public/defaultProfilePic.jpg"),
+        },
+    };
+};
+
+export default Account;
