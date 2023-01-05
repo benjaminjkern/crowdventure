@@ -12,13 +12,6 @@ export const graphqlClient = new ApolloClient({
 });
 export const queryCall = async (callName, parameters = {}, variables = {}) => {
     const useVariables = scrubVariables(variables);
-    console.log(`
-    query${formatVariables(useVariables)} {
-        ${callName}${formatArguments(useVariables)} {
-            ${formatParameters(parameters)}
-        }
-    }
-`);
     return graphqlClient
         .query({
             query: gql`

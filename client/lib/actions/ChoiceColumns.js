@@ -3,7 +3,7 @@ import ActionCard from "./ActionCard";
 
 // import EditChoiceModal from "../Modals/EditChoiceModal";
 
-const ChoiceColumns = ({ node, choices }) => {
+const ChoiceColumns = ({ choices }) => {
     if (choices.length === 0) return <></>;
 
     return (

@@ -1,12 +1,15 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import AccountPreview from "../../lib/accounts/AccountPreview";
+import ChoiceColumns from "../../lib/actions/ChoiceColumns";
 import { queryCall } from "../../lib/apiUtils";
 import CrowdventureAlert from "../../lib/components/CrowdventureAlert";
 import CrowdventureButton from "../../lib/components/CrowdventureButton";
+import LoadingBox from "../../lib/components/LoadingBox";
 import { UnsafeModeContext } from "../../lib/unsafeMode";
 import { UserContext } from "../../lib/user";
+import { deepCopy } from "../../lib/utils";
 
 // import PictureModal from "../Modals/PictureModal";
 // import EditNodeModal from "../Modals/EditNodeModal";
@@ -14,13 +17,14 @@ import { UserContext } from "../../lib/user";
 
 // import ChoiceColumns from "./ChoiceColumns";
 
-const NodePage = ({ node }) => {
+const NodePage = ({ node: initNode }) => {
     const BLURAMOUNT = 40;
+
     const { unsafeMode } = useContext(UnsafeModeContext);
-
     const { user } = useContext(UserContext);
-
     const router = useRouter();
+
+    const node = deepCopy(initNode);
 
     const reportNode = () => {
         // mutation_call(
@@ -53,7 +57,19 @@ const NodePage = ({ node }) => {
     //         </Alert>
     //     );
 
-    if (!node) return <div>WTF</div>;
+    if (!node) return <LoadingBox />;
+
+    // Dumb hack because backend is bad
+    if (node.pictureURL === "null") node.pictureURL = null;
+
+    node.canonChoices.forEach((choice) => {
+        choice.from = node;
+        choice.canon = true;
+    });
+    node.nonCanonChoices.forEach((choice) => {
+        choice.from = node;
+        choice.canon = false;
+    });
 
     if (node.hidden && !unsafeMode)
         return (
@@ -136,12 +152,8 @@ const NodePage = ({ node }) => {
                 Go back!
             </CrowdventureButton>
             {node.canonChoices.length ? (
-                <div>Choice Columns</div>
+                <ChoiceColumns choices={node.canonChoices} />
             ) : (
-                // <ChoiceColumns
-                //     node={node}
-                //     canon={true}
-                // />
                 <p className="text-muted">
                     By decree of <strong>{node.owner.screenName}</strong>, this
                     journey ends here.
@@ -175,13 +187,8 @@ const NodePage = ({ node }) => {
                 Suggest New Choice
             </CrowdventureButton>
             {node.nonCanonChoices.length ? (
-                <div>Choice Columns</div>
+                <ChoiceColumns choices={node.nonCanonChoices} />
             ) : (
-                // <ChoiceColumns
-                //     node={node}
-                //     loggedInAs={loggedInAs}
-                //     canon={false}
-                // />
                 <p className="text-muted">
                     There are currently no options! You can help expand the
                     story by adding to it!
@@ -220,9 +227,6 @@ const FULL_CHOICE_GQL = {
         },
         ID: 0,
         hidden: 0,
-    },
-    from: {
-        ID: 0,
     },
 };
 

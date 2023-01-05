@@ -1,15 +1,20 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AccountPreview from "../accounts/AccountPreview";
+import { mutationCall } from "../apiUtils";
 import CrowdventureCard from "../components/CrowdventureCard";
 import LikeDislikeController from "../components/LikeDislikeController";
 import { UnsafeModeContext } from "../unsafeMode";
 import { UserContext } from "../user";
 
-const ActionCard = ({ disabled, choice: initChoice, node }) => {
+const ActionCard = ({ choice: initChoice }) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { user } = useContext(UserContext);
 
     const [choice, setChoice] = useState(initChoice);
+
+    useEffect(() => {
+        setChoice(initChoice);
+    }, [initChoice]);
 
     choice.liked = choice.likedBy.some(
         (account) => account.screenName === user?.screenName
@@ -117,10 +122,17 @@ const ActionCard = ({ disabled, choice: initChoice, node }) => {
         !(
             unsafeMode ||
             choice.suggestedBy.screenName === user?.screenName ||
-            (choice.canon && node.owner.screenName === user?.screenName)
+            (choice.canon && choice.from.owner.screenName === user?.screenName)
         )
     )
         return;
+
+    const disabled =
+        !choice.to ||
+        ((choice.to.hidden || choice.to.owner.hidden) &&
+            (!user ||
+                (!user.unsafeMode &&
+                    choice.to.owner.screenName !== user.screenName)));
 
     return (
         <CrowdventureCard
@@ -132,13 +144,7 @@ const ActionCard = ({ disabled, choice: initChoice, node }) => {
                     behavior: "smooth",
                 })
             }
-            disabled={
-                !choice.to ||
-                ((choice.to.hidden || choice.to.owner.hidden) &&
-                    (!user ||
-                        (!user.unsafeMode &&
-                            choice.to.owner.screenName !== user.screenName)))
-            }
+            disabled={disabled}
             text={choice.action} // { active, tooltip, icon, iconColor }
             overlayIcons={[
                 {
@@ -166,7 +172,7 @@ const ActionCard = ({ disabled, choice: initChoice, node }) => {
                 {
                     disabled:
                         !user ||
-                        (user.screenName !== node.owner.screenName &&
+                        (user.screenName !== choice.from.owner.screenName &&
                             !user.isAdmin),
                     text: `Make ${choice.canon ? "Nonc" : "C"}anon`,
                     onClick: () =>
@@ -178,7 +184,7 @@ const ActionCard = ({ disabled, choice: initChoice, node }) => {
                     disabled:
                         !user ||
                         (user.screenName !== choice.suggestedBy.screenName &&
-                            user.screenName !== node.owner.screenName &&
+                            user.screenName !== choice.from.owner.screenName &&
                             !user.isAdmin),
                     text: "Delete",
                     onClick: () => removeSuggestion(choice.ID),
@@ -188,7 +194,8 @@ const ActionCard = ({ disabled, choice: initChoice, node }) => {
                         user &&
                         (user.isAdmin ||
                             (choice.canon &&
-                                user.screenName === node.owner.screenName) ||
+                                user.screenName ===
+                                    choice.from.owner.screenName) ||
                             (!choice.canon &&
                                 user.screenName ===
                                     choice.suggestedBy.screenName))
