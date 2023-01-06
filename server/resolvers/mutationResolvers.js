@@ -1,7 +1,7 @@
 const { UserInputError } = require("apollo-server-lambda");
 const { databaseCalls } = require("./databaseCalls.js");
 const { encrypt, flagContent } = require("./resolverUtils.js");
-const AccountResolvers = require("./accountResolvers.js");
+// const AccountResolvers = require("./accountResolvers.js");
 const NodeResolvers = require("./nodeResolvers.js");
 
 const MAX_NOTIFICATIONS = 50;
@@ -105,31 +105,37 @@ const MutationResolvers = {
                     invalidArgs: Object.keys(args),
                 });
             }
-            const nodes = await AccountResolvers.nodes(account);
-            nodes.forEach((node) =>
-                databaseCalls.addNode({ ...node, owner: args.newScreenName })
+            throw new UserInputError(
+                "Changing screen name is no longer allowed! (Too many bugs with the way it was implemented originally because I am dumb)",
+                {
+                    invalidArgs: Object.keys(args),
+                }
             );
-            const choices = await AccountResolvers.suggestedChoices(account);
-            choices.forEach((choice) => {
-                const newLikes = choice.likedBy;
-                if (newLikes[account.screenName]) {
-                    delete newLikes[account.screenName];
-                    newLikes[args.newScreenName] = args.newScreenName;
-                }
-                const newDislikes = choice.dislikedBy;
-                if (newDislikes[account.screenName]) {
-                    delete newDislikes[account.screenName];
-                    newDislikes[args.newScreenName] = args.newScreenName;
-                }
-                databaseCalls.addChoice({
-                    ...choice,
-                    suggestedBy: args.newScreenName,
-                    likedBy: newLikes,
-                    dislikedBy: newDislikes,
-                });
-            });
-            databaseCalls.removeAccount(account.screenName);
-            account.screenName = args.newScreenName;
+            // const nodes = await AccountResolvers.nodes(account);
+            // nodes.forEach((node) =>
+            //     databaseCalls.addNode({ ...node, owner: args.newScreenName })
+            // );
+            // const choices = await AccountResolvers.suggestedChoices(account);
+            // choices.forEach((choice) => {
+            //     const newLikes = choice.likedBy;
+            //     if (newLikes[account.screenName]) {
+            //         delete newLikes[account.screenName];
+            //         newLikes[args.newScreenName] = args.newScreenName;
+            //     }
+            //     const newDislikes = choice.dislikedBy;
+            //     if (newDislikes[account.screenName]) {
+            //         delete newDislikes[account.screenName];
+            //         newDislikes[args.newScreenName] = args.newScreenName;
+            //     }
+            //     databaseCalls.addChoice({
+            //         ...choice,
+            //         suggestedBy: args.newScreenName,
+            //         likedBy: newLikes,
+            //         dislikedBy: newDislikes,
+            //     });
+            // });
+            // databaseCalls.removeAccount(account.screenName);
+            // account.screenName = args.newScreenName;
         }
         MutationResolvers.createNotification(
             account,

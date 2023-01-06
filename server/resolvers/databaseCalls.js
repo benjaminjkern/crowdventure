@@ -299,7 +299,3 @@ const filterVisible = async (tableName, arg, value) =>
         : [];
 
 module.exports = { databaseCalls };
-
-// (async() => {
-//     console.log(await databaseCalls.sortedNodes(20, 0, false));
-// })();

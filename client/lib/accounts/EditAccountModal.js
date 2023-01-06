@@ -7,7 +7,7 @@ import CrowdventureCheckboxInput from "../components/CrowdventureCheckboxInput";
 import { UserContext } from "../user";
 import { ModalContext } from "../modal";
 import ConfirmModal from "../components/ConfirmModal";
-import { mutationCall, queryCall } from "../apiUtils";
+import { mutationCall } from "../apiUtils";
 import { FULL_ACCOUNT_GQL } from "../../pages/account/[accountId]";
 import { useRouter } from "next/router";
 
@@ -21,13 +21,12 @@ const EditAccountModal = ({ account, setAccount }) => {
     const [profilePictureField, setProfilePictureField] = useState(
         account.profilePicURL
     );
-    const [nameField, setNameField] = useState("");
     const [pass1, setPass1] = useState("");
     const [pass2, setPass2] = useState("");
     const [hidden, setHidden] = useState(account.hidden);
     const [isAdmin, setAdmin] = useState(account.isAdmin);
 
-    const editPage = (checkedIfExists = false) => {
+    const editPage = () => {
         if (pass1 && pass2 && pass1 !== pass2) {
             setInfo(<div style={{ color: "red" }}>Passwords must match!</div>);
             return;
@@ -38,29 +37,6 @@ const EditAccountModal = ({ account, setAccount }) => {
         if (bioField !== account.bio) params.bio = bioField;
         if (profilePictureField !== account.profilePicURL)
             params.profilePicURL = profilePictureField;
-        if (
-            nameField !== account.screenName &&
-            nameField.match(/^[a-zA-Z0-9_]+$/)
-        ) {
-            if (!checkedIfExists) {
-                queryCall(
-                    "getAccount",
-                    { screenName: 0 },
-                    { screenName: nameField }
-                )
-                    .catch(() => editPage(true))
-                    .then(() => {
-                        setInfo(
-                            <div style={{ color: "red" }}>
-                                That account already exists!
-                            </div>
-                        );
-                    });
-                return;
-            } else {
-                params.newScreenName = nameField;
-            }
-        }
         if (pass1) params.newPassword = pass1;
         if (user.isAdmin) {
             params.hidden = hidden;
@@ -69,10 +45,6 @@ const EditAccountModal = ({ account, setAccount }) => {
 
         mutationCall("editAccount", FULL_ACCOUNT_GQL, params).then(
             (newAccount) => {
-                if (params.newScreenName) {
-                    localStorage.setItem("screenName", params.newScreenName);
-                    router.push(`/account/${params.newScreenName}`);
-                }
                 if (account.screenName === user?.screenName) {
                     setUser(newAccount);
                 }
@@ -125,6 +97,7 @@ const EditAccountModal = ({ account, setAccount }) => {
                         account.profilePicURL === profilePictureField ? 1 : 0.2,
                 }}
             />
+            {account.screenName}
             Profile Pic URL:
             <CrowdventureTextInput
                 value={profilePictureField}
@@ -135,12 +108,6 @@ const EditAccountModal = ({ account, setAccount }) => {
                 rows="3"
                 value={bioField}
                 onChangeText={setBioField}
-            />
-            Change your screen name:
-            <CrowdventureTextInput
-                placeholder={account.screenName}
-                value={nameField}
-                onChangeText={setNameField}
             />
             Change your password:
             <CrowdventureTextInput
