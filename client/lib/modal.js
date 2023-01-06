@@ -12,7 +12,9 @@ const ModalProvider = ({ children }) => {
         <ModalContext.Provider
             value={{ openModal, closeModal, closeAllModals }}
         >
-            {modalStack}
+            {modalStack.map((modal, i) => (
+                <div key={i}>{modal}</div>
+            ))}
             {children}
         </ModalContext.Provider>
     );

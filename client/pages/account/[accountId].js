@@ -252,6 +252,12 @@ export const FULL_ACCOUNT_GQL = {
     isAdmin: 0,
     featuredNodes: NODE_PREVIEW_GQL,
     nodes: NODE_PREVIEW_GQL,
+    notifications: {
+        time: 0,
+        seen: 0,
+        content: 0,
+        link: 0,
+    },
 };
 
 export const getStaticProps = async ({ params: { accountId } }) => {

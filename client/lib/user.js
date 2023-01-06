@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
+import { FULL_ACCOUNT_GQL } from "../pages/account/[accountId]";
 import { mutationCall } from "./apiUtils";
 
 export const UserContext = createContext();
@@ -7,21 +8,9 @@ const UserProvider = ({ children }) => {
     const [user, setUser] = useState();
 
     const relogin = (screenName) => {
-        mutationCall(
-            "loginAccount",
-            {
-                screenName: 0,
-                profilePicURL: 0,
-                isAdmin: 0,
-                notifications: {
-                    time: 0,
-                    seen: 0,
-                    content: 0,
-                    link: 0,
-                },
-            },
-            { screenName }
-        ).then(setUser);
+        mutationCall("loginAccount", FULL_ACCOUNT_GQL, { screenName }).then(
+            setUser
+        );
     };
 
     useEffect(() => {

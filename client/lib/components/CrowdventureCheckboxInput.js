@@ -1,10 +1,17 @@
 import React from "react";
 
-const CrowdventureCheckboxInput = ({ label, ...props }) => {
+const CrowdventureCheckboxInput = ({ label, onChange, ...props }) => {
     return (
-        <input type="checkbox" {...props}>
+        <>
+            <input
+                type="checkbox"
+                onChange={(e) => {
+                    onChange(e.target.checked);
+                }}
+                {...props}
+            />
             {label}
-        </input>
+        </>
     );
 };
 

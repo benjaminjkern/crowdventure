@@ -5,6 +5,7 @@ import CrowdventureModal from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { UserContext } from "../user";
 import { mutationCall } from "../apiUtils";
+import { FULL_ACCOUNT_GQL } from "../../pages/account/[accountId]";
 
 const LoginModal = () => {
     const [info, setInfo] = useState("");
@@ -28,18 +29,10 @@ const LoginModal = () => {
                 </span>
             );
 
-        mutationCall(
-            "loginAccount",
-            {
-                screenName: 0,
-                profilePicURL: 0,
-                isAdmin: 0,
-                notifications: {
-                    seen: 0,
-                },
-            },
-            { screenName, password }
-        ).then((newUser) => {
+        mutationCall("loginAccount", FULL_ACCOUNT_GQL, {
+            screenName,
+            password,
+        }).then((newUser) => {
             if (!newUser) {
                 setInfo(
                     <div style={{ color: "red" }}>
