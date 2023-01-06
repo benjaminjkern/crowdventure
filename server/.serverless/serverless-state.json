@@ -8,7 +8,6 @@
       "name": "aws",
       "runtime": "nodejs12.x",
       "stage": "dev",
-      "variableSyntax": "\\${([^{}:]+?(?:\\(|:)(?:[^:{}][^{}]*?)?)}",
       "region": "us-east-1",
       "versionFunctions": true,
       "compiledCloudFormationTemplate": {
@@ -174,7 +173,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/apollo-lambda/dev/1622696655925-2021-06-03T05:04:15.925Z/apollo-lambda.zip"
+                "S3Key": "serverless/apollo-lambda/dev/1672970626835-2023-01-06T02:03:46.835Z/apollo-lambda.zip"
               },
               "Handler": "server.graphqlHandler",
               "Runtime": "nodejs12.x",
@@ -192,14 +191,14 @@
               "GraphqlLogGroup"
             ]
           },
-          "GraphqlLambdaVersionbUu2FHmlbDM4XIfxEa8Fm0Fc839M1SgED2DLyn1VwM": {
+          "GraphqlLambdaVersionvKfnsWyk5KpsfVades8IejVytk6G0cv0wzoTWKlQ": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "GraphqlLambdaFunction"
               },
-              "CodeSha256": "lpjZdQDriqTV8j95gf0gAw9qfT21P/naw7aLVzMLo8w="
+              "CodeSha256": "8T/5llwZkX4ZgMRMsWcvmA0E9if1gJOAfNYE2K1VTQ0="
             }
           },
           "ApiGatewayRestApi": {
@@ -257,11 +256,11 @@
                     "StatusCode": "200",
                     "ResponseParameters": {
                       "method.response.header.Access-Control-Allow-Origin": "'*'",
-                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
                       "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST'"
                     },
                     "ResponseTemplates": {
-                      "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+                      "application/json": ""
                     }
                   }
                 ]
@@ -315,7 +314,10 @@
                 }
               },
               "MethodResponses": []
-            }
+            },
+            "DependsOn": [
+              "GraphqlLambdaPermissionApiGateway"
+            ]
           },
           "ApiGatewayMethodGraphqlGet": {
             "Type": "AWS::ApiGateway::Method",
@@ -358,9 +360,12 @@
                 }
               },
               "MethodResponses": []
-            }
+            },
+            "DependsOn": [
+              "GraphqlLambdaPermissionApiGateway"
+            ]
           },
-          "ApiGatewayDeployment1622696641797": {
+          "ApiGatewayDeployment1672970616762": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -424,7 +429,7 @@
           "GraphqlLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "GraphqlLambdaVersionbUu2FHmlbDM4XIfxEa8Fm0Fc839M1SgED2DLyn1VwM"
+              "Ref": "GraphqlLambdaVersionvKfnsWyk5KpsfVades8IejVytk6G0cv0wzoTWKlQ"
             },
             "Export": {
               "Name": "sls-apollo-lambda-dev-GraphqlLambdaFunctionQualifiedArn"
@@ -552,9 +557,6 @@
               "path": "graphql",
               "method": "post",
               "cors": {
-                "origins": [
-                  "*"
-                ],
                 "origin": "*",
                 "methods": [
                   "OPTIONS",
@@ -566,7 +568,8 @@
                   "Authorization",
                   "X-Api-Key",
                   "X-Amz-Security-Token",
-                  "X-Amz-User-Agent"
+                  "X-Amz-User-Agent",
+                  "X-Amzn-Trace-Id"
                 ],
                 "allowCredentials": false
               },
@@ -578,9 +581,6 @@
               "path": "graphql",
               "method": "get",
               "cors": {
-                "origins": [
-                  "*"
-                ],
                 "origin": "*",
                 "methods": [
                   "OPTIONS",
@@ -592,7 +592,8 @@
                   "Authorization",
                   "X-Api-Key",
                   "X-Amz-Security-Token",
-                  "X-Amz-User-Agent"
+                  "X-Amz-User-Agent",
+                  "X-Amzn-Trace-Id"
                 ],
                 "allowCredentials": false
               },
@@ -606,16 +607,13 @@
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "GraphqlLambdaVersionbUu2FHmlbDM4XIfxEa8Fm0Fc839M1SgED2DLyn1VwM"
+        "versionLogicalId": "GraphqlLambdaVersionvKfnsWyk5KpsfVades8IejVytk6G0cv0wzoTWKlQ"
       }
     },
     "configValidationMode": "warn",
     "serviceFilename": "serverless.yml",
-    "layers": {},
     "initialServerlessConfig": {
-      "service": {
-        "$ref": "$[\"service\"][\"serviceObject\"]"
-      },
+      "service": "apollo-lambda",
       "provider": {
         "$ref": "$[\"service\"][\"provider\"]"
       },
@@ -623,11 +621,12 @@
         "$ref": "$[\"service\"][\"functions\"]"
       }
     },
+    "layers": {},
     "isDashboardMonitoringPreconfigured": false,
-    "artifact": "/Users/benkern/Documents/crowdventure/server/.serverless/apollo-lambda.zip"
+    "artifact": "/Users/ben/Documents/crowdventure/server/.serverless/apollo-lambda.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/apollo-lambda/dev/1622696655925-2021-06-03T05:04:15.925Z",
+    "artifactDirectoryName": "serverless/apollo-lambda/dev/1672970626835-2023-01-06T02:03:46.835Z",
     "artifact": "apollo-lambda.zip"
   }
 }

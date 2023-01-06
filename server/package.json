@@ -1,11 +1,11 @@
 {
-    "name": "dventure_server",
+    "name": "crowdventure_server",
     "version": "1.0.0",
     "description": "yeuh",
     "main": "server.js",
     "author": "Ben Kern",
     "license": "MIT",
-    "repository": "https://github.com/benjaminjkern/dventure.online",
+    "repository": "https://github.com/benjaminjkern/crowdventure",
     "dependencies": {
         "apollo-server": "^2.16.1",
         "apollo-server-lambda": "^2.15.0",

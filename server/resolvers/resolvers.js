@@ -5,7 +5,6 @@ const FeedbackResolvers = require("./feedbackResolvers.js");
 const NotificationResolvers = require("./notificationResolvers.js");
 const QueryResolvers = require("./queryResolvers.js");
 const MutationResolvers = require("./mutationResolvers.js");
-const { databaseCalls } = require("./databaseCalls.js");
 
 const GraphQLLong = require("graphql-type-long");
 
@@ -27,8 +26,3 @@ const resolvers = {
 };
 
 module.exports = { resolvers };
-
-(async () => {
-    const account = await databaseCalls.getAccount("ben");
-    console.log(await resolvers.Account.featuredNodes(account));
-})();
