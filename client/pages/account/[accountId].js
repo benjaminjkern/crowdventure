@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from "react";
 import { useRouter } from "next/router";
 
 // import PictureModal from "./Modals/PictureModal";
-// import MessageModal from "./Modals/MessageModal";
 
 import { NODE_PREVIEW_GQL } from "..";
 import { mutationCall, queryCall } from "../../lib/apiUtils";
@@ -16,6 +15,7 @@ import CrowdventureButton from "../../lib/components/CrowdventureButton";
 import CrowdventureTextInput from "../../lib/components/CrowdventureTextInput";
 import EditAccountModal from "../../lib/accounts/EditAccountModal";
 import { ModalContext } from "../../lib/modal";
+import MessageModal from "../../lib/accounts/MessageModal";
 
 const AccountPage = ({ account: initAccount }) => {
     const [searchQuery, setSearchQuery] = useState("");
@@ -148,13 +148,7 @@ const AccountPage = ({ account: initAccount }) => {
                 user && (
                     <CrowdventureButton
                         onClick={() => {
-                            // showModal(
-                            //     <MessageModal
-                            //         account={account}
-                            //         loggedInAs={loggedInAs}
-                            //         close={() => showModal(undefined)}
-                            //     />
-                            // );
+                            openModal(<MessageModal account={account} />);
                         }}
                     >
                         Send Message

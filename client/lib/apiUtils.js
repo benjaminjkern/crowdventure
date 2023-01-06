@@ -4,7 +4,7 @@ import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 const backendURL =
     "https://3yfp7ejc0m.execute-api.us-east-1.amazonaws.com/dev/graphql";
 
-const DEBUG_CALLS = false;
+const DEBUG_CALLS = true;
 
 // const BING_API_KEY = "8300cebe5f0d452a9ccb4bca67af4659";
 
