@@ -12,61 +12,24 @@ export const graphqlClient = new ApolloClient({
     uri: backendURL,
     cache: new InMemoryCache(),
 });
-export const queryCall = async (callName, parameters = {}, variables = {}) => {
-    const useVariables = scrubVariables(variables);
-    if (DEBUG_CALLS)
-        console.log(`
-    query${formatVariables(useVariables)} {
-        ${callName}${formatArguments(useVariables)}${formatParameters(
-            parameters
-        )}
-    }
-`);
-    return graphqlClient
-        .query({
-            query: gql`
-                query${formatVariables(useVariables)} {
-                    ${callName}${formatArguments(
-                useVariables
-            )}${formatParameters(parameters)}
-                }
-            `,
-            variables: useVariables,
-            fetchPolicy: "network-only",
-        })
-        .then(({ data, error }) => {
-            if (error) throw error;
-            return data[callName];
-        })
-        .catch((err) => {
-            console.error(err);
-            throw err;
-        });
-};
 
-export const mutationCall = async (callName, parameters, variables) => {
+const gqlCall = (gqlType, callName, parameters = {}, variables = {}) => {
     const useVariables = scrubVariables(variables);
-    if (DEBUG_CALLS) {
-        console.log(`
-        mutation${formatVariables(useVariables)} {
-            ${callName}${formatArguments(useVariables)}${formatParameters(
-            parameters
-        )}
-        }
-    `);
-    }
-    return graphqlClient
-        .mutate({
-            mutation: gql`
-                mutation${formatVariables(useVariables)} {
-                    ${callName}${formatArguments(
-                useVariables
-            )}${formatParameters(parameters)}
-                }
-            `,
-            variables: useVariables,
-            fetchPolicy: "network-only",
-        })
+    const call = `${gqlType}${formatVariables(useVariables)} {
+    ${callName}${formatArguments(useVariables)}${formatParameters(parameters)}
+}`;
+    if (DEBUG_CALLS) console.log(call, variables);
+
+    // This is just cuz graphql is dumb and likes to have a bunch of redundent call names
+    const gqlClientCallName = gqlType === "mutation" ? "mutate" : gqlType;
+
+    return graphqlClient[gqlClientCallName]({
+        [gqlType]: gql`
+            ${call}
+        `,
+        variables: useVariables,
+        fetchPolicy: "network-only",
+    })
         .then(({ data, error }) => {
             if (error) throw error;
             return data[callName];
@@ -93,16 +56,27 @@ const formatArguments = (variables) => {
         .join(",")})`;
 };
 
-const formatParameters = (parameters) => {
+const formatParameters = (parameters, tab = 2) => {
     const paramNames = Object.keys(parameters);
     if (paramNames.length === 0) return "";
-    return `{${paramNames
-        .map((param) => {
-            if (typeof parameters[param] === "object")
-                return `${param}${formatParameters(parameters[param])}`;
-            return param;
-        })
-        .join(",")}}`;
+    return `{
+${paramNames
+    .map((param) => {
+        const tabs = Array(tab * 4)
+            .fill(" ")
+            .join("");
+
+        if (typeof parameters[param] === "object")
+            return `${tabs}${param} ${formatParameters(
+                parameters[param],
+                tab + 1
+            )}`;
+        return `${tabs}${param}`;
+    })
+    .join("\n")}
+${Array((tab - 1) * 4)
+    .fill(" ")
+    .join("")}}`;
 };
 
 const scrubVariables = (variables) => {
@@ -124,3 +98,8 @@ const guessType = (variableValue) => {
     }
     throw `Could not find a good variable match for ${variableValue}`;
 };
+
+export const queryCall = (callName, parameters, variables) =>
+    gqlCall("query", callName, parameters, variables);
+export const mutationCall = (callName, parameters, variables) =>
+    gqlCall("mutation", callName, parameters, variables);

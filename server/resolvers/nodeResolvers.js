@@ -23,16 +23,18 @@ const ChoiceResolvers = require("./choiceResolvers.js");
 
 const NodeResolvers = {
     content: async (parent, args, context) => {
-        const IP = context.headers["X-Forwarded-For"].split(",")[0];
-        const newParent = await databaseCalls.getNode(parent.ID);
-        if (typeof newParent.views !== "object") {
-            newParent.views = { previouslySaved: newParent.views };
+        if (context.headers) {
+            const IP = context.headers["X-Forwarded-For"].split(",")[0];
+            const newParent = await databaseCalls.getNode(parent.ID);
+            if (typeof newParent.views !== "object") {
+                newParent.views = { previouslySaved: newParent.views };
+            }
+            if (!newParent.views[IP]) {
+                newParent.views[IP] = IP;
+                databaseCalls.addNode(newParent);
+            }
+            parent.views = newParent.views;
         }
-        if (!newParent.views[IP]) {
-            newParent.views[IP] = IP;
-            databaseCalls.addNode(newParent);
-        }
-        parent.views = newParent.views;
         return parent.content;
     },
     views: async (parent) => {
