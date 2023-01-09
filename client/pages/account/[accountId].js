@@ -265,9 +265,7 @@ export const getStaticProps = async ({ params: { accountId } }) => {
         props: {
             account,
             pageTitle: `${account.screenName} on Crowdventure!`,
-            previewImage:
-                account.profilePicURL ||
-                require("../../public/defaultProfilePic.jpg"),
+            previewImage: account.profilePicURL,
         },
     };
 };
