@@ -7,11 +7,12 @@ import { queryCall } from "../../lib/apiUtils";
 import CrowdventureAlert from "../../lib/components/CrowdventureAlert";
 import CrowdventureButton from "../../lib/components/CrowdventureButton";
 import LoadingBox from "../../lib/components/LoadingBox";
+import PictureModal from "../../lib/components/PictureModal";
+import { ModalContext } from "../../lib/modal";
 import { UnsafeModeContext } from "../../lib/unsafeMode";
 import { UserContext } from "../../lib/user";
 import { deepCopy } from "../../lib/utils";
 
-// import PictureModal from "../Modals/PictureModal";
 // import EditNodeModal from "../Modals/EditNodeModal";
 // import SuggestChoiceModal from "../Modals/SuggestChoiceModal";
 
@@ -22,6 +23,7 @@ const NodePage = ({ node: initNode }) => {
 
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { user } = useContext(UserContext);
+    const { openModal } = useContext(ModalContext);
     const router = useRouter();
 
     const node = deepCopy(initNode);
@@ -124,17 +126,14 @@ const NodePage = ({ node: initNode }) => {
                               }
                             : {}),
                     }}
-                    onClick={
-                        () => {}
-                        // showModal(
-                        //     <PictureModal
-                        //         loggedInAs={loggedInAs}
-                        //         pictureURL={node.pictureURL}
-                        //         title={node.title}
-                        //         close={() => showModal(undefined)}
-                        //     />
-                        // )
-                    }
+                    onClick={() => {
+                        openModal(
+                            <PictureModal
+                                pictureURL={node.pictureURL}
+                                title={node.title}
+                            />
+                        );
+                    }}
                 />
             )}
             {node.content.split("\n").map((line, i) => (

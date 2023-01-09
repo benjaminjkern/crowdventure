@@ -9,7 +9,6 @@ import { ModalContext } from "../modal";
 import { UserContext } from "../user";
 import { UnsafeModeContext } from "../unsafeMode";
 import SignUpModal from "./SignUpModal";
-// import SignUpModal from "./Modals/SignUpModal";
 // import UnsafeModal from "./Modals/UnsafeModal";
 
 const AccountManager = () => {

@@ -1,8 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useRouter } from "next/router";
 
-// import PictureModal from "./Modals/PictureModal";
-
 import { NODE_PREVIEW_GQL } from "..";
 import { mutationCall, queryCall } from "../../lib/apiUtils";
 import { UserContext } from "../../lib/user";
@@ -16,6 +14,7 @@ import CrowdventureTextInput from "../../lib/components/CrowdventureTextInput";
 import EditAccountModal from "../../lib/accounts/EditAccountModal";
 import { ModalContext } from "../../lib/modal";
 import MessageModal from "../../lib/accounts/MessageModal";
+import PictureModal from "../../lib/components/PictureModal";
 
 const AccountPage = ({ account: initAccount }) => {
     const [searchQuery, setSearchQuery] = useState("");
@@ -77,19 +76,15 @@ const AccountPage = ({ account: initAccount }) => {
             <AccountPreview
                 account={account}
                 onClickImage={() => {
-                    // showModal(
-                    //     <PictureModal
-                    //         loggedInAs={loggedInAs}
-                    //         title={account.screenName}
-                    //         pictureURL={
-                    //             account.profilePicURL
-                    //                 ? account.profilePicURL
-                    //                 : process.env.PUBLIC_URL +
-                    //                   "/defaultProfilePic.jpg"
-                    //         }
-                    //         close={() => showModal(undefined)}
-                    //     />
-                    // );
+                    openModal(
+                        <PictureModal
+                            title={account.screenName}
+                            pictureURL={
+                                account.profilePicURL ||
+                                require("../../public/defaultProfilePic.jpg")
+                            }
+                        />
+                    );
                 }}
             />
 
