@@ -7,32 +7,78 @@ import CrowdventureModal from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { UserContext } from "../user";
 import { mutationCall } from "../apiUtils";
+import ConfirmModal from "../components/ConfirmModal";
+import CrowdventureCheckboxInput from "../components/CrowdventureCheckboxInput";
+import { ModalContext } from "../modal";
 
 // import SearchImage from "../SearchImage";
 
-const CreateNodeModal = ({ callback, picture, pictureUnsafe, featured }) => {
-    const [title, setTitle] = useState("");
-    const [content, setContent] = useState("");
-    const [pictureField, setPictureField] = useState(picture);
-    const [showImageSearch, setShowImageSearch] = useState(false);
-
-    const [info, setInfo] = useState("");
+const CreateNodeModal = ({
+    callback,
+    node,
+    setNode,
+    picture,
+    pictureUnsafe,
+    featured,
+}) => {
+    const [title, setTitle] = useState(node?.title);
+    const [content, setContent] = useState(node?.content);
+    const [pictureField, setPictureField] = useState(
+        node?.pictureURL || picture
+    );
     const [shouldHide, setShouldHide] = useState(pictureUnsafe);
+    const [hidden, setHidden] = useState();
+
+    const [showImageSearch, setShowImageSearch] = useState(false);
+    const [info, setInfo] = useState("");
 
     const { user } = useContext(UserContext);
-
+    const { openModal, closeModal } = useContext(ModalContext);
     const router = useRouter();
 
-    const createNode = () => {
-        if (!title)
-            return setInfo(
+    const validateInputs = () => {
+        if (!title) {
+            setInfo(
                 <span style={{ color: "red" }}>Content cannot be empty!</span>
             );
+            return false;
+        }
 
-        if (!content)
-            return setInfo(
+        if (!content) {
+            setInfo(
                 <span style={{ color: "red" }}>Title cannot be empty!</span>
             );
+            return false;
+        }
+
+        return true;
+    };
+
+    const editNode = () => {
+        if (!validateInputs()) return;
+
+        mutationCall(
+            "editNode",
+            { ID: 0 },
+            {
+                nodeID: node.ID,
+                title,
+                content,
+                pictureURL: pictureField,
+                hidden:
+                    shouldHide ||
+                    (hidden !== undefined && !node.pictureUnsafe) ||
+                    undefined,
+                pictureUnsafe: shouldHide,
+            }
+        ).then((newNode) => {
+            setNode(newNode);
+            closeModal();
+        });
+    };
+
+    const createNode = () => {
+        if (!validateInputs()) return;
 
         mutationCall(
             "createNode",
@@ -51,15 +97,33 @@ const CreateNodeModal = ({ callback, picture, pictureUnsafe, featured }) => {
         ).then((newNode) => router.push(`/node/${newNode.ID}`));
     };
 
+    const deleteNode = () => {
+        mutationCall("deleteNode", undefined, { nodeID: node.ID }).then(() => {
+            router.back();
+        });
+    };
+
     return (
         <CrowdventureModal
-            modalTitle="Creating New Page"
+            modalTitle={`${node ? "Editing" : "Creating New"} Page`}
             modalButtons={[
                 {
-                    text: "Create Page!",
+                    text: `${node ? "Edit" : "Create"} Page!`,
                     onClick: () => {
-                        createNode();
+                        if (node) createNode();
+                        else editNode();
                     },
+                },
+                {
+                    active: node,
+                    text: "Delete",
+                    onClick: openModal(
+                        <ConfirmModal
+                            onConfirm={deleteNode}
+                            title="Delete Page"
+                            content="This will erase all suggested choices of this page, and their associated scores. This will NOT delete sub-pages of this page. Are you sure you wish to continue?"
+                        />
+                    ),
                 },
             ]}
         >
@@ -106,6 +170,8 @@ const CreateNodeModal = ({ callback, picture, pictureUnsafe, featured }) => {
             <span>
                 {!pictureField
                     ? "(Don't use any picture)"
+                    : pictureField === node?.pictureURL
+                    ? "(Use existing picture)"
                     : "(Use new picture)"}
             </span>
             <CrowdventureButton
@@ -136,6 +202,16 @@ const CreateNodeModal = ({ callback, picture, pictureUnsafe, featured }) => {
                 value={content}
                 onChangeText={setContent}
             />
+            {node && user?.isAdmin && (
+                <>
+                    Admin Controls:
+                    <CrowdventureCheckboxInput
+                        checked={hidden}
+                        onChange={setHidden}
+                        label="Page should be hidden"
+                    />
+                </>
+            )}
             {info || ""}
             {shouldHide && (
                 <span style={{ color: "red" }}>
