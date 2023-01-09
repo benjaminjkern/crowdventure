@@ -8,6 +8,7 @@ import LoginModal from "./LoginModal";
 import { ModalContext } from "../modal";
 import { UserContext } from "../user";
 import { UnsafeModeContext } from "../unsafeMode";
+import SignUpModal from "./SignUpModal";
 // import SignUpModal from "./Modals/SignUpModal";
 // import UnsafeModal from "./Modals/UnsafeModal";
 
@@ -32,13 +33,7 @@ const AccountManager = () => {
                 <CrowdventureButton
                     buttonType="text"
                     onClick={() => {
-                        // showModal(
-                        //     <SignUpModal
-                        //         loggedInAs={loggedInAs}
-                        //         setLoggedInAs={setLoggedInAs}
-                        //         close={() => showModal(undefined)}
-                        //     />
-                        // );
+                        openModal(<SignUpModal />);
                     }}
                 >
                     Sign Up
