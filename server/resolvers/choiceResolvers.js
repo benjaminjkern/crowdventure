@@ -5,32 +5,28 @@ const ChoiceResolvers = {
     to: async (parent) => await databaseCalls.getNode(parent.to),
     suggestedBy: async (parent) =>
         await databaseCalls.getAccount(parent.suggestedBy),
-    likes: (parent) => Object.keys(parent.likedBy).length,
-    dislikes: (parent) => Object.keys(parent.dislikedBy).length,
-    score: (parent) =>
-        parent
-            ? parent.score ||
-              ChoiceResolvers.likes(parent) - ChoiceResolvers.dislikes(parent)
-            : 0,
+    likes: async (parent) =>
+        (await ChoiceResolvers.likedBy(parent)).then(
+            (likedBy) => likedBy.length
+        ),
+    dislikes: async (parent) =>
+        (await ChoiceResolvers.dislikedBy(parent)).then(
+            (dislikedBy) => dislikedBy.length
+        ),
+    score: async (parent) =>
+        (await ChoiceResolvers.likes(parent)) -
+        (await ChoiceResolvers.dislikes(parent)),
     likedBy: async (parent) =>
-        await Promise.all(
-            Object.keys(parent.likedBy).map((accountScreenName) =>
-                databaseCalls.getAccount(accountScreenName)
-            )
-        ),
+        await databaseCalls.getLikedByForChoice(parent.ID),
     dislikedBy: async (parent) =>
-        await Promise.all(
-            Object.keys(parent.dislikedBy).map((accountScreenName) =>
-                databaseCalls.getAccount(accountScreenName)
-            )
-        ),
+        await databaseCalls.getDisikedByForChoice(parent.ID),
     dateCreated: async (parent) => {
-        const newParent = await databaseCalls.getChoice(parent.ID);
-        if (!newParent.dateCreated) {
-            parent.dateCreated = "Before September 16, 2020";
-            newParent.dateCreated = "Before September 16, 2020";
+        if (!parent.dateCreated) {
+            const existingParent = await databaseCalls.getChoice(parent.ID);
+            existingParent.dateCreated = `Before ${new Date().toJSON()}`;
+            parent.dateCreated = existingParent.dateCreated;
+            await databaseCalls.addChoice(existingParent);
         }
-        databaseCalls.addChoice(newParent);
         return parent.dateCreated;
     },
 };

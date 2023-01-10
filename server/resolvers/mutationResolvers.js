@@ -5,7 +5,7 @@ const { encrypt, flagContent } = require("./resolverUtils.js");
 const NodeResolvers = require("./nodeResolvers.js");
 const AccountResolvers = require("./accountResolvers.js");
 
-const MAX_NOTIFICATIONS = 50;
+// const MAX_NOTIFICATIONS = 50;
 
 const updateTime = async (
     node,
@@ -47,18 +47,16 @@ const MutationResolvers = {
                 invalidArgs: Object.keys(args),
             });
         }
-        const IP = context.headers["X-Forwarded-For"].split(",")[0];
+        const IP = context.headers
+            ? context.headers["X-Forwarded-For"].split(",")[0]
+            : undefined;
         return await databaseCalls.addAccount({
             screenName: args.screenName,
-            bio: flagContent(args.bio) ? null : args.bio,
+            bio: flagContent(args.bio) ? undefined : args.bio,
             encryptedPassword: encrypt(args.password),
             lastIP: IP,
             profilePicURL: args.profilePicURL,
             dateCreated: new Date().toJSON(),
-            nodes: [],
-            suggestedChoices: [],
-            liked: {},
-            disliked: {},
         });
     },
     deleteAccount: async (parent, args) => {
@@ -73,16 +71,19 @@ const MutationResolvers = {
         console.log(`Deleting Account ${account.screenName}`);
         // again, not really checking or caring if these work for now
         // I only care about it not returning promises for now
-        account.suggestedChoices.forEach((choiceID) =>
-            MutationResolvers.removeSuggestion(undefined, { choiceID })
-        );
-        (await AccountResolvers.nodes(parent)).forEach((nodeID) =>
-            MutationResolvers.deleteNode(undefined, { nodeID })
-        );
+
+        for (const { ID } of await AccountResolvers.suggestedChoices(account)) {
+            await MutationResolvers.removeSuggestion(undefined, {
+                choiceID: ID,
+            });
+        }
+        for (const { ID } of await AccountResolvers.nodes(account)) {
+            await MutationResolvers.deleteNode(undefined, { nodeID: ID });
+        }
 
         return await databaseCalls.removeAccount(account.screenName);
     },
-    editAccount: async (parent, args, context) => {
+    editAccount: async (parent, args) => {
         const account = await databaseCalls.getAccount(args.screenName);
         if (!account) {
             throw new UserInputError("That account doesnt exist!", {
@@ -100,18 +101,20 @@ const MutationResolvers = {
             account.profilePicURL = args.profilePicURL;
         if (args.hidden !== undefined) account.hidden = args.hidden;
         if (args.isAdmin !== undefined) account.isAdmin = args.isAdmin;
+
         if (args.newScreenName && !flagContent(args.newScreenName)) {
-            if (await databaseCalls.getAccount(args.newScreenName)) {
-                throw new UserInputError("That account already exists!", {
-                    invalidArgs: Object.keys(args),
-                });
-            }
             throw new UserInputError(
                 "Changing screen name is no longer allowed! (Too many bugs with the way it was implemented originally because I am dumb)",
                 {
                     invalidArgs: Object.keys(args),
                 }
             );
+            //
+            // if (await databaseCalls.getAccount(args.newScreenName)) {
+            //     throw new UserInputError("That account already exists!", {
+            //         invalidArgs: Object.keys(args),
+            //     });
+            // }
             // const nodes = await AccountResolvers.nodes(account);
             // nodes.forEach((node) =>
             //     databaseCalls.addNode({ ...node, owner: args.newScreenName })
@@ -138,17 +141,18 @@ const MutationResolvers = {
             // databaseCalls.removeAccount(account.screenName);
             // account.screenName = args.newScreenName;
         }
-        MutationResolvers.createNotification(
-            account,
-            {
-                content: `Your account was edited by an administrator.`,
-                link: `/node/${account.screenName}`,
-            },
-            context
-        );
+        // await MutationResolvers.createNotification(
+        //     account,
+        //     {
+        //         content: `Your account was edited by an administrator.`,
+        //         link: `/node/${account.screenName}`,
+        //     },
+        //     context
+        // );
 
         return await databaseCalls.addAccount(account);
     },
+
     loginAccount: async (parent, args, context) => {
         const account = await databaseCalls.getAccount(args.screenName);
         if (!account) {
@@ -156,15 +160,18 @@ const MutationResolvers = {
                 invalidArgs: Object.keys(args),
             });
         }
-        const IP = context.headers["X-Forwarded-For"].split(",")[0];
+        const IP = context.headers
+            ? context.headers["X-Forwarded-For"].split(",")[0]
+            : undefined;
         if (args.password) {
-            if (encrypt(args.password) === account.encryptedPassword)
-                account.lastIP = IP;
-            else return null;
+            if (encrypt(args.password) !== account.encryptedPassword)
+                return null;
+
+            account.lastIP = IP;
         }
-        if (account.lastIP === IP)
-            return await databaseCalls.addAccount(account);
-        return null;
+
+        if (!IP || account.lastIP !== IP) return null;
+        return await databaseCalls.addAccount(account);
     },
     createNode: async (parent, args) => {
         const account = await databaseCalls.getAccount(args.accountScreenName);
@@ -210,15 +217,12 @@ const MutationResolvers = {
                 undefined,
             dateCreated: now.toJSON(),
             lastUpdated: now.getTime(),
-            views: {},
-            canonChoices: [],
-            nonCanonChoices: [],
         };
         // account.nodes.push(newNode.ID);
-        databaseCalls.addAccount(account);
+        // databaseCalls.addAccount(account);
         return await databaseCalls.addNode(newNode);
     },
-    deleteNode: async (parent, args, context) => {
+    deleteNode: async (parent, args) => {
         const node = await databaseCalls.getNode(args.nodeID);
         if (!node) {
             throw new UserInputError("That node doesnt exist!", {
@@ -226,36 +230,27 @@ const MutationResolvers = {
             });
         }
 
-        const account = await databaseCalls.getAccount(node.owner);
-
         console.log(`Deleting node ${node.ID} (${node.title})`);
 
-        node.canonChoices.forEach((choiceID) =>
-            MutationResolvers.removeSuggestion(undefined, { choiceID })
-        );
-        node.nonCanonChoices.forEach((choiceID) =>
-            MutationResolvers.removeSuggestion(undefined, { choiceID })
-        );
-
-        if (account) {
-            // account.nodes = account.nodes.filter(
-            //     (nodeID) => nodeID !== node.ID
-            // );
-            databaseCalls.addAccount(account);
+        for (const { ID } of await NodeResolvers.allChoices(node)) {
+            await MutationResolvers.removeSuggestion(undefined, {
+                choiceID: ID,
+            });
         }
-        MutationResolvers.createNotification(
-            undefined,
-            {
-                accountScreenName: node.owner,
-                content: `Your page titled "${node.title}" was deleted by an administrator.`,
-                link: `/node/${node.ID}`,
-            },
-            context
-        );
+
+        // MutationResolvers.createNotification(
+        //     undefined,
+        //     {
+        //         accountScreenName: node.owner,
+        //         content: `Your page titled "${node.title}" was deleted by an administrator.`,
+        //         link: `/node/${node.ID}`,
+        //     },
+        //     context
+        // );
 
         return await databaseCalls.removeNode(node.ID);
     },
-    editNode: async (parent, args, context) => {
+    editNode: async (parent, args) => {
         const node = await databaseCalls.getNode(args.nodeID);
         if (!node) {
             throw new UserInputError("That node doesnt exist!", {
@@ -283,15 +278,15 @@ const MutationResolvers = {
         }
         if (args.featured !== undefined) node.featured = args.featured;
 
-        MutationResolvers.createNotification(
-            undefined,
-            {
-                accountScreenName: node.owner,
-                content: `Your page titled "${node.title}" was edited by an administrator.`,
-                link: `/node/${node.ID}`,
-            },
-            context
-        );
+        // MutationResolvers.createNotification(
+        //     undefined,
+        //     {
+        //         accountScreenName: node.owner,
+        //         content: `Your page titled "${node.title}" was edited by an administrator.`,
+        //         link: `/node/${node.ID}`,
+        //     },
+        //     context
+        // );
 
         return await databaseCalls.addNode(node);
     },
@@ -336,19 +331,19 @@ const MutationResolvers = {
             action: args.action,
             dateCreated: new Date().toJSON(),
             to: toNode.ID,
-            likedBy: {},
-            dislikedBy: {},
             suggestedBy: account.screenName,
             hidden: flagContent(args.content) || undefined,
         };
 
-        account.suggestedChoices.push(newChoice.ID);
+        // account.suggestedChoices.push(newChoice.ID);
 
         if (account.screenName === node.owner) {
-            node.canonChoices.push(newChoice.ID);
-            updateTime(node);
+            newChoice.isCanon = true;
+            // node.canonChoices.push(newChoice.ID);
+            // updateTime(node);
         } else {
-            node.nonCanonChoices.push(newChoice.ID);
+            newChoice.isCanon = false;
+            // node.nonCanonChoices.push(newChoice.ID);
             MutationResolvers.createNotification(
                 undefined,
                 {
@@ -362,13 +357,11 @@ const MutationResolvers = {
 
         // MutationResolvers.createNotification(undefined, { accountScreenName: toNode.owner, content: `${account.screenName} suggested a new choice that leads to your page "${toNode.title}"!`, link: `/node/${node.ID}` }, context);
 
-        console.log(node);
-
-        databaseCalls.addAccount(account);
-        databaseCalls.addNode(node);
+        // databaseCalls.addAccount(account);
+        // databaseCalls.addNode(node);
         return await databaseCalls.addChoice(newChoice);
     },
-    editSuggestion: async (parent, args, context) => {
+    editSuggestion: async (parent, args) => {
         const choice = await databaseCalls.getChoice(args.choiceID);
         if (!choice) {
             throw new UserInputError("That choice doesnt exist!", {
@@ -378,155 +371,149 @@ const MutationResolvers = {
 
         console.log(`Editing suggestion ${choice.ID} (${choice.action})`);
 
-        const daddy = await databaseCalls.getNode(choice.from);
+        // const daddy = await databaseCalls.getNode(choice.from);
 
         if (args.hidden !== undefined) {
             choice.hidden = args.hidden;
         }
         if (args.toID && choice.to !== args.toID) {
             choice.to = args.toID;
-            if (daddy.canonChoices.includes(choice.ID)) {
-                updateTime(daddy);
-            }
+            // if (daddy.canonChoices.includes(choice.ID)) {
+            //     updateTime(daddy);
+            // }
+        }
+        if (args.isCanon !== undefined) {
+            choice.isCanon = args.isCanon;
         }
         if (args.action) {
             choice.action = args.action;
             if (flagContent(args.action)) choice.hidden = true;
         }
 
-        MutationResolvers.createNotification(
-            undefined,
-            {
-                accountScreenName: choice.suggestedBy,
-                content: `Your suggested choice "${choice.action}" stemming from page titled "${daddy.title}" has been edited!`,
-                link: `/node/${daddy.ID}`,
-            },
-            context
-        );
+        // MutationResolvers.createNotification(
+        //     undefined,
+        //     {
+        //         accountScreenName: choice.suggestedBy,
+        //         content: `Your suggested choice "${choice.action}" stemming from page titled "${daddy.title}" has been edited!`,
+        //         link: `/node/${daddy.ID}`,
+        //     },
+        //     context
+        // );
 
         return await databaseCalls.addChoice(choice);
     },
-    removeSuggestion: async (parent, args, context) => {
+    removeSuggestion: async (parent, args) => {
         const choice = await databaseCalls.getChoice(args.choiceID);
         if (!choice) {
             throw new UserInputError("That choice doesnt exist!", {
                 invalidArgs: Object.keys(args),
             });
         }
-        const account = await databaseCalls.getAccount(choice.suggestedBy);
-        const node = await databaseCalls.getNode(choice.from);
+        // const account = await databaseCalls.getAccount(choice.suggestedBy);
+        // const node = await databaseCalls.getNode(choice.from);
 
         console.log(`Removing suggestion ${choice.ID} (${choice.action})`);
 
-        if (account) {
-            // idk how either of these can be null but whatever
-            account.suggestedChoices = account.suggestedChoices.filter(
-                (choiceID) => choiceID !== choice.ID
-            );
-
-            if (node)
-                MutationResolvers.createNotification(
-                    account,
-                    {
-                        content: `Your suggested choice "${choice.action}" stemming from page titled "${node.title}" was deleted.`,
-                        link: `/node/${node.ID}`,
-                    },
-                    context
-                );
-            databaseCalls.addAccount(account);
-        }
-        if (node) {
-            if (node.canonChoices.includes(choice.ID)) {
-                updateTime(node);
-            }
-            node.canonChoices = node.canonChoices.filter(
-                (choiceID) => choiceID !== choice.ID
-            );
-            node.nonCanonChoices = node.nonCanonChoices.filter(
-                (choiceID) => choiceID !== choice.ID
-            );
-            databaseCalls.addNode(node);
-        }
+        // MutationResolvers.createNotification(
+        //     account,
+        //     {
+        //         content: `Your suggested choice "${choice.action}" stemming from page titled "${node.title}" was deleted.`,
+        //         link: `/node/${node.ID}`,
+        //     },
+        //     context
+        // );
+        // if (node) {
+        // if (choice.isCanon) {
+        //     updateTime(node);
+        // }
+        // node.canonChoices = node.canonChoices.filter(
+        //     (choiceID) => choiceID !== choice.ID
+        // );
+        // node.nonCanonChoices = node.nonCanonChoices.filter(
+        //     (choiceID) => choiceID !== choice.ID
+        // );
+        // databaseCalls.addNode(node);
+        // }
         return await databaseCalls.removeChoice(choice.ID);
     },
-    makeCanon: async (parent, args, context) => {
-        const choice = await databaseCalls.getChoice(args.choiceID);
-        if (!choice) {
-            throw new UserInputError("That choice doesnt exist!", {
-                invalidArgs: Object.keys(args),
-            });
-        }
-        const node = await databaseCalls.getNode(choice.from);
-        if (!node) {
-            throw new UserInputError("That node doesnt exist!", {
-                invalidArgs: Object.keys(args),
-            });
-        }
+    // makeCanon: async (parent, args, context) => {
+    //     const choice = await databaseCalls.getChoice(args.choiceID);
+    //     if (!choice) {
+    //         throw new UserInputError("That choice doesnt exist!", {
+    //             invalidArgs: Object.keys(args),
+    //         });
+    //     }
+    //     const node = await databaseCalls.getNode(choice.from);
+    //     if (!node) {
+    //         throw new UserInputError("That node doesnt exist!", {
+    //             invalidArgs: Object.keys(args),
+    //         });
+    //     }
 
-        if (node.canonChoices.includes(choice.ID)) return choice;
+    //     if (node.canonChoices.includes(choice.ID)) return choice;
 
-        console.log(
-            `Making choice ${choice.ID} (${choice.action}) in node ${node.ID} (${node.title}) canon`
-        );
+    //     console.log(
+    //         `Making choice ${choice.ID} (${choice.action}) in node ${node.ID} (${node.title}) canon`
+    //     );
 
-        updateTime(node);
+    //     updateTime(node);
 
-        node.canonChoices.push(choice.ID);
-        node.nonCanonChoices = node.nonCanonChoices.filter(
-            (id) => id !== choice.ID
-        );
+    //     node.canonChoices.push(choice.ID);
+    //     node.nonCanonChoices = node.nonCanonChoices.filter(
+    //         (id) => id !== choice.ID
+    //     );
 
-        MutationResolvers.createNotification(
-            undefined,
-            {
-                accountScreenName: choice.suggestedBy,
-                content: `Your suggested choice "${choice.action}" stemming from page titled "${node.title}" was made canon!`,
-                link: `/node/${node.ID}`,
-            },
-            context
-        );
+    //     MutationResolvers.createNotification(
+    //         undefined,
+    //         {
+    //             accountScreenName: choice.suggestedBy,
+    //             content: `Your suggested choice "${choice.action}" stemming from page titled "${node.title}" was made canon!`,
+    //             link: `/node/${node.ID}`,
+    //         },
+    //         context
+    //     );
 
-        databaseCalls.addNode(node);
-        return choice;
-    },
-    makeNonCanon: async (parent, args, context) => {
-        const choice = await databaseCalls.getChoice(args.choiceID);
-        if (!choice) {
-            throw new UserInputError("That choice doesnt exist!", {
-                invalidArgs: Object.keys(args),
-            });
-        }
-        const node = await databaseCalls.getNode(choice.from);
-        if (!node) {
-            throw new UserInputError("That node doesnt exist!", {
-                invalidArgs: Object.keys(args),
-            });
-        }
-        if (node.nonCanonChoices.includes(choice.ID)) return choice;
+    //     databaseCalls.addNode(node);
+    //     return choice;
+    // },
+    // makeNonCanon: async (parent, args, context) => {
+    //     const choice = await databaseCalls.getChoice(args.choiceID);
+    //     if (!choice) {
+    //         throw new UserInputError("That choice doesnt exist!", {
+    //             invalidArgs: Object.keys(args),
+    //         });
+    //     }
+    //     const node = await databaseCalls.getNode(choice.from);
+    //     if (!node) {
+    //         throw new UserInputError("That node doesnt exist!", {
+    //             invalidArgs: Object.keys(args),
+    //         });
+    //     }
+    //     if (node.nonCanonChoices.includes(choice.ID)) return choice;
 
-        console.log(
-            `Making choice ${choice.ID} (${choice.action}) in node ${node.ID} (${node.title}) non-canon`
-        );
+    //     console.log(
+    //         `Making choice ${choice.ID} (${choice.action}) in node ${node.ID} (${node.title}) non-canon`
+    //     );
 
-        updateTime(node);
+    //     updateTime(node);
 
-        node.nonCanonChoices.push(choice.ID);
-        node.canonChoices = node.canonChoices.filter((id) => id !== choice.ID);
+    //     node.nonCanonChoices.push(choice.ID);
+    //     node.canonChoices = node.canonChoices.filter((id) => id !== choice.ID);
 
-        MutationResolvers.createNotification(
-            undefined,
-            {
-                accountScreenName: choice.suggestedBy,
-                content: `Your suggested choice "${choice.action}" stemming from page titled "${node.title}" was made non-canon!`,
-                link: `/node/${node.ID}`,
-            },
-            context
-        );
+    //     MutationResolvers.createNotification(
+    //         undefined,
+    //         {
+    //             accountScreenName: choice.suggestedBy,
+    //             content: `Your suggested choice "${choice.action}" stemming from page titled "${node.title}" was made non-canon!`,
+    //             link: `/node/${node.ID}`,
+    //         },
+    //         context
+    //     );
 
-        databaseCalls.addNode(node);
-        return choice;
-    },
-    likeSuggestion: async (parent, args, context) => {
+    //     databaseCalls.addNode(node);
+    //     return choice;
+    // },
+    likeSuggestion: async (parent, args) => {
         const choice = await databaseCalls.getChoice(args.choiceID);
         if (!choice) {
             throw new UserInputError("That node doesnt exist!", {
@@ -539,58 +526,56 @@ const MutationResolvers = {
                 invalidArgs: Object.keys(args),
             });
         }
-        const node = await databaseCalls.getNode(choice.from);
+        // const node = await databaseCalls.getNode(choice.from);
 
         console.log(
             `${account.screenName} is liking choice ${choice.ID} (${choice.action})`
         );
 
-        delete choice.dislikedBy[account.screenName];
-
-        if (!choice.likedBy[account.screenName]) {
-            choice.likedBy[account.screenName] = account.screenName;
-            if (node)
-                MutationResolvers.createNotification(
-                    undefined,
-                    {
-                        accountScreenName: choice.suggestedBy,
-                        content: `${account.screenName} liked your choice ${choice.action} on page titled "${node.title}"!`,
-                        link: `/account/${account.screenName}`,
-                    },
-                    context
-                );
-        } else delete choice.likedBy[account.screenName];
-
-        databaseCalls.addAccount(account);
-        return await databaseCalls.addChoice(choice);
-    },
-    dislikeSuggestion: async (parent, args) => {
-        const choice = await databaseCalls.getChoice(args.choiceID);
-        if (!choice) {
-            throw new UserInputError("That choice doesnt exist!", {
-                invalidArgs: Object.keys(args),
-            });
-        }
-
-        const account = await databaseCalls.getAccount(args.accountScreenName);
-        if (!account) {
-            throw new UserInputError("That account doesnt exist!", {
-                invalidArgs: Object.keys(args),
-            });
-        }
-        console.log(
-            `${account.screenName} is disliking choice ${choice.ID} (${choice.action})`
+        const reaction = await databaseCalls.getReactionByAccountAndChoice(
+            args.accountScreenName,
+            args.choiceID
         );
 
-        delete choice.likedBy[account.screenName];
+        if (!reaction) {
+            let ID = Math.random().toString(36).substring(2, 12).toUpperCase();
+            while (await databaseCalls.getReaction(ID))
+                ID = Math.random().toString(36).substring(2, 12).toUpperCase();
 
-        if (!choice.dislikedBy[account.screenName])
-            choice.dislikedBy[account.screenName] = account.screenName;
-        else delete choice.dislikedBy[account.screenName];
+            return await databaseCalls.addReaction({
+                ID,
+                account: args.accountScreenName,
+                choice: args.choiceID,
+                like: args.like,
+            });
+        } else if (reaction.like === args.like) {
+            // If it already matches what you are trying to do, turn it off
+            return await databaseCalls.removeReaction(reaction);
+        } else {
+            reaction.like = args.like;
+            return await databaseCalls.addReaction(reaction);
+        }
 
-        databaseCalls.addAccount(account);
-        return await databaseCalls.addChoice(choice);
+        // delete choice.dislikedBy[account.screenName];
+
+        // if (!choice.likedBy[account.screenName]) {
+        //     choice.likedBy[account.screenName] = account.screenName;
+        //     if (node)
+        //         MutationResolvers.createNotification(
+        //             undefined,
+        //             {
+        //                 accountScreenName: choice.suggestedBy,
+        //                 content: `${account.screenName} liked your choice ${choice.action} on page titled "${node.title}"!`,
+        //                 link: `/account/${account.screenName}`,
+        //             },
+        //             context
+        //         );
+        // } else delete choice.likedBy[account.screenName];
+
+        // databaseCalls.addAccount(account);
+        // return await databaseCalls.addChoice(choice);
     },
+
     createFeedback: async (parent, args, context) => {
         let account;
         if (args.accountScreenName) {
@@ -618,7 +603,9 @@ const MutationResolvers = {
         while (await databaseCalls.getFeedback(ID))
             ID = Math.random().toString(36).substring(2, 12).toUpperCase();
 
-        const IP = context.headers["X-Forwarded-For"].split(",")[0];
+        const IP = context.headers
+            ? context.headers["X-Forwarded-For"].split(",")[0]
+            : undefined;
         const feedback = {
             ID,
             submittedBy: args.accountScreenName || "",
@@ -634,6 +621,7 @@ const MutationResolvers = {
                 ID: args.reportingObjectID,
             };
 
+            // Hide nodes and choices that are being reported
             switch (args.reportingObjectType) {
                 case "Node":
                     databaseCalls
@@ -672,45 +660,45 @@ const MutationResolvers = {
         }
         return await databaseCalls.removeFeedback(feedback.ID);
     },
-    removeAllFeedback: async (parent, args) => {
-        const allFeedback = await databaseCalls.allFeedback();
+    // removeAllFeedback: async (parent, args) => {
+    //     const allFeedback = await databaseCalls.allFeedback();
 
-        if (
-            args.reportingObjectID !== undefined &&
-            args.reportingObjectType === undefined
-        ) {
-            throw new UserInputError(
-                "Invalid input, make sure you report both object type and ID",
-                {
-                    invalidArgs: Object.keys(args),
-                }
-            );
-        }
+    //     if (
+    //         args.reportingObjectID !== undefined &&
+    //         args.reportingObjectType === undefined
+    //     ) {
+    //         throw new UserInputError(
+    //             "Invalid input, make sure you report both object type and ID",
+    //             {
+    //                 invalidArgs: Object.keys(args),
+    //             }
+    //         );
+    //     }
 
-        allFeedback.forEach((feedback) => {
-            // accountScreenName: String, reportingObjectType: String, reportingObjectID: String, info: String
-            if (
-                args.accountScreenName &&
-                feedback.submittedBy !== args.accountScreenName
-            )
-                return;
-            if (
-                args.reportingObjectType &&
-                (feedback.reporting === undefined ||
-                    feedback.reporting.type !== args.reportingObjectType)
-            )
-                return;
-            if (
-                args.reportingObjectID &&
-                (feedback.reporting === undefined ||
-                    feedback.reporting.ID !== args.reportingObjectType)
-            )
-                return;
-            if (args.info && feedback.info !== args.info) return;
-            databaseCalls.removeFeedback(feedback.ID);
-        });
-        return true;
-    },
+    //     allFeedback.forEach((feedback) => {
+    //         // accountScreenName: String, reportingObjectType: String, reportingObjectID: String, info: String
+    //         if (
+    //             args.accountScreenName &&
+    //             feedback.submittedBy !== args.accountScreenName
+    //         )
+    //             return;
+    //         if (
+    //             args.reportingObjectType &&
+    //             (feedback.reporting === undefined ||
+    //                 feedback.reporting.type !== args.reportingObjectType)
+    //         )
+    //             return;
+    //         if (
+    //             args.reportingObjectID &&
+    //             (feedback.reporting === undefined ||
+    //                 feedback.reporting.ID !== args.reportingObjectType)
+    //         )
+    //             return;
+    //         if (args.info && feedback.info !== args.info) return;
+    //         databaseCalls.removeFeedback(feedback.ID);
+    //     });
+    //     return true;
+    // },
 
     createNotification: async (parent, args) => {
         let account;
@@ -725,98 +713,115 @@ const MutationResolvers = {
             }
         }
 
-        if (!account.notifications) account.notifications = [];
+        // if (!account.notifications) account.notifications = [];
+
+        let ID = Math.random().toString(36).substring(2, 12).toUpperCase();
+        while (await databaseCalls.getNotification(ID))
+            ID = Math.random().toString(36).substring(2, 12).toUpperCase();
 
         const newNotification = {
+            ID,
             time: new Date().getTime(),
             content: args.content,
             link: args.link,
             seen: false,
+            account: account.screenName,
         };
 
-        account.notifications = [
-            newNotification,
-            ...account.notifications,
-        ].slice(0, MAX_NOTIFICATIONS);
-        if (!parent) databaseCalls.addAccount(account);
+        // account.notifications = [
+        //     newNotification,
+        //     ...account.notifications,
+        // ].slice(0, MAX_NOTIFICATIONS);
+        // if (!parent) databaseCalls.addAccount(account);
 
-        return newNotification;
+        return await databaseCalls.addNotification(newNotification);
     },
     removeNotification: async (parent, args) => {
-        let account;
-        if (parent) {
-            account = parent;
-        } else {
-            account = await databaseCalls.getAccount(args.accountScreenName);
-            if (!account) {
-                throw new UserInputError(`Account doesn't exist!`, {
-                    invalidArgs: Object.keys(args),
-                });
-            }
+        const notification = await databaseCalls.getNotification(args.ID);
+
+        if (!notification) {
+            throw new UserInputError(`Notification doesn't exist!`, {
+                invalidArgs: Object.keys(args),
+            });
         }
+        return await databaseCalls.removeNotification(notification.ID);
+        // let account;
+        // if (parent) {
+        //     account = parent;
+        // } else {
+        //     account = await databaseCalls.getAccount(args.accountScreenName);
+        //     if (!account) {
+        //         throw new UserInputError(`Account doesn't exist!`, {
+        //             invalidArgs: Object.keys(args),
+        //         });
+        //     }
+        // }
 
-        if (!account.notifications) account.notifications = [];
+        // if (!account.notifications) account.notifications = [];
 
-        if (!account.notifications[args.index]) return false;
+        // if (!account.notifications[args.index]) return false;
 
-        account.notifications = [
-            ...account.notifications.slice(0, args.index),
-            ...account.notifications.slice(args.index + 1),
-        ];
-        databaseCalls.addAccount(account);
+        // account.notifications = [
+        //     ...account.notifications.slice(0, args.index),
+        //     ...account.notifications.slice(args.index + 1),
+        // ];
+        // databaseCalls.addAccount(account);
 
-        return true;
+        // return true;
     },
     seeNotification: async (parent, args) => {
-        let account;
-        if (parent) {
-            account = parent;
-        } else {
-            account = await databaseCalls.getAccount(args.accountScreenName);
-            if (!account) {
-                throw new UserInputError(`Account doesn't exist!`, {
-                    invalidArgs: Object.keys(args),
-                });
-            }
+        const notification = await databaseCalls.getNotification(args.ID);
+
+        if (!notification) {
+            throw new UserInputError(`Notification doesn't exist!`, {
+                invalidArgs: Object.keys(args),
+            });
         }
+        notification.seen =
+            args.force !== undefined ? args.force : !notification.seen;
 
-        if (!account.notifications) account.notifications = [];
+        return await databaseCalls.addNotification(notification);
+        // let account;
+        // if (parent) {
+        //     account = parent;
+        // } else {
+        //     account = await databaseCalls.getAccount(args.accountScreenName);
+        //     if (!account) {
+        //         throw new UserInputError(`Account doesn't exist!`, {
+        //             invalidArgs: Object.keys(args),
+        //         });
+        //     }
+        // }
 
-        if (args.index === -1) {
-            for (const notification of account.notifications) {
-                notification.seen = true;
-            }
-        } else if (!account.notifications[args.index]) return false;
-        else {
-            if (args.force === undefined)
-                account.notifications[args.index].seen =
-                    !account.notifications[args.index].seen;
-            else account.notifications[args.index].seen = args.force;
-        }
-        databaseCalls.addAccount(account);
+        // if (!account.notifications) account.notifications = [];
 
-        return true;
+        // if (args.index === -1) {
+        //     for (const notification of account.notifications) {
+        //         notification.seen = true;
+        //     }
+        // } else if (!account.notifications[args.index]) return false;
+        // else {
+        //     if (args.force === undefined)
+        //         account.notifications[args.index].seen =
+        //             !account.notifications[args.index].seen;
+        //     else account.notifications[args.index].seen = args.force;
+        // }
+        // databaseCalls.addAccount(account);
+
+        // return true;
     },
     clearNotifications: async (parent, args) => {
-        let account;
-        if (parent) {
-            account = parent;
-        } else {
-            account = await databaseCalls.getAccount(args.accountScreenName);
-            if (!account) {
-                throw new UserInputError(`Account doesn't exist!`, {
-                    invalidArgs: Object.keys(args),
-                });
-            }
+        const account = await databaseCalls.getAccount(args.accountScreenName);
+        if (!account) {
+            throw new UserInputError(`Account doesn't exist!`, {
+                invalidArgs: Object.keys(args),
+            });
         }
-
-        if (args.onlyClearSeen && account.notifications)
-            account.notifications = account.notifications.filter(
-                (notification) => !notification.seen
-            );
-        else account.notifications = [];
-        databaseCalls.addAccount(account);
-
+        for (const { ID } of await AccountResolvers.notifications(
+            account.screenName
+        )) {
+            await databaseCalls.removeNotification(ID);
+        }
         return true;
     },
 };

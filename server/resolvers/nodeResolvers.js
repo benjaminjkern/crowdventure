@@ -1,6 +1,4 @@
 const { databaseCalls } = require("./databaseCalls.js");
-const { sort } = require("./resolverUtils.js");
-const ChoiceResolvers = require("./choiceResolvers.js");
 
 // all nodes that can possible be reached from this node
 // const allConnected = async (node, visited = {}) => {
@@ -25,80 +23,54 @@ const NodeResolvers = {
     content: async (parent, args, context) => {
         if (context.headers) {
             const IP = context.headers["X-Forwarded-For"].split(",")[0];
-            const newParent = await databaseCalls.getNode(parent.ID);
-            if (typeof newParent.views !== "object") {
-                newParent.views = { previouslySaved: newParent.views };
-            }
-            if (!newParent.views[IP]) {
-                newParent.views[IP] = IP;
-                databaseCalls.addNode(newParent);
-            }
-            parent.views = newParent.views;
+            await databaseCalls.addView({
+                node: parent.ID,
+                IP,
+                time: new Date().getTime(),
+            });
         }
         return parent.content;
     },
     views: async (parent) => {
-        if (typeof parent.views === "object") {
-            const newParent = await databaseCalls.getNode(parent.ID);
-            while (typeof newParent.views.previouslySaved === "object") {
-                newParent.views.previouslySaved =
-                    newParent.views.previouslySaved.previouslySaved;
-            }
-            databaseCalls.addNode(newParent);
-            parent.views = newParent.views;
-            return (
-                Object.keys(parent.views).filter(
-                    (key) => key !== "previouslySaved"
-                ).length + (parent.views.previouslySaved || 0)
-            );
-        } else {
-            const newParent = await databaseCalls.getNode(parent.ID);
-            newParent.views = { previouslySaved: parent.views };
-            databaseCalls.addNode(newParent);
-            parent.views = newParent.views;
-            return newParent.views.previouslySaved;
-        }
+        return (await databaseCalls.getViewsForNode(parent.ID)).length;
+        // if (typeof parent.views === "object") {
+        //     const newParent = await databaseCalls.getNode(parent.ID);
+        //     while (typeof newParent.views.previouslySaved === "object") {
+        //         newParent.views.previouslySaved =
+        //             newParent.views.previouslySaved.previouslySaved;
+        //     }
+        //     databaseCalls.addNode(newParent);
+        //     parent.views = newParent.views;
+        //     return (
+        //         Object.keys(parent.views).filter(
+        //             (key) => key !== "previouslySaved"
+        //         ).length + (parent.views.previouslySaved || 0)
+        //     );
+        // } else {
+        //     const newParent = await databaseCalls.getNode(parent.ID);
+        //     newParent.views = { previouslySaved: parent.views };
+        //     databaseCalls.addNode(newParent);
+        //     parent.views = newParent.views;
+        //     return newParent.views.previouslySaved;
+        // }
     },
     owner: async (parent) => await databaseCalls.getAccount(parent.owner),
     canonChoices: async (parent) =>
-        await Promise.all(
-            parent.canonChoices.map((id) => databaseCalls.getChoice(id))
-        ),
+        await databaseCalls.getCanonChoicesForNode(parent.ID),
     nonCanonChoices: async (parent) =>
-        await Promise.all(
-            parent.nonCanonChoices.map((id) => databaseCalls.getChoice(id))
-        )
-            .then((choices) =>
-                choices.map((choice) => ({
-                    ...choice,
-                    score: ChoiceResolvers.score(choice),
-                }))
-            )
-            .then((choices) =>
-                sort(choices, (a, b) =>
-                    a.score === b.score ? 0 : a.score > b.score ? -1 : 1
-                )
-            ),
-    dateCreated: async (parent) => {
-        const newParent = await databaseCalls.getNode(parent.ID);
-        if (!newParent.dateCreated) {
-            parent.dateCreated = "Before September 16, 2020";
-            newParent.dateCreated = "Before September 16, 2020";
-            databaseCalls.addNode(newParent);
-        }
-        return parent.dateCreated;
-    },
-    // should return the total number of nodes it is connected to
+        await databaseCalls.getNonCanonChoicesForNode(parent.ID),
     size: async () => {
+        // should return the total number of nodes it is connected to
         return 0;
         // if (parent.size) return parent.size;
         // return Object.keys(await allConnected(parent)).length;
     },
-    parents: async (parent) => {
-        const choices = await databaseCalls.filterParents(parent.ID);
-        return await Promise.all(
-            choices.map((choice) => databaseCalls.getNode(choice.from))
-        );
+    parents: async () => {
+        return [];
+        // const choices = await databaseCalls.filterParents(parent.ID);
+        // return await Promise.all(
+        //     choices.map((choice) => databaseCalls.getNode(choice.from))
+        // );
     },
 };
 

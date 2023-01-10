@@ -11,6 +11,9 @@ const ACCOUNT_TABLE = "Accounts";
 const NODE_TABLE = "Nodes2";
 const CHOICE_TABLE = "Choices";
 const FEEDBACK_TABLE = "Feedback";
+const NOTIFICATION_TABLE = "Notifications";
+const VIEW_TABLE = "Views";
+const REACTION_TABLE = "Reactions";
 const SORTED_NODE_TABLE = "SortedNodes";
 const DBON = true;
 
@@ -69,6 +72,10 @@ const databaseCalls = {
         await getItem(CHOICE_TABLE, { ID: choiceID }),
     getFeedback: async (feedbackID) =>
         await getItem(FEEDBACK_TABLE, { ID: feedbackID }),
+    getReaction: async (reactionID) =>
+        await getItem(REACTION_TABLE, { ID: reactionID }),
+    getNotification: async (notificationID) =>
+        await getItem(NOTIFICATION_TABLE, { ID: notificationID }),
 
     addAccount: async (account) => await addItem(ACCOUNT_TABLE, account),
     addNode: async (node) => {
@@ -84,6 +91,9 @@ const databaseCalls = {
     },
     addChoice: async (choice) => await addItem(CHOICE_TABLE, choice),
     addFeedback: async (feedback) => await addItem(FEEDBACK_TABLE, feedback),
+    addReaction: async (reaction) => await addItem(REACTION_TABLE, reaction),
+    addNotification: async (notification) =>
+        await addItem(NOTIFICATION_TABLE, notification),
 
     removeAccount: async (accountScreenName) =>
         await removeItem(ACCOUNT_TABLE, { screenName: accountScreenName }),
@@ -95,9 +105,80 @@ const databaseCalls = {
         await removeItem(CHOICE_TABLE, { ID: choiceID }),
     removeFeedback: async (feedbackID) =>
         await removeItem(FEEDBACK_TABLE, { ID: feedbackID }),
+    removeReaction: async (reactionID) =>
+        await removeItem(REACTION_TABLE, { ID: reactionID }),
+    removeNotification: async (notificationID) =>
+        await removeItem(NOTIFICATION_TABLE, { ID: notificationID }),
+
+    // New calls
 
     getNodesOwnedByAccount: async (screenName) => {
         return await filter(NODE_TABLE, "owner", screenName);
+    },
+    getChoicesSuggestedByAccount: async (screenName) => {
+        return await filter(CHOICE_TABLE, "suggestedBy", screenName);
+    },
+    getNotificationsForAccount: async (screenName) => {
+        return await filter(NOTIFICATION_TABLE, "account", screenName);
+    },
+    getFeaturedNodesOwnedByAccount: async (screenName) => {
+        return await multiFilter(NODE_TABLE, {
+            ExpressionAttributeNames: {
+                "#o": "owner",
+            },
+            ExpressionAttributeValues: {
+                ":sn": screenName,
+                ":t": true,
+            },
+            FilterExpression: `#o = :sn AND featured = :t`,
+        });
+    },
+    getLikedByForChoice: async (choiceID) => {
+        return await multiFilter(REACTION_TABLE, {
+            ExpressionAttributeNames: {
+                "#l": "like",
+            },
+            ExpressionAttributeValues: {
+                ":ci": choiceID,
+                ":t": true,
+            },
+            FilterExpression: `choice = :ci AND #l = :t`,
+        });
+    },
+    getDisikedByForChoice: async (choiceID) => {
+        return await multiFilter(REACTION_TABLE, {
+            ExpressionAttributeNames: {
+                "#l": "like",
+            },
+            ExpressionAttributeValues: {
+                ":ci": choiceID,
+                ":f": false,
+            },
+            FilterExpression: `choice = :ci AND #l = :f`,
+        });
+    },
+    getReactionByAccountAndChoice: async (screenName, choiceID) => {
+        return (
+            await multiFilter(
+                REACTION_TABLE,
+                `choice = ${choiceID} AND account = ${screenName}`
+            )
+        )[0];
+    },
+    getViewsForNode: async (nodeID) => {
+        return await filter(VIEW_TABLE, "node", nodeID);
+    },
+    getCanonChoicesForNode: async (nodeID) => {
+        return await multiFilter(
+            CHOICE_TABLE,
+            `node = ${nodeID} AND isCanon = true`
+        );
+    },
+    getNonCanonChoicesForNode: async (nodeID) => {
+        return await multiFilter(
+            CHOICE_TABLE,
+            `node = ${nodeID} AND isCanon = false`
+        );
     },
 };
 
@@ -257,6 +338,37 @@ const removeItem = async (tableName, key) =>
             console.log(err);
             return err;
         });
+
+// const removeMultiple = async (tableName, keys) =>
+//     await docClient
+//         .batchWrite({
+//             RequestItems: {
+//                 [tableName]: keys.map((key) => ({
+//                     DeleteRequest: { Key: key },
+//                 })),
+//             },
+//         })
+//         .promise()
+//         .then(() => true)
+//         .catch((err) => {
+//             console.log(err);
+//             return err;
+//         });
+
+const multiFilter = async (tableName, filterExpression) =>
+    DBON
+        ? await docClient
+              .scan({
+                  TableName: tableName,
+                  ...filterExpression,
+              })
+              .promise()
+              .then((data) => data.Items)
+              .catch((err) => {
+                  console.log(err);
+                  return err;
+              })
+        : [];
 
 const filter = async (tableName, arg, value) =>
     DBON

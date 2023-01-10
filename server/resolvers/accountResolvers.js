@@ -3,49 +3,41 @@ const NodeResolvers = require("./nodeResolvers.js");
 const ChoiceResolvers = require("./choiceResolvers.js");
 
 const AccountResolvers = {
-    nodes: async (parent) => {
-        return await databaseCalls.getNodesOwnedByAccount(parent.screenName);
-    },
+    nodes: async (parent) =>
+        await databaseCalls.getNodesOwnedByAccount(parent.screenName),
     suggestedChoices: async (parent) =>
-        await Promise.all(
-            parent.suggestedChoices.map((id) => databaseCalls.getChoice(id))
-        ),
+        await databaseCalls.getChoicesSuggestedByAccount(parent.screenName),
+    notifications: async (parent) =>
+        await databaseCalls.getNotificationsForAccount(parent.screenName),
     totalNodeViews: async (parent) =>
-        await Promise.all(
-            (
-                await databaseCalls.getNodesOwnedByAccount(parent.screenName)
-            ).map((node) => NodeResolvers.views(node))
-        ).then((nodes) => nodes.reduce((x, y) => x + y, 0)),
+        // TODO: Make views be stored in database
+        await databaseCalls
+            .getNodesOwnedByAccount(parent.screenName)
+            .then((nodes) =>
+                Promise.all(nodes.map((node) => NodeResolvers.views(node)))
+            )
+            .then((nodes) => nodes.reduce((x, y) => x + y, 0)),
     totalSuggestionScore: async (parent) =>
-        parent.suggestedChoices
-            ? await Promise.all(
-                  parent.suggestedChoices.map((id) =>
-                      databaseCalls.getChoice(id)
-                  )
-              ).then((choices) =>
-                  choices
-                      .map((choice) => ChoiceResolvers.score(choice))
-                      .reduce((x, y) => x + y, 0)
-              )
-            : 0,
-    featuredNodes: async (parent) => {
-        const allNodes = await AccountResolvers.nodes(parent);
-        return await Promise.all(
-            allNodes
-                .filter((node) => node.featured)
-                .map(async (node) => ({
-                    ...node,
-                    size: await NodeResolvers.size(node),
-                }))
-        );
-    },
+        // TODO: Make score be stored in database
+        await databaseCalls
+            .getChoicesSuggestedByAccount(parent.screenName)
+            .then((choices) =>
+                Promise.all(
+                    choices.map((choice) => ChoiceResolvers.score(choice))
+                )
+            )
+            .then((choices) => choices.reduce((x, y) => x + y, 0)),
+    featuredNodes: async (parent) =>
+        await databaseCalls.getFeaturedNodesOwnedByAccount(parent.screenName),
     dateCreated: async (parent) => {
-        const newParent = await databaseCalls.getAccount(parent.ID);
-        if (!newParent.dateCreated) {
-            parent.dateCreated = "Before September 16, 2020";
-            newParent.dateCreated = "Before September 16, 2020";
+        if (!parent.dateCreated) {
+            const existingParent = await databaseCalls.getAccount(
+                parent.screenName
+            );
+            existingParent.dateCreated = `Before ${new Date().toJSON()}`;
+            parent.dateCreated = existingParent.dateCreated;
+            await databaseCalls.addAccount(existingParent);
         }
-        databaseCalls.addAccount(newParent);
         return parent.dateCreated;
     },
 };

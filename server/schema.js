@@ -148,14 +148,19 @@ const typeDefs = gql`
             action: String
             toID: String
             hidden: Boolean
+            isCanon: Boolean
         ): Choice
         removeSuggestion(choiceID: String!): Boolean
 
-        makeCanon(choiceID: String!): Choice
-        makeNonCanon(choiceID: String!): Choice
+        # makeCanon(choiceID: String!): Choice
+        # makeNonCanon(choiceID: String!): Choice
 
-        likeSuggestion(accountScreenName: String!, choiceID: String!): Choice
-        dislikeSuggestion(accountScreenName: String!, choiceID: String!): Choice
+        likeSuggestion(
+            accountScreenName: String!
+            choiceID: String!
+            like: Boolean!
+        ): Choice
+        # dislikeSuggestion(accountScreenName: String!, choiceID: String!): Choice
 
         createFeedback(
             accountScreenName: String
@@ -164,24 +169,20 @@ const typeDefs = gql`
             info: String!
         ): Feedback
         removeFeedback(feedbackID: String!): Boolean
-        removeAllFeedback(
-            accountScreenName: String
-            reportingObjectType: String
-            reportingObjectID: String
-            info: String
-        ): Boolean
+        # removeAllFeedback(
+        #     accountScreenName: String
+        #     reportingObjectType: String
+        #     reportingObjectID: String
+        #     info: String
+        # ): Boolean
 
         createNotification(
             accountScreenName: String!
             content: String!
             link: String
         ): Notification!
-        seeNotification(
-            accountScreenName: String!
-            index: Int!
-            force: Boolean
-        ): Boolean
-        removeNotification(accountScreenName: String!, index: Int!): Boolean
+        seeNotification(notificationID: String!, force: Boolean): Boolean
+        removeNotification(notificationID: String!): Boolean
         clearNotifications(
             accountScreenName: String!
             onlyClearSeen: Boolean
