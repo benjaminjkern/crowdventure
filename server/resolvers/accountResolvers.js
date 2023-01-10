@@ -3,25 +3,18 @@ const NodeResolvers = require("./nodeResolvers.js");
 const ChoiceResolvers = require("./choiceResolvers.js");
 
 const AccountResolvers = {
-    nodes: async (parent) =>
-        await Promise.all(parent.nodes.map((id) => databaseCalls.getNode(id))),
-    // .then((nodes) => nodes.map((node) => ({...node, views: NodeResolvers.views(node) })))
-    // .then((nodes) => sort(nodes, (a, b) => {
-    //     if (a.featured) return b.featured ? 0 : -1;
-    //     if (b.featured) return 1;
-    //     return a.views === b.views ? 0 : a.views > b.views ? -1 : 1;
-    // })),
+    nodes: async (parent) => {
+        return await databaseCalls.getNodesOwnedByAccount(parent.screenName);
+    },
     suggestedChoices: async (parent) =>
         await Promise.all(
             parent.suggestedChoices.map((id) => databaseCalls.getChoice(id))
         ),
     totalNodeViews: async (parent) =>
         await Promise.all(
-            parent.nodes.map((id) =>
-                databaseCalls
-                    .getNode(id)
-                    .then((node) => NodeResolvers.views(node))
-            )
+            (
+                await databaseCalls.getNodesOwnedByAccount(parent.screenName)
+            ).map((node) => NodeResolvers.views(node))
         ).then((nodes) => nodes.reduce((x, y) => x + y, 0)),
     totalSuggestionScore: async (parent) =>
         parent.suggestedChoices

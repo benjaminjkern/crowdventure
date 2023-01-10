@@ -41,11 +41,16 @@ const CrowdventureModal = ({ modalTitle, children, modalButtons }) => {
                 {children}
                 {modalButtons.length && (
                     <div>
-                        {modalButtons.map(({ text, ...props }, i) => (
-                            <CrowdventureButton key={i} {...props}>
-                                {text}
-                            </CrowdventureButton>
-                        ))}
+                        {modalButtons.map(
+                            ({ active = true, text, ...props }, i) => {
+                                if (!active) return;
+                                return (
+                                    <CrowdventureButton key={i} {...props}>
+                                        {text}
+                                    </CrowdventureButton>
+                                );
+                            }
+                        )}
                     </div>
                 )}
             </div>

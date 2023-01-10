@@ -33,7 +33,7 @@ const CreateNodeModal = ({
     const [info, setInfo] = useState("");
 
     const { user } = useContext(UserContext);
-    const { openModal, closeModal } = useContext(ModalContext);
+    const { openModal, closeModal, closeAllModals } = useContext(ModalContext);
     const router = useRouter();
 
     const validateInputs = () => {
@@ -94,12 +94,16 @@ const CreateNodeModal = ({
                 hidden: shouldHide || undefined,
                 pictureUnsafe: shouldHide || undefined,
             }
-        ).then((newNode) => router.push(`/node/${newNode.ID}`));
+        ).then((newNode) => {
+            router.push(`/node/${newNode.ID}`);
+            closeModal();
+        });
     };
 
     const deleteNode = () => {
         mutationCall("deleteNode", undefined, { nodeID: node.ID }).then(() => {
             router.back();
+            closeAllModals();
         });
     };
 
@@ -110,20 +114,21 @@ const CreateNodeModal = ({
                 {
                     text: `${node ? "Edit" : "Create"} Page!`,
                     onClick: () => {
-                        if (node) createNode();
-                        else editNode();
+                        if (node) editNode();
+                        else createNode();
                     },
                 },
                 {
-                    active: node,
+                    active: !!node,
                     text: "Delete",
-                    onClick: openModal(
-                        <ConfirmModal
-                            onConfirm={deleteNode}
-                            title="Delete Page"
-                            content="This will erase all suggested choices of this page, and their associated scores. This will NOT delete sub-pages of this page. Are you sure you wish to continue?"
-                        />
-                    ),
+                    onClick: () =>
+                        openModal(
+                            <ConfirmModal
+                                onConfirm={deleteNode}
+                                title="Delete Page"
+                                content="This will erase all suggested choices of this page, and their associated scores. This will NOT delete sub-pages of this page. Are you sure you wish to continue?"
+                            />
+                        ),
                 },
             ]}
         >

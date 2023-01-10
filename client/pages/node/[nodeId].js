@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AccountPreview from "../../lib/accounts/AccountPreview";
 import ActionCard from "../../lib/actions/ActionCard";
 import { queryCall } from "../../lib/apiUtils";
@@ -9,6 +9,7 @@ import CrowdventureButton from "../../lib/components/CrowdventureButton";
 import LoadingBox from "../../lib/components/LoadingBox";
 import PictureModal from "../../lib/components/PictureModal";
 import { ModalContext } from "../../lib/modal";
+import CreateNodeModal from "../../lib/nodes/CreateNodeModal";
 import { UnsafeModeContext } from "../../lib/unsafeMode";
 import { UserContext } from "../../lib/user";
 import { deepCopy } from "../../lib/utils";
@@ -26,7 +27,11 @@ const NodePage = ({ node: initNode }) => {
     const { openModal } = useContext(ModalContext);
     const router = useRouter();
 
-    const node = deepCopy(initNode);
+    const [node, setNode] = useState(deepCopy(initNode));
+
+    useEffect(() => {
+        setNode(deepCopy(initNode));
+    }, [initNode]);
 
     const reportNode = () => {
         // mutation_call(
@@ -161,7 +166,9 @@ const NodePage = ({ node: initNode }) => {
             {(node.owner.screenName === user?.screenName || user?.isAdmin) && (
                 <CrowdventureButton
                     onClick={() => {
-                        // showModal(<EditNodeModal node={node} />);
+                        openModal(
+                            <CreateNodeModal node={node} setNode={setNode} />
+                        );
                     }}
                 >
                     Edit Page

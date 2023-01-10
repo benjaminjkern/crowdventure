@@ -3,6 +3,7 @@ const { databaseCalls } = require("./databaseCalls.js");
 const { encrypt, flagContent } = require("./resolverUtils.js");
 // const AccountResolvers = require("./accountResolvers.js");
 const NodeResolvers = require("./nodeResolvers.js");
+const AccountResolvers = require("./accountResolvers.js");
 
 const MAX_NOTIFICATIONS = 50;
 
@@ -75,7 +76,7 @@ const MutationResolvers = {
         account.suggestedChoices.forEach((choiceID) =>
             MutationResolvers.removeSuggestion(undefined, { choiceID })
         );
-        account.nodes.forEach((nodeID) =>
+        (await AccountResolvers.nodes(parent)).forEach((nodeID) =>
             MutationResolvers.deleteNode(undefined, { nodeID })
         );
 
@@ -213,7 +214,7 @@ const MutationResolvers = {
             canonChoices: [],
             nonCanonChoices: [],
         };
-        account.nodes.push(newNode.ID);
+        // account.nodes.push(newNode.ID);
         databaseCalls.addAccount(account);
         return await databaseCalls.addNode(newNode);
     },
@@ -237,9 +238,9 @@ const MutationResolvers = {
         );
 
         if (account) {
-            account.nodes = account.nodes.filter(
-                (nodeID) => nodeID !== node.ID
-            );
+            // account.nodes = account.nodes.filter(
+            //     (nodeID) => nodeID !== node.ID
+            // );
             databaseCalls.addAccount(account);
         }
         MutationResolvers.createNotification(

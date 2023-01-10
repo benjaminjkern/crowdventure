@@ -95,6 +95,10 @@ const databaseCalls = {
         await removeItem(CHOICE_TABLE, { ID: choiceID }),
     removeFeedback: async (feedbackID) =>
         await removeItem(FEEDBACK_TABLE, { ID: feedbackID }),
+
+    getNodesOwnedByAccount: async (screenName) => {
+        return await filter(NODE_TABLE, "owner", screenName);
+    },
 };
 
 const getPaginatedFilteredTable = async (
