@@ -5,14 +5,9 @@ const ChoiceResolvers = {
     to: async (parent) => await databaseCalls.getNode(parent.to),
     suggestedBy: async (parent) =>
         await databaseCalls.getAccount(parent.suggestedBy),
-    likes: async (parent) =>
-        (await ChoiceResolvers.likedBy(parent)).then(
-            (likedBy) => likedBy.length
-        ),
+    likes: async (parent) => (await ChoiceResolvers.likedBy(parent)).length,
     dislikes: async (parent) =>
-        (await ChoiceResolvers.dislikedBy(parent)).then(
-            (dislikedBy) => dislikedBy.length
-        ),
+        (await ChoiceResolvers.dislikedBy(parent)).length,
     score: async (parent) =>
         (await ChoiceResolvers.likes(parent)) -
         (await ChoiceResolvers.dislikes(parent)),
