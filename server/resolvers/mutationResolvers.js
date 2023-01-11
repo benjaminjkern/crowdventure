@@ -464,7 +464,7 @@ const MutationResolvers = {
             await changeScore(choice, -1);
             // replace with reaction.like === args.like
             // If it already matches what you are trying to do, turn it off
-            return await databaseCalls.removeReaction(reaction);
+            return await databaseCalls.removeReaction(reaction.ID);
         } else {
             await changeScore(choice, 2);
             reaction.like = true;
@@ -506,7 +506,7 @@ const MutationResolvers = {
             await changeScore(choice, 1);
             // replace with reaction.like === args.like
             // If it already matches what you are trying to do, turn it off
-            return await databaseCalls.removeReaction(reaction);
+            return await databaseCalls.removeReaction(reaction.ID);
         } else {
             await changeScore(choice, -2);
             reaction.like = false;

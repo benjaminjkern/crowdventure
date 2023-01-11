@@ -20,10 +20,22 @@ const ChoiceResolvers = {
     //     parent.score = choice.score;
     //     return parent.score;
     // },
-    likedBy: async (parent) =>
-        await databaseCalls.getLikedByForChoice(parent.ID),
-    dislikedBy: async (parent) =>
-        await databaseCalls.getDisikedByForChoice(parent.ID),
+    likedBy: async (parent) => {
+        const likedBy = await databaseCalls.getLikedByForChoice(parent.ID);
+        const newLikedBy = [];
+        for (const { account } of likedBy) {
+            newLikedBy.push(await databaseCalls.getAccount(account));
+        }
+        return newLikedBy;
+    },
+    dislikedBy: async (parent) => {
+        const dislikedBy = await databaseCalls.getDisikedByForChoice(parent.ID);
+        const newDislikedBy = [];
+        for (const { account } of dislikedBy) {
+            newDislikedBy.push(await databaseCalls.getAccount(account));
+        }
+        return newDislikedBy;
+    },
 };
 
 module.exports = ChoiceResolvers;
