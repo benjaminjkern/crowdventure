@@ -76,6 +76,7 @@ const databaseCalls = {
         await getItem(REACTION_TABLE, { ID: reactionID }),
     getNotification: async (notificationID) =>
         await getItem(NOTIFICATION_TABLE, { ID: notificationID }),
+    getView: async (viewID) => await getItem(VIEW_TABLE, { ID: viewID }),
 
     addAccount: async (account) => await addItem(ACCOUNT_TABLE, account),
     addNode: async (node) => {
@@ -83,7 +84,7 @@ const databaseCalls = {
             idx: "Node",
             ID: node.ID,
             lastUpdated:
-                node.lastUpdated || new Date(node.dateCreated).getTime(),
+                node.lastUpdated || new Date("September 16, 2020").getTime(),
             hidden: node.hidden || node.pictureUnsafe || false,
             featured: node.featured || false,
         });
@@ -94,6 +95,7 @@ const databaseCalls = {
     addReaction: async (reaction) => await addItem(REACTION_TABLE, reaction),
     addNotification: async (notification) =>
         await addItem(NOTIFICATION_TABLE, notification),
+    addView: async (view) => await addItem(VIEW_TABLE, view),
 
     removeAccount: async (accountScreenName) =>
         await removeItem(ACCOUNT_TABLE, { screenName: accountScreenName }),
@@ -159,26 +161,47 @@ const databaseCalls = {
     },
     getReactionByAccountAndChoice: async (screenName, choiceID) => {
         return (
-            await multiFilter(
-                REACTION_TABLE,
-                `choice = ${choiceID} AND account = ${screenName}`
-            )
+            await multiFilter(REACTION_TABLE, {
+                ExpressionAttributeNames: {
+                    "#c": "choice",
+                    "#a": "account",
+                },
+                ExpressionAttributeValues: {
+                    ":ci": choiceID,
+                    ":sn": screenName,
+                },
+                FilterExpression: `#c = :ci AND #a = :sn`,
+            })
         )[0];
     },
     getViewsForNode: async (nodeID) => {
         return await filter(VIEW_TABLE, "node", nodeID);
     },
     getCanonChoicesForNode: async (nodeID) => {
-        return await multiFilter(
-            CHOICE_TABLE,
-            `node = ${nodeID} AND isCanon = true`
-        );
+        return await multiFilter(CHOICE_TABLE, {
+            ExpressionAttributeNames: {
+                "#n": "from",
+                "#ic": "isCanon",
+            },
+            ExpressionAttributeValues: {
+                ":ni": nodeID,
+                ":t": true,
+            },
+            FilterExpression: `#n = :ni AND #ic = :t`,
+        });
     },
     getNonCanonChoicesForNode: async (nodeID) => {
-        return await multiFilter(
-            CHOICE_TABLE,
-            `node = ${nodeID} AND isCanon = false`
-        );
+        return await multiFilter(CHOICE_TABLE, {
+            ExpressionAttributeNames: {
+                "#n": "from",
+                "#ic": "isCanon",
+            },
+            ExpressionAttributeValues: {
+                ":ni": nodeID,
+                ":f": false,
+            },
+            FilterExpression: `#n = :ni AND #ic = :f`,
+        });
     },
 };
 
@@ -355,20 +378,21 @@ const removeItem = async (tableName, key) =>
 //             return err;
 //         });
 
-const multiFilter = async (tableName, filterExpression) =>
-    DBON
-        ? await docClient
-              .scan({
-                  TableName: tableName,
-                  ...filterExpression,
-              })
-              .promise()
-              .then((data) => data.Items)
-              .catch((err) => {
-                  console.log(err);
-                  return err;
-              })
-        : [];
+const multiFilter = async (tableName, filterExpression) => {
+    if (!DBON) return [];
+
+    return await docClient
+        .scan({
+            TableName: tableName,
+            ...filterExpression,
+        })
+        .promise()
+        .then((data) => data.Items)
+        .catch((err) => {
+            console.log(err);
+            return err;
+        });
+};
 
 const filter = async (tableName, arg, value) =>
     DBON

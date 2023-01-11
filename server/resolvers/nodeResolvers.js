@@ -1,4 +1,5 @@
 const { databaseCalls } = require("./databaseCalls.js");
+const { uniqueID } = require("./resolverUtils.js");
 
 // all nodes that can possible be reached from this node
 // const allConnected = async (node, visited = {}) => {
@@ -24,15 +25,18 @@ const NodeResolvers = {
         if (context.headers) {
             const IP = context.headers["X-Forwarded-For"].split(",")[0];
             await databaseCalls.addView({
+                ID: await uniqueID(databaseCalls.getView),
                 node: parent.ID,
                 IP,
-                time: new Date().getTime(),
             });
         }
         return parent.content;
     },
     views: async (parent) => {
-        return (await databaseCalls.getViewsForNode(parent.ID)).length;
+        return (
+            parent.storedViews +
+            (await databaseCalls.getViewsForNode(parent.ID)).length
+        );
         // if (typeof parent.views === "object") {
         //     const newParent = await databaseCalls.getNode(parent.ID);
         //     while (typeof newParent.views.previouslySaved === "object") {

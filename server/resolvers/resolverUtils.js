@@ -41,6 +41,16 @@ const scramble = (list) => {
     return newList;
 };
 
+const uniqueID = async (fetchFunc, prefix = "", upperCase = true) => {
+    let ID;
+    while (ID === undefined || (await fetchFunc(ID))) {
+        ID = Math.random().toString(36).substring(2, 12);
+        if (upperCase) ID = ID.toUpperCase();
+        ID = `${prefix}${ID}`;
+    }
+    return ID;
+};
+
 const BAD_WORDS = new RegExp(
     ["nigg", "fag"].map((word) => word.split("").join(".{0,4}")).join("|")
 );
@@ -49,4 +59,4 @@ const flagContent = (content) =>
     typeof content === "string" &&
     content.toLowerCase().match(BAD_WORDS) !== null;
 
-module.exports = { encrypt, sort, scramble, flagContent };
+module.exports = { encrypt, sort, scramble, flagContent, uniqueID };

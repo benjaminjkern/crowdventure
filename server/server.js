@@ -4,7 +4,7 @@
  * that's what we're gonna be using for the final product anyways
  */
 
-const LOCAL = true;
+const LOCAL = false;
 
 const { ApolloServer } = require(LOCAL
     ? "apollo-server"
