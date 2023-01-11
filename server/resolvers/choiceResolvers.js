@@ -8,22 +8,22 @@ const ChoiceResolvers = {
     likes: async (parent) => (await ChoiceResolvers.likedBy(parent)).length,
     dislikes: async (parent) =>
         (await ChoiceResolvers.dislikedBy(parent)).length,
-    score: async (parent) =>
-        (await ChoiceResolvers.likes(parent)) -
-        (await ChoiceResolvers.dislikes(parent)),
+    // score: async (parent) => {
+    //     if (parent.score) return parent.score;
+
+    //     const choice = await databaseCalls.getChoice(parent.ID);
+    //     choice.score =
+    //         (await ChoiceResolvers.likes(choice)) -
+    //         (await ChoiceResolvers.dislikes(choice));
+    //     await databaseCalls.addChoice(choice);
+
+    //     parent.score = choice.score;
+    //     return parent.score;
+    // },
     likedBy: async (parent) =>
         await databaseCalls.getLikedByForChoice(parent.ID),
     dislikedBy: async (parent) =>
         await databaseCalls.getDisikedByForChoice(parent.ID),
-    dateCreated: async (parent) => {
-        if (!parent.dateCreated) {
-            const existingParent = await databaseCalls.getChoice(parent.ID);
-            existingParent.dateCreated = `Before ${new Date().toJSON()}`;
-            parent.dateCreated = existingParent.dateCreated;
-            await databaseCalls.addChoice(existingParent);
-        }
-        return parent.dateCreated;
-    },
 };
 
 module.exports = ChoiceResolvers;

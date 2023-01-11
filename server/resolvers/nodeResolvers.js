@@ -23,41 +23,40 @@ const { uniqueID } = require("./resolverUtils.js");
 const NodeResolvers = {
     content: async (parent, args, context) => {
         if (context.headers) {
+            // update views
             const IP = context.headers["X-Forwarded-For"].split(",")[0];
-            await databaseCalls.addView({
-                ID: await uniqueID(databaseCalls.getView),
-                node: parent.ID,
-                IP,
-            });
+            const existingView = await databaseCalls.getViewByNodeAndIP(
+                parent.ID
+            );
+            if (!existingView) {
+                await databaseCalls.addView({
+                    ID: await uniqueID(databaseCalls.getView),
+                    node: parent.ID,
+                    IP,
+                });
+                // Fetch the actual node from database so we dont write any weird intermittent data
+                const node = await databaseCalls.getNode(parent.ID);
+                node.views = (node.views || 0) + 1;
+                await databaseCalls.addNode(node);
+                const account = await databaseCalls.getAccount(node.owner);
+                account.totalNodeViews = (account.totalNodeViews || 0) + 1;
+                await databaseCalls.addAccount(account);
+            }
         }
         return parent.content;
     },
-    views: async (parent) => {
-        return (
-            parent.storedViews +
-            (await databaseCalls.getViewsForNode(parent.ID)).length
-        );
-        // if (typeof parent.views === "object") {
-        //     const newParent = await databaseCalls.getNode(parent.ID);
-        //     while (typeof newParent.views.previouslySaved === "object") {
-        //         newParent.views.previouslySaved =
-        //             newParent.views.previouslySaved.previouslySaved;
-        //     }
-        //     databaseCalls.addNode(newParent);
-        //     parent.views = newParent.views;
-        //     return (
-        //         Object.keys(parent.views).filter(
-        //             (key) => key !== "previouslySaved"
-        //         ).length + (parent.views.previouslySaved || 0)
-        //     );
-        // } else {
-        //     const newParent = await databaseCalls.getNode(parent.ID);
-        //     newParent.views = { previouslySaved: parent.views };
-        //     databaseCalls.addNode(newParent);
-        //     parent.views = newParent.views;
-        //     return newParent.views.previouslySaved;
-        // }
-    },
+    // views: async (parent) => {
+    //     if (parent.views) return parent.views;
+
+    //     const node = await databaseCalls.getNode(parent.ID);
+    //     node.views =
+    //         node.storedViews +
+    //         (await databaseCalls.getViewsForNode(node.ID)).length;
+    //     await databaseCalls.addNode(node);
+
+    //     parent.views = node.views;
+    //     return parent.views;
+    // },
     owner: async (parent) => await databaseCalls.getAccount(parent.owner),
     canonChoices: async (parent) =>
         await databaseCalls.getCanonChoicesForNode(parent.ID),

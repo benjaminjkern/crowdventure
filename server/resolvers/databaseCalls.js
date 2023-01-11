@@ -203,6 +203,19 @@ const databaseCalls = {
             FilterExpression: `#n = :ni AND #ic = :f`,
         });
     },
+    getViewByNodeAndIP: async (nodeID, IP) => {
+        return await multiFilter(VIEW_TABLE, {
+            ExpressionAttributeNames: {
+                "#n": "node",
+                "#ip": "IP",
+            },
+            ExpressionAttributeValues: {
+                ":ni": nodeID,
+                ":ip": IP,
+            },
+            FilterExpression: `#n = :ni AND #ip = :ip`,
+        });
+    },
 };
 
 const getPaginatedFilteredTable = async (

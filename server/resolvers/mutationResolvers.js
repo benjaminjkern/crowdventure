@@ -452,18 +452,22 @@ const MutationResolvers = {
         );
 
         if (!reaction) {
+            await changeScore(choice, 1);
+
             return await databaseCalls.addReaction({
                 ID: await uniqueID(databaseCalls.getReaction),
                 account: args.accountScreenName,
                 choice: args.choiceID,
-                like: args.like,
+                like: true,
             });
         } else if (reaction.like === true) {
+            await changeScore(choice, -1);
             // replace with reaction.like === args.like
             // If it already matches what you are trying to do, turn it off
             return await databaseCalls.removeReaction(reaction);
         } else {
-            reaction.like = args.like;
+            await changeScore(choice, 2);
+            reaction.like = true;
             return await databaseCalls.addReaction(reaction);
         }
     },
@@ -491,18 +495,21 @@ const MutationResolvers = {
         );
 
         if (!reaction) {
+            await changeScore(choice, -1);
             return await databaseCalls.addReaction({
                 ID: await uniqueID(databaseCalls.getReaction),
                 account: args.accountScreenName,
                 choice: args.choiceID,
-                like: args.like,
+                like: false,
             });
         } else if (reaction.like === false) {
+            await changeScore(choice, 1);
             // replace with reaction.like === args.like
             // If it already matches what you are trying to do, turn it off
             return await databaseCalls.removeReaction(reaction);
         } else {
-            reaction.like = args.like;
+            await changeScore(choice, -2);
+            reaction.like = false;
             return await databaseCalls.addReaction(reaction);
         }
     },
@@ -653,6 +660,14 @@ const MutationResolvers = {
         }
         return true;
     },
+};
+
+const changeScore = async (choice, diff) => {
+    choice.score += diff;
+    await databaseCalls.addChoice(choice);
+    const suggestedBy = await databaseCalls.getAccount(choice.suggestedBy);
+    suggestedBy.totalSuggestionScore += diff;
+    await databaseCalls.addAccount(suggestedBy);
 };
 
 module.exports = { MutationResolvers, updateTime };
