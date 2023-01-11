@@ -281,12 +281,8 @@ const MutationResolvers = {
             });
         }
 
-        let ID = `${node.ID}-${Math.random().toString(36).substring(2, 12)}`;
-        while (await databaseCalls.getChoice(ID))
-            ID = `${node.ID}-${Math.random().toString(36).substring(2, 12)}`;
-
         const newChoice = {
-            ID: uniqueID(databaseCalls.getChoice, `${node.ID}-`, false),
+            ID: await uniqueID(databaseCalls.getChoice, `${node.ID}-`, false),
             from: node.ID,
             action: args.action,
             dateCreated: new Date().toJSON(),
