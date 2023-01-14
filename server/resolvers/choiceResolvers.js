@@ -8,18 +8,18 @@ const ChoiceResolvers = {
     likes: async (parent) => (await ChoiceResolvers.likedBy(parent)).length,
     dislikes: async (parent) =>
         (await ChoiceResolvers.dislikedBy(parent)).length,
-    // score: async (parent) => {
-    //     if (parent.score) return parent.score;
+    score: async (parent) => {
+        (async () => {
+            const choice = await databaseCalls.getChoice(parent.ID);
+            const score = choice.score;
+            choice.score =
+                (await ChoiceResolvers.likes(choice)) -
+                (await ChoiceResolvers.dislikes(choice));
+            if (score !== choice.score) await databaseCalls.addChoice(choice);
+        })();
 
-    //     const choice = await databaseCalls.getChoice(parent.ID);
-    //     choice.score =
-    //         (await ChoiceResolvers.likes(choice)) -
-    //         (await ChoiceResolvers.dislikes(choice));
-    //     await databaseCalls.addChoice(choice);
-
-    //     parent.score = choice.score;
-    //     return parent.score;
-    // },
+        return parent.score;
+    },
     likedBy: async (parent) => {
         const likedBy = await databaseCalls.getLikedByForChoice(parent.ID);
         const newLikedBy = [];

@@ -58,6 +58,8 @@ const MutationResolvers = {
             profilePicURL: args.profilePicURL,
             dateCreated: new Date().toJSON(),
             isAdmin: false,
+            totalSuggestionScore: 0,
+            totalNodeViews: 0,
         });
     },
     deleteAccount: async (parent, args) => {
@@ -178,6 +180,7 @@ const MutationResolvers = {
                 args.hidden,
             dateCreated: now.toJSON(),
             lastUpdated: now.getTime(),
+            views: 0,
         };
 
         return await databaseCalls.addNode(newNode);
@@ -289,6 +292,7 @@ const MutationResolvers = {
             to: toNode.ID,
             suggestedBy: account.screenName,
             hidden: flagContent(args.content) || undefined,
+            score: 0,
         };
 
         if (account.screenName === node.owner) {

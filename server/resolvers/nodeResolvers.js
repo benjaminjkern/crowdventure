@@ -45,23 +45,27 @@ const NodeResolvers = {
         }
         return parent.content;
     },
-    // views: async (parent) => {
-    //     if (parent.views) return parent.views;
+    views: async (parent) => {
+        (async () => {
+            const node = await databaseCalls.getNode(parent.ID);
+            const views = node.views;
+            node.views =
+                node.storedViews +
+                (await databaseCalls.getViewsForNode(node.ID)).length;
+            if (views !== node.views) await databaseCalls.addNode(node);
+        })();
 
-    //     const node = await databaseCalls.getNode(parent.ID);
-    //     node.views =
-    //         node.storedViews +
-    //         (await databaseCalls.getViewsForNode(node.ID)).length;
-    //     await databaseCalls.addNode(node);
-
-    //     parent.views = node.views;
-    //     return parent.views;
-    // },
+        return parent.views;
+    },
     owner: async (parent) => await databaseCalls.getAccount(parent.owner),
     canonChoices: async (parent) =>
         await databaseCalls.getCanonChoicesForNode(parent.ID),
     nonCanonChoices: async (parent) =>
         await databaseCalls.getNonCanonChoicesForNode(parent.ID),
+    allChoices: async (parent) => [
+        ...(await databaseCalls.getCanonChoicesForNode(parent.ID)),
+        ...(await databaseCalls.getNonCanonChoicesForNode(parent.ID)),
+    ],
     size: async () => {
         // should return the total number of nodes it is connected to
         return 0;
