@@ -1,20 +1,13 @@
 import React, { useState } from "react";
 
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+const ImageSearch = ({ onSelectImage }) => {
+    let targets = {};
+    let queries = {};
 
-import { AsyncTypeahead } from "react-bootstrap-typeahead";
+    let displayed = 0;
+    let lastQuery;
+    let tempRows = [];
 
-const { BING_API_KEY } = require("./apolloURL");
-
-let targets = {};
-let queries = {};
-
-let displayed = 0;
-let lastQuery;
-let tempRows = [];
-
-const SearchImage = (props) => {
-    const { callback, loggedInAs } = props;
     const [isLoading, setIsLoading] = useState(false);
     const [rows, setRows] = useState([]);
 
@@ -179,10 +172,7 @@ const SearchImage = (props) => {
 
     return (
         <AsyncTypeahead
-            id="async-example"
             isLoading={isLoading}
-            filterBy={() => true}
-            labelKey="id"
             minLength={2}
             onSearch={handleSearch}
             maxResults={10}
@@ -263,4 +253,4 @@ const SearchImage = (props) => {
     );
 };
 
-export default SearchImage;
+export default ImageSearch;
