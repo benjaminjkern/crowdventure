@@ -36,6 +36,7 @@ const AccountPreview = ({
     );
 
     if (onClickImage) return inside;
+
     return (
         <Link
             href={`/account/${account.screenName}`}

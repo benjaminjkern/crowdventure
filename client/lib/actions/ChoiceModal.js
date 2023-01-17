@@ -1,15 +1,15 @@
 import React, { useContext, useState } from "react";
 import { mutationCall } from "../apiUtils";
+import CrowdventureCheckboxInput from "../components/CrowdventureCheckboxInput";
 import CrowdventureModal from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { ModalContext } from "../modal";
 
-// import SearchPage from "../Node/SearchPage";
-
 import CreateNodeModal from "../nodes/CreateNodeModal";
+import NodeSearch from "../nodes/NodeSearch";
 import { UserContext } from "../user";
 
-const SuggestChoiceModal = ({ fromNode, choice }) => {
+const ChoiceModal = ({ fromNode, choice }) => {
     const [info, setInfo] = useState("");
 
     const [toPage, setToPage] = useState(choice?.to.ID || "");
@@ -19,43 +19,67 @@ const SuggestChoiceModal = ({ fromNode, choice }) => {
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
 
-    const createNewAction = (toID) => {
-        if (!toID) {
-            openModal(
-                <CreateNodeModal
-                    picture={fromNode.pictureURL}
-                    pictureUnsafe={fromNode.pictureUnsafe}
-                    callback={(node) => createNewAction(node.ID)}
-                />
+    const verifyForm = () => {
+        if (!suggestAction) {
+            setInfo(
+                <span style={{ color: "red" }}>Action cannot be empty!</span>
             );
-        } else {
-            mutationCall(
-                "suggestChoice",
-                { ID: 0 },
-                {
-                    accountScreenName: user.screenName,
-                    fromID: fromNode.ID,
-                    action: suggestAction,
-                    toID,
-                }
-            ).then(() => {});
+            return false;
         }
+        return true;
+    };
+
+    const openCreateNodeModal = (callback) => {
+        openModal(
+            <CreateNodeModal
+                picture={fromNode.pictureURL}
+                pictureUnsafe={fromNode.pictureUnsafe}
+                callback={(node) => callback(node.ID)}
+            />
+        );
+    };
+
+    const editAction = () => {
+        if (!verifyForm()) return;
+
+        if (!toPage) return openCreateNodeModal(editAction);
+
+        mutationCall(
+            "editSuggestion",
+            { ID: 0 },
+            {
+                choiceID: choice.ID,
+                action: suggestAction,
+                toID: toPage,
+                ...(hidden !== undefined ? { hidden } : {}),
+            }
+        ).then(() => {});
+    };
+
+    const createNewAction = () => {
+        if (!verifyForm()) return;
+
+        if (!toPage) return openCreateNodeModal(createNewAction);
+
+        mutationCall(
+            "suggestChoice",
+            { ID: 0 },
+            {
+                accountScreenName: user.screenName,
+                fromID: fromNode.ID,
+                action: suggestAction,
+                toID: toPage,
+            }
+        ).then(() => {});
     };
 
     return (
         <CrowdventureModal
-            modalTitle="Suggesting New Choice"
+            modalTitle={`${choice ? "Editing" : "Suggesting New"} Choice`}
             modalButtons={[
                 {
-                    text: "Submit New Choice",
-                    onClick: () =>
-                        suggestAction
-                            ? createNewAction(toPage)
-                            : setInfo(
-                                  <span style={{ color: "red" }}>
-                                      Action cannot be empty!
-                                  </span>
-                              ),
+                    text: `${choice ? "Edit" : "Submit New"} Choice`,
+                    onClick: () => (choice ? editAction : createNewAction)(),
                 },
             ]}
         >
@@ -65,13 +89,20 @@ const SuggestChoiceModal = ({ fromNode, choice }) => {
                 onChange={setSuggestAction}
             />
             Go to Page:
-            {/* <SearchPage
-                        callback={(nodeID) => setToPage(nodeID)}
-                        toID={toPage}
-                    /> */}
+            <NodeSearch callback={setToPage} toID={toPage} />
+            {user?.isAdmin && (
+                <>
+                    Admin Controls:
+                    <CrowdventureCheckboxInput
+                        checked={hidden}
+                        onChange={setHidden}
+                        label="Choice should be hidden"
+                    />
+                </>
+            )}
             {info}
         </CrowdventureModal>
     );
 };
 
-export default SuggestChoiceModal;
+export default ChoiceModal;

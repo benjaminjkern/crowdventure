@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
 import AccountPreview from "../../lib/accounts/AccountPreview";
 import ActionCard from "../../lib/actions/ActionCard";
+import ChoiceModal from "../../lib/actions/ChoiceModal";
 import { queryCall } from "../../lib/apiUtils";
 import CrowdventureAlert from "../../lib/components/CrowdventureAlert";
 import CrowdventureButton from "../../lib/components/CrowdventureButton";
@@ -191,13 +192,7 @@ const NodePage = ({ node: initNode }) => {
             <CrowdventureButton
                 requireSignedIn={true}
                 onClick={() => {
-                    // showModal(
-                    //     <SuggestChoiceModal
-                    //         loggedInAs={loggedInAs}
-                    //         fromNode={node}
-                    //         close={() => showModal(undefined)}
-                    //     />
-                    // );
+                    openModal(<ChoiceModal fromNode={node} />);
                 }}
             >
                 Suggest New Choice
