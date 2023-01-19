@@ -3,13 +3,12 @@ import AccountPreview from "../accounts/AccountPreview";
 import { queryCall } from "../apiUtils";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 
-const NodeSearch = ({ callback, toID }) => {
+const NodeSearch = ({ onSelectNode, toNode }) => {
     const [allNodes, setAllNodes] = useState(undefined);
     const [options, setOptions] = useState([]);
-    const [toNode, setToNode] = useState(undefined);
 
     const [open, setOpen] = useState(false);
-    const [query, setQuery] = useState("");
+    const [query, setQuery] = useState(toNode?.title);
 
     const processNodeTitle = (newQuery) => {
         setOptions(
@@ -29,15 +28,10 @@ const NodeSearch = ({ callback, toID }) => {
     const selectNode = (node) => {
         setQuery(node.title);
         setOpen(false);
+        onSelectNode(node);
     };
 
     useEffect(() => {
-        if (toID) {
-            queryCall("getNode", { title: 0, ID: 0 }, { ID: toID }).then(
-                setToNode
-            );
-        }
-
         queryCall(
             "allNodes",
             { title: 0, owner: { screenName: 0, profilePicURL: 0 }, ID: 0 },

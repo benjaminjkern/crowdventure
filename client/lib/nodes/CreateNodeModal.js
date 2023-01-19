@@ -10,6 +10,7 @@ import { mutationCall } from "../apiUtils";
 import ConfirmModal from "../components/ConfirmModal";
 import CrowdventureCheckboxInput from "../components/CrowdventureCheckboxInput";
 import { ModalContext } from "../modal";
+import ImageSearch from "../components/ImageSearch";
 
 // import SearchImage from "../SearchImage";
 
@@ -187,15 +188,13 @@ const CreateNodeModal = ({
             {showImageSearch && (
                 <>
                     <br />
-                    (Image search goes here)
-                    {/* <SearchImage
-                            loggedInAs={loggedInAs}
-                            callback={(url, familyFriendly) => {
-                                setPictureField(url);
-                                setShowChangePic(false);
-                                setShouldHide(!familyFriendly);
-                            }}
-                        /> */}
+                    <ImageSearch
+                        onSelectImage={(url, familyFriendly) => {
+                            setPictureField(url);
+                            // setShowChangePic(false);
+                            setShouldHide(!familyFriendly);
+                        }}
+                    />
                 </>
             )}
             <hr />

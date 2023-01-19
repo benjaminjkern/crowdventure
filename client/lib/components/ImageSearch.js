@@ -1,55 +1,86 @@
-import React, { useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import { UnsafeModeContext } from "../unsafeMode";
+import { UserContext } from "../user";
+import CrowdventureTextInput from "./CrowdventureTextInput";
+import TooltipWrapper from "./TooltipWrapper";
+
+// Should hide this
+const BING_API_KEY = "8300cebe5f0d452a9ccb4bca67af4659";
 
 const ImageSearch = ({ onSelectImage }) => {
-    let targets = {};
-    let queries = {};
+    const { user } = useContext(UserContext);
+    // const { unsafeMode } = useContext(UnsafeModeContext);
+    const unsafeMode = true;
 
-    let displayed = 0;
-    let lastQuery;
-    let tempRows = [];
+    const [fetching, setFetching] = useState(undefined);
+    const [fetchResults, setFetchResults] = useState(undefined);
+    const [images, setImages] = useState([]);
+    const [atEnd, setAtEnd] = useState(false);
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [rows, setRows] = useState([]);
+    const [query, setQuery] = useState("");
+    const [open, setOpen] = useState(false);
 
     const BLURAMOUNT = 10;
     const PAGESIZE = 20;
     const MAXROWLENGTH = 2;
+    const MIN_SEARCH_LENGTH = 2;
 
-    const checkImage = (path) =>
-        new Promise((resolve) => {
+    const checkImage = (image) => {
+        if (!image.isFamilyFriendly && !unsafeMode) return false;
+        return new Promise((resolve) => {
             const img = new Image();
             img.onload = () => {
-                resolve(true);
+                resolve(image);
             };
-            img.onerror = () => {
+            img.onerror = (e) => {
+                e.preventDefault();
                 resolve(false);
             };
-            img.src = path;
+            img.src = image.contentUrl;
         });
+    };
 
-    const handleSearch = (
-        query,
-        amount = PAGESIZE,
-        offset = query !== lastQuery ? 0 : displayed
-    ) => {
-        setIsLoading(true);
-        if (query !== lastQuery) {
-            Object.keys(queries).forEach(
-                (key) => (queries[key].cancelled = true)
-            );
-            tempRows = [];
-            setRows([]);
-            displayed = 0;
-            offset = 0;
-            lastQuery = query;
+    const filterImages = async (images) => {
+        const validImages = (
+            await Promise.all(images.map((image) => checkImage(image)))
+        ).filter((image) => image);
+
+        return { filteredImages: validImages };
+    };
+
+    useEffect(() => {
+        if (query.length < MIN_SEARCH_LENGTH) {
+            setOpen(false);
+            setFetching(undefined);
+            return;
         }
-        queries[query] = { query }; // the query attribute is pointless but whatever
+        setOpen(true);
+        setTimeout(() => {
+            setFetching(query);
+        }, 1000);
+    }, [query]);
 
-        fetch(
+    useEffect(() => {
+        if (!fetching) return;
+        if (fetching !== query) return;
+        fetchImages(fetching).then((newImages) => {
+            setFetchResults({ newImages, fetching });
+            setFetching(undefined);
+        });
+    }, [fetching]);
+
+    useEffect(() => {
+        if (!fetchResults) return;
+        if (fetchResults.fetching !== query) return;
+        setImages(fetchResults.newImages);
+    }, [fetchResults]);
+
+    const fetchImages = (query, amount = PAGESIZE, offset = 0) => {
+        return fetch(
             "https://api.cognitive.microsoft.com/bing/v7.0/images/search?q=" +
                 encodeURIComponent(query) +
                 `&count=${amount}&safeSearch=${
-                    loggedInAs && loggedInAs.unsafeMode ? "Off" : "Strict"
+                    unsafeMode ? "Off" : "Strict"
                 }&offset=` +
                 offset,
             {
@@ -59,134 +90,91 @@ const ImageSearch = ({ onSelectImage }) => {
             }
         )
             .then((data) => data.json())
-            .then(async (data) => {
-                const fullpage = data.value.length === amount;
-
-                let filteredOptions = data.value.filter(
-                    (hit) =>
-                        hit.isFamilyFriendly ||
-                        (loggedInAs && loggedInAs.unsafeMode)
-                );
-
-                if (queries[query].cancelled) {
-                    delete queries[query];
-                    return;
-                }
-
-                const imagesExist = await Promise.all(
-                    data.value.map((hit) => checkImage(hit.contentUrl))
-                );
-
-                filteredOptions = filteredOptions.filter(
-                    (_, i) => imagesExist[i]
-                );
-
-                const newRows = tempRows.filter((row) => row.id !== "buffer");
-
-                for (const hit of filteredOptions) {
-                    if (
-                        newRows.length === 0 ||
-                        newRows[newRows.length - 1].images.length ===
-                            MAXROWLENGTH
-                    ) {
-                        newRows.push({
-                            id: "(Image Selected)",
-                            images: [hit],
-                        });
-                    } else {
-                        newRows[newRows.length - 1].images.push(hit);
-                    }
-                    displayed++;
-                }
-
-                if (queries[query].cancelled) {
-                    delete queries[query];
-                    return;
-                }
-
-                if (fullpage) {
-                    if (filteredOptions.length < amount) {
-                        tempRows = newRows;
-                        handleSearch(query, amount - filteredOptions.length);
-                        return;
-                    } else {
-                        newRows.push({ id: "buffer", images: [] });
-                    }
-                }
-                tempRows = newRows;
-                setRows(newRows);
-
-                delete queries[query];
-
-                setIsLoading(false);
+            .then(({ value, error, ...rest }) => {
+                if (error?.code === 429) return { error };
+                if (!value) return { error: "Something went wrong!" };
+                // return new Promise(resolve => {
+                //         setTimeout(() => resolve(fetchImages(query, amount, offset)), 5000);
+                //     })
+                // console.log(value, rest);
+                return filterImages(value);
             })
-            .catch(() => {});
+            .then(async ({ filteredImages, error }) => {
+                if (error) return [];
+                if (filteredImages.length === amount) return filteredImages;
+                return [
+                    ...filteredImages,
+                    // ...(await fetchImages({
+                    //     query,
+                    //     amount: amount - filteredImages.length,
+                    //     offset: offset + amount}
+                    // )),
+                ];
+            });
     };
 
-    const startunblur = (component, id) => {
-        Object.keys(targets).forEach((key) => {
-            if (key !== id + "") {
-                startreblur(key);
-            }
-        });
-        targets[id] = {
-            component,
-            currentblur: BLURAMOUNT,
-            unblurring: true,
-        };
-        unblur(id);
-    };
-    const unblur = (id) => {
-        if (!targets[id]) return;
-        targets[id].currentblur -= 0.1;
-        if (targets[id].currentblur >= 0 && targets[id].unblurring) {
-            targets[id].component.style["-webkit-filter"] =
-                "blur(" + targets[id].currentblur + "px)";
-            targets[id].component.style.filter =
-                "blur(" + targets[id].currentblur + "px)";
-            setTimeout(() => unblur(id), 1);
-        } else {
-            targets[id].unblurring = false;
-        }
-    };
+    // const startunblur = (component, id) => {
+    //     Object.keys(targets).forEach((key) => {
+    //         if (key !== id + "") {
+    //             startreblur(key);
+    //         }
+    //     });
+    //     targets[id] = {
+    //         component,
+    //         currentblur: BLURAMOUNT,
+    //         unblurring: true,
+    //     };
+    //     unblur(id);
+    // };
 
-    const startreblur = (id) => {
-        if (!targets[id]) return;
-        targets[id].unblurring = false;
-        reblur(id);
-    };
+    // const unblur = (id) => {
+    //     if (!targets[id]) return;
+    //     targets[id].currentblur -= 0.1;
+    //     if (targets[id].currentblur >= 0 && targets[id].unblurring) {
+    //         targets[id].component.style["-webkit-filter"] =
+    //             "blur(" + targets[id].currentblur + "px)";
+    //         targets[id].component.style.filter =
+    //             "blur(" + targets[id].currentblur + "px)";
+    //         setTimeout(() => unblur(id), 1);
+    //     } else {
+    //         targets[id].unblurring = false;
+    //     }
+    // };
 
-    const reblur = (id) => {
-        if (!targets[id]) return;
-        targets[id].currentblur += 0.1;
-        if (targets[id].currentblur <= BLURAMOUNT && !targets[id].unblurring) {
-            targets[id].component.style["-webkit-filter"] =
-                "blur(" + targets[id].currentblur + "px)";
-            targets[id].component.style.filter =
-                "blur(" + targets[id].currentblur + "px)";
-            setTimeout(() => reblur(id), 1);
-        } else {
-            delete targets[id];
-        }
-    };
+    // const startreblur = (id) => {
+    //     if (!targets[id]) return;
+    //     targets[id].unblurring = false;
+    //     reblur(id);
+    // };
+
+    // const reblur = (id) => {
+    //     if (!targets[id]) return;
+    //     targets[id].currentblur += 0.1;
+    //     if (targets[id].currentblur <= BLURAMOUNT && !targets[id].unblurring) {
+    //         targets[id].component.style["-webkit-filter"] =
+    //             "blur(" + targets[id].currentblur + "px)";
+    //         targets[id].component.style.filter =
+    //             "blur(" + targets[id].currentblur + "px)";
+    //         setTimeout(() => reblur(id), 1);
+    //     } else {
+    //         delete targets[id];
+    //     }
+    // };
 
     return (
-        <AsyncTypeahead
-            isLoading={isLoading}
-            minLength={2}
-            onSearch={handleSearch}
-            maxResults={10}
-            onPaginate={() => handleSearch(lastQuery)}
-            useCache={false}
-            options={rows}
-            placeholder="Search for an image..."
-            renderMenuItemChildren={(row, _, index) => (
-                <div className="row align-items-center">
-                    {row.images.map((image, i) => (
-                        <div key={i} className="col">
+        <>
+            <CrowdventureTextInput
+                placeholder="Search for an image..."
+                value={query}
+                onChangeText={setQuery}
+            />
+            {open && (
+                <div style={{ height: 200 }}>
+                    {images.map((image, i) => (
+                        <div key={i}>
                             <img
                                 onClick={() =>
-                                    callback(
+                                    onSelectImage(
                                         image.contentUrl,
                                         image.isFamilyFriendly
                                     )
@@ -196,35 +184,26 @@ const ImageSearch = ({ onSelectImage }) => {
                                     marginRight: "10px",
                                     borderRadius: "4px",
                                     width: "100%",
-                                    ...(image.isFamilyFriendly
-                                        ? {}
-                                        : {
-                                              "-webkit-filter":
-                                                  "blur(" + BLURAMOUNT + "px)",
-                                              filter:
-                                                  "blur(" + BLURAMOUNT + "px)",
-                                          }),
+                                    // ...(image.isFamilyFriendly
+                                    //     ? {}
+                                    //     : {
+                                    //           "-webkit-filter":
+                                    //               "blur(" + BLURAMOUNT + "px)",
+                                    //           filter:
+                                    //               "blur(" + BLURAMOUNT + "px)",
+                                    //       }),
                                 }}
-                                onMouseEnter={(e) => {
-                                    if (!image.isFamilyFriendly)
-                                        startunblur(e.target, 2 * index + i);
-                                }}
-                                onMouseLeave={() => {
-                                    if (!image.isFamilyFriendly)
-                                        startreblur(2 * index + i);
-                                }}
+                                // onMouseEnter={(e) => {
+                                //     if (!image.isFamilyFriendly)
+                                //         startunblur(e.target, 2 * index + i);
+                                // }}
+                                // onMouseLeave={() => {
+                                //     if (!image.isFamilyFriendly)
+                                //         startreblur(2 * index + i);
+                                // }}
                             />
-                            {image.isFamilyFriendly ? (
-                                ""
-                            ) : (
-                                <OverlayTrigger
-                                    overlay={
-                                        <Tooltip>
-                                            This picture will automatically flag
-                                            this page as hidden!
-                                        </Tooltip>
-                                    }
-                                >
+                            {!image.isFamilyFriendly && (
+                                <TooltipWrapper tooltip="This picture will automatically flag this page as hidden!">
                                     <div
                                         style={{
                                             position: "absolute",
@@ -243,13 +222,20 @@ const ImageSearch = ({ onSelectImage }) => {
                                     >
                                         &#xf056;
                                     </div>
-                                </OverlayTrigger>
+                                </TooltipWrapper>
                             )}
                         </div>
                     ))}
                 </div>
             )}
-        />
+        </>
+        // <AsyncTypeahead
+        //     isLoading={isLoading}
+        //     minLength={2}
+        //     maxResults={10}
+        //     onPaginate={() => handleSearch(lastQuery)}
+        //     useCache={false}
+        // />
     );
 };
 
