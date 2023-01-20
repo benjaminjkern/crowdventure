@@ -11,6 +11,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import CrowdventureCheckboxInput from "../components/CrowdventureCheckboxInput";
 import { ModalContext } from "../modal";
 import ImageSearch from "../components/ImageSearch";
+import CloseButton from "../components/CloseButton";
 
 // import SearchImage from "../SearchImage";
 
@@ -140,11 +141,10 @@ const CreateNodeModal = ({
                         borderStyle: "solid",
                         borderColor: "#eee",
                         borderRadius: 8,
+                        position: "relative",
                     }}
                 >
-                    <Image
-                        width={100}
-                        height={100}
+                    <img
                         src={pictureField}
                         alt="This text shouldnt be showing!"
                         style={{
@@ -152,24 +152,12 @@ const CreateNodeModal = ({
                             borderRadius: 8,
                         }}
                     />
-                    {/* <span
-                        className="fa fa-times"
-                        style={{
-                            position: "absolute",
-                            top: "1.5em",
-                            right: "1.5em",
-                            color: "#888",
-                            cursor: "pointer",
-                            textShadow:
-                                "-1px 0 2px white, 0 1px 2px white, 1px 0 2px white, 0 -1px 2px white",
-                        }}
-                        onMouseEnter={(e) => (e.target.style.color = "#555")}
-                        onMouseLeave={(e) => (e.target.style.color = "#888")}
+                    <CloseButton
                         onClick={() => {
                             setPictureField("");
                             setShouldHide(false);
                         }}
-                    /> */}
+                    />
                 </div>
             )}
             Picture:
@@ -192,6 +180,7 @@ const CreateNodeModal = ({
                         onSelectImage={(url, familyFriendly) => {
                             setPictureField(url);
                             // setShowChangePic(false);
+                            setShowImageSearch(false);
                             setShouldHide(!familyFriendly);
                         }}
                     />
