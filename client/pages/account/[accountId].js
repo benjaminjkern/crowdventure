@@ -113,7 +113,6 @@ const AccountPage = ({ account: initAccount }) => {
                 <>
                     <CrowdventureButton
                         onClick={() => {
-                            localStorage.removeItem("screenName");
                             setUser();
                         }}
                     >

@@ -7,24 +7,39 @@ export const UserContext = createContext();
 const UserProvider = ({ children }) => {
     const [user, setUser] = useState();
 
-    const relogin = (screenName) => {
-        mutationCall("loginAccount", FULL_ACCOUNT_GQL, { screenName }).then(
-            setUser
-        );
+    const relogin = (savedUser) => {
+        mutationCall("loginAccount", FULL_ACCOUNT_GQL, {
+            screenName: savedUser.screenName,
+        }).then(setUser);
+    };
+
+    const saveUser = (newUser) => {
+        if (newUser) {
+            const smallerUser = {
+                screenName: newUser.screenName,
+                isAdmin: newUser.isAdmin,
+                notifications: newUser.notifications,
+            };
+
+            localStorage.setItem("savedUser", JSON.stringify(smallerUser));
+        } else {
+            localStorage.removeItem("savedUser");
+        }
+        setUser(newUser);
     };
 
     useEffect(() => {
-        const screenName = localStorage.getItem("screenName");
-        if (!screenName) {
+        const savedUser = JSON.parse(localStorage.getItem("savedUser"));
+        if (!savedUser) {
             setUser(null);
             return;
         }
-
-        relogin(screenName);
+        setUser(savedUser);
+        relogin(savedUser);
     }, []);
 
     return (
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserContext.Provider value={{ user, setUser: saveUser }}>
             {children}
         </UserContext.Provider>
     );

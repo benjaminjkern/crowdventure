@@ -46,7 +46,6 @@ const SignUpModal = () => {
                 })
             )
             .then((newUser) => {
-                localStorage.setItem("screenName", screenName);
                 setUser(newUser);
                 closeModal();
             });

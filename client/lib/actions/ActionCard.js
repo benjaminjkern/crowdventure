@@ -135,7 +135,7 @@ const ActionCard = ({ choice: initChoice }) => {
         !choice.to ||
         ((choice.to.hidden || choice.to.owner.hidden) &&
             (!user ||
-                (!user.unsafeMode &&
+                (!unsafeMode &&
                     choice.to.owner.screenName !== user.screenName)));
 
     return (

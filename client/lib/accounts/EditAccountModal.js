@@ -61,7 +61,6 @@ const EditAccountModal = ({ account, setAccount }) => {
             { screenName: account.screenName }
         ).then(() => {
             if (account.screenName === user?.screenName) {
-                localStorage.removeItem("screenName");
                 setUser();
             }
             setAccount();

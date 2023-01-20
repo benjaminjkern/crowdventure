@@ -43,7 +43,6 @@ const LoginModal = () => {
                 return;
             }
 
-            localStorage.setItem("screenName", screenName);
             setUser(newUser);
             closeModal();
         });
