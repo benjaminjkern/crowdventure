@@ -12,6 +12,7 @@ import CrowdventureCheckboxInput from "../components/CrowdventureCheckboxInput";
 import { ModalContext } from "../modal";
 import ImageSearch from "../components/ImageSearch";
 import CloseButton from "../components/CloseButton";
+import { PaletteContext } from "../colorPalette";
 
 // import SearchImage from "../SearchImage";
 
@@ -36,6 +37,7 @@ const CreateNodeModal = ({
 
     const { user } = useContext(UserContext);
     const { openModal, closeModal, closeAllModals } = useContext(ModalContext);
+    const { borderColor } = useContext(PaletteContext);
     const router = useRouter();
 
     const validateInputs = () => {
@@ -160,14 +162,23 @@ const CreateNodeModal = ({
                     />
                 </div>
             )}
-            Picture:
-            <span>
-                {!pictureField
-                    ? "(Don't use any picture)"
-                    : pictureField === node?.pictureURL
-                    ? "(Use existing picture)"
-                    : "(Use new picture)"}
-            </span>
+            <div
+                style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    marginTop: 5,
+                    marginBottom: 5,
+                }}
+            >
+                <span>Picture:</span>
+                <span style={{ color: borderColor }}>
+                    {!pictureField
+                        ? "(Don't use any picture)"
+                        : pictureField === node?.pictureURL
+                        ? "(Use existing picture)"
+                        : "(Use new picture)"}
+                </span>
+            </div>
             <CrowdventureButton
                 onClick={() => setShowImageSearch(!showImageSearch)}
             >
@@ -197,11 +208,13 @@ const CreateNodeModal = ({
             />
             {node && user?.isAdmin && (
                 <>
+                    <hr />
                     Admin Controls:
                     <CrowdventureCheckboxInput
                         checked={hidden}
                         onChange={setHidden}
                         label="Page should be hidden"
+                        style={{ marginBottom: 10 }}
                     />
                 </>
             )}

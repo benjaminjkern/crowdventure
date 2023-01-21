@@ -16,6 +16,7 @@ const PaletteProvider = ({ children }) => {
         backgroundColor: unsafeMode
             ? ["rgb(34,34,34)", "rgb(41,41,41)", "rgb(50,50,50)"]
             : ["white", "white", "white"],
+        borderColor: "lightgray",
     });
 
     useEffect(() => {

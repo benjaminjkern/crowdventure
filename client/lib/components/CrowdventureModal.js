@@ -11,7 +11,7 @@ const CrowdventureModal = ({
     modalStyle,
 }) => {
     const { closeModal } = useContext(ModalContext);
-    const { backgroundColor } = useContext(PaletteContext);
+    const { backgroundColor, borderColor } = useContext(PaletteContext);
 
     return (
         <div
@@ -27,7 +27,7 @@ const CrowdventureModal = ({
                 overflow: "scroll",
                 ...modalStyle,
             }}
-            onClick={closeModal}
+            onMouseDown={closeModal}
         >
             <div
                 style={{
@@ -37,13 +37,26 @@ const CrowdventureModal = ({
                     padding: 20,
                     borderRadius: 20,
                 }}
-                onClick={(e) => {
+                onMouseDown={(e) => {
                     e.stopPropagation();
                 }}
             >
-                <div style={{ position: "relative" }}>
+                <div
+                    style={{
+                        position: "relative",
+                        borderBottomColor: borderColor,
+                        borderBottomWidth: 1,
+                        borderBottomStyle: "solid",
+                        textAlign: "center",
+                        marginBottom: 10,
+                        paddingBottom: 10,
+                    }}
+                >
                     {modalTitle}
-                    <CloseButton onClick={closeModal} style={{ top: 0 }} />
+                    <CloseButton
+                        onClick={closeModal}
+                        style={{ top: 0, right: 0 }}
+                    />
                 </div>
                 {children}
                 {modalButtons.length && (
