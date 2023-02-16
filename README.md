@@ -14,9 +14,8 @@ Everyone likes Choose-Your-Own-Adventure games, but they often lead to some issu
 
 Crowdventure is a web-based and dynamically crowd-sourced Create-Your-Own-Adventure game. With Crowdventure, you will be able to navigate the vast sea of possibilities that have been suggested by and democratically voted upon by the entire internet, as well as suggest and vote upon your own!
 
-Currently in Version 0.1.7. [See Change Log](https://github.com/benjaminjkern/crowdventure/blob/master/CHANGELOG.md)
+Currently in Version 0.2. [See Change Log](https://github.com/benjaminjkern/crowdventure/blob/master/CHANGELOG.md)
 
 # Check it out here: [crowdventure.me](http://crowdventure.me)
 
 I made this project originally for school, but I liked the idea a lot so I stuck with it.
-Here is the [Documentation repo](https://github.com/benjaminjkern/cmsi-402-senior-project-lab).
