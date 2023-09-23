@@ -3,7 +3,7 @@
     "version": "1.0",
     "main": "index.js",
     "repository": "https://github.com/benjaminjkern/crowdventure.git",
-    "author": "benjaminjkern <bkern1@lion.lmu.edu>",
+    "author": "benjaminjkern <benkern@pixelgate.net>",
     "license": "MIT",
     "dependencies": {
         "@apollo/client": "^3.7.3",
