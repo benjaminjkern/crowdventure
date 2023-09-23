@@ -5,9 +5,9 @@ const CrowdventureTextInput = ({ value, onChangeText, ...props }) => {
     const { backgroundColor } = useContext(PaletteContext);
     return (
         <input
-            value={value}
             onChange={(e) => onChangeText(e.target.value)}
             style={{ backgroundColor: backgroundColor[2] }}
+            value={value}
             {...props}
         />
     );

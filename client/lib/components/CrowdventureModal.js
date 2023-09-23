@@ -15,6 +15,7 @@ const CrowdventureModal = ({
 
     return (
         <div
+            onMouseDown={closeModal}
             style={{
                 position: "fixed",
                 left: 0,
@@ -27,18 +28,17 @@ const CrowdventureModal = ({
                 overflow: "scroll",
                 ...modalStyle,
             }}
-            onMouseDown={closeModal}
         >
             <div
+                onMouseDown={(e) => {
+                    e.stopPropagation();
+                }}
                 style={{
                     margin: 50,
                     width: 600,
                     backgroundColor: backgroundColor[1],
                     padding: 20,
                     borderRadius: 20,
-                }}
-                onMouseDown={(e) => {
-                    e.stopPropagation();
                 }}
             >
                 <div
@@ -59,7 +59,7 @@ const CrowdventureModal = ({
                     />
                 </div>
                 {children}
-                {modalButtons.length && (
+                {modalButtons.length ? (
                     <div>
                         {modalButtons.map(
                             ({ active = true, text, ...props }, i) => {
@@ -72,7 +72,7 @@ const CrowdventureModal = ({
                             }
                         )}
                     </div>
-                )}
+                ) : null}
             </div>
         </div>
     );

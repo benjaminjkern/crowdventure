@@ -63,26 +63,26 @@ const AccountPage = ({ account: initAccount }) => {
     return (
         <>
             {account.hidden &&
-                !unsafeMode &&
-                account.screenName === user?.screenName && (
-                    <CrowdventureAlert title="Unsafe!">
-                        This page has been hidden from general users, because
-                        the content has been deemed unsafe. Users in unsafe mode
-                        can see this page and its content. Since you own this
-                        page, you can see it. If you believe this page should be
-                        considered safe, click <a href="">Here</a>.
-                    </CrowdventureAlert>
-                )}
+            !unsafeMode &&
+            account.screenName === user?.screenName ? (
+                <CrowdventureAlert title="Unsafe!">
+                    This page has been hidden from general users, because the
+                    content has been deemed unsafe. Users in unsafe mode can see
+                    this page and its content. Since you own this page, you can
+                    see it. If you believe this page should be considered safe,
+                    click <a href="">Here</a>.
+                </CrowdventureAlert>
+            ) : null}
             <AccountPreview
                 account={account}
                 onClickImage={() => {
                     openModal(
                         <PictureModal
-                            title={account.screenName}
                             pictureURL={
                                 account.profilePicURL ||
                                 require("../../public/defaultProfilePic.jpg")
                             }
+                            title={account.screenName}
                         />
                     );
                 }}
@@ -94,7 +94,7 @@ const AccountPage = ({ account: initAccount }) => {
                 </p>
             ))}
 
-            {(user?.screenName === account.screenName || user?.isAdmin) && (
+            {user?.screenName === account.screenName || user?.isAdmin ? (
                 <CrowdventureButton
                     onClick={() => {
                         openModal(
@@ -107,7 +107,7 @@ const AccountPage = ({ account: initAccount }) => {
                 >
                     Edit Account
                 </CrowdventureButton>
-            )}
+            ) : null}
 
             {user?.screenName === account.screenName ? (
                 <>
@@ -125,7 +125,7 @@ const AccountPage = ({ account: initAccount }) => {
                     >
                         Notifications{" "}
                         {user.notifications.filter((notif) => !notif.seen)
-                            .length && (
+                            .length ? (
                             <span style={{ color: "red" }}>
                                 (
                                 {
@@ -135,7 +135,7 @@ const AccountPage = ({ account: initAccount }) => {
                                 }{" "}
                                 New)
                             </span>
-                        )}
+                        ) : null}
                     </CrowdventureButton>
                 </>
             ) : (
@@ -185,12 +185,10 @@ const AccountPage = ({ account: initAccount }) => {
 
             <h3>Search All Pages Authored by {account.screenName}:</h3>
             <CrowdventureTextInput
-                value={searchQuery}
-                placeholder={"Search for a page..."}
                 onChangeText={(newQuery) => {
                     console.log(account.nodes);
                     setSearchQuery(newQuery);
-                    if (newQuery.length >= 2) {
+                    if (newQuery.length >= 2)
                         setSearchedNodes([
                             ...account.nodes.filter((node) =>
                                 node.title
@@ -207,12 +205,12 @@ const AccountPage = ({ account: initAccount }) => {
                                         .includes(newQuery.toLowerCase())
                             ),
                         ]);
-                    } else {
-                        setSearchedNodes([]);
-                    }
+                    else setSearchedNodes([]);
                 }}
+                placeholder="Search for a page..."
+                value={searchQuery}
             />
-            {searchQuery && <NodeViewer nodes={searchedNodes} />}
+            {searchQuery ? <NodeViewer nodes={searchedNodes} /> : null}
 
             {user?.screenName !== account.screenName && (
                 <CrowdventureButton onClick={reportAccount}>
@@ -223,12 +221,10 @@ const AccountPage = ({ account: initAccount }) => {
     );
 };
 
-export const getStaticPaths = async () => {
-    return {
-        paths: [],
-        fallback: true,
-    };
-};
+export const getStaticPaths = async () => ({
+    paths: [],
+    fallback: true,
+});
 
 export const FULL_ACCOUNT_GQL = {
     bio: 0,

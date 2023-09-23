@@ -7,7 +7,6 @@ const PictureModal = ({ title, pictureURL }) => {
     const { closeModal } = useContext(ModalContext);
     return (
         <CrowdventureModal
-            modalTitle={title}
             modalButtons={[
                 {
                     text: `Thanks for showing me this ${
@@ -16,14 +15,15 @@ const PictureModal = ({ title, pictureURL }) => {
                     onClick: closeModal,
                 },
             ]}
+            modalTitle={title}
         >
             <Image
-                src={pictureURL}
-                width={200}
                 height={200}
+                src={pictureURL}
                 style={{
                     maxHeight: "70vh",
                 }}
+                width={200}
             />
         </CrowdventureModal>
     );

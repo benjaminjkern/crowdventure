@@ -22,6 +22,7 @@ const CrowdventureCard = ({
 
     return (
         <div
+            ref={ref}
             style={{
                 width: 200,
                 textAlign: "center",
@@ -29,22 +30,21 @@ const CrowdventureCard = ({
                 overflow: "hidden",
                 backgroundColor: backgroundColor[1],
             }}
-            ref={ref}
         >
             <Link href={href}>
                 <a
-                    style={{
-                        color: disabled ? "grey" : rootColor[1],
-                        pointerEvents: disabled ? "none" : "auto",
-                    }}
                     onMouseEnter={() => {
                         ref.current.style.boxShadow = `0 0 6px ${rootColor[0]}`;
                     }}
                     onMouseLeave={() => {
                         ref.current.style.boxShadow = `0 0 3px ${rootColor[1]}`;
                     }}
+                    style={{
+                        color: disabled ? "grey" : rootColor[1],
+                        pointerEvents: disabled ? "none" : "auto",
+                    }}
                 >
-                    {picture && (
+                    {picture ? (
                         <div
                             style={{
                                 backgroundColor: "white",
@@ -56,25 +56,23 @@ const CrowdventureCard = ({
                         >
                             <Image
                                 height={200}
-                                width={200}
+                                onError={(e) => {
+                                    e.target.parentNode.style.display = "none";
+                                }}
                                 src={picture}
                                 style={{
                                     // Blur bad images
                                     ...(pictureUnsafe
                                         ? {
-                                              "-webkit-filter":
-                                                  "blur(" + BLURAMOUNT + "px)",
-                                              filter:
-                                                  "blur(" + BLURAMOUNT + "px)",
+                                              "-webkit-filter": `blur(${BLURAMOUNT}px)`,
+                                              filter: `blur(${BLURAMOUNT}px)`,
                                           }
                                         : {}),
                                 }}
-                                onError={(e) => {
-                                    e.target.parentNode.style.display = "none";
-                                }}
+                                width={200}
                             />
                         </div>
-                    )}
+                    ) : null}
                     <div style={{ paddingTop: "2em", textAlign: "center" }}>
                         {text}
                     </div>
@@ -84,7 +82,7 @@ const CrowdventureCard = ({
             {overlayIcons.map(
                 ({ active, tooltip, icon, iconColor }, i) =>
                     active && (
-                        <TooltipWrapper tooltip={tooltip} key={i}>
+                        <TooltipWrapper key={i} tooltip={tooltip}>
                             {iconColor} {icon}
                             {/* <div
                     style={{
@@ -112,7 +110,7 @@ const CrowdventureCard = ({
 
             <div
                 style={{
-                    backgroundColor: backgroundColor,
+                    backgroundColor,
                     color: "gray",
                     textAlign: "center",
                     fontSize: 10,

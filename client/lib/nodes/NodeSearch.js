@@ -12,15 +12,14 @@ const NodeSearch = ({ onSelectNode, toNode }) => {
 
     const processNodeTitle = (newQuery) => {
         setOptions(
-            allNodes.filter((node) => {
-                return (
+            allNodes.filter(
+                (node) =>
                     !newQuery.length ||
                     node.title.toLowerCase().includes(newQuery.toLowerCase()) ||
                     node.owner.screenName
                         .toLowerCase()
                         .includes(newQuery.toLowerCase())
-                );
-            })
+            )
         );
         setQuery(newQuery);
     };
@@ -44,22 +43,22 @@ const NodeSearch = ({ onSelectNode, toNode }) => {
     return (
         <>
             <CrowdventureTextInput
-                placeholder="(Leave Empty to Create New Page)"
-                value={query}
+                onBlur={() => setOpen(false)}
                 onChangeText={processNodeTitle}
                 onFocus={() => setOpen(true)}
-                onBlur={() => setOpen(false)}
+                placeholder="(Leave Empty to Create New Page)"
+                value={query}
             />
-            {open && (
+            {open ? (
                 <div style={{ maxHeight: 200 }}>
                     {options.map((node, i) => (
-                        <div onClick={() => selectNode(node)} key={i}>
+                        <div key={i} onClick={() => selectNode(node)}>
                             {node.title}
                             <AccountPreview account={node.owner} />
                         </div>
                     ))}
                 </div>
-            )}
+            ) : null}
         </>
     );
 };

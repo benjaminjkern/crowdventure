@@ -8,7 +8,6 @@ const UnsafeModal = () => {
 
     return (
         <CrowdventureModal
-            modalTitle="Turn on Unsafe Mode"
             modalButtons={[
                 {
                     text: "Turn on Unsafe Mode",
@@ -18,6 +17,7 @@ const UnsafeModal = () => {
                     },
                 },
             ]}
+            modalTitle="Turn on Unsafe Mode"
         >
             Unsafe Mode allows you to see <b>ALL</b> of the content on
             Crowdventure, including content that has been classified as
@@ -25,8 +25,8 @@ const UnsafeModal = () => {
             and agree to the terms of service:
             <p />
             <CrowdventureTextInput
-                disabled
                 as="textarea"
+                disabled
                 rows="5"
                 value={`Please read these terms of service ("terms", "terms of service") carefully before using the Crowdventure website (the "service").
             
@@ -61,8 +61,8 @@ IX. User Account
             />
             <CrowdventureCheckboxInput
                 // style={{ float: "right" }}
-                label="I agree to the terms of service."
                 checked={understand}
+                label="I agree to the terms of service."
                 onChange={setUnderstand}
             />
         </CrowdventureModal>

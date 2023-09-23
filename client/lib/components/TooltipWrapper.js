@@ -1,7 +1,5 @@
 import React from "react";
 
-const TooltipWrapper = () => {
-    return <div></div>;
-};
+const TooltipWrapper = () => <div />;
 
 export default TooltipWrapper;

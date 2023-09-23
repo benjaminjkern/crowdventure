@@ -1,7 +1,5 @@
 import React from "react";
 
-const CrowdventureSwitch = ({ value }) => {
-    return <div></div>;
-};
+const CrowdventureSwitch = ({ value }) => <div />;
 
 export default CrowdventureSwitch;

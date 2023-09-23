@@ -72,7 +72,6 @@ const AccountManager = () => {
             />
             Unsafe Mode:{" "}
             <CrowdventureSwitch
-                value={unsafeMode}
                 onChange={(checked) => {
                     if (checked) {
                         // showModal(
@@ -97,12 +96,9 @@ const AccountManager = () => {
                         // });
                     }
                 }}
+                value={unsafeMode}
             />
-            <TooltipWrapper
-                tooltip={
-                    "Unsafe mode allows you to see all content on Crowdventure, including content that has been flagged as unsafe for the general public!"
-                }
-            >
+            <TooltipWrapper tooltip="Unsafe mode allows you to see all content on Crowdventure, including content that has been flagged as unsafe for the general public!">
                 {/* <span className="fa fa-info-circle" /> */}
             </TooltipWrapper>
         </div>

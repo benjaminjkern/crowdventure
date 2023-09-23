@@ -32,8 +32,8 @@ const UnsafeImage = ({ style, unsafe, ...props }) => {
                 ...style,
                 ...(unsafe
                     ? {
-                          "-webkit-filter": "blur(" + blurAmount + "px)",
-                          filter: "blur(" + blurAmount + "px)",
+                          "-webkit-filter": `blur(${blurAmount}px)`,
+                          filter: `blur(${blurAmount}px)`,
                       }
                     : undefined),
             }}

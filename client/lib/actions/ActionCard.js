@@ -33,13 +33,11 @@ const ActionCard = ({ choice: initChoice }) => {
             (account) => account.screenName !== user?.screenName
         );
 
-        if (choice.liked) {
+        if (choice.liked)
             choice.likedBy = choice.likedBy.filter(
                 (account) => account.screenName !== user?.screenName
             );
-        } else {
-            choice.likedBy.push(user);
-        }
+        else choice.likedBy.push(user);
 
         setChoice({ ...choice });
 
@@ -64,13 +62,11 @@ const ActionCard = ({ choice: initChoice }) => {
             (account) => account.screenName !== user?.screenName
         );
 
-        if (choice.disliked) {
+        if (choice.disliked)
             choice.dislikedBy = choice.dislikedBy.filter(
                 (account) => account.screenName !== user?.screenName
             );
-        } else {
-            choice.dislikedBy.push(user);
-        }
+        else choice.dislikedBy.push(user);
 
         setChoice({ ...choice });
 
@@ -140,38 +136,7 @@ const ActionCard = ({ choice: initChoice }) => {
 
     return (
         <CrowdventureCard
-            href={`/node/${choice.to.ID}`}
-            onClick={() =>
-                window.scrollTo({
-                    top: 0,
-                    left: 0,
-                    behavior: "smooth",
-                })
-            }
             disabled={disabled}
-            text={choice.action} // { active, tooltip, icon, iconColor }
-            overlayIcons={[
-                {
-                    active: choice.hidden || choice.suggestedBy.hidden,
-                    tooltip: `This action is hidden, because it has been marked as unsafe! You can see it because you are ${
-                        unsafeMode ? "in Unsafe Mode." : "the owner."
-                    }`,
-                    icon: "minus-circle",
-                    iconColor: "red",
-                },
-                {
-                    active:
-                        !choice.hidden &&
-                        choice.to &&
-                        (choice.to.hidden || choice.to.owner.hidden) &&
-                        !disabled,
-                    tooltip: `This page this action leads to is hidden, because it has been marked as unsafe! You will be able to see it because you are ${
-                        unsafeMode ? "in Unsafe Mode." : "the owner."
-                    }`,
-                    icon: "minus-circle",
-                    iconColor: "red",
-                },
-            ]}
             dropdownOptions={[
                 {
                     disabled:
@@ -221,13 +186,44 @@ const ActionCard = ({ choice: initChoice }) => {
                 {},
                 { onClick: () => reportSuggestion(choice.ID), text: "Report" },
             ]}
+            href={`/node/${choice.to.ID}`}
+            onClick={() =>
+                window.scrollTo({
+                    top: 0,
+                    left: 0,
+                    behavior: "smooth",
+                })
+            }
+            overlayIcons={[
+                {
+                    active: choice.hidden || choice.suggestedBy.hidden,
+                    tooltip: `This action is hidden, because it has been marked as unsafe! You can see it because you are ${
+                        unsafeMode ? "in Unsafe Mode." : "the owner."
+                    }`,
+                    icon: "minus-circle",
+                    iconColor: "red",
+                },
+                {
+                    active:
+                        !choice.hidden &&
+                        choice.to &&
+                        (choice.to.hidden || choice.to.owner.hidden) &&
+                        !disabled,
+                    tooltip: `This page this action leads to is hidden, because it has been marked as unsafe! You will be able to see it because you are ${
+                        unsafeMode ? "in Unsafe Mode." : "the owner."
+                    }`,
+                    icon: "minus-circle",
+                    iconColor: "red",
+                },
+            ]}
+            text={choice.action} // { active, tooltip, icon, iconColor }
         >
             <LikeDislikeController
                 count={choice.score}
-                liked={choice.liked}
+                dislike={dislike}
                 disliked={choice.disliked}
                 like={like}
-                dislike={dislike}
+                liked={choice.liked}
             />
             Suggested By: <AccountPreview account={choice.suggestedBy} />
         </CrowdventureCard>

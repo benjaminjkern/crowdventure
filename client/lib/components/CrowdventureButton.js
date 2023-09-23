@@ -16,13 +16,13 @@ const CrowdventureButton = ({
         return (
             <span
                 onClick={onClick}
-                style={{ cursor: "pointer", ...style }}
                 onMouseEnter={(e) => {
                     e.target.style.textDecoration = "underline";
                 }}
                 onMouseLeave={(e) => {
                     e.target.style.textDecoration = "none";
                 }}
+                style={{ cursor: "pointer", ...style }}
             >
                 {children}
             </span>
@@ -30,6 +30,15 @@ const CrowdventureButton = ({
 
     return (
         <button
+            disabled={requireSignedIn ? !user : null}
+            onClick={onClick}
+            onMouseEnter={(e) => {
+                e.target.style.backgroundColor = rootColor[0];
+                // Do overlay
+            }}
+            onMouseLeave={(e) => {
+                e.target.style.backgroundColor = rootColor[1];
+            }}
             style={{
                 border: `1px solid ${rootColor[0]}`,
                 padding: 5,
@@ -39,15 +48,6 @@ const CrowdventureButton = ({
                 cursor: (!requireSignedIn || user) && "pointer",
                 ...style,
             }}
-            disabled={requireSignedIn && !user}
-            onMouseEnter={(e) => {
-                e.target.style.backgroundColor = rootColor[0];
-                // Do overlay
-            }}
-            onMouseLeave={(e) => {
-                e.target.style.backgroundColor = rootColor[1];
-            }}
-            onClick={onClick}
             {...props}
         >
             {children}

@@ -25,15 +25,13 @@ const NotificationsPage = () => {
                 {unseen.length ? "!" : "."}
             </span>
             <p />
-            {user.notifications.map((notification, idx) => {
-                return (
-                    <CrowdventureNotification
-                        notification={notification}
-                        key={idx}
-                        idx={idx}
-                    />
-                );
-            })}
+            {user.notifications.map((notification, idx) => (
+                <CrowdventureNotification
+                    idx={idx}
+                    key={idx}
+                    notification={notification}
+                />
+            ))}
 
             <CrowdventureButton
                 className="float-right"
@@ -47,12 +45,10 @@ const NotificationsPage = () => {
     );
 };
 
-export const getStaticProps = () => {
-    return {
-        props: {
-            pageTitle: "Crowdventure - Notifications", // Ideally this would say number of notifications but I dont wanna worry about that rn
-        },
-    };
-};
+export const getStaticProps = () => ({
+    props: {
+        pageTitle: "Crowdventure - Notifications", // Ideally this would say number of notifications but I dont wanna worry about that rn
+    },
+});
 
 export default NotificationsPage;

@@ -32,9 +32,9 @@ const ChoiceModal = ({ fromNode, choice }) => {
     const openCreateNodeModal = (callback) => {
         openModal(
             <CreateNodeModal
+                callback={(node) => callback(node.ID)}
                 picture={fromNode.pictureURL}
                 pictureUnsafe={fromNode.pictureUnsafe}
-                callback={(node) => callback(node.ID)}
             />
         );
     };
@@ -75,31 +75,31 @@ const ChoiceModal = ({ fromNode, choice }) => {
 
     return (
         <CrowdventureModal
-            modalTitle={`${choice ? "Editing" : "Suggesting New"} Choice`}
             modalButtons={[
                 {
                     text: `${choice ? "Edit" : "Submit New"} Choice`,
                     onClick: () => (choice ? editAction : createNewAction)(),
                 },
             ]}
+            modalTitle={`${choice ? "Editing" : "Suggesting New"} Choice`}
         >
             Action:
             <CrowdventureTextInput
-                value={suggestAction}
                 onChange={setSuggestAction}
+                value={suggestAction}
             />
             Go to Page:
             <NodeSearch callback={setToPage} toID={toPage} />
-            {user?.isAdmin && (
+            {user?.isAdmin ? (
                 <>
                     Admin Controls:
                     <CrowdventureCheckboxInput
                         checked={hidden}
-                        onChange={setHidden}
                         label="Choice should be hidden"
+                        onChange={setHidden}
                     />
                 </>
-            )}
+            ) : null}
             {info}
         </CrowdventureModal>
     );

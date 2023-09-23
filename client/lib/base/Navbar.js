@@ -3,26 +3,24 @@ import Image from "next/image";
 import Link from "next/link";
 import AccountManager from "../accounts/AccountManager";
 
-const Navbar = () => {
-    return (
-        <div>
-            <Link href="/">
-                <a>
-                    <Image
-                        height={50}
-                        src={require("../../public/logo.png")}
-                        alt="Crowdventure Logo"
-                        style={{ width: "100%" }}
-                    />
-                </a>
-            </Link>
+const Navbar = () => (
+    <div>
+        <Link href="/">
+            <a>
+                <Image
+                    alt="Crowdventure Logo"
+                    height={50}
+                    src={require("../../public/logo.png")}
+                    style={{ width: "100%" }}
+                />
+            </a>
+        </Link>
 
-            <AccountManager />
+        <AccountManager />
 
-            {/* // <CrowdventureCollapse>
+        {/* // <CrowdventureCollapse>
             Should collapse on smaller width screens
         // </CrowdventureCollapse> */}
-        </div>
-    );
-};
+    </div>
+);
 export default Navbar;

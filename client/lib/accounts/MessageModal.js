@@ -12,7 +12,6 @@ const MessageModal = ({ account }) => {
 
     return (
         <CrowdventureModal
-            modalTitle={`Send message to ${account.screenName}`}
             modalButtons={[
                 {
                     disabled: message.length === 0,
@@ -33,9 +32,10 @@ const MessageModal = ({ account }) => {
                     },
                 },
             ]}
+            modalTitle={`Send message to ${account.screenName}`}
         >
             Message:
-            <CrowdventureTextInput value={message} onChangeText={setMessage} />
+            <CrowdventureTextInput onChangeText={setMessage} value={message} />
         </CrowdventureModal>
     );
 };

@@ -100,21 +100,28 @@ const NodePage = ({ node: initNode }) => {
     return (
         <>
             {(node.hidden || node.owner.hidden) &&
-                node.owner.screenName === user?.screenName &&
-                !unsafeMode && (
-                    <CrowdventureAlert title="Unsafe!">
-                        This page has been hidden from general users, because
-                        the content has been deemed unsafe. Users in unsafe mode
-                        can see this page and its content. Since you own this
-                        page, you can see it. If you believe this page should be
-                        considered safe, click <a href="">Here</a>.
-                    </CrowdventureAlert>
-                )}
+            node.owner.screenName === user?.screenName &&
+            !unsafeMode ? (
+                <CrowdventureAlert title="Unsafe!">
+                    This page has been hidden from general users, because the
+                    content has been deemed unsafe. Users in unsafe mode can see
+                    this page and its content. Since you own this page, you can
+                    see it. If you believe this page should be considered safe,
+                    click <a href="">Here</a>.
+                </CrowdventureAlert>
+            ) : null}
             <h1>{node.title}</h1>
-            {node.pictureURL && (
+            {node.pictureURL ? (
                 <Image
-                    width={200}
                     height={200}
+                    onClick={() => {
+                        openModal(
+                            <PictureModal
+                                pictureURL={node.pictureURL}
+                                title={node.title}
+                            />
+                        );
+                    }}
                     src={node.pictureURL}
                     style={{
                         marginLeft: "auto",
@@ -126,22 +133,14 @@ const NodePage = ({ node: initNode }) => {
                         cursor: "pointer",
                         ...(node.pictureUnsafe
                             ? {
-                                  "-webkit-filter":
-                                      "blur(" + BLURAMOUNT + "px)",
-                                  filter: "blur(" + BLURAMOUNT + "px)",
+                                  "-webkit-filter": `blur(${BLURAMOUNT}px)`,
+                                  filter: `blur(${BLURAMOUNT}px)`,
                               }
                             : {}),
                     }}
-                    onClick={() => {
-                        openModal(
-                            <PictureModal
-                                pictureURL={node.pictureURL}
-                                title={node.title}
-                            />
-                        );
-                    }}
+                    width={200}
                 />
-            )}
+            ) : null}
             {node.content.split("\n").map((line, i) => (
                 <p key={i} style={{ textIndent: "5%" }}>
                     {line}
@@ -164,7 +163,7 @@ const NodePage = ({ node: initNode }) => {
             )}
             Author: <AccountPreview account={node.owner} />
             Views: {node.views}
-            {(node.owner.screenName === user?.screenName || user?.isAdmin) && (
+            {node.owner.screenName === user?.screenName || user?.isAdmin ? (
                 <CrowdventureButton
                     onClick={() => {
                         openModal(
@@ -174,13 +173,13 @@ const NodePage = ({ node: initNode }) => {
                 >
                     Edit Page
                 </CrowdventureButton>
-            )}
+            ) : null}
             {node.canonChoices.length + node.nonCanonChoices.length > 0 ? (
                 <div>
                     {[...node.canonChoices, ...node.nonCanonChoices].map(
-                        (choice, idx) => {
-                            return <ActionCard choice={choice} key={idx} />;
-                        }
+                        (choice, idx) => (
+                            <ActionCard choice={choice} key={idx} />
+                        )
                     )}
                 </div>
             ) : (
@@ -190,10 +189,10 @@ const NodePage = ({ node: initNode }) => {
                 </p>
             )}
             <CrowdventureButton
-                requireSignedIn={true}
                 onClick={() => {
                     openModal(<ChoiceModal fromNode={node} />);
                 }}
+                requireSignedIn
             >
                 Suggest New Choice
             </CrowdventureButton>
@@ -204,12 +203,10 @@ const NodePage = ({ node: initNode }) => {
     );
 };
 
-export const getStaticPaths = async () => {
-    return {
-        paths: [],
-        fallback: true,
-    };
-};
+export const getStaticPaths = async () => ({
+    paths: [],
+    fallback: true,
+});
 
 const FULL_CHOICE_GQL = {
     ID: 0,

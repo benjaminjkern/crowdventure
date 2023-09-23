@@ -36,6 +36,19 @@ const CrowdventureNotification = ({ notification, idx }) => {
     return (
         <div
             // I THINK I use the ref here justt because otherwise it tries to attach the style to the individual element that you hover over
+            onClick={(e) => {
+                if (e.target !== bigButtonRef.current) return;
+                seeNotification().then(() => {
+                    console.log(notification.link);
+                    if (notification.link) router.push(notification.link);
+                });
+            }}
+            onMouseOut={() => {
+                bigButtonRef.current.style.boxShadow = `0 0 3px ${rootColor[1]}`;
+            }}
+            onMouseOver={() => {
+                bigButtonRef.current.style.boxShadow = `0 0 6px ${rootColor[0]}`;
+            }}
             ref={bigButtonRef}
             style={{
                 width: "100%",
@@ -50,21 +63,27 @@ const CrowdventureNotification = ({ notification, idx }) => {
                 userSelect: "none" /* Non-prefixed version, currently
                       supported by Chrome, Edge, Opera and Firefox */,
             }}
-            onMouseOver={() => {
-                bigButtonRef.current.style.boxShadow = `0 0 6px ${rootColor[0]}`;
-            }}
-            onMouseOut={() => {
-                bigButtonRef.current.style.boxShadow = `0 0 3px ${rootColor[1]}`;
-            }}
-            onClick={(e) => {
-                if (e.target !== bigButtonRef.current) return;
-                seeNotification().then(() => {
-                    console.log(notification.link);
-                    if (notification.link) router.push(notification.link);
-                });
-            }}
         >
             <div
+                onClick={() => {
+                    seeNotification(!notification.seen);
+                }}
+                onMouseDown={() => {
+                    seenButtonRef.current.style.backgroundColor =
+                        notification.seen ? "darkgray" : rootColor[0];
+                }}
+                onMouseOut={() => {
+                    seenButtonRef.current.style.backgroundColor =
+                        notification.seen ? "lightgrey" : rootColor[2];
+                }}
+                onMouseOver={() => {
+                    seenButtonRef.current.style.backgroundColor =
+                        notification.seen ? "silver" : rootColor[1];
+                }}
+                onMouseUp={() => {
+                    seenButtonRef.current.style.backgroundColor =
+                        notification.seen ? "silver" : rootColor[1];
+                }}
                 ref={seenButtonRef}
                 style={{
                     width: "1.25em",
@@ -80,25 +99,6 @@ const CrowdventureNotification = ({ notification, idx }) => {
                     color: notification.seen ? "grey" : "white",
                     borderRadius: "50%",
                     textAlign: "center",
-                }}
-                onMouseOver={() => {
-                    seenButtonRef.current.style.backgroundColor =
-                        notification.seen ? "silver" : rootColor[1];
-                }}
-                onMouseOut={() => {
-                    seenButtonRef.current.style.backgroundColor =
-                        notification.seen ? "lightgrey" : rootColor[2];
-                }}
-                onMouseDown={() => {
-                    seenButtonRef.current.style.backgroundColor =
-                        notification.seen ? "darkgray" : rootColor[0];
-                }}
-                onMouseUp={() => {
-                    seenButtonRef.current.style.backgroundColor =
-                        notification.seen ? "silver" : rootColor[1];
-                }}
-                onClick={() => {
-                    seeNotification(!notification.seen);
                 }}
             >
                 <span className="fa fa-exclamation">!</span>

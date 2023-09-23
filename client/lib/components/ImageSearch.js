@@ -77,14 +77,13 @@ const ImageSearch = ({ onSelectImage }) => {
         setFetchResults(undefined);
     }, [fetchResults]);
 
-    const fetchImages = (query, amount = PAGESIZE, offset = 0) => {
-        return fetch(
-            "https://api.cognitive.microsoft.com/bing/v7.0/images/search?q=" +
-                encodeURIComponent(query) +
-                `&count=${amount}&safeSearch=${
-                    unsafeMode ? "Off" : "Strict"
-                }&offset=` +
-                offset,
+    const fetchImages = (query, amount = PAGESIZE, offset = 0) =>
+        fetch(
+            `https://api.cognitive.microsoft.com/bing/v7.0/images/search?q=${encodeURIComponent(
+                query
+            )}&count=${amount}&safeSearch=${
+                unsafeMode ? "Off" : "Strict"
+            }&offset=${offset}`,
             {
                 headers: {
                     "Ocp-Apim-Subscription-Key": BING_API_KEY,
@@ -113,20 +112,19 @@ const ImageSearch = ({ onSelectImage }) => {
                     // )),
                 ];
             });
-    };
 
     const rows = splitIntoRows(images, MAXROWLENGTH);
 
     return (
         <>
             <CrowdventureTextInput
+                onChangeText={setQuery}
                 placeholder="Search for an image..."
                 value={query}
-                onChangeText={setQuery}
             />
-            {open && (
+            {open ? (
                 <div style={{ height: 350, overflow: "scroll" }}>
-                    {(fetching || fetchResults) && "Loading..."}
+                    {fetching || fetchResults ? "Loading..." : null}
                     {rows.map((row, r) => (
                         <div
                             key={r}
@@ -166,6 +164,7 @@ const ImageSearch = ({ onSelectImage }) => {
                                     {!image.isFamilyFriendly && (
                                         <TooltipWrapper tooltip="This picture will automatically flag this page as hidden!">
                                             <div
+                                                className="fa"
                                                 style={{
                                                     position: "absolute",
                                                     top: "5px",
@@ -183,7 +182,6 @@ const ImageSearch = ({ onSelectImage }) => {
                                                     "text-shadow":
                                                         "0 0 1px black",
                                                 }}
-                                                className="fa"
                                             >
                                                 &#xf056;
                                             </div>
@@ -194,7 +192,7 @@ const ImageSearch = ({ onSelectImage }) => {
                         </div>
                     ))}
                 </div>
-            )}
+            ) : null}
         </>
     );
 };

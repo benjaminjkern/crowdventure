@@ -22,9 +22,8 @@ const UserProvider = ({ children }) => {
             };
 
             localStorage.setItem("savedUser", JSON.stringify(smallerUser));
-        } else {
-            localStorage.removeItem("savedUser");
-        }
+        } else localStorage.removeItem("savedUser");
+
         setUser(newUser);
     };
 

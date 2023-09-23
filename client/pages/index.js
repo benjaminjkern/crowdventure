@@ -39,8 +39,8 @@ const HomePage = ({ topNodes: initTopNodes, recentNodes: initRecentNodes }) => {
     return (
         <>
             <CrowdventureButton
-                requireSignedIn={true}
                 onClick={() => openModal(<CreateNodeModal />)}
+                requireSignedIn
             >
                 Create a New Adventure!
             </CrowdventureButton>

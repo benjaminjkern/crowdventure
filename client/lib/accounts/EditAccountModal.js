@@ -45,9 +45,9 @@ const EditAccountModal = ({ account, setAccount }) => {
 
         mutationCall("editAccount", FULL_ACCOUNT_GQL, params).then(
             (newAccount) => {
-                if (account.screenName === user?.screenName) {
+                if (account.screenName === user?.screenName)
                     setUser(newAccount);
-                }
+
                 setAccount(newAccount);
                 closeModal();
             }
@@ -60,9 +60,8 @@ const EditAccountModal = ({ account, setAccount }) => {
             {},
             { screenName: account.screenName }
         ).then(() => {
-            if (account.screenName === user?.screenName) {
-                setUser();
-            }
+            if (account.screenName === user?.screenName) setUser();
+
             setAccount();
             router.push("/");
             closeAllModals();
@@ -71,7 +70,6 @@ const EditAccountModal = ({ account, setAccount }) => {
 
     return (
         <CrowdventureModal
-            modalTitle="Editing Account"
             modalButtons={[
                 { text: "Edit Account", onClick: editPage },
                 {
@@ -79,18 +77,19 @@ const EditAccountModal = ({ account, setAccount }) => {
                     onClick: () => {
                         openModal(
                             <ConfirmModal
-                                title="Delete Account"
                                 content="This will erase all content created by this account, including all pages and suggested choices, and liked and disliked content. Are you sure you wish to continue?"
                                 onConfirm={deleteAccount}
+                                title="Delete Account"
                             />
                         );
                     },
                 },
             ]}
+            modalTitle="Editing Account"
         >
             <ModalImage
-                src={account.profilePicURL}
                 alt={`${account.screenName}'s Profile Pic`}
+                src={account.profilePicURL}
                 style={{
                     opacity:
                         account.profilePicURL === profilePictureField ? 1 : 0.2,
@@ -99,48 +98,48 @@ const EditAccountModal = ({ account, setAccount }) => {
             {account.screenName}
             Profile Pic URL:
             <CrowdventureTextInput
-                value={profilePictureField}
                 onChangeText={setProfilePictureField}
+                value={profilePictureField}
             />
             Bio:
             <CrowdventureTextInput
+                onChangeText={setBioField}
                 rows="3"
                 value={bioField}
-                onChangeText={setBioField}
             />
             Change your password:
             <CrowdventureTextInput
-                type="password"
-                placeholder="••••••••"
-                value={pass1}
                 onChangeText={setPass1}
+                placeholder="••••••••"
+                type="password"
+                value={pass1}
             />
-            {pass1 && (
+            {pass1 ? (
                 <>
                     Confirm password:
                     <CrowdventureTextInput
-                        type="password"
-                        placeholder="••••••••"
-                        value={pass2}
                         onChangeText={setPass2}
+                        placeholder="••••••••"
+                        type="password"
+                        value={pass2}
                     />
                 </>
-            )}
-            {user?.isAdmin && (
+            ) : null}
+            {user?.isAdmin ? (
                 <>
                     Admin Controls:
                     <CrowdventureCheckboxInput
                         checked={hidden}
-                        onChange={setHidden}
                         label="Account should be hidden"
+                        onChange={setHidden}
                     />
                     <CrowdventureCheckboxInput
                         checked={isAdmin}
-                        onChange={setAdmin}
                         label="Account is an admin"
+                        onChange={setAdmin}
                     />
                 </>
-            )}
+            ) : null}
             {info}
         </CrowdventureModal>
     );

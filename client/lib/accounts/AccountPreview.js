@@ -15,13 +15,13 @@ const AccountPreview = ({
         <>
             {imgSide === "right" && `${account.screenName} `}
             <Image
+                alt={`${account.screenName} Profile Pic`}
+                height={20}
+                onClick={onClickImage}
                 src={
                     account.profilePicURL ||
                     require("../../public/defaultProfilePic.jpg")
                 }
-                alt={`${account.screenName} Profile Pic`}
-                width={20}
-                height={20}
                 style={{
                     borderWidth: 1,
                     borderStyle: "solid",
@@ -29,7 +29,7 @@ const AccountPreview = ({
                     borderRadius: "50%",
                     cursor: onClickImage ? "pointer" : "auto",
                 }}
-                onClick={onClickImage}
+                width={20}
             />
             {imgSide === "left" && ` ${account.screenName}`}
         </>

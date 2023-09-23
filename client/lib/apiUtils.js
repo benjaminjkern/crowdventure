@@ -77,12 +77,11 @@ ${Array((tab - 1) * 4)
     .join("")}}`;
 };
 
-const scrubVariables = (variables) => {
-    return Object.keys(variables).reduce((p, varName) => {
+const scrubVariables = (variables) =>
+    Object.keys(variables).reduce((p, varName) => {
         if (variables[varName] === undefined) return p;
         return { ...p, [varName]: variables[varName] };
     }, {});
-};
 
 const guessType = (variableValue) => {
     switch (typeof variableValue) {

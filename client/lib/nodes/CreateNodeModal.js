@@ -113,7 +113,6 @@ const CreateNodeModal = ({
 
     return (
         <CrowdventureModal
-            modalTitle={`${node ? "Editing" : "Creating New"} Page`}
             modalButtons={[
                 {
                     text: `${node ? "Edit" : "Create"} Page!`,
@@ -123,20 +122,21 @@ const CreateNodeModal = ({
                     },
                 },
                 {
-                    active: !!node,
+                    active: Boolean(node),
                     text: "Delete",
                     onClick: () =>
                         openModal(
                             <ConfirmModal
+                                content="This will erase all suggested choices of this page, and their associated scores. This will NOT delete sub-pages of this page. Are you sure you wish to continue?"
                                 onConfirm={deleteNode}
                                 title="Delete Page"
-                                content="This will erase all suggested choices of this page, and their associated scores. This will NOT delete sub-pages of this page. Are you sure you wish to continue?"
                             />
                         ),
                 },
             ]}
+            modalTitle={`${node ? "Editing" : "Creating New"} Page`}
         >
-            {pictureField && (
+            {pictureField ? (
                 <div
                     style={{
                         borderWidth: 1,
@@ -147,8 +147,8 @@ const CreateNodeModal = ({
                     }}
                 >
                     <img
-                        src={pictureField}
                         alt="This text shouldnt be showing!"
+                        src={pictureField}
                         style={{
                             padding: 1,
                             borderRadius: 8,
@@ -161,7 +161,7 @@ const CreateNodeModal = ({
                         }}
                     />
                 </div>
-            )}
+            ) : null}
             <div
                 style={{
                     flexDirection: "row",
@@ -184,7 +184,7 @@ const CreateNodeModal = ({
             >
                 {pictureField ? "Change" : "Select"} Picture
             </CrowdventureButton>
-            {showImageSearch && (
+            {showImageSearch ? (
                 <>
                     <br />
                     <ImageSearch
@@ -196,36 +196,36 @@ const CreateNodeModal = ({
                         }}
                     />
                 </>
-            )}
+            ) : null}
             <hr />
             Title:
-            <CrowdventureTextInput value={title} onChangeText={setTitle} />
+            <CrowdventureTextInput onChangeText={setTitle} value={title} />
             Content:
             <CrowdventureTextInput
+                onChangeText={setContent}
                 rows={3}
                 value={content}
-                onChangeText={setContent}
             />
-            {node && user?.isAdmin && (
+            {node && user?.isAdmin ? (
                 <>
                     <hr />
                     Admin Controls:
                     <CrowdventureCheckboxInput
                         checked={hidden}
-                        onChange={setHidden}
                         label="Page should be hidden"
+                        onChange={setHidden}
                         style={{ marginBottom: 10 }}
                     />
                 </>
-            )}
+            ) : null}
             {info || ""}
-            {shouldHide && (
+            {shouldHide ? (
                 <span style={{ color: "red" }}>
                     The image chosen will cause the page to automatically be
                     hidden. If you would like to not have this happen, change or
                     remove the image.
                 </span>
-            )}
+            ) : null}
         </CrowdventureModal>
     );
 };

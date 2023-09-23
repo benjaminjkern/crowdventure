@@ -57,9 +57,6 @@ const NodePreview = ({ node }) => {
 
     return (
         <CrowdventureCard
-            href={`/node/${node.ID}`}
-            picture={node.pictureURL}
-            pictureUnsafe={node.pictureUnsafe}
             dropdownOptions={[
                 {
                     active: user && node.featured,
@@ -72,9 +69,9 @@ const NodePreview = ({ node }) => {
                     onClick: () => {
                         openModal(
                             <ConfirmModal
+                                content="This will erase all suggested choices of this page, and their associated scores. This will NOT delete sub-pages of this page. Are you sure you wish to continue?"
                                 onConfirm={() => deleteNode(node)}
                                 title="Delete Page"
-                                content="This will erase all suggested choices of this page, and their associated scores. This will NOT delete sub-pages of this page. Are you sure you wish to continue?"
                             />
                         );
                     },
@@ -98,7 +95,7 @@ const NodePreview = ({ node }) => {
                     text: `${node.hidden ? "Un-h" : "H"}ide page`,
                 },
             ]}
-            text={node.title}
+            href={`/node/${node.ID}`}
             overlayIcons={[
                 {
                     active: node.featured,
@@ -115,6 +112,9 @@ const NodePreview = ({ node }) => {
                     iconColor: "red",
                 },
             ]}
+            picture={node.pictureURL}
+            pictureUnsafe={node.pictureUnsafe}
+            text={node.title}
         >
             Author: <AccountPreview account={node.owner} />
             Views: {node.views}

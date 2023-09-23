@@ -54,19 +54,19 @@ const LoginModal = () => {
 
     return (
         <CrowdventureModal
-            modalTitle="Log in"
             modalButtons={[{ text: "Log in", onClick: login }]}
+            modalTitle="Log in"
         >
             Screen Name:
             <CrowdventureTextInput
-                value={screenName}
                 onChangeText={setScreenName}
+                value={screenName}
             />
             Password:
             <CrowdventureTextInput
+                onChangeText={setPassword}
                 type="password"
                 value={password}
-                onChangeText={setPassword}
             />
             {info ? info : ""}
         </CrowdventureModal>

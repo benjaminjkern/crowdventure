@@ -5,14 +5,14 @@ const ModalImage = ({ src, alt, style }) => {
     if (!src) return;
     return (
         <Image
-            src={src}
             alt={alt}
-            width={200}
             height={200}
+            src={src}
             style={{
                 borderRadius: "8px",
                 ...style,
             }}
+            width={200}
         />
     );
 };

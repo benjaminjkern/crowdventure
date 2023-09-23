@@ -53,25 +53,25 @@ const SignUpModal = () => {
 
     return (
         <CrowdventureModal
-            modalTitle="Sign Up for Crowdventure!"
             modalButtons={[{ text: "Sign Up", onClick: handleSubmitSignUp }]}
+            modalTitle="Sign Up for Crowdventure!"
         >
             Screen Name:
             <CrowdventureTextInput
-                value={screenName}
                 onChangeText={setScreenName}
+                value={screenName}
             />
             Create Password:
             <CrowdventureTextInput
+                onChangeText={setPass1}
                 type="password"
                 value={pass1}
-                onChangeText={setPass1}
             />
             Confirm Password:
             <CrowdventureTextInput
+                onChangeText={setPass2}
                 type="password"
                 value={pass2}
-                onChangeText={setPass2}
             />
             {info ? info : ""}
         </CrowdventureModal>

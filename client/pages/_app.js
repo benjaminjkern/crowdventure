@@ -21,27 +21,27 @@ const App = ({ Component, pageProps }) => {
             <Head>
                 <meta charSet="utf-8" />
                 <meta
-                    name="viewport"
                     content="width=device-width, initial-scale=1"
+                    name="viewport"
                 />
-                <meta name="description" content="Crowdventure your mom" />
-                <meta name="author" content="Ben Kern" />
+                <meta content="Crowdventure your mom" name="description" />
+                <meta content="Ben Kern" name="author" />
 
                 {/* This stuff shows up when you send someone the link via imessage */}
                 <meta
-                    property="og:title"
                     content={pageTitle || "Crowdventure"}
+                    property="og:title"
                 />
                 <meta
-                    property="og:image"
                     href={
                         previewImage ||
                         "https://github.com/benjaminjkern/crowdventure/blob/master/NewLogo.png?raw=true"
                     }
+                    property="og:image"
                 />
 
                 <title>{pageTitle || "Crowdventure"}</title>
-                <link rel="icon" href="/favicon.png" />
+                <link href="/favicon.png" rel="icon" />
             </Head>
             <UnsafeModeProvider>
                 <PaletteProvider>

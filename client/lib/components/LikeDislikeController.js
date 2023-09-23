@@ -8,22 +8,22 @@ const LikeDislikeController = ({ count, liked, like, disliked, dislike }) => {
         <>
             <CrowdventureButton
                 buttonType="text"
-                requireSignedIn={true}
+                onClick={dislike}
+                requireSignedIn
                 style={{
                     color: disliked ? "red" : unsafeMode ? "white" : "black",
                 }}
-                onClick={dislike}
             >
                 Dislike
             </CrowdventureButton>
-            {" " + count + " "}
+            {` ${count} `}
             <CrowdventureButton
                 buttonType="text"
-                requireSignedIn={true}
+                onClick={like}
+                requireSignedIn
                 style={{
                     color: liked ? "green" : unsafeMode ? "white" : "black",
                 }}
-                onClick={like}
             >
                 Like
             </CrowdventureButton>
