@@ -44,7 +44,7 @@ const AccountPreview = ({
                 color: foregroundColor,
             }}
         >
-            <a>{inside}</a>
+            {inside}
         </Link>
     );
 };

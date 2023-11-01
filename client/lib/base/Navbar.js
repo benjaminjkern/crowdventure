@@ -6,14 +6,12 @@ import AccountManager from "../accounts/AccountManager";
 const Navbar = () => (
     <div>
         <Link href="/">
-            <a>
-                <Image
-                    alt="Crowdventure Logo"
-                    height={50}
-                    src={require("../../public/logo.png")}
-                    style={{ width: "100%" }}
-                />
-            </a>
+            <Image
+                alt="Crowdventure Logo"
+                height={50}
+                src={require("../../public/logo.png")}
+                style={{ width: "100%" }}
+            />
         </Link>
 
         <AccountManager />
