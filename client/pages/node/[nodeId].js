@@ -97,113 +97,121 @@ const NodePage = ({ node: initNode }) => {
             </CrowdventureAlert>
         );
 
+    // {(node.hidden || node.owner.hidden) &&
+    //     node.owner.screenName === user?.screenName &&
+    //     !unsafeMode ? (
+    //         <CrowdventureAlert title="Unsafe!">
+    //             This page has been hidden from general users, because the
+    //             content has been deemed unsafe. Users in unsafe mode can see
+    //             this page and its content. Since you own this page, you can
+    //             see it. If you believe this page should be considered safe,
+    //             click <Link href="">Here</Link>.
+    //         </CrowdventureAlert>
+    //     ) : null}
+
     return (
-        <>
-            {(node.hidden || node.owner.hidden) &&
-            node.owner.screenName === user?.screenName &&
-            !unsafeMode ? (
-                <CrowdventureAlert title="Unsafe!">
-                    This page has been hidden from general users, because the
-                    content has been deemed unsafe. Users in unsafe mode can see
-                    this page and its content. Since you own this page, you can
-                    see it. If you believe this page should be considered safe,
-                    click <a href="">Here</a>.
-                </CrowdventureAlert>
-            ) : null}
-            <h1>{node.title}</h1>
+        <div style={{ flexDirection: "row" }}>
             {node.pictureURL ? (
-                <Image
-                    height={200}
-                    onClick={() => {
-                        openModal(
-                            <PictureModal
-                                pictureURL={node.pictureURL}
-                                title={node.title}
-                            />
-                        );
-                    }}
-                    src={node.pictureURL}
-                    style={{
-                        marginLeft: "auto",
-                        marginRight: "auto",
-                        borderWidth: 1,
-                        borderStyle: "solid",
-                        borderColor: "#eee",
-                        borderRadius: 8,
-                        cursor: "pointer",
-                        ...(node.pictureUnsafe
-                            ? {
-                                  "-webkit-filter": `blur(${BLURAMOUNT}px)`,
-                                  filter: `blur(${BLURAMOUNT}px)`,
-                              }
-                            : {}),
-                    }}
-                    width={200}
-                />
+                <div style={{ flex: 3, position: "relative" }}>
+                    <Image
+                        fill
+                        objectFit="cover"
+                        onClick={() => {
+                            openModal(
+                                <PictureModal
+                                    pictureURL={node.pictureURL}
+                                    title={node.title}
+                                />
+                            );
+                        }}
+                        src={node.pictureURL}
+                        style={{
+                            marginLeft: "auto",
+                            marginRight: "auto",
+                            borderWidth: 1,
+                            borderStyle: "solid",
+                            borderColor: "#eee",
+                            borderRadius: 8,
+                            cursor: "pointer",
+                            ...(node.pictureUnsafe
+                                ? {
+                                      "-webkit-filter": `blur(${BLURAMOUNT}px)`,
+                                      filter: `blur(${BLURAMOUNT}px)`,
+                                  }
+                                : {}),
+                        }}
+                    />
+                </div>
             ) : null}
-            {node.content.split("\n").map((line, i) => (
-                <p key={i} style={{ textIndent: "5%" }}>
-                    {line}
-                </p>
-            ))}
-            <hr />
-            <CrowdventureButton
-                // Should be off to the side
-                onClick={() => {
-                    router.back();
-                }}
-            >
-                Go back!
-            </CrowdventureButton>
-            {node.canonChoices.length === 0 && (
-                <p className="text-muted">
-                    By decree of <strong>{node.owner.screenName}</strong>, this
-                    journey ends here.
-                </p>
-            )}
-            Author: <AccountPreview account={node.owner} />
-            Views: {node.views}
-            {node.owner.screenName === user?.screenName || user?.isAdmin ? (
+            <div style={{ flex: 2 }}>
+                <h1>{node.title}</h1>
+                {node.content.split("\n").map((line, i) => (
+                    <p key={i} style={{ textIndent: "5%" }}>
+                        {line}
+                    </p>
+                ))}
+                <hr />
                 <CrowdventureButton
+                    // Should be off to the side
                     onClick={() => {
-                        openModal(
-                            <CreateNodeModal node={node} setNode={setNode} />
-                        );
+                        router.back();
                     }}
                 >
-                    Edit Page
+                    Go back!
                 </CrowdventureButton>
-            ) : null}
-            {node.canonChoices.length + node.nonCanonChoices.length > 0 ? (
-                <div>
-                    {[...node.canonChoices, ...node.nonCanonChoices].map(
-                        (choice, idx) => (
-                            <ActionCard choice={choice} key={idx} />
-                        )
-                    )}
-                </div>
-            ) : (
-                <p className="text-muted">
-                    There are currently no options! You can help expand the
-                    story by adding to it!
-                </p>
-            )}
-            <CrowdventureButton
-                onClick={() => {
-                    openModal(<ChoiceModal fromNode={node} />);
-                }}
-                requireSignedIn
-            >
-                Suggest New Choice
-            </CrowdventureButton>
-            <CrowdventureButton onClick={reportNode}>
-                Report Page
-            </CrowdventureButton>
-        </>
+                {node.canonChoices.length === 0 && (
+                    <p className="text-muted">
+                        By decree of <strong>{node.owner.screenName}</strong>,
+                        this journey ends here.
+                    </p>
+                )}
+                Author: <AccountPreview account={node.owner} />
+                Views: {node.views}
+                {node.owner.screenName === user?.screenName || user?.isAdmin ? (
+                    <CrowdventureButton
+                        onClick={() => {
+                            openModal(
+                                <CreateNodeModal
+                                    node={node}
+                                    setNode={setNode}
+                                />
+                            );
+                        }}
+                    >
+                        Edit Page
+                    </CrowdventureButton>
+                ) : null}
+                {node.canonChoices.length + node.nonCanonChoices.length > 0 ? (
+                    <div>
+                        {[...node.canonChoices, ...node.nonCanonChoices].map(
+                            (choice, idx) => (
+                                <ActionCard choice={choice} key={idx} />
+                            )
+                        )}
+                    </div>
+                ) : (
+                    <p className="text-muted">
+                        There are currently no options! You can help expand the
+                        story by adding to it!
+                    </p>
+                )}
+                <CrowdventureButton
+                    onClick={() => {
+                        openModal(<ChoiceModal fromNode={node} />);
+                    }}
+                    requireSignedIn
+                >
+                    Suggest New Choice
+                </CrowdventureButton>
+                <CrowdventureButton onClick={reportNode}>
+                    Report Page
+                </CrowdventureButton>
+            </div>
+        </div>
     );
 };
 
-export const getStaticPaths = async () => ({
+export const getStaticPaths = () => ({
     paths: [],
     fallback: true,
 });
