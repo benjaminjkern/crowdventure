@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createRef, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { useRouter } from "next/router";
 import { UserContext } from "../lib/user";
 import CrowdventureButton from "../lib/components/CrowdventureButton";

@@ -8,6 +8,23 @@ import CreateNodeModal from "../lib/nodes/CreateNodeModal";
 import { UnsafeModeContext } from "../lib/unsafeMode";
 import { queryCall } from "../lib/apiUtils";
 
+export const NODE_PREVIEW_GQL = {
+    hidden: 0,
+    ID: 0,
+    title: 0,
+    owner: {
+        screenName: 0,
+        profilePicURL: 0,
+    },
+    views: 0,
+    size: 0,
+    pictureURL: 0,
+    pictureUnsafe: 0,
+    // These arent really used here but are on the account page
+    featured: 0,
+    content: 0,
+};
+
 const HomePage = ({ topNodes: initTopNodes, recentNodes: initRecentNodes }) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { openModal } = useContext(ModalContext);
@@ -75,23 +92,6 @@ const HomePage = ({ topNodes: initTopNodes, recentNodes: initRecentNodes }) => {
             </CrowdventureButton>
         </>
     );
-};
-
-export const NODE_PREVIEW_GQL = {
-    hidden: 0,
-    ID: 0,
-    title: 0,
-    owner: {
-        screenName: 0,
-        profilePicURL: 0,
-    },
-    views: 0,
-    size: 0,
-    pictureURL: 0,
-    pictureUnsafe: 0,
-    // These arent really used here but are on the account page
-    featured: 0,
-    content: 0,
 };
 
 export const getStaticProps = async () => {

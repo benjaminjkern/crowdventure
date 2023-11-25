@@ -1,16 +1,30 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, {
+    createContext,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 
 export const UnsafeModeContext = createContext();
 
 const UnsafeModeProvider = ({ children }) => {
-    const [unsafeMode, setUnsafeMode] = useState(false);
+    // eslint-disable-next-line react/hook-use-state
+    const [unsafeMode, setUnsafeModeReal] = useState(false);
 
     useEffect(() => {
-        setUnsafeMode(localStorage.getItem("unsafeMode") === "true");
+        setUnsafeModeReal(localStorage.getItem("unsafeMode") === "true");
     }, []);
 
+    const setUnsafeMode = (value) => {
+        localStorage.setItem("unsafeMode", String(Boolean(value)));
+        setUnsafeModeReal(Boolean(value));
+    };
+
+    const value = useMemo(() => ({ unsafeMode, setUnsafeMode }), [unsafeMode]);
+
     return (
-        <UnsafeModeContext.Provider value={unsafeMode}>
+        <UnsafeModeContext.Provider value={value}>
             {children}
         </UnsafeModeContext.Provider>
     );

@@ -14,7 +14,7 @@ import SignUpModal from "./SignUpModal";
 const AccountManager = () => {
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
-    const { unsafeMode } = useContext(UnsafeModeContext);
+    const { unsafeMode, setUnsafeMode } = useContext(UnsafeModeContext);
 
     if (!user)
         return (
@@ -73,6 +73,7 @@ const AccountManager = () => {
             Unsafe Mode:{" "}
             <CrowdventureSwitch
                 onChange={(checked) => {
+                    setUnsafeMode(checked);
                     if (checked) {
                         // showModal(
                         //     <UnsafeModal

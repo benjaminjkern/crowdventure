@@ -1,5 +1,6 @@
 * {
     box-sizing: border-box;
+    font-family: "Arial Rounded MT Bold";
 }
 
 body {
@@ -10,7 +11,7 @@ body {
         white 90%,
         rgb(158, 232, 255)
     );
-    font-family: "Arial Rounded MT Bold" !important;
+    margin: 0;
 }
 
 body,

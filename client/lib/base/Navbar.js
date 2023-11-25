@@ -4,13 +4,19 @@ import Link from "next/link";
 import AccountManager from "../accounts/AccountManager";
 
 const Navbar = () => (
-    <div>
+    <nav
+        style={{
+            display: "flex",
+            height: 50,
+            justifyContent: "space-between",
+            alignItems: "center",
+        }}
+    >
         <Link href="/">
             <Image
                 alt="Crowdventure Logo"
                 height={50}
                 src={require("../../public/logo.png")}
-                style={{ width: "100%" }}
             />
         </Link>
 
@@ -19,6 +25,6 @@ const Navbar = () => (
         {/* // <CrowdventureCollapse>
             Should collapse on smaller width screens
         // </CrowdventureCollapse> */}
-    </div>
+    </nav>
 );
 export default Navbar;

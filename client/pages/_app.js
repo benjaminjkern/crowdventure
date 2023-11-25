@@ -48,8 +48,8 @@ const App = ({ Component, pageProps }) => {
                     <UserProvider>
                         <ModalProvider>
                             <Navbar />
-                            <Component {...otherPageProps} />
-                            <Footer />
+                            {/* <Component {...otherPageProps} />
+                            <Footer /> */}
                         </ModalProvider>
                     </UserProvider>
                 </PaletteProvider>
