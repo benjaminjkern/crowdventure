@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import CrowdventureButton from "../components/CrowdventureButton";
-import { useRouter } from "next/router";
 import { UserContext } from "../user";
 import CreateNodeModal from "./CreateNodeModal";
 import AccountPreview from "../accounts/AccountPreview";
@@ -11,7 +10,6 @@ import { PaletteContext } from "../colorPalette";
 
 const NodeSidebar = ({ node, setNode }) => {
     const { user } = useContext(UserContext);
-    const router = useRouter();
     const { openModal } = useContext(ModalContext);
     const { mutedTextColor } = useContext(PaletteContext);
     const reportNode = () => {
@@ -43,6 +41,8 @@ const NodeSidebar = ({ node, setNode }) => {
         ...node.canonChoices,
         ...node.nonCanonChoices,
     ];
+
+    const loggedInAsOwner = node.owner.screenName === user?.screenName;
     return (
         <div style={{ paddingInline: 10 }}>
             <h1>{node.title}</h1>
@@ -51,26 +51,7 @@ const NodeSidebar = ({ node, setNode }) => {
                     {line}
                 </p>
             ))}
-            <hr />
-            <CrowdventureButton
-                // Should be off to the side
-                onClick={() => {
-                    router.back();
-                }}
-            >
-                Go back!
-            </CrowdventureButton>
-            {node.canonChoices.length === 0 && (
-                <span style={{ color: mutedTextColor }}>
-                    By decree of <strong>{node.owner.screenName}</strong>, this
-                    journey ends here.
-                </span>
-            )}
-            <span style={{ gap: 5 }}>
-                Author: <AccountPreview account={node.owner} />
-            </span>
-            Views: {node.views}
-            {node.owner.screenName === user?.screenName || user?.isAdmin ? (
+            {loggedInAsOwner || user?.isAdmin ? (
                 <CrowdventureButton
                     onClick={() => {
                         openModal(
@@ -81,6 +62,17 @@ const NodeSidebar = ({ node, setNode }) => {
                     Edit Page
                 </CrowdventureButton>
             ) : null}
+            {node.canonChoices.length === 0 && (
+                <span style={{ color: mutedTextColor }}>
+                    By decree of <strong>{node.owner.screenName}</strong>, this
+                    journey ends here.
+                </span>
+            )}
+            <hr />
+            <span style={{ gap: 5 }}>
+                Author: <AccountPreview account={node.owner} />
+            </span>
+            Views: {node.views}
             {choices.length > 0 ? (
                 <div>
                     {choices.map((choice, idx) => (

@@ -12,7 +12,7 @@ const CrowdventureNotification = ({ notification, idx }) => {
     const { user, setUser } = useContext(UserContext);
     const router = useRouter();
 
-    const seeNotification = async (setSeen) => {
+    const seeNotification = (setSeen) => {
         if (notification.seen === setSeen) return;
         const originalSeen = notification.seen;
         notification.seen = setSeen;

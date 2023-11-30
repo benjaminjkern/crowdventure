@@ -10,6 +10,8 @@ import { deepCopy } from "../../lib/utils";
 import { PaletteContext } from "../../lib/colorPalette";
 import { useWindowSize } from "../../lib/hooks";
 import NodeSidebar from "../../lib/nodes/NodeSidebar";
+import CrowdventureButton from "../../lib/components/CrowdventureButton";
+import { useRouter } from "next/router";
 
 // import EditNodeModal from "../Modals/EditNodeModal";
 // import SuggestChoiceModal from "../Modals/SuggestChoiceModal";
@@ -45,6 +47,8 @@ const NodePage = ({ node: initNode }) => {
     //     );
 
     const { effectiveContentWidth } = useWindowSize();
+
+    const router = useRouter();
 
     if (!node) return <LoadingBox />;
 
@@ -107,6 +111,21 @@ const NodePage = ({ node: initNode }) => {
                             width: (effectiveContentWidth * 3) / 5,
                         }}
                     >
+                        <CrowdventureButton
+                            // Should be off to the side
+                            onClick={() => {
+                                router.back();
+                            }}
+                            style={{
+                                position: "absolute",
+                                zIndex: 1,
+                                width: "fit-content",
+                                left: 20,
+                                top: 20,
+                            }}
+                        >
+                            Go back!
+                        </CrowdventureButton>
                         <Image
                             fill
                             objectFit="cover"
