@@ -34,6 +34,8 @@ const useDefaultStyles = createUseStyles((theme) => {
             },
             "span, a": {
                 display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
             },
             /** ***************** Overwrite default styles *********************/
             "h1,h2,h3,h4,h5,h6": {

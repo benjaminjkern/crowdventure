@@ -21,7 +21,7 @@ const AccountManager = ({ wrapperStyle }) => {
         return (
             <div style={{ alignItems: "center", marginInline: 20 }}>
                 You are not logged in.{" "}
-                <div style={{ flexDirection: "row" }}>
+                <span style={{ gap: 5 }}>
                     <CrowdventureButton
                         buttonType="text"
                         onClick={() => {
@@ -30,7 +30,7 @@ const AccountManager = ({ wrapperStyle }) => {
                     >
                         Log In
                     </CrowdventureButton>
-                    <span style={{ marginInline: 5 }}>or</span>
+                    or
                     <CrowdventureButton
                         buttonType="text"
                         onClick={() => {
@@ -39,7 +39,7 @@ const AccountManager = ({ wrapperStyle }) => {
                     >
                         Sign Up
                     </CrowdventureButton>
-                </div>
+                </span>
             </div>
         );
 

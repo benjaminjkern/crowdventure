@@ -8,6 +8,7 @@ import PaletteProvider from "../lib/colorPalette";
 import ModalProvider from "../lib/modal";
 import UserProvider from "../lib/user";
 import UnsafeModeProvider from "../lib/unsafeMode";
+import { MAX_CONTENT_WIDTH } from "../lib/hooks";
 
 // Crowdventure! - Page not found! - for 404 page (NONEXISTENT RIGHT NOW)
 
@@ -48,8 +49,9 @@ const App = ({ Component, pageProps }) => {
                             <div
                                 style={{
                                     minHeight: "100vh",
-                                    paddingInline:
-                                        "max(10vw + 20px, 50vw - 700px)",
+                                    paddingInline: `max(10vw + 20px, 50vw - ${
+                                        MAX_CONTENT_WIDTH / 2
+                                    }px)`,
                                 }}
                             >
                                 <Navbar />

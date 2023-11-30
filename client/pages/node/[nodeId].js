@@ -1,59 +1,36 @@
 import Image from "next/image";
-import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
-import AccountPreview from "../../lib/accounts/AccountPreview";
-import ActionCard from "../../lib/actions/ActionCard";
-import ChoiceModal from "../../lib/actions/ChoiceModal";
 import { queryCall } from "../../lib/apiUtils";
 import CrowdventureAlert from "../../lib/components/CrowdventureAlert";
-import CrowdventureButton from "../../lib/components/CrowdventureButton";
 import LoadingBox from "../../lib/components/LoadingBox";
 import PictureModal from "../../lib/components/PictureModal";
 import { ModalContext } from "../../lib/modal";
-import CreateNodeModal from "../../lib/nodes/CreateNodeModal";
 import { UnsafeModeContext } from "../../lib/unsafeMode";
-import { UserContext } from "../../lib/user";
 import { deepCopy } from "../../lib/utils";
 import { PaletteContext } from "../../lib/colorPalette";
+import { useWindowSize } from "../../lib/hooks";
+import NodeSidebar from "../../lib/nodes/NodeSidebar";
 
 // import EditNodeModal from "../Modals/EditNodeModal";
 // import SuggestChoiceModal from "../Modals/SuggestChoiceModal";
 
 // import ChoiceColumns from "./ChoiceColumns";
 
+const NAVBAR_HEIGHT = 100;
+const FOOTER_HEIGHT = 78;
+
 const NodePage = ({ node: initNode }) => {
     const BLURAMOUNT = 40;
 
     const { unsafeMode } = useContext(UnsafeModeContext);
-    const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
     const { lightBackgroundColor } = useContext(PaletteContext);
-    const router = useRouter();
 
     const [node, setNode] = useState(deepCopy(initNode));
 
     useEffect(() => {
         setNode(deepCopy(initNode));
     }, [initNode]);
-
-    const reportNode = () => {
-        // mutation_call(
-        //     "createFeedback",
-        //     {
-        //         ...(loggedInAs
-        //             ? { accountScreenName: loggedInAs.screenName }
-        //             : {}),
-        //         info: "This is inappropriate",
-        //         reportingObjectType: "Node",
-        //         reportingObjectID: node.ID,
-        //     },
-        //     { info: 0, reporting: 0 },
-        //     () => {
-        //         alert("Successfully reported page!");
-        //         window.location.reload(false);
-        //     }
-        // );
-    };
 
     // if (node === null)
     //     return (
@@ -66,6 +43,8 @@ const NodePage = ({ node: initNode }) => {
     //             </p>
     //         </Alert>
     //     );
+
+    const { effectiveContentWidth } = useWindowSize();
 
     if (!node) return <LoadingBox />;
 
@@ -112,102 +91,55 @@ const NodePage = ({ node: initNode }) => {
     //     ) : null}
 
     return (
-        <div style={{ flexDirection: "row" }}>
+        <div style={{ flexDirection: "row", flex: 1 }}>
             {node.pictureURL ? (
-                <div style={{ flex: 3, position: "relative" }}>
-                    <Image
-                        fill
-                        objectFit="cover"
-                        onClick={() => {
-                            openModal(
-                                <PictureModal
-                                    pictureURL={node.pictureURL}
-                                    title={node.title}
-                                />
-                            );
-                        }}
-                        src={node.pictureURL}
+                <div
+                    style={{
+                        flex: 3,
+                        position: "relative",
+                    }}
+                >
+                    <div
                         style={{
-                            marginLeft: "auto",
-                            marginRight: "auto",
-                            borderWidth: 1,
-                            borderStyle: "solid",
-                            borderColor: lightBackgroundColor,
-                            borderRadius: 8,
-                            cursor: "pointer",
-                            ...(node.pictureUnsafe
-                                ? {
-                                      "-webkit-filter": `blur(${BLURAMOUNT}px)`,
-                                      filter: `blur(${BLURAMOUNT}px)`,
-                                  }
-                                : {}),
+                            position: "fixed",
+                            top: NAVBAR_HEIGHT,
+                            height: `calc(100vh - ${NAVBAR_HEIGHT}px - ${FOOTER_HEIGHT}px)`,
+                            width: (effectiveContentWidth * 3) / 5,
                         }}
-                    />
+                    >
+                        <Image
+                            fill
+                            objectFit="cover"
+                            onClick={() => {
+                                openModal(
+                                    <PictureModal
+                                        pictureURL={node.pictureURL}
+                                        title={node.title}
+                                    />
+                                );
+                            }}
+                            src={node.pictureURL}
+                            style={{
+                                marginLeft: "auto",
+                                marginRight: "auto",
+                                borderWidth: 1,
+                                borderStyle: "solid",
+                                borderColor: lightBackgroundColor,
+                                borderRadius: 8,
+                                cursor: "pointer",
+                                ...(node.pictureUnsafe
+                                    ? {
+                                          "-webkit-filter": `blur(${BLURAMOUNT}px)`,
+                                          filter: `blur(${BLURAMOUNT}px)`,
+                                      }
+                                    : {}),
+                            }}
+                        />
+                    </div>
                 </div>
             ) : null}
             <div style={{ flex: 2 }}>
-                <h1>{node.title}</h1>
-                {node.content.split("\n").map((line, i) => (
-                    <p key={i} style={{ textIndent: "5%" }}>
-                        {line}
-                    </p>
-                ))}
-                <hr />
-                <CrowdventureButton
-                    // Should be off to the side
-                    onClick={() => {
-                        router.back();
-                    }}
-                >
-                    Go back!
-                </CrowdventureButton>
-                {node.canonChoices.length === 0 && (
-                    <p className="text-muted">
-                        By decree of <strong>{node.owner.screenName}</strong>,
-                        this journey ends here.
-                    </p>
-                )}
-                Author: <AccountPreview account={node.owner} />
-                Views: {node.views}
-                {node.owner.screenName === user?.screenName || user?.isAdmin ? (
-                    <CrowdventureButton
-                        onClick={() => {
-                            openModal(
-                                <CreateNodeModal
-                                    node={node}
-                                    setNode={setNode}
-                                />
-                            );
-                        }}
-                    >
-                        Edit Page
-                    </CrowdventureButton>
-                ) : null}
-                {node.canonChoices.length + node.nonCanonChoices.length > 0 ? (
-                    <div>
-                        {[...node.canonChoices, ...node.nonCanonChoices].map(
-                            (choice, idx) => (
-                                <ActionCard choice={choice} key={idx} />
-                            )
-                        )}
-                    </div>
-                ) : (
-                    <p className="text-muted">
-                        There are currently no options! You can help expand the
-                        story by adding to it!
-                    </p>
-                )}
-                <CrowdventureButton
-                    onClick={() => {
-                        openModal(<ChoiceModal fromNode={node} />);
-                    }}
-                    requireSignedIn
-                >
-                    Suggest New Choice
-                </CrowdventureButton>
-                <CrowdventureButton onClick={reportNode}>
-                    Report Page
-                </CrowdventureButton>
+                <NodeSidebar node={node} setNode={setNode} />
             </div>
         </div>
     );

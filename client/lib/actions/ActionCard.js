@@ -237,17 +237,10 @@ const ActionCard = ({ choice: initChoice }) => {
                 like={like}
                 liked={choice.liked}
             />
-            <div
-                style={{
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: 5,
-                }}
-            >
+            <span style={{ gap: 5 }}>
                 Suggested By:{" "}
                 <AccountPreview account={choice.suggestedBy} scale={3 / 4} />
-            </div>
+            </span>
         </CrowdventureCard>
     );
 };

@@ -127,16 +127,13 @@ const NodePreview = ({ node }) => {
             pictureUnsafe={node.pictureUnsafe}
             text={node.title}
         >
-            <div
+            <span
                 style={{
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
                     gap: 5,
                 }}
             >
                 Author: <AccountPreview account={node.owner} scale={3 / 4} />
-            </div>
+            </span>
             Views: {node.views}
         </CrowdventureCard>
     );

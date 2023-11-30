@@ -17,6 +17,7 @@ const AccountPreview = ({
     const { mutedTextColor } = useContext(PaletteContext);
     const wrapperStyle = {
         alignItems: "center",
+        justifyContent: "flex-start",
         ...style,
     };
 
