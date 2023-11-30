@@ -1,9 +1,28 @@
-import React from "react";
+import React, { useContext } from "react";
+import { PaletteContext } from "../colorPalette";
+import { attachStyleListener } from "../attachStyleListener";
 
-// All this really does is provide a nicer onChangeText feature. There might be more later.
-
-const CrowdventureTextInput = ({ onChangeText, ...props }) => (
-    <input onChange={(e) => onChangeText(e.target.value)} {...props} />
-);
+const CrowdventureTextInput = ({ onChangeText, style, ...props }) => {
+    const { backgroundColor, lightBackgroundColor } =
+        useContext(PaletteContext);
+    return (
+        <input
+            onChange={(e) => onChangeText(e.target.value)}
+            style={{
+                backgroundColor: backgroundColor[2],
+                border: `1px solid ${lightBackgroundColor}`,
+                padding: 5,
+                borderRadius: 5,
+                width: "100%",
+                ...style,
+            }}
+            {...attachStyleListener("focus", {
+                outline: "none",
+                backgroundColor: lightBackgroundColor,
+            })}
+            {...props}
+        />
+    );
+};
 
 export default CrowdventureTextInput;

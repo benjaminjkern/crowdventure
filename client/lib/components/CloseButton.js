@@ -2,6 +2,7 @@ import React from "react";
 
 const CloseButton = ({ onClick, style }) => (
     <span
+        aria-hidden
         onClick={onClick}
         onMouseEnter={(e) => (e.target.style.color = "#555")}
         onMouseLeave={(e) => (e.target.style.color = "#888")}

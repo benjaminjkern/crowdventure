@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 
 import { NODE_PREVIEW_GQL } from "..";
-import { mutationCall, queryCall } from "../../lib/apiUtils";
+import { queryCall } from "../../lib/apiUtils";
 import { UserContext } from "../../lib/user";
 import LoadingBox from "../../lib/components/LoadingBox";
 import { UnsafeModeContext } from "../../lib/unsafeMode";
@@ -21,22 +21,6 @@ const AccountPage = ({ account: initAccount }) => {
     useEffect(() => {
         if (initAccount) setAccount(initAccount);
     }, [initAccount]);
-
-    const reportAccount = () => {
-        mutationCall(
-            "createFeedback",
-            { info: 0, reporting: 0 },
-            {
-                accountScreenName: user?.screenName,
-                info: "This is inappropriate",
-                reportingObjectType: "Account",
-                reportingObjectID: account.screenName,
-            }
-        ).then(() => {
-            alert("Successfully reported account!");
-            // TODO: Check for unsafe now
-        });
-    };
 
     if (!account) return <LoadingBox />;
 
@@ -123,15 +107,10 @@ const AccountPage = ({ account: initAccount }) => {
                     else setSearchedNodes([]);
                 }}
                 placeholder="Search for a page..."
+                style={{ marginTop: 5 }}
                 value={searchQuery}
             />
-            {searchQuery ? <NodeViewer nodes={searchedNodes} /> : null}
-
-            {!loggedInAsThisUser && (
-                <CrowdventureButton onClick={reportAccount}>
-                    Report Account
-                </CrowdventureButton>
-            )}
+            <NodeViewer nodes={searchedNodes} />
         </>
     );
 };

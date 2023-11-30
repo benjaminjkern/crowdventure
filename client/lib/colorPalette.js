@@ -11,6 +11,7 @@ const getPalette = (unsafeMode) => ({
         "rgb(100, 180, 244)",
         "rgb(158, 232, 255)",
     ],
+    errorColor: ["rgb(224,80,80)", "rgb(244,100,100)", "rgb(255,120,120)"],
     textColor: unsafeMode ? "white" : "black",
     mutedTextColor: unsafeMode ? "darkgray" : "gray",
     backgroundColor: unsafeMode

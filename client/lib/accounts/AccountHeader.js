@@ -6,11 +6,28 @@ import { UserContext } from "../user";
 import CrowdventureButton from "../components/CrowdventureButton";
 import MessageModal from "./MessageModal";
 import EditAccountModal from "./EditAccountModal";
+import { mutationCall } from "../apiUtils";
 
 const AccountHeader = ({ account, setAccount }) => {
     const openModal = useContext(ModalContext);
 
     const { user, setUser } = useContext(UserContext);
+
+    const reportAccount = () => {
+        mutationCall(
+            "createFeedback",
+            { info: 0, reporting: 0 },
+            {
+                accountScreenName: user?.screenName,
+                info: "This is inappropriate",
+                reportingObjectType: "Account",
+                reportingObjectID: account.screenName,
+            }
+        ).then(() => {
+            alert("Successfully reported account!");
+            // TODO: Check for unsafe now
+        });
+    };
 
     const loggedInAsThisUser = user?.screenName === account.screenName;
     return (
@@ -83,6 +100,7 @@ const AccountHeader = ({ account, setAccount }) => {
 
                 {loggedInAsThisUser ? (
                     <CrowdventureButton
+                        category="error"
                         onClick={() => {
                             setUser();
                         }}
@@ -90,6 +108,15 @@ const AccountHeader = ({ account, setAccount }) => {
                         Log out
                     </CrowdventureButton>
                 ) : null}
+
+                {!loggedInAsThisUser && (
+                    <CrowdventureButton
+                        category="error"
+                        onClick={reportAccount}
+                    >
+                        Report Account
+                    </CrowdventureButton>
+                )}
             </div>
         </div>
     );

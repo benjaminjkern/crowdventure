@@ -1,5 +1,10 @@
 import { createUseStyles } from "react-jss";
 
+// This is ONLY FOR COMPONENTS THAT IT DOESNT MAKE SENSE TO PULL OUT SEPARATELY
+// For example, doesnt include button because the button has extra functionality that
+// I want pulled out with the button, so that's its own component.
+// Basically this is for components that I plan on using as-is.
+
 const useDefaultStyles = createUseStyles((theme) => {
     // Use theme basically just so react-jss doesnt get mad at me
     const { rootColor, backgroundColor, textColor, lightBackgroundColor } =
@@ -30,42 +35,24 @@ const useDefaultStyles = createUseStyles((theme) => {
                 display: "inline-flex",
             },
             /** ***************** Overwrite default styles *********************/
+            "h1,h2,h3,h4,h5,h6": {
+                display: "inline-flex",
+                margin: 0,
+            },
+
             a: {
                 color: rootColor[1],
                 textDecoration: "none",
             },
-
             "a:focus, a:hover": {
                 textDecoration: "underline",
             },
+
             hr: {
                 width: "100%",
                 height: 1,
                 border: "none",
                 backgroundColor: lightBackgroundColor,
-            },
-            input: {
-                backgroundColor: backgroundColor[2],
-                border: `1px solid ${lightBackgroundColor}`,
-                padding: 5,
-                borderRadius: 5,
-                width: "100%",
-            },
-            "input:focus": {
-                outline: "none",
-                backgroundColor: lightBackgroundColor,
-            },
-
-            button: {
-                border: `1px solid ${rootColor[0]}`,
-                padding: 5,
-                borderRadius: 5,
-                backgroundColor: rootColor[1],
-                color: "white",
-                width: "100%",
-            },
-            "button:hover": {
-                backgroundColor: rootColor[0],
             },
 
             /** ***************** Gradient for body *********************/
