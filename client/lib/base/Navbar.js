@@ -10,7 +10,6 @@ const Navbar = () => (
             justifyContent: "space-between",
             alignItems: "center",
             flexDirection: "row",
-            paddingInline: "10vw", // Dont cover things with side color
         }}
     >
         <Link href="/">

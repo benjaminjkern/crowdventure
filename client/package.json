@@ -1,6 +1,6 @@
 {
     "name": "crowdventure",
-    "version": "1.0",
+    "version": "Pre-2.0",
     "main": "index.js",
     "repository": "https://github.com/benjaminjkern/crowdventure.git",
     "author": "benjaminjkern <benkern@pixelgate.net>",
