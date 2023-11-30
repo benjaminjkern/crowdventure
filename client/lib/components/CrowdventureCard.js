@@ -5,6 +5,7 @@ import { PaletteContext } from "../colorPalette";
 import OptionsDropdown from "./OptionsDropdown";
 import TooltipWrapper from "./TooltipWrapper";
 import { attachStyleListener } from "../attachStyleListener";
+import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 
 const CrowdventureCard = ({
     href,
@@ -16,7 +17,7 @@ const CrowdventureCard = ({
     children,
     disabled,
 }) => {
-    const { rootColor, backgroundColor, lightBackgroundColor } =
+    const { rootColor, backgroundColor, lightBackgroundColor, mutedTextColor } =
         useContext(PaletteContext);
     const ref = useRef();
 
@@ -121,9 +122,9 @@ const CrowdventureCard = ({
             <div
                 style={{
                     backgroundColor: lightBackgroundColor,
-                    color: "gray",
+                    color: mutedTextColor,
                     textAlign: "center",
-                    fontSize: 15,
+                    fontSize: (DEFAULT_TEXT_SIZE * 3) / 4,
                     padding: 10,
                 }}
             >

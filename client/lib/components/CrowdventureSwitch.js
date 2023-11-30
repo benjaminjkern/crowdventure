@@ -6,7 +6,6 @@ const CrowdventureSwitch = ({ value, onChange, size = 20, padding = 2 }) => {
         useContext(PaletteContext);
     return (
         <div
-            aria-hidden="true"
             onClick={() => onChange(!value)}
             style={{
                 width: size * 2,

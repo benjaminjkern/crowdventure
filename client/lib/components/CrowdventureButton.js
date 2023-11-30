@@ -22,7 +22,6 @@ const CrowdventureButton = ({
     if (buttonType === "text")
         return (
             <span
-                aria-hidden="true"
                 onClick={onClick}
                 {...attachStyleListener("hover", {
                     textDecoration: "underline",

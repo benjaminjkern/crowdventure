@@ -16,7 +16,6 @@ const CrowdventureModal = ({
 
     return (
         <div
-            aria-hidden
             onMouseDown={closeModal}
             style={{
                 position: "fixed",
@@ -32,7 +31,6 @@ const CrowdventureModal = ({
             }}
         >
             <div
-                aria-hidden
                 onMouseDown={(e) => {
                     e.stopPropagation();
                 }}

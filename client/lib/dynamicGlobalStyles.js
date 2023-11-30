@@ -5,7 +5,7 @@ import { createUseStyles } from "react-jss";
 // I want pulled out with the button, so that's its own component.
 // Basically this is for components that I plan on using as-is.
 
-export const DEFAULT_TEXT_SIZE = 20;
+export const DEFAULT_TEXT_SIZE = 16;
 
 const useDefaultStyles = createUseStyles((theme) => {
     // Use theme basically just so react-jss doesnt get mad at me

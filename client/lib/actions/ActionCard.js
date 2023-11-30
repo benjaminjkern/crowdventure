@@ -116,7 +116,10 @@ const ActionCard = ({ choice: initChoice }) => {
         });
     };
 
-    // Hide hidden actions, but show if you 1. are in unsafeMode, 2. suggested the action, or 3. own the page and the action is canon
+    // Hide hidden actions, but show if you
+    // 1. are in unsafeMode,
+    // 2. suggested the action, or
+    // 3. own the page and the action is canon
     if (
         (choice.hidden || choice.suggestedBy.hidden) &&
         !(
@@ -197,9 +200,13 @@ const ActionCard = ({ choice: initChoice }) => {
             overlayIcons={[
                 {
                     active: choice.hidden || choice.suggestedBy.hidden,
-                    tooltip: `This action is hidden, because it has been marked as unsafe! You can see it because you are ${
-                        unsafeMode ? "in Unsafe Mode." : "the owner."
-                    }`,
+                    tooltip: (
+                        <span>
+                            This action is hidden, because it has been marked as
+                            unsafe! You can see it because you are{" "}
+                            {unsafeMode ? "in Unsafe Mode." : "the owner."}
+                        </span>
+                    ),
                     icon: "minus-circle",
                     iconColor: "red",
                 },
@@ -209,9 +216,14 @@ const ActionCard = ({ choice: initChoice }) => {
                         choice.to &&
                         (choice.to.hidden || choice.to.owner.hidden) &&
                         !disabled,
-                    tooltip: `This page this action leads to is hidden, because it has been marked as unsafe! You will be able to see it because you are ${
-                        unsafeMode ? "in Unsafe Mode." : "the owner."
-                    }`,
+                    tooltip: (
+                        <span>
+                            This page this action leads to is hidden, because it
+                            has been marked as unsafe! You will be able to see
+                            it because you are{" "}
+                            {unsafeMode ? "in Unsafe Mode." : "the owner."}
+                        </span>
+                    ),
                     icon: "minus-circle",
                     iconColor: "red",
                 },
@@ -225,7 +237,17 @@ const ActionCard = ({ choice: initChoice }) => {
                 like={like}
                 liked={choice.liked}
             />
-            Suggested By: <AccountPreview account={choice.suggestedBy} />
+            <div
+                style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 5,
+                }}
+            >
+                Suggested By:{" "}
+                <AccountPreview account={choice.suggestedBy} scale={3 / 4} />
+            </div>
         </CrowdventureCard>
     );
 };

@@ -5,7 +5,7 @@ import CrowdventureButton from "./CrowdventureButton";
 const LikeDislikeController = ({ count, liked, like, disliked, dislike }) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
     return (
-        <>
+        <div style={{ flexDirection: "row", justifyContent: "center", gap: 5 }}>
             <CrowdventureButton
                 buttonType="text"
                 onClick={dislike}
@@ -27,7 +27,7 @@ const LikeDislikeController = ({ count, liked, like, disliked, dislike }) => {
             >
                 Like
             </CrowdventureButton>
-        </>
+        </div>
     );
 };
 

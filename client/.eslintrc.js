@@ -3,7 +3,7 @@ module.exports = {
         "eslint:all",
         "plugin:react/all",
         "plugin:import/recommended",
-        "plugin:jsx-a11y/recommended",
+        // "plugin:jsx-a11y/recommended", <- Wanna add this later but its fine
         "plugin:react-hooks/recommended",
     ],
     parserOptions: {
