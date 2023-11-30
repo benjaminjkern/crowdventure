@@ -43,17 +43,17 @@ const App = ({ Component, pageProps }) => {
                 <title>{pageTitle || "Crowdventure"}</title>
                 <link href="/favicon.png" rel="icon" />
             </Head>
-            <UnsafeModeProvider>
-                <PaletteProvider>
-                    <UserProvider>
+            <UserProvider>
+                <UnsafeModeProvider>
+                    <PaletteProvider>
                         <ModalProvider>
                             <Navbar />
-                            {/* <Component {...otherPageProps} />
-                            <Footer /> */}
+                            <Component {...otherPageProps} />
+                            <Footer />
                         </ModalProvider>
-                    </UserProvider>
-                </PaletteProvider>
-            </UnsafeModeProvider>
+                    </PaletteProvider>
+                </UnsafeModeProvider>
+            </UserProvider>
         </>
     );
 };
