@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { UnsafeModeContext } from "./unsafeMode";
-import { ThemeProvider, createUseStyles } from "react-jss";
+import { ThemeProvider } from "react-jss";
+import GlobalStyleProvider from "./dynamicGlobalStyles";
 
 export const PaletteContext = createContext();
 
@@ -15,48 +16,7 @@ const getPalette = (unsafeMode) => ({
     backgroundColor: unsafeMode
         ? ["rgb(34,34,34)", "rgb(41,41,41)", "rgb(50,50,50)"]
         : ["white", "white", "white"],
-    lightBackgroundColor: unsafeMode ? "rgb(50,50,50)" : "rgb(230,240,255)",
-});
-
-const useDefaultStyles = createUseStyles((theme) => {
-    // Use theme basically just so react-jss doesnt get mad at me
-    const { rootColor, backgroundColor, textColor, lightBackgroundColor } =
-        theme;
-    return {
-        "@global": {
-            /** ***************** Custom Selection ************************/
-
-            "::-moz-selection": {
-                background: rootColor[1],
-            },
-
-            "::selection": {
-                background: rootColor[1],
-            },
-            /** ***************** Remove bad defaults - Specific to the links *********************/
-            a: {
-                color: rootColor[1],
-                textDecoration: "none",
-            },
-
-            "a:focus, a:hover": {
-                textDecoration: "underline",
-            },
-            hr: {
-                backgroundColor: lightBackgroundColor,
-            },
-            body: {
-                backgroundImage: `linear-gradient(
-                    to right,
-                    rgb(158, 232, 255),
-                    ${backgroundColor[0]} 10%,
-                    ${backgroundColor[0]} 90%,
-                    rgb(158, 232, 255)
-                )`,
-                color: textColor,
-            },
-        },
-    };
+    lightBackgroundColor: unsafeMode ? "rgb(60,60,70)" : "rgb(230,240,255)",
 });
 
 const PaletteProvider = ({ children }) => {
@@ -75,11 +35,6 @@ const PaletteProvider = ({ children }) => {
             </ThemeProvider>
         </PaletteContext.Provider>
     );
-};
-
-const GlobalStyleProvider = ({ children }) => {
-    useDefaultStyles();
-    return children;
 };
 
 export default PaletteProvider;

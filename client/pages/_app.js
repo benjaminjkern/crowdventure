@@ -1,8 +1,6 @@
 import React from "react";
 import Head from "next/head";
 
-import "../styles/globals.css";
-
 import Footer from "../lib/base/Footer";
 import Navbar from "../lib/base/Navbar";
 
@@ -51,11 +49,12 @@ const App = ({ Component, pageProps }) => {
                                 style={{
                                     minHeight: "100vh",
                                     paddingInline: "calc(10vw + 20px)", // Dont cover things with side color,
-                                    justifyContent: "space-between",
                                 }}
                             >
                                 <Navbar />
-                                <Component {...otherPageProps} />
+                                <div style={{ flex: 1 }}>
+                                    <Component {...otherPageProps} />
+                                </div>
                                 <Footer />
                             </div>
                         </ModalProvider>

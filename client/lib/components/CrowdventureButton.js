@@ -35,21 +35,8 @@ const CrowdventureButton = ({
         <button
             disabled={requireSignedIn ? !user : null}
             onClick={onClick}
-            onMouseEnter={(e) => {
-                e.target.style.backgroundColor = rootColor[0];
-                // Do overlay
-            }}
-            onMouseLeave={(e) => {
-                e.target.style.backgroundColor = rootColor[1];
-            }}
             style={{
-                border: `1px solid ${rootColor[0]}`,
-                padding: 5,
-                borderRadius: 5,
-                backgroundColor: rootColor[1],
-                color: "white",
                 cursor: (!requireSignedIn || user) && "pointer",
-                width: "100%",
                 ...style,
             }}
             {...props}
