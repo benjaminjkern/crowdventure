@@ -10,7 +10,6 @@ import PaletteProvider from "../lib/colorPalette";
 import ModalProvider from "../lib/modal";
 import UserProvider from "../lib/user";
 import UnsafeModeProvider from "../lib/unsafeMode";
-import GlobalStyleProvider from "../lib/globalStyles";
 
 // Crowdventure! - Page not found! - for 404 page (NONEXISTENT RIGHT NOW)
 
@@ -47,20 +46,18 @@ const App = ({ Component, pageProps }) => {
             <UserProvider>
                 <UnsafeModeProvider>
                     <PaletteProvider>
-                        <GlobalStyleProvider>
-                            <ModalProvider>
-                                <div
-                                    style={{
-                                        minHeight: "100vh",
-                                        justifyContent: "space-between",
-                                    }}
-                                >
-                                    <Navbar />
-                                    {/* <Component {...otherPageProps} /> */}
-                                    <Footer />
-                                </div>
-                            </ModalProvider>
-                        </GlobalStyleProvider>
+                        <ModalProvider>
+                            <div
+                                style={{
+                                    minHeight: "100vh",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                <Navbar />
+                                {/* <Component {...otherPageProps} /> */}
+                                <Footer />
+                            </div>
+                        </ModalProvider>
                     </PaletteProvider>
                 </UnsafeModeProvider>
             </UserProvider>

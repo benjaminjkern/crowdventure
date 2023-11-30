@@ -1,7 +1,35 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { UnsafeModeContext } from "./unsafeMode";
+import { ThemeProvider, createUseStyles } from "react-jss";
 
 export const PaletteContext = createContext();
+
+const useDefaultStyles = createUseStyles((theme) => {
+    // Use theme basically just so react-jss doesnt get mad at me
+    const { rootColor } = theme;
+    return {
+        "@global": {
+            /** ***************** Custom Selection ************************/
+
+            "::-moz-selection": {
+                background: rootColor[1],
+            },
+
+            "::selection": {
+                background: rootColor[1],
+            },
+            /** ***************** Remove bad defaults - Specific to the links *********************/
+            a: {
+                color: rootColor[1],
+                textDecoration: "none",
+            },
+
+            "a:focus, a:hover": {
+                textDecoration: "underline",
+            },
+        },
+    };
+});
 
 const getPalette = (unsafeMode) => ({
     rootColor: [
@@ -36,9 +64,16 @@ const PaletteProvider = ({ children }) => {
 
     return (
         <PaletteContext.Provider value={palette}>
-            {children}
+            <ThemeProvider theme={palette}>
+                <GlobalStyleProvider>{children}</GlobalStyleProvider>
+            </ThemeProvider>
         </PaletteContext.Provider>
     );
+};
+
+const GlobalStyleProvider = ({ children }) => {
+    useDefaultStyles();
+    return children;
 };
 
 export default PaletteProvider;

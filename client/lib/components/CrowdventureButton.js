@@ -19,11 +19,9 @@ const CrowdventureButton = ({
                 onClick={onClick}
                 onMouseEnter={(e) => {
                     e.target.style.textDecoration = "underline";
-                    e.target.style.color = rootColor[0];
                 }}
                 onMouseLeave={(e) => {
                     e.target.style.textDecoration = "none";
-                    e.target.style.color = rootColor[1];
                 }}
                 style={{ cursor: "pointer", color: rootColor[1], ...style }}
             >

@@ -3,8 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { PaletteContext } from "../colorPalette";
 
-const wrapperStyle = { justifyContent: "center", alignItems: "center" };
-
 const AccountPreview = ({
     account,
     imgSide = "left",
@@ -12,13 +10,20 @@ const AccountPreview = ({
     isLink = true,
     onClickImage,
 }) => {
-    const { foregroundColor } = useContext(PaletteContext);
+    const { textColor } = useContext(PaletteContext);
+    const wrapperStyle = {
+        justifyContent: "center",
+        alignItems: "center",
+        color: textColor,
+    };
+
+    const screenNameText = (
+        <span style={{ marginRight: 5 }}>{account.screenName}</span>
+    );
 
     const inside = (
         <>
-            {imgSide === "right" && (
-                <span style={{ marginRight: 5 }}>{account.screenName}</span>
-            )}
+            {imgSide === "right" && screenNameText}
             <Image
                 alt={`${account.screenName} Profile Pic`}
                 height={20}
@@ -36,9 +41,7 @@ const AccountPreview = ({
                 }}
                 width={20}
             />
-            {imgSide === "left" && (
-                <span style={{ marginLeft: 5 }}>{account.screenName}</span>
-            )}
+            {imgSide === "left" && screenNameText}
         </>
     );
 
