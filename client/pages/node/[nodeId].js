@@ -8,7 +8,7 @@ import { ModalContext } from "../../lib/modal";
 import { UnsafeModeContext } from "../../lib/unsafeMode";
 import { deepCopy } from "../../lib/utils";
 import { PaletteContext } from "../../lib/colorPalette";
-import { useWindowSize } from "../../lib/hooks";
+import { useMediaQuery, useWindowSize } from "../../lib/hooks";
 import NodeSidebar from "../../lib/nodes/NodeSidebar";
 import CrowdventureButton from "../../lib/components/CrowdventureButton";
 import { useRouter } from "next/router";
@@ -49,6 +49,8 @@ const NodePage = ({ node: initNode }) => {
     const { effectiveContentWidth } = useWindowSize();
 
     const router = useRouter();
+
+    const isMobile = useMediaQuery(`(max-width: 800px)`);
 
     if (!node) return <LoadingBox />;
 
@@ -95,7 +97,7 @@ const NodePage = ({ node: initNode }) => {
     //     ) : null}
 
     return (
-        <div style={{ flexDirection: "row", flex: 1 }}>
+        <div style={{ flexDirection: !isMobile && "row", flex: 1 }}>
             {node.pictureURL ? (
                 <div
                     style={{
@@ -105,10 +107,14 @@ const NodePage = ({ node: initNode }) => {
                 >
                     <div
                         style={{
-                            position: "fixed",
-                            top: NAVBAR_HEIGHT,
-                            height: `calc(100vh - ${NAVBAR_HEIGHT}px - ${FOOTER_HEIGHT}px)`,
-                            width: (effectiveContentWidth * 3) / 5,
+                            height: isMobile
+                                ? "50vh"
+                                : `calc(100vh - ${NAVBAR_HEIGHT}px - ${FOOTER_HEIGHT}px)`,
+                            ...(!isMobile && {
+                                position: "fixed",
+                                top: NAVBAR_HEIGHT,
+                                width: (effectiveContentWidth * 3) / 5,
+                            }),
                         }}
                     >
                         <CrowdventureButton
