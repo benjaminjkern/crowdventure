@@ -15,7 +15,7 @@ const AccountManager = ({ wrapperStyle }) => {
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
     const { unsafeMode, setUnsafeMode } = useContext(UnsafeModeContext);
-    const { mutedTextColor } = useContext(PaletteContext);
+    const { mutedTextColor, textColor } = useContext(PaletteContext);
 
     if (!user)
         return (
@@ -73,6 +73,7 @@ const AccountManager = ({ wrapperStyle }) => {
                     )
                 }
                 scale={1.5}
+                style={{ color: textColor }}
             />
             <div style={{ flexDirection: "row", marginTop: 5 }}>
                 <span style={{ color: mutedTextColor, marginRight: 5 }}>

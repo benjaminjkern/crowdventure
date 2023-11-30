@@ -5,6 +5,8 @@ import { createUseStyles } from "react-jss";
 // I want pulled out with the button, so that's its own component.
 // Basically this is for components that I plan on using as-is.
 
+export const DEFAULT_TEXT_SIZE = 20;
+
 const useDefaultStyles = createUseStyles((theme) => {
     // Use theme basically just so react-jss doesnt get mad at me
     const { rootColor, backgroundColor, textColor, lightBackgroundColor } =
@@ -14,7 +16,6 @@ const useDefaultStyles = createUseStyles((theme) => {
             "*": {
                 boxSizing: "border-box",
                 fontFamily: "Arial Rounded MT Bold",
-                color: textColor,
             },
             /** ***************** Custom Selection ************************/
 
@@ -57,6 +58,8 @@ const useDefaultStyles = createUseStyles((theme) => {
 
             /** ***************** Gradient for body *********************/
             body: {
+                fontSize: DEFAULT_TEXT_SIZE,
+                color: textColor,
                 margin: 0,
                 backgroundImage: `linear-gradient(
                     to right,

@@ -48,7 +48,8 @@ const App = ({ Component, pageProps }) => {
                             <div
                                 style={{
                                     minHeight: "100vh",
-                                    paddingInline: "calc(10vw + 20px)", // Dont cover things with side color,
+                                    paddingInline:
+                                        "max(10vw + 20px, 50vw - 700px)",
                                 }}
                             >
                                 <Navbar />

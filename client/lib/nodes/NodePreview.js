@@ -69,7 +69,14 @@ const NodePreview = ({ node }) => {
                     onClick: () => {
                         openModal(
                             <ConfirmModal
-                                content="This will erase all suggested choices of this page, and their associated scores. This will NOT delete sub-pages of this page. Are you sure you wish to continue?"
+                                content={
+                                    <span>
+                                        This will erase all suggested choices of
+                                        this page, and their associated scores.
+                                        This will NOT delete sub-pages of this
+                                        page. Are you sure you wish to continue?
+                                    </span>
+                                }
                                 onConfirm={() => deleteNode(node)}
                                 title="Delete Page"
                             />
@@ -105,9 +112,13 @@ const NodePreview = ({ node }) => {
                 },
                 {
                     active: node.hidden,
-                    tooltip: `This page is hidden, because it has been marked as unsafe! You can see it because you are ${
-                        unsafeMode ? "in Unsafe Mode." : "the owner."
-                    }`,
+                    tooltip: (
+                        <span>
+                            This page is hidden, because it has been marked as
+                            unsafe! You can see it because you are{" "}
+                            {unsafeMode ? "in Unsafe Mode." : "the owner."}
+                        </span>
+                    ),
                     icon: "minus-circle",
                     iconColor: "red",
                 },
@@ -116,7 +127,16 @@ const NodePreview = ({ node }) => {
             pictureUnsafe={node.pictureUnsafe}
             text={node.title}
         >
-            Author: <AccountPreview account={node.owner} />
+            <div
+                style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 5,
+                }}
+            >
+                Author: <AccountPreview account={node.owner} scale={3 / 4} />
+            </div>
             Views: {node.views}
         </CrowdventureCard>
     );

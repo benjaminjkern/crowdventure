@@ -4,19 +4,25 @@ const getEventListeners = (event) => {
     throw new Error(`Unknown event! ${event}`);
 };
 
-export const attachStyleListener = (event, style) => {
+export const attachStyleListener = (
+    event,
+    style,
+    getTarget = (e) => e.target
+) => {
     const [onEventStart, onEventFinish] = getEventListeners(event);
     return {
         [onEventStart]: (e) => {
-            e.target.previousStyle = {};
+            const target = getTarget(e);
+            target.previousStyle = {};
             for (const key of Object.keys(style)) {
-                e.target.previousStyle[key] = e.target.style[key];
-                e.target.style[key] = style[key];
+                target.previousStyle[key] = target.style[key];
+                target.style[key] = style[key];
             }
         },
         [onEventFinish]: (e) => {
+            const target = getTarget(e);
             for (const key of Object.keys(style))
-                e.target.style[key] = e.target.previousStyle[key];
+                target.style[key] = target.previousStyle?.[key];
         },
     };
 };

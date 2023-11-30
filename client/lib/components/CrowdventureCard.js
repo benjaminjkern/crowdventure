@@ -4,6 +4,7 @@ import React, { useContext, useRef } from "react";
 import { PaletteContext } from "../colorPalette";
 import OptionsDropdown from "./OptionsDropdown";
 import TooltipWrapper from "./TooltipWrapper";
+import { attachStyleListener } from "../attachStyleListener";
 
 const CrowdventureCard = ({
     href,
@@ -15,7 +16,8 @@ const CrowdventureCard = ({
     children,
     disabled,
 }) => {
-    const { rootColor, backgroundColor } = useContext(PaletteContext);
+    const { rootColor, backgroundColor, lightBackgroundColor } =
+        useContext(PaletteContext);
     const ref = useRef();
 
     const BLURAMOUNT = 20;
@@ -24,57 +26,66 @@ const CrowdventureCard = ({
         <div
             ref={ref}
             style={{
-                width: 200,
                 textAlign: "center",
                 boxShadow: `0 0 3px ${rootColor[1]}`,
                 overflow: "hidden",
                 backgroundColor: backgroundColor[1],
+                borderRadius: 5,
+                margin: 5,
+                justifyContent: "space-between",
             }}
         >
             <Link
                 href={href}
-                onMouseEnter={() => {
-                    ref.current.style.boxShadow = `0 0 6px ${rootColor[0]}`;
-                }}
-                onMouseLeave={() => {
-                    ref.current.style.boxShadow = `0 0 3px ${rootColor[1]}`;
-                }}
+                {...attachStyleListener(
+                    "hover",
+                    {
+                        boxShadow: `0 0 6px ${rootColor[0]}`,
+                    },
+                    () => ref.current
+                )}
                 style={{
-                    color: disabled ? "grey" : rootColor[1],
+                    color: disabled ? "grey" : null,
                     pointerEvents: disabled ? "none" : "auto",
+                    justifyContent: "center",
+                    flex: 1,
                 }}
             >
-                {picture ? (
-                    <div
-                        style={{
-                            backgroundColor: "white",
-                            // loggedInAs && loggedInAs.unsafeMode
-                            //     ? palette[5]
-                            //     : "white",
-                            padding: "1px",
-                        }}
-                    >
-                        <Image
-                            height={200}
-                            onError={(e) => {
-                                e.target.parentNode.style.display = "none";
-                            }}
-                            src={picture}
+                <div style={{ width: "100%" }}>
+                    {picture ? (
+                        <div
                             style={{
-                                // Blur bad images
-                                ...(pictureUnsafe
-                                    ? {
-                                          "-webkit-filter": `blur(${BLURAMOUNT}px)`,
-                                          filter: `blur(${BLURAMOUNT}px)`,
-                                      }
-                                    : {}),
+                                backgroundColor: "white",
+                                // loggedInAs && loggedInAs.unsafeMode
+                                //     ? palette[5]
+                                //     : "white",
+                                padding: "1px",
+                                position: "relative",
+                                aspectRatio: 16 / 9,
                             }}
-                            width={200}
-                        />
+                        >
+                            <Image
+                                fill
+                                onError={(e) => {
+                                    e.target.parentNode.style.display = "none";
+                                }}
+                                src={picture}
+                                style={{
+                                    objectFit: "cover",
+                                    // Blur bad images
+                                    ...(pictureUnsafe
+                                        ? {
+                                              "-webkit-filter": `blur(${BLURAMOUNT}px)`,
+                                              filter: `blur(${BLURAMOUNT}px)`,
+                                          }
+                                        : {}),
+                                }}
+                            />
+                        </div>
+                    ) : null}
+                    <div style={{ padding: 20, textAlign: "center" }}>
+                        {text}
                     </div>
-                ) : null}
-                <div style={{ paddingTop: "2em", textAlign: "center" }}>
-                    {text}
                 </div>
             </Link>
 
@@ -109,10 +120,11 @@ const CrowdventureCard = ({
 
             <div
                 style={{
-                    backgroundColor,
+                    backgroundColor: lightBackgroundColor,
                     color: "gray",
                     textAlign: "center",
-                    fontSize: 10,
+                    fontSize: 15,
+                    padding: 10,
                 }}
             >
                 {children}

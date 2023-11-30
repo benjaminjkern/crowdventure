@@ -1,29 +1,30 @@
 import React from "react";
 
 import NodePreview from "./NodePreview";
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 
 const NodeViewer = ({ nodes }) => (
-    <div
-        style={{
-            marginTop: "5px",
-            marginBottom: "5px",
-            flexDirection: "row",
-            flexWrap: "wrap",
-        }}
-    >
-        {nodes
-            // .filter(
-            //     (node) =>
-            //         (loggedInAs &&
-            //             (loggedInAs.unsafeMode ||
-            //                 user.screenName ===
-            //                     node.owner.screenName)) ||
-            //         !node.hidden
-            // )
-            .map((node, i) => (
-                <NodePreview key={i} node={node} />
-            ))}
-    </div>
+    <ResponsiveMasonry columnsCountBreakPoints={{ 0: 1, 700: 2, 1000: 3 }}>
+        <Masonry
+            style={{
+                marginTop: "5px",
+                marginBottom: "5px",
+            }}
+        >
+            {nodes
+                // .filter(
+                //     (node) =>
+                //         (loggedInAs &&
+                //             (loggedInAs.unsafeMode ||
+                //                 user.screenName ===
+                //                     node.owner.screenName)) ||
+                //         !node.hidden
+                // )
+                .map((node, i) => (
+                    <NodePreview key={i} node={node} />
+                ))}
+        </Masonry>
+    </ResponsiveMasonry>
 );
 
 export default NodeViewer;

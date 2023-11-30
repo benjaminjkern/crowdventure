@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { PaletteContext } from "../colorPalette";
+import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 
 const AccountPreview = ({
     account,
@@ -9,19 +10,20 @@ const AccountPreview = ({
     scale = 1,
     isLink = true,
     onClickImage,
+    style,
 }) => {
     const imageSize = 30 * scale;
-    const { textColor, mutedTextColor } = useContext(PaletteContext);
+    const textSize = DEFAULT_TEXT_SIZE * scale;
+    const { mutedTextColor } = useContext(PaletteContext);
     const wrapperStyle = {
-        // justifyContent: "center",
         alignItems: "center",
-        color: textColor,
+        ...style,
     };
 
     const inside = (
         <>
             {imgSide === "right" && (
-                <span style={{ marginRight: 5, fontSize: `${scale}em` }}>
+                <span style={{ marginRight: 5, fontSize: textSize }}>
                     {account.screenName}
                 </span>
             )}
@@ -43,7 +45,7 @@ const AccountPreview = ({
                 width={imageSize}
             />
             {imgSide === "left" && (
-                <span style={{ marginLeft: 5, fontSize: `${scale}em` }}>
+                <span style={{ marginLeft: 5, fontSize: textSize }}>
                     {account.screenName}
                 </span>
             )}
