@@ -54,7 +54,7 @@ const App = ({ Component, pageProps }) => {
                                 }}
                             >
                                 <Navbar />
-                                {/* <Component {...otherPageProps} /> */}
+                                <Component {...otherPageProps} />
                                 <Footer />
                             </div>
                         </ModalProvider>

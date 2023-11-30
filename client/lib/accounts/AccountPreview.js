@@ -6,10 +6,12 @@ import { PaletteContext } from "../colorPalette";
 const AccountPreview = ({
     account,
     imgSide = "left",
+    scale = 1,
     overlay,
     isLink = true,
     onClickImage,
 }) => {
+    const imageSize = 30 * scale;
     const { textColor } = useContext(PaletteContext);
     const wrapperStyle = {
         justifyContent: "center",
@@ -17,16 +19,16 @@ const AccountPreview = ({
         color: textColor,
     };
 
-    const screenNameText = (
-        <span style={{ marginRight: 5 }}>{account.screenName}</span>
-    );
-
     const inside = (
         <>
-            {imgSide === "right" && screenNameText}
+            {imgSide === "right" && (
+                <span style={{ marginRight: 5, fontSize: `${scale}em` }}>
+                    {account.screenName}
+                </span>
+            )}
             <Image
                 alt={`${account.screenName} Profile Pic`}
-                height={20}
+                height={imageSize}
                 onClick={onClickImage}
                 src={
                     account.profilePicURL ||
@@ -39,14 +41,18 @@ const AccountPreview = ({
                     borderRadius: "50%",
                     cursor: isLink || onClickImage ? "pointer" : "auto",
                 }}
-                width={20}
+                width={imageSize}
             />
-            {imgSide === "left" && screenNameText}
+            {imgSide === "left" && (
+                <span style={{ marginLeft: 5, fontSize: `${scale}em` }}>
+                    {account.screenName}
+                </span>
+            )}
         </>
     );
 
     if (onClickImage || !isLink)
-        return <span style={wrapperStyle}>inside</span>;
+        return <span style={wrapperStyle}>{inside}</span>;
 
     return (
         <Link href={`/account/${account.screenName}`} style={wrapperStyle}>

@@ -13,8 +13,8 @@ const getPalette = (unsafeMode) => ({
     textColor: unsafeMode ? "white" : "black",
     backgroundColor: unsafeMode
         ? ["rgb(34,34,34)", "rgb(41,41,41)", "rgb(50,50,50)"]
-        : ["rgb(255,255,255)", "rgb(220,245,255)", "rgb(180,238,255)"],
-    borderColor: "lightgray",
+        : ["white", "white", "white"],
+    borderColor: unsafeMode ? "darkgray" : "lightgray",
 });
 
 const useDefaultStyles = createUseStyles((theme) => {
