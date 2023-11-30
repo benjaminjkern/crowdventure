@@ -45,34 +45,82 @@ const NodeSidebar = ({ node, setNode }) => {
     const loggedInAsOwner = node.owner.screenName === user?.screenName;
     return (
         <div style={{ paddingInline: 10 }}>
-            <h1>{node.title}</h1>
-            {node.content.split("\n").map((line, i) => (
-                <p key={i} style={{ textIndent: "5%" }}>
-                    {line}
-                </p>
-            ))}
-            {loggedInAsOwner || user?.isAdmin ? (
+            <div
+                style={{
+                    gap: 20,
+                    marginInline: 20,
+                    marginTop: 30,
+                }}
+            >
+                <h1 style={{ textAlign: "center", display: "block" }}>
+                    {node.title}
+                </h1>
+
+                {node.content.split("\n").map((line, i) => (
+                    <div
+                        key={i}
+                        style={{
+                            // justifyContent: ''
+                            textAlign: "justify",
+                            textIndent: "5%",
+                        }}
+                    >
+                        {line}
+                    </div>
+                ))}
+                {node.canonChoices.length === 0 && (
+                    <span style={{ color: mutedTextColor }}>
+                        By decree of {node.owner.screenName}, this journey ends
+                        here.
+                    </span>
+                )}
+            </div>
+            <hr />
+            <div
+                style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                }}
+            >
+                <span>Views: {node.views}</span>
+                <span style={{ gap: 5 }}>
+                    Author: <AccountPreview account={node.owner} />
+                </span>
+            </div>
+            <div
+                style={{
+                    flexDirection: "row",
+                    marginTop: 10,
+                    gap: 10,
+                }}
+            >
+                {loggedInAsOwner || user?.isAdmin ? (
+                    <CrowdventureButton
+                        onClick={() => {
+                            openModal(
+                                <CreateNodeModal
+                                    node={node}
+                                    setNode={setNode}
+                                />
+                            );
+                        }}
+                    >
+                        Edit Page
+                    </CrowdventureButton>
+                ) : null}
                 <CrowdventureButton
                     onClick={() => {
-                        openModal(
-                            <CreateNodeModal node={node} setNode={setNode} />
-                        );
+                        openModal(<ChoiceModal fromNode={node} />);
                     }}
+                    requireSignedIn
                 >
-                    Edit Page
+                    Suggest New Choice
                 </CrowdventureButton>
-            ) : null}
-            {node.canonChoices.length === 0 && (
-                <span style={{ color: mutedTextColor }}>
-                    By decree of <strong>{node.owner.screenName}</strong>, this
-                    journey ends here.
-                </span>
-            )}
+                <CrowdventureButton onClick={reportNode}>
+                    Report Page
+                </CrowdventureButton>
+            </div>
             <hr />
-            <span style={{ gap: 5 }}>
-                Author: <AccountPreview account={node.owner} />
-            </span>
-            Views: {node.views}
             {choices.length > 0 ? (
                 <div>
                     {choices.map((choice, idx) => (
@@ -80,22 +128,17 @@ const NodeSidebar = ({ node, setNode }) => {
                     ))}
                 </div>
             ) : (
-                <span style={{ color: mutedTextColor }}>
+                <span
+                    style={{
+                        color: mutedTextColor,
+                        textAlign: "center",
+                        marginBottom: 10,
+                    }}
+                >
                     There are currently no options! You can help expand the
                     story by adding to it!
                 </span>
             )}
-            <CrowdventureButton
-                onClick={() => {
-                    openModal(<ChoiceModal fromNode={node} />);
-                }}
-                requireSignedIn
-            >
-                Suggest New Choice
-            </CrowdventureButton>
-            <CrowdventureButton onClick={reportNode}>
-                Report Page
-            </CrowdventureButton>
         </div>
     );
 };
