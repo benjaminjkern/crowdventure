@@ -39,7 +39,6 @@ const NodePage = ({ node: initNode }) => {
     //         <Alert variant="danger">
     //             <title>Error! Node: {match.params.id}</title>
     //             <Alert.Heading>Oh snap! You ran into an error</Alert.Heading>
-    //             <p>
     //                 This page does not exist, or maybe our database is down. Who
     //                 knows? Not you. Hahahaha
     //             </p>

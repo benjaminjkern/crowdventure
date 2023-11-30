@@ -50,9 +50,9 @@ const AccountHeader = ({ account, setAccount }) => {
                 />
 
                 {account.bio?.split("\n").map((line, i) => (
-                    <p key={i} style={{ textIndent: "5%" }}>
+                    <span key={i} style={{ textIndent: "5%" }}>
                         {line}
-                    </p>
+                    </span>
                 ))}
             </div>
             <div style={{ flex: 1, gap: 5 }}>

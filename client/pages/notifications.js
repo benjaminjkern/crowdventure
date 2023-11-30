@@ -24,7 +24,6 @@ const NotificationsPage = () => {
                 {unseen.length !== 1 ? "s" : ""}
                 {unseen.length ? "!" : "."}
             </span>
-            <p />
             {user.notifications.map((notification, idx) => (
                 <CrowdventureNotification
                     idx={idx}

@@ -23,7 +23,6 @@ const UnsafeModal = () => {
             Crowdventure, including content that has been classified as
             &quot;unsafe&quot;. Before you can continue, you must acknowledge
             and agree to the terms of service:
-            <p />
             <CrowdventureTextInput
                 as="textarea"
                 disabled
