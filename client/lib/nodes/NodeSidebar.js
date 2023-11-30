@@ -32,16 +32,7 @@ const NodeSidebar = ({ node, setNode }) => {
         // );
     };
 
-    const choices = [
-        ...node.canonChoices,
-        ...node.nonCanonChoices,
-        ...node.canonChoices,
-        ...node.nonCanonChoices,
-        ...node.canonChoices,
-        ...node.nonCanonChoices,
-        ...node.canonChoices,
-        ...node.nonCanonChoices,
-    ];
+    const choices = [...node.canonChoices, ...node.nonCanonChoices];
 
     const loggedInAsOwner = node.owner.screenName === user?.screenName;
     return (
