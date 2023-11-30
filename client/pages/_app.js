@@ -50,7 +50,7 @@ const App = ({ Component, pageProps }) => {
                             <div
                                 style={{
                                     minHeight: "100vh",
-                                    paddingInline: "10vw", // Dont cover things with side color,
+                                    paddingInline: "calc(10vw + 20px)", // Dont cover things with side color,
                                     justifyContent: "space-between",
                                 }}
                             >

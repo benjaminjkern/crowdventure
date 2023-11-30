@@ -14,6 +14,7 @@ import CreateNodeModal from "../../lib/nodes/CreateNodeModal";
 import { UnsafeModeContext } from "../../lib/unsafeMode";
 import { UserContext } from "../../lib/user";
 import { deepCopy } from "../../lib/utils";
+import { PaletteContext } from "../../lib/colorPalette";
 
 // import EditNodeModal from "../Modals/EditNodeModal";
 // import SuggestChoiceModal from "../Modals/SuggestChoiceModal";
@@ -26,6 +27,7 @@ const NodePage = ({ node: initNode }) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
+    const { lightBackgroundColor } = useContext(PaletteContext);
     const router = useRouter();
 
     const [node, setNode] = useState(deepCopy(initNode));
@@ -130,7 +132,7 @@ const NodePage = ({ node: initNode }) => {
                             marginRight: "auto",
                             borderWidth: 1,
                             borderStyle: "solid",
-                            borderColor: "#eee",
+                            borderColor: lightBackgroundColor,
                             borderRadius: 8,
                             cursor: "pointer",
                             ...(node.pictureUnsafe
@@ -213,7 +215,7 @@ const NodePage = ({ node: initNode }) => {
 
 export const getStaticPaths = () => ({
     paths: [],
-    fallback: true,
+    fallback: "blocking",
 });
 
 const FULL_CHOICE_GQL = {

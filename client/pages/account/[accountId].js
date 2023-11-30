@@ -1,5 +1,4 @@
 import React, { useState, useContext, useEffect } from "react";
-import { useRouter } from "next/router";
 
 import { NODE_PREVIEW_GQL } from "..";
 import { mutationCall, queryCall } from "../../lib/apiUtils";
@@ -7,23 +6,17 @@ import { UserContext } from "../../lib/user";
 import LoadingBox from "../../lib/components/LoadingBox";
 import { UnsafeModeContext } from "../../lib/unsafeMode";
 import CrowdventureAlert from "../../lib/components/CrowdventureAlert";
-import AccountPreview from "../../lib/accounts/AccountPreview";
 import NodeViewer from "../../lib/nodes/NodeViewer";
 import CrowdventureButton from "../../lib/components/CrowdventureButton";
 import CrowdventureTextInput from "../../lib/components/CrowdventureTextInput";
-import EditAccountModal from "../../lib/accounts/EditAccountModal";
-import { ModalContext } from "../../lib/modal";
-import MessageModal from "../../lib/accounts/MessageModal";
-import PictureModal from "../../lib/components/PictureModal";
+import AccountHeader from "../../lib/accounts/AccountHeader";
 
 const AccountPage = ({ account: initAccount }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchedNodes, setSearchedNodes] = useState([]);
     const [account, setAccount] = useState(initAccount);
-    const { user, setUser } = useContext(UserContext);
+    const { user } = useContext(UserContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
-    const { openModal } = useContext(ModalContext);
-    const router = useRouter();
 
     useEffect(() => {
         if (initAccount) setAccount(initAccount);
@@ -47,11 +40,9 @@ const AccountPage = ({ account: initAccount }) => {
 
     if (!account) return <LoadingBox />;
 
-    if (
-        account.hidden &&
-        !unsafeMode &&
-        account.screenName !== user?.screenName
-    )
+    const loggedInAsThisUser = user?.screenName === account.screenName;
+
+    if (account.hidden && !unsafeMode && !loggedInAsThisUser)
         return (
             <CrowdventureAlert title="Unsafe!">
                 This page has been hidden from general users, because the
@@ -62,9 +53,7 @@ const AccountPage = ({ account: initAccount }) => {
 
     return (
         <>
-            {account.hidden &&
-            !unsafeMode &&
-            account.screenName === user?.screenName ? (
+            {account.hidden && !unsafeMode && loggedInAsThisUser ? (
                 <CrowdventureAlert title="Unsafe!">
                     This page has been hidden from general users, because the
                     content has been deemed unsafe. Users in unsafe mode can see
@@ -73,89 +62,10 @@ const AccountPage = ({ account: initAccount }) => {
                     click <a href="">Here</a>.
                 </CrowdventureAlert>
             ) : null}
-            <AccountPreview
-                account={account}
-                onClickImage={() => {
-                    openModal(
-                        <PictureModal
-                            pictureURL={
-                                account.profilePicURL ||
-                                require("../../public/defaultProfilePic.jpg")
-                            }
-                            title={account.screenName}
-                        />
-                    );
-                }}
-            />
 
-            {account.bio?.split("\n").map((line, i) => (
-                <p key={i} style={{ textIndent: "5%" }}>
-                    {line}
-                </p>
-            ))}
+            <AccountHeader account={account} setAccount={setAccount} />
 
-            {user?.screenName === account.screenName || user?.isAdmin ? (
-                <CrowdventureButton
-                    onClick={() => {
-                        openModal(
-                            <EditAccountModal
-                                account={account}
-                                setAccount={setAccount}
-                            />
-                        );
-                    }}
-                >
-                    Edit Account
-                </CrowdventureButton>
-            ) : null}
-
-            {user?.screenName === account.screenName ? (
-                <>
-                    <CrowdventureButton
-                        onClick={() => {
-                            setUser();
-                        }}
-                    >
-                        Log out
-                    </CrowdventureButton>
-                    <CrowdventureButton
-                        onClick={() => {
-                            router.push("/notifications");
-                        }}
-                    >
-                        Notifications{" "}
-                        {user.notifications.filter((notif) => !notif.seen)
-                            .length ? (
-                            <span style={{ color: "red" }}>
-                                (
-                                {
-                                    user.notifications.filter(
-                                        (notif) => !notif.seen
-                                    ).length
-                                }{" "}
-                                New)
-                            </span>
-                        ) : null}
-                    </CrowdventureButton>
-                </>
-            ) : (
-                user && (
-                    <CrowdventureButton
-                        onClick={() => {
-                            openModal(<MessageModal account={account} />);
-                        }}
-                    >
-                        Send Message
-                    </CrowdventureButton>
-                )
-            )}
-            <div>
-                {/** float right */}
-                Total views: {account.totalNodeViews} Total score:{" "}
-                {account.totalSuggestionScore}
-            </div>
-
-            {user?.screenName === account.screenName && (
+            {loggedInAsThisUser ? (
                 <CrowdventureButton
                     onClick={() => {
                         // showModal(
@@ -174,7 +84,12 @@ const AccountPage = ({ account: initAccount }) => {
                 >
                     Create a New Adventure!
                 </CrowdventureButton>
-            )}
+            ) : null}
+
+            <div style={{ alignItems: "flex-end" }}>
+                Total views: {account.totalNodeViews} Total score:{" "}
+                {account.totalSuggestionScore}
+            </div>
 
             <hr />
 
@@ -212,7 +127,7 @@ const AccountPage = ({ account: initAccount }) => {
             />
             {searchQuery ? <NodeViewer nodes={searchedNodes} /> : null}
 
-            {user?.screenName !== account.screenName && (
+            {!loggedInAsThisUser && (
                 <CrowdventureButton onClick={reportAccount}>
                     Report Account
                 </CrowdventureButton>
@@ -221,9 +136,9 @@ const AccountPage = ({ account: initAccount }) => {
     );
 };
 
-export const getStaticPaths = async () => ({
+export const getStaticPaths = () => ({
     paths: [],
-    fallback: true,
+    fallback: "blocking",
 });
 
 export const FULL_ACCOUNT_GQL = {

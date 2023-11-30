@@ -1,22 +1,21 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
+import { UserContext } from "../user";
+import { ModalContext } from "../modal";
+import { UnsafeModeContext } from "../unsafeMode";
+import { PaletteContext } from "../colorPalette";
 import CrowdventureButton from "../components/CrowdventureButton";
+import LoginModal from "../accounts/LoginModal";
+import SignUpModal from "../accounts/SignUpModal";
+import AccountPreview from "../accounts/AccountPreview";
 import CrowdventureSwitch from "../components/CrowdventureSwitch";
 import TooltipWrapper from "../components/TooltipWrapper";
-import AccountPreview from "./AccountPreview";
-
-import LoginModal from "./LoginModal";
-import { ModalContext } from "../modal";
-import { UserContext } from "../user";
-import { UnsafeModeContext } from "../unsafeMode";
-import SignUpModal from "./SignUpModal";
-import { PaletteContext } from "../colorPalette";
 // import UnsafeModal from "./Modals/UnsafeModal";
 
 const AccountManager = ({ wrapperStyle }) => {
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
     const { unsafeMode, setUnsafeMode } = useContext(UnsafeModeContext);
-    const { borderColor } = useContext(PaletteContext);
+    const { mutedTextColor } = useContext(PaletteContext);
 
     if (!user)
         return (
@@ -76,7 +75,7 @@ const AccountManager = ({ wrapperStyle }) => {
                 scale={1.5}
             />
             <div style={{ flexDirection: "row", marginTop: 5 }}>
-                <span style={{ color: borderColor, marginRight: 5 }}>
+                <span style={{ color: mutedTextColor, marginRight: 5 }}>
                     Unsafe Mode:
                 </span>
                 <CrowdventureSwitch
@@ -107,7 +106,15 @@ const AccountManager = ({ wrapperStyle }) => {
                     }}
                     value={unsafeMode}
                 />
-                <TooltipWrapper tooltip="Unsafe mode allows you to see all content on Crowdventure, including content that has been flagged as unsafe for the general public!">
+                <TooltipWrapper
+                    tooltip={
+                        <span>
+                            Unsafe mode allows you to see all content on
+                            Crowdventure, including content that has been
+                            flagged as unsafe for the general public!
+                        </span>
+                    }
+                >
                     {/* <span className="fa fa-info-circle" /> */}
                 </TooltipWrapper>
             </div>

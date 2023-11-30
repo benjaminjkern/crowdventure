@@ -7,14 +7,13 @@ const AccountPreview = ({
     account,
     imgSide = "left",
     scale = 1,
-    overlay,
     isLink = true,
     onClickImage,
 }) => {
     const imageSize = 30 * scale;
-    const { textColor } = useContext(PaletteContext);
+    const { textColor, mutedTextColor } = useContext(PaletteContext);
     const wrapperStyle = {
-        justifyContent: "center",
+        // justifyContent: "center",
         alignItems: "center",
         color: textColor,
     };
@@ -37,7 +36,7 @@ const AccountPreview = ({
                 style={{
                     borderWidth: 1,
                     borderStyle: "solid",
-                    borderColor: "#bbb",
+                    borderColor: mutedTextColor,
                     borderRadius: "50%",
                     cursor: isLink || onClickImage ? "pointer" : "auto",
                 }}

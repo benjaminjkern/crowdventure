@@ -11,15 +11,17 @@ const getPalette = (unsafeMode) => ({
         "rgb(158, 232, 255)",
     ],
     textColor: unsafeMode ? "white" : "black",
+    mutedTextColor: unsafeMode ? "darkgray" : "gray",
     backgroundColor: unsafeMode
         ? ["rgb(34,34,34)", "rgb(41,41,41)", "rgb(50,50,50)"]
         : ["white", "white", "white"],
-    borderColor: unsafeMode ? "darkgray" : "lightgray",
+    lightBackgroundColor: unsafeMode ? "rgb(50,50,50)" : "rgb(230,240,255)",
 });
 
 const useDefaultStyles = createUseStyles((theme) => {
     // Use theme basically just so react-jss doesnt get mad at me
-    const { rootColor, backgroundColor, textColor } = theme;
+    const { rootColor, backgroundColor, textColor, lightBackgroundColor } =
+        theme;
     return {
         "@global": {
             /** ***************** Custom Selection ************************/
@@ -39,6 +41,9 @@ const useDefaultStyles = createUseStyles((theme) => {
 
             "a:focus, a:hover": {
                 textDecoration: "underline",
+            },
+            hr: {
+                backgroundColor: lightBackgroundColor,
             },
             body: {
                 backgroundImage: `linear-gradient(

@@ -1,12 +1,9 @@
 import React, { useContext } from "react";
 import { PaletteContext } from "../colorPalette";
-import { UnsafeModeContext } from "../unsafeMode";
 
 const CrowdventureSwitch = ({ value, onChange, size = 20, padding = 2 }) => {
-    const { borderColor, rootColor, backgroundColor } =
+    const { lightBackgroundColor, rootColor, backgroundColor } =
         useContext(PaletteContext);
-
-    const { unsafeMode } = useContext(UnsafeModeContext);
     return (
         <div
             aria-hidden="true"
@@ -16,7 +13,7 @@ const CrowdventureSwitch = ({ value, onChange, size = 20, padding = 2 }) => {
                 height: size,
                 borderRadius: size / 2,
                 justifyContent: "center",
-                backgroundColor: unsafeMode ? backgroundColor[2] : borderColor,
+                backgroundColor: lightBackgroundColor,
                 padding,
                 cursor: "pointer",
             }}

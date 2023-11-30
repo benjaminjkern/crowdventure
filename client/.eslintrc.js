@@ -85,7 +85,7 @@ module.exports = {
          * I would still like to have a warning for something like these
          * but they are either too annoying or dont do exactly what I want
          */
-        "sort-imports": "off",
+        "sort-imports": "off", // This would be great if I could fix it automatically
         "react/prop-types": "off",
         "no-magic-numbers": "off",
         "react/no-array-index-key": "off",
@@ -107,6 +107,7 @@ module.exports = {
         // These ones are nice but conflict with prettier
         "no-extra-parens": "off", // The two differ on whether ...(a ? b : c) needs parentheses or not
         quotes: "off", // Prettier will force a situation like 'url("SUP")' to interfere with this
+        "react/jsx-indent": "off",
         /*
          * Prettier will put an object inside of a ternary indented two extra spaces out for some reason,
          * this one can probably be fixed on the prettier side but whatever

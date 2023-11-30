@@ -11,10 +11,12 @@ const CrowdventureModal = ({
     modalStyle,
 }) => {
     const { closeModal } = useContext(ModalContext);
-    const { backgroundColor, borderColor } = useContext(PaletteContext);
+    const { backgroundColor, lightBackgroundColor } =
+        useContext(PaletteContext);
 
     return (
         <div
+            aria-hidden
             onMouseDown={closeModal}
             style={{
                 position: "fixed",
@@ -30,6 +32,7 @@ const CrowdventureModal = ({
             }}
         >
             <div
+                aria-hidden
                 onMouseDown={(e) => {
                     e.stopPropagation();
                 }}
@@ -44,7 +47,7 @@ const CrowdventureModal = ({
                 <div
                     style={{
                         position: "relative",
-                        borderBottomColor: borderColor,
+                        borderBottomColor: lightBackgroundColor,
                         borderBottomWidth: 1,
                         borderBottomStyle: "solid",
                         textAlign: "center",

@@ -37,7 +37,7 @@ const CreateNodeModal = ({
 
     const { user } = useContext(UserContext);
     const { openModal, closeModal, closeAllModals } = useContext(ModalContext);
-    const { borderColor } = useContext(PaletteContext);
+    const { lightBackgroundColor, mutedTextColor } = useContext(PaletteContext);
     const router = useRouter();
 
     const validateInputs = () => {
@@ -141,7 +141,7 @@ const CreateNodeModal = ({
                     style={{
                         borderWidth: 1,
                         borderStyle: "solid",
-                        borderColor: "#eee",
+                        borderColor: lightBackgroundColor,
                         borderRadius: 8,
                         position: "relative",
                     }}
@@ -171,7 +171,7 @@ const CreateNodeModal = ({
                 }}
             >
                 <span>Picture:</span>
-                <span style={{ color: borderColor }}>
+                <span style={{ color: mutedTextColor }}>
                     {!pictureField
                         ? "(Don't use any picture)"
                         : pictureField === node?.pictureURL

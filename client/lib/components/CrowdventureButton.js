@@ -1,12 +1,14 @@
 import React, { useContext } from "react";
 import { PaletteContext } from "../colorPalette";
 import { UserContext } from "../user";
+import Link from "next/link";
 const CrowdventureButton = ({
     children,
     style,
     buttonType,
     requireSignedIn,
     onClick,
+    href,
     ...props
 }) => {
     const { user } = useContext(UserContext);
@@ -29,7 +31,7 @@ const CrowdventureButton = ({
             </span>
         );
 
-    return (
+    const button = (
         <button
             disabled={requireSignedIn ? !user : null}
             onClick={onClick}
@@ -47,12 +49,20 @@ const CrowdventureButton = ({
                 backgroundColor: rootColor[1],
                 color: "white",
                 cursor: (!requireSignedIn || user) && "pointer",
+                width: "100%",
                 ...style,
             }}
             {...props}
         >
             {children}
         </button>
+    );
+    if (!href) return button;
+
+    return (
+        <Link href={href} style={{ textDecoration: "none" }}>
+            {button}
+        </Link>
     );
 };
 export default CrowdventureButton;
