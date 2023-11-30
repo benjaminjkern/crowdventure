@@ -1,25 +1,25 @@
 import React, { useContext } from "react";
 import { PaletteContext } from "../colorPalette";
+import { UnsafeModeContext } from "../unsafeMode";
 
-const CrowdventureSwitch = ({ value, onChange, size = 40, padding = 2 }) => {
+const CrowdventureSwitch = ({ value, onChange, size = 20, padding = 2 }) => {
     const { borderColor, rootColor, backgroundColor } =
         useContext(PaletteContext);
+
+    const { unsafeMode } = useContext(UnsafeModeContext);
     return (
         <div
-            aria-checked={value}
             aria-hidden="true"
             onClick={() => onChange(!value)}
-            role="checkbox"
             style={{
                 width: size * 2,
                 height: size,
                 borderRadius: size / 2,
                 justifyContent: "center",
-                backgroundColor: borderColor,
+                backgroundColor: unsafeMode ? backgroundColor[2] : borderColor,
                 padding,
                 cursor: "pointer",
             }}
-            tabIndex={0}
         >
             <div
                 style={{

@@ -3,17 +3,22 @@ import Link from "next/link";
 import Image from "next/image";
 import { PaletteContext } from "../colorPalette";
 
+const wrapperStyle = { justifyContent: "center", alignItems: "center" };
+
 const AccountPreview = ({
     account,
     imgSide = "left",
     overlay,
+    isLink = true,
     onClickImage,
 }) => {
     const { foregroundColor } = useContext(PaletteContext);
 
     const inside = (
         <>
-            {imgSide === "right" && `${account.screenName} `}
+            {imgSide === "right" && (
+                <span style={{ marginRight: 5 }}>{account.screenName}</span>
+            )}
             <Image
                 alt={`${account.screenName} Profile Pic`}
                 height={20}
@@ -27,23 +32,21 @@ const AccountPreview = ({
                     borderStyle: "solid",
                     borderColor: "#bbb",
                     borderRadius: "50%",
-                    cursor: onClickImage ? "pointer" : "auto",
+                    cursor: isLink || onClickImage ? "pointer" : "auto",
                 }}
                 width={20}
             />
-            {imgSide === "left" && ` ${account.screenName}`}
+            {imgSide === "left" && (
+                <span style={{ marginLeft: 5 }}>{account.screenName}</span>
+            )}
         </>
     );
 
-    if (onClickImage) return inside;
+    if (onClickImage || !isLink)
+        return <span style={wrapperStyle}>inside</span>;
 
     return (
-        <Link
-            href={`/account/${account.screenName}`}
-            style={{
-                color: foregroundColor,
-            }}
-        >
+        <Link href={`/account/${account.screenName}`} style={wrapperStyle}>
             {inside}
         </Link>
     );

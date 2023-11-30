@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import CrowdventureButton from "../components/CrowdventureButton";
 import CrowdventureSwitch from "../components/CrowdventureSwitch";
 import TooltipWrapper from "../components/TooltipWrapper";
@@ -18,25 +18,27 @@ const AccountManager = () => {
 
     if (!user)
         return (
-            <div>
+            <div style={{ alignItems: "center", marginInline: 20 }}>
                 You are not logged in.{" "}
-                <CrowdventureButton
-                    buttonType="text"
-                    onClick={() => {
-                        openModal(<LoginModal />);
-                    }}
-                >
-                    Log In
-                </CrowdventureButton>
-                or
-                <CrowdventureButton
-                    buttonType="text"
-                    onClick={() => {
-                        openModal(<SignUpModal />);
-                    }}
-                >
-                    Sign Up
-                </CrowdventureButton>
+                <span>
+                    <CrowdventureButton
+                        buttonType="text"
+                        onClick={() => {
+                            openModal(<LoginModal />);
+                        }}
+                    >
+                        Log In
+                    </CrowdventureButton>{" "}
+                    or{" "}
+                    <CrowdventureButton
+                        buttonType="text"
+                        onClick={() => {
+                            openModal(<SignUpModal />);
+                        }}
+                    >
+                        Sign Up
+                    </CrowdventureButton>
+                </span>
             </div>
         );
 

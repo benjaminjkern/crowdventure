@@ -6,10 +6,10 @@ import AccountManager from "../accounts/AccountManager";
 const Navbar = () => (
     <nav
         style={{
-            display: "flex",
-            height: 50,
+            height: 75,
             justifyContent: "space-between",
             alignItems: "center",
+            flexDirection: "row",
         }}
     >
         <Link href="/">

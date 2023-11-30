@@ -4,18 +4,18 @@
 }
 
 body {
-    background-image: linear-gradient(
-        to right,
-        rgb(158, 232, 255),
-        white 10%,
-        white 90%,
-        rgb(158, 232, 255)
-    );
     margin: 0;
 }
 
 body,
-div {
+div,
+nav,
+footer {
     display: flex;
     flex-direction: column;
+}
+
+span,
+a {
+    display: inline-flex;
 }
