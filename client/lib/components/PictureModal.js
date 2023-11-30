@@ -17,14 +17,16 @@ const PictureModal = ({ title, pictureURL }) => {
             ]}
             modalTitle={title}
         >
-            <Image
-                height={200}
-                src={pictureURL}
-                style={{
-                    maxHeight: "70vh",
-                }}
-                width={200}
-            />
+            <div style={{ position: "relative" }}>
+                <img
+                    alt="A Cool Picture!"
+                    src={pictureURL}
+                    style={{
+                        objectFit: "cover",
+                        maxHeight: "70vh",
+                    }}
+                />
+            </div>
         </CrowdventureModal>
     );
 };

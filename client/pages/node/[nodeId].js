@@ -133,6 +133,7 @@ const NodePage = ({ node: initNode }) => {
                             Go back!
                         </CrowdventureButton>
                         <Image
+                            alt="Image failed to load."
                             fill
                             objectFit="cover"
                             onClick={() => {
@@ -142,6 +143,9 @@ const NodePage = ({ node: initNode }) => {
                                         title={node.title}
                                     />
                                 );
+                            }}
+                            onError={() => {
+                                setNode({ ...node, pictureURL: null });
                             }}
                             src={node.pictureURL}
                             style={{

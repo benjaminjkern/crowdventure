@@ -62,6 +62,7 @@ const CrowdventureModal = ({
                 {children}
                 {modalButtons.length ? (
                     <div>
+                        <hr />
                         {modalButtons.map(
                             ({ active = true, text, ...props }, i) => {
                                 if (!active) return;

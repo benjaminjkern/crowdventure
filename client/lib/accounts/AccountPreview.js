@@ -29,7 +29,7 @@ const AccountPreview = ({
                 </span>
             )}
             <Image
-                alt={`${account.screenName} Profile Pic`}
+                alt={`${account.screenName}'s Profile Pic`}
                 height={imageSize}
                 onClick={onClickImage}
                 src={
@@ -37,6 +37,7 @@ const AccountPreview = ({
                     require("../../public/defaultProfilePic.jpg")
                 }
                 style={{
+                    objectFit: "cover",
                     borderWidth: 1,
                     borderStyle: "solid",
                     borderColor: mutedTextColor,

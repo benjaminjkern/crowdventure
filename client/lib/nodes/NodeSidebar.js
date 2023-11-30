@@ -7,6 +7,7 @@ import { ModalContext } from "../modal";
 import ActionCard from "../actions/ActionCard";
 import ChoiceModal from "../actions/ChoiceModal";
 import { PaletteContext } from "../colorPalette";
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 
 const NodeSidebar = ({ node, setNode }) => {
     const { user } = useContext(UserContext);
@@ -116,17 +117,25 @@ const NodeSidebar = ({ node, setNode }) => {
                 >
                     Suggest New Choice
                 </CrowdventureButton>
-                <CrowdventureButton onClick={reportNode}>
+                <CrowdventureButton category="error" onClick={reportNode}>
                     Report Page
                 </CrowdventureButton>
             </div>
             <hr />
             {choices.length > 0 ? (
-                <div>
-                    {choices.map((choice, idx) => (
-                        <ActionCard choice={choice} key={idx} />
-                    ))}
-                </div>
+                <ResponsiveMasonry
+                    columnsCountBreakPoints={
+                        node.pictureURL
+                            ? { 0: 1, 1400: 2 }
+                            : { 0: 1, 600: 2, 900: 3 }
+                    }
+                >
+                    <Masonry>
+                        {choices.map((choice, idx) => (
+                            <ActionCard choice={choice} key={idx} />
+                        ))}
+                    </Masonry>
+                </ResponsiveMasonry>
             ) : (
                 <span
                     style={{

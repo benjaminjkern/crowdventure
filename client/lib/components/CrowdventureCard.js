@@ -66,6 +66,7 @@ const CrowdventureCard = ({
                             }}
                         >
                             <Image
+                                alt="Selected Picture"
                                 fill
                                 onError={(e) => {
                                     e.target.parentNode.style.display = "none";
