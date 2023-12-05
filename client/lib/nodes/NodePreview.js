@@ -103,6 +103,10 @@ const NodePreview = ({ node }) => {
                 },
             ]}
             href={`/node/${node.ID}`}
+            onImageError={() => {
+                // Set to null so it doesnt keep trying to recall image
+                node.pictureURL = null;
+            }}
             overlayIcons={[
                 {
                     active: node.featured,

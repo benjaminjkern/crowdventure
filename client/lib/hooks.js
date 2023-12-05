@@ -60,3 +60,8 @@ export const useDebounce = (func, delay = 500) => {
         timerRef.current = setTimeout(() => func(...args), delay);
     };
 };
+
+export const useDebouncedEffect = (func, dependencies) => {
+    const debouncedFunc = useDebounce(func);
+    useEffect(debouncedFunc, dependencies);
+};

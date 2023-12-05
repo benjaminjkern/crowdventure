@@ -13,31 +13,31 @@ import AccountHeader from "../../lib/accounts/AccountHeader";
 import { useDebounce } from "../../lib/hooks";
 
 const AccountPage = ({ account: initAccount }) => {
-    const [searchQuery, setSearchQuery] = useState("");
     const [searchedNodes, setSearchedNodes] = useState([]);
     const [account, setAccount] = useState(initAccount);
     const { user } = useContext(UserContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
 
-    const searchForNodes = useDebounce((newQuery) => {
-        setSearchQuery(newQuery);
-        if (newQuery.length >= 2)
-            setSearchedNodes([
-                ...account.nodes.filter((node) =>
-                    node.title.toLowerCase().includes(newQuery.toLowerCase())
-                ),
-                ...account.nodes.filter(
-                    (node) =>
-                        !node.title
-                            .toLowerCase()
-                            .includes(newQuery.toLowerCase()) &&
-                        node.content
-                            .toLowerCase()
-                            .includes(newQuery.toLowerCase())
-                ),
-            ]);
-        else setSearchedNodes([]);
+    const setSearchQuery = useDebounce((searchQuery) => {
+        setSearchedNodes([
+            ...account.nodes.filter((node) =>
+                node.title.toLowerCase().includes(searchQuery.toLowerCase())
+            ),
+            ...account.nodes.filter(
+                (node) =>
+                    !node.title
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase()) &&
+                    node.content
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase())
+            ),
+        ]);
     });
+
+    useEffect(() => {
+        setSearchQuery("");
+    }, []);
 
     useEffect(() => {
         if (initAccount) setAccount(initAccount);
@@ -97,19 +97,18 @@ const AccountPage = ({ account: initAccount }) => {
                 {account.totalSuggestionScore}
             </div>
 
-            <hr />
+            {/* <hr /> */}
 
-            <h3>Featured Stories:</h3>
-            <NodeViewer nodes={account.featuredNodes} />
+            {/* <h3>Featured Stories:</h3>
+            <NodeViewer nodes={account.featuredNodes} /> */}
 
             <hr />
 
             <h3>Search All Pages Authored by {account.screenName}:</h3>
             <CrowdventureTextInput
-                onChangeText={searchForNodes}
+                onChangeText={setSearchQuery}
                 placeholder="Search for a page..."
                 style={{ marginTop: 5 }}
-                value={searchQuery}
             />
             <NodeViewer nodes={searchedNodes} />
         </>

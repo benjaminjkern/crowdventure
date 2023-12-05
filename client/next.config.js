@@ -1,7 +1,7 @@
 module.exports = {
     reactStrictMode: true,
     swcMinify: true,
-    async redirects() {
+    redirects() {
         return [
             {
                 source: "/node",
@@ -16,10 +16,15 @@ module.exports = {
                 protocol: "https",
                 hostname: "**",
             },
-
             {
                 protocol: "http",
                 hostname: "**",
+            },
+            {
+                protocol: "https",
+                hostname: "**",
+                pathname: "**/.*/**",
+                // This is needed because of a nextjs bug
             },
         ],
     },

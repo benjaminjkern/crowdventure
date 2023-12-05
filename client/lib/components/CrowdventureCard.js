@@ -17,14 +17,10 @@ const CrowdventureCard = ({
     text,
     children,
     disabled,
+    onImageError = () => {},
 }) => {
-    const {
-        rootColor,
-        backgroundColor,
-        lightBackgroundColor,
-        mutedTextColor,
-        textColor,
-    } = useContext(PaletteContext);
+    const { rootColor, backgroundColor, lightBackgroundColor, mutedTextColor } =
+        useContext(PaletteContext);
     const ref = useRef();
 
     const BLURAMOUNT = 20;
@@ -73,11 +69,13 @@ const CrowdventureCard = ({
                                 }}
                             >
                                 <Image
-                                    alt="Selected Picture"
+                                    alt="Something went wrong!"
                                     fill
                                     onError={(e) => {
                                         e.target.parentNode.style.display =
                                             "none";
+
+                                        onImageError();
                                     }}
                                     src={picture}
                                     style={{
