@@ -3,7 +3,11 @@ import { attachStyleListener } from "../attachStyleListener";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import { PaletteContext } from "../colorPalette";
 
-const TooltipWrapper = ({ tooltip, children, tooltipStyle = {} }) => {
+const TooltipWrapper = ({
+    tooltip,
+    children,
+    tooltipStyle = { bottom: "100%" },
+}) => {
     const ref = useRef();
     const { textColor, backgroundColor } = useContext(PaletteContext);
     return (

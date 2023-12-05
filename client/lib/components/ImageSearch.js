@@ -162,7 +162,15 @@ const ImageSearch = ({ onSelectImage }) => {
                                         unsafe={!image.isFamilyFriendly}
                                     />
                                     {!image.isFamilyFriendly && (
-                                        <TooltipWrapper tooltip="This picture will automatically flag this page as hidden!">
+                                        <TooltipWrapper
+                                            tooltip={
+                                                <span>
+                                                    This picture will
+                                                    automatically flag this page
+                                                    as hidden!
+                                                </span>
+                                            }
+                                        >
                                             <div
                                                 className="fa"
                                                 style={{

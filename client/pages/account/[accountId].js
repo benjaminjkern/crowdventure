@@ -10,6 +10,7 @@ import NodeViewer from "../../lib/nodes/NodeViewer";
 import CrowdventureButton from "../../lib/components/CrowdventureButton";
 import CrowdventureTextInput from "../../lib/components/CrowdventureTextInput";
 import AccountHeader from "../../lib/accounts/AccountHeader";
+import { useDebounce } from "../../lib/hooks";
 
 const AccountPage = ({ account: initAccount }) => {
     const [searchQuery, setSearchQuery] = useState("");
@@ -17,6 +18,26 @@ const AccountPage = ({ account: initAccount }) => {
     const [account, setAccount] = useState(initAccount);
     const { user } = useContext(UserContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
+
+    const searchForNodes = useDebounce((newQuery) => {
+        setSearchQuery(newQuery);
+        if (newQuery.length >= 2)
+            setSearchedNodes([
+                ...account.nodes.filter((node) =>
+                    node.title.toLowerCase().includes(newQuery.toLowerCase())
+                ),
+                ...account.nodes.filter(
+                    (node) =>
+                        !node.title
+                            .toLowerCase()
+                            .includes(newQuery.toLowerCase()) &&
+                        node.content
+                            .toLowerCase()
+                            .includes(newQuery.toLowerCase())
+                ),
+            ]);
+        else setSearchedNodes([]);
+    });
 
     useEffect(() => {
         if (initAccount) setAccount(initAccount);
@@ -85,28 +106,7 @@ const AccountPage = ({ account: initAccount }) => {
 
             <h3>Search All Pages Authored by {account.screenName}:</h3>
             <CrowdventureTextInput
-                onChangeText={(newQuery) => {
-                    console.log(account.nodes);
-                    setSearchQuery(newQuery);
-                    if (newQuery.length >= 2)
-                        setSearchedNodes([
-                            ...account.nodes.filter((node) =>
-                                node.title
-                                    .toLowerCase()
-                                    .includes(newQuery.toLowerCase())
-                            ),
-                            ...account.nodes.filter(
-                                (node) =>
-                                    !node.title
-                                        .toLowerCase()
-                                        .includes(newQuery.toLowerCase()) &&
-                                    node.content
-                                        .toLowerCase()
-                                        .includes(newQuery.toLowerCase())
-                            ),
-                        ]);
-                    else setSearchedNodes([]);
-                }}
+                onChangeText={searchForNodes}
                 placeholder="Search for a page..."
                 style={{ marginTop: 5 }}
                 value={searchQuery}

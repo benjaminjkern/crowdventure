@@ -5,7 +5,8 @@ import { PaletteContext } from "../colorPalette";
 
 const OptionsDropdown = ({
     dropdownOptions,
-    dropdownStyle = { right: "100%" },
+    wrapperStyle = { justifyContent: "center", alignItems: "flex-end" },
+    dropdownStyle = { top: "100%" },
 }) => {
     const ref = useRef();
     const [open, setOpen] = useState(false);
@@ -31,62 +32,48 @@ const OptionsDropdown = ({
 
     return (
         <div
+            ref={ref}
             style={{
-                position: "absolute",
-                top: 0,
-                right: 0,
+                position: "relative",
+                ...wrapperStyle,
             }}
         >
+            <CrowdventureButton onClick={() => setOpen((newOpen) => !newOpen)}>
+                Gear
+            </CrowdventureButton>
             <div
-                ref={ref}
                 style={{
-                    position: "relative",
-                    // justifyContent: "center",
-                    alignItems: "center",
+                    position: "absolute",
+                    textAlign: "center",
+                    visibility: open ? "visible" : "hidden",
+                    fontSize: DEFAULT_TEXT_SIZE * 0.8,
+                    backgroundColor: backgroundColor[2],
+                    padding: 10,
+                    borderRadius: 10,
+                    width: 200,
+                    zIndex: 2,
+                    ...dropdownStyle,
                 }}
             >
-                <CrowdventureButton
-                    onClick={() => setOpen((newOpen) => !newOpen)}
-                >
-                    Gear
-                </CrowdventureButton>
-                <div
-                    style={{
-                        position: "absolute",
-                        textAlign: "center",
-                        visibility: open ? "visible" : "hidden",
-                        fontSize: DEFAULT_TEXT_SIZE * 0.8,
-                        backgroundColor: backgroundColor[2],
-                        padding: 10,
-                        borderRadius: 10,
-                        width: 200,
-                        zIndex: 2,
-                        ...dropdownStyle,
-                    }}
-                >
-                    {dropdownOptions.map(
-                        (
-                            { active = true, disabled = false, onClick, text },
-                            i
-                        ) =>
-                            active &&
-                            (text || onClick ? (
-                                <CrowdventureButton
-                                    buttonType="text"
-                                    disabled={disabled || !onClick}
-                                    key={i}
-                                    onClick={onClick}
-                                    style={{
-                                        backgroundColor,
-                                    }}
-                                >
-                                    {text}
-                                </CrowdventureButton>
-                            ) : (
-                                <hr />
-                            ))
-                    )}
-                </div>
+                {dropdownOptions.map(
+                    ({ active = true, disabled = false, onClick, text }, i) =>
+                        active &&
+                        (text || onClick ? (
+                            <CrowdventureButton
+                                buttonType="text"
+                                disabled={disabled || !onClick}
+                                key={i}
+                                onClick={onClick}
+                                style={{
+                                    backgroundColor,
+                                }}
+                            >
+                                {text}
+                            </CrowdventureButton>
+                        ) : (
+                            <hr />
+                        ))
+                )}
             </div>
         </div>
     );

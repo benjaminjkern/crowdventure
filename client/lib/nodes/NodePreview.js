@@ -5,6 +5,7 @@ import CrowdventureCard from "../components/CrowdventureCard";
 import { ModalContext } from "../modal";
 import { UnsafeModeContext } from "../unsafeMode";
 import { UserContext } from "../user";
+import { faMinusCircle, faStar } from "@fortawesome/free-solid-svg-icons";
 
 // import ConfirmModal from "./Modals/ConfirmModal";
 
@@ -106,7 +107,7 @@ const NodePreview = ({ node }) => {
                 {
                     active: node.featured,
                     tooltip: `This page has been starred by ${node.owner.screenName}!`,
-                    icon: "stay",
+                    icon: faStar,
                     iconColor: "yellow",
                 },
                 {
@@ -118,7 +119,7 @@ const NodePreview = ({ node }) => {
                             {unsafeMode ? "in Unsafe Mode." : "the owner."}
                         </span>
                     ),
-                    icon: "minus-circle",
+                    icon: faMinusCircle,
                     iconColor: "red",
                 },
             ]}

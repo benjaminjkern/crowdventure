@@ -6,6 +6,7 @@ import OptionsDropdown from "./OptionsDropdown";
 import TooltipWrapper from "./TooltipWrapper";
 import { attachStyleListener } from "../attachStyleListener";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const CrowdventureCard = ({
     href,
@@ -17,8 +18,13 @@ const CrowdventureCard = ({
     children,
     disabled,
 }) => {
-    const { rootColor, backgroundColor, lightBackgroundColor, mutedTextColor } =
-        useContext(PaletteContext);
+    const {
+        rootColor,
+        backgroundColor,
+        lightBackgroundColor,
+        mutedTextColor,
+        textColor,
+    } = useContext(PaletteContext);
     const ref = useRef();
 
     const BLURAMOUNT = 20;
@@ -93,40 +99,35 @@ const CrowdventureCard = ({
                     </div>
                 </Link>
 
-                <div style={{ position: "absolute", top: 5, left: 5 }}>
+                <div
+                    style={{
+                        position: "absolute",
+                        top: 5,
+                        left: 5,
+                        flexDirection: "row",
+                        gap: 5,
+                    }}
+                >
                     {overlayIcons.map(
                         ({ active, tooltip, icon, iconColor }, i) =>
                             active && (
-                                <TooltipWrapper
-                                    key={i}
-                                    tooltip={tooltip}
-                                    tooltipStyle={{ bottom: "100%" }}
-                                >
-                                    {iconColor} {icon}
-                                    {/* <div
-                    style={{
-                        position: "absolute",
-                        top: "5px",
-                        left: "5px",
-                        color: "yellow",
-                        "-webkit-touch-callout": "none",
-                        "-webkit-user-select": "none",
-                        "-khtml-user-select": "none",
-                        "-moz-user-select": "none",
-                        "-ms-user-select": "none",
-                        "user-select": "none",
-                        "text-shadow": "0 0 1px black",
-                    }}
-                    className="fa"
-                >
-                    &#xf005;
-                </div> */}
+                                <TooltipWrapper key={i} tooltip={tooltip}>
+                                    <FontAwesomeIcon
+                                        color={iconColor}
+                                        icon={icon}
+                                        style={{
+                                            width: 15,
+                                            height: 15,
+                                            filter: `drop-shadow(0 0 1px black)`,
+                                        }}
+                                    />
                                 </TooltipWrapper>
                             )
                     )}
                 </div>
-
-                <OptionsDropdown dropdownOptions={dropdownOptions} />
+                <div style={{ position: "absolute", top: 5, right: 5 }}>
+                    <OptionsDropdown dropdownOptions={dropdownOptions} />
+                </div>
 
                 <div
                     style={{

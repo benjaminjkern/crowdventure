@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const MAX_CONTENT_WIDTH = 1400;
 
@@ -50,4 +50,13 @@ export const useScrollPosition = () => {
     }, []);
 
     return scrollPosition;
+};
+
+export const useDebounce = (func, delay = 500) => {
+    const timerRef = useRef();
+
+    return (...args) => {
+        clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(() => func(...args), delay);
+    };
 };

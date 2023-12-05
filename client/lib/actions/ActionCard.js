@@ -5,6 +5,7 @@ import CrowdventureCard from "../components/CrowdventureCard";
 import LikeDislikeController from "../components/LikeDislikeController";
 import { UnsafeModeContext } from "../unsafeMode";
 import { UserContext } from "../user";
+import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 
 const ActionCard = ({ choice: initChoice }) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
@@ -205,7 +206,7 @@ const ActionCard = ({ choice: initChoice }) => {
                             {unsafeMode ? "in Unsafe Mode." : "the owner."}
                         </span>
                     ),
-                    icon: "minus-circle",
+                    icon: faMinusCircle,
                     iconColor: "red",
                 },
                 {
@@ -222,7 +223,7 @@ const ActionCard = ({ choice: initChoice }) => {
                             {unsafeMode ? "in Unsafe Mode." : "the owner."}
                         </span>
                     ),
-                    icon: "minus-circle",
+                    icon: faMinusCircle,
                     iconColor: "red",
                 },
             ]}
