@@ -55,17 +55,19 @@ const NodePreview = ({ node }) => {
         // });
     };
 
+    const userOwnsNode = user?.screenName === node.owner.screenName;
+
     return (
         <CrowdventureCard
             dropdownOptions={[
                 {
-                    active: user && node.featured,
+                    active: user,
                     onClick: () => featurePage(node, node.featured),
-                    disabled: user?.screenName !== node.owner.screenName,
+                    disabled: !(user?.isAdmin || userOwnsNode),
                     text: `${node.featured ? "Un-f" : "F"}eature page`,
                 },
                 {
-                    active: user && node.featured,
+                    active: user,
                     onClick: () => {
                         openModal(
                             <ConfirmModal
@@ -82,18 +84,15 @@ const NodePreview = ({ node }) => {
                             />
                         );
                     },
-                    // showModal(
-                    //
-                    // ),
-                    disabled: user?.screenName !== node.owner.screenName,
+                    disabled: !(user?.isAdmin || userOwnsNode),
                     text: "Delete",
                 },
-                {
-                    active: user && node.featured,
-                    disabled: true,
-                    text: "Make Private",
-                },
-                { active: user && node.featured },
+                // {
+                //     active: user,
+                //     disabled: true,
+                //     text: "Make Private",
+                // },
+                { active: user },
                 { onClick: () => reportNode(node.ID), text: "Report" },
                 { active: user?.isAdmin },
                 {

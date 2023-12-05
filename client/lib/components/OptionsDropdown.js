@@ -1,11 +1,33 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import CrowdventureButton from "./CrowdventureButton";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import { PaletteContext } from "../colorPalette";
 
-const OptionsDropdown = ({ dropdownOptions, dropdownStyle = {} }) => {
+const OptionsDropdown = ({
+    dropdownOptions,
+    dropdownStyle = { right: "100%" },
+}) => {
+    const ref = useRef();
     const [open, setOpen] = useState(false);
-    const { textColor, backgroundColor } = useContext(PaletteContext);
+
+    const { backgroundColor } = useContext(PaletteContext);
+
+    useEffect(() => {
+        const listener = (e) => {
+            if (
+                ref.current &&
+                (e.target === ref.current ||
+                    [...ref.current.children].includes(e.target) ||
+                    [...ref.current.children[1].children].includes(e.target))
+            )
+                return;
+            setOpen(false);
+        };
+        document.addEventListener("click", listener);
+        return () => {
+            document.removeEventListener("click", listener);
+        };
+    }, []);
 
     return (
         <div
@@ -16,6 +38,7 @@ const OptionsDropdown = ({ dropdownOptions, dropdownStyle = {} }) => {
             }}
         >
             <div
+                ref={ref}
                 style={{
                     position: "relative",
                     // justifyContent: "center",
@@ -33,13 +56,12 @@ const OptionsDropdown = ({ dropdownOptions, dropdownStyle = {} }) => {
                         textAlign: "center",
                         visibility: open ? "visible" : "hidden",
                         fontSize: DEFAULT_TEXT_SIZE * 0.8,
-                        padding: 5,
-                        borderRadius: 5,
-                        backgroundColor: textColor,
-                        color: backgroundColor[0],
+                        backgroundColor: backgroundColor[2],
+                        padding: 10,
+                        borderRadius: 10,
                         width: 200,
-                        right: "100%",
                         zIndex: 2,
+                        ...dropdownStyle,
                     }}
                 >
                     {dropdownOptions.map(
@@ -50,9 +72,13 @@ const OptionsDropdown = ({ dropdownOptions, dropdownStyle = {} }) => {
                             active &&
                             (text || onClick ? (
                                 <CrowdventureButton
+                                    buttonType="text"
                                     disabled={disabled || !onClick}
                                     key={i}
                                     onClick={onClick}
+                                    style={{
+                                        backgroundColor,
+                                    }}
                                 >
                                     {text}
                                 </CrowdventureButton>

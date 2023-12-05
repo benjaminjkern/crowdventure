@@ -36,9 +36,13 @@ const CrowdventureButton = ({
             <span
                 onClick={onClick}
                 {...attachStyleListener("hover", {
-                    textDecoration: "underline",
+                    textDecoration: isDisabled ? null : "underline",
                 })}
-                style={{ cursor: "pointer", color: lightColor, ...style }}
+                style={{
+                    cursor: isDisabled ? "default" : "pointer",
+                    color: lightColor,
+                    ...style,
+                }}
             >
                 {children}
             </span>
@@ -55,7 +59,7 @@ const CrowdventureButton = ({
                 backgroundColor: lightColor,
                 color: "white",
                 width: "100%",
-                cursor: isDisabled ? null : "pointer",
+                cursor: isDisabled ? "default" : "pointer",
                 ...style,
             }}
             {...attachStyleListener("hover", {

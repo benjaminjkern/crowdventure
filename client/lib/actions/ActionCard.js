@@ -142,10 +142,10 @@ const ActionCard = ({ choice: initChoice }) => {
             disabled={disabled}
             dropdownOptions={[
                 {
-                    disabled:
-                        !user ||
-                        (user.screenName !== choice.from.owner.screenName &&
-                            !user.isAdmin),
+                    disabled: !(
+                        user?.isAdmin ||
+                        user?.screenName === choice.from.owner.screenName
+                    ),
                     text: `Make ${choice.canon ? "Nonc" : "C"}anon`,
                     onClick: () =>
                         choice.canon
@@ -153,24 +153,22 @@ const ActionCard = ({ choice: initChoice }) => {
                             : makeCanon(choice.ID),
                 },
                 {
-                    disabled:
-                        !user ||
-                        (user.screenName !== choice.suggestedBy.screenName &&
-                            user.screenName !== choice.from.owner.screenName &&
-                            !user.isAdmin),
+                    disabled: !(
+                        user?.isAdmin ||
+                        user?.screenName === choice.from.owner.screenName ||
+                        user?.screenName === choice.suggestedBy.screenName
+                    ),
                     text: "Delete",
                     onClick: () => removeSuggestion(choice.ID),
                 },
                 {
                     disabled: !(
-                        user &&
-                        (user.isAdmin ||
-                            (choice.canon &&
-                                user.screenName ===
-                                    choice.from.owner.screenName) ||
-                            (!choice.canon &&
-                                user.screenName ===
-                                    choice.suggestedBy.screenName))
+                        user?.isAdmin ||
+                        (choice.canon &&
+                            user?.screenName ===
+                                choice.from.owner.screenName) ||
+                        (!choice.canon &&
+                            user?.screenName === choice.suggestedBy.screenName)
                     ),
                     text: "Edit",
                     onClick: () => {

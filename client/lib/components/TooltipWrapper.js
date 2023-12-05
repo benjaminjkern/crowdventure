@@ -36,6 +36,7 @@ const TooltipWrapper = ({ tooltip, children, tooltipStyle = {} }) => {
                     backgroundColor: textColor,
                     color: backgroundColor[0],
                     width: 200,
+                    zIndex: 2,
                     ...tooltipStyle,
                 }}
             >
