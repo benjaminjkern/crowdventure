@@ -13,6 +13,7 @@ import { ModalContext } from "../modal";
 import ImageSearch from "../components/ImageSearch";
 import CloseButton from "../components/CloseButton";
 import { PaletteContext } from "../colorPalette";
+import { useStatelessValue } from "../hooks";
 
 // import SearchImage from "../SearchImage";
 
@@ -24,15 +25,10 @@ const CreateNodeModal = ({
     pictureUnsafe,
     featured,
 }) => {
-    const [title, setTitle] = useState(node?.title);
-    const [content, setContent] = useState(node?.content);
-    const [pictureField, setPictureField] = useState(
-        node?.pictureURL || picture
-    );
-    const [shouldHide, setShouldHide] = useState(pictureUnsafe);
-    const [hidden, setHidden] = useState();
+    const title = useStatelessValue(node?.title || "");
+    const content = useStatelessValue(node?.content || "");
+    const hidden = useStatelessValue(node?.hidden || false);
 
-    const [showImageSearch, setShowImageSearch] = useState(false);
     const [info, setInfo] = useState("");
 
     const { user } = useContext(UserContext);
@@ -41,14 +37,14 @@ const CreateNodeModal = ({
     const router = useRouter();
 
     const validateInputs = () => {
-        if (!title) {
+        if (!title.getValue()) {
             setInfo(
                 <span style={{ color: "red" }}>Content cannot be empty!</span>
             );
             return false;
         }
 
-        if (!content) {
+        if (!content.getValue()) {
             setInfo(
                 <span style={{ color: "red" }}>Title cannot be empty!</span>
             );
@@ -58,33 +54,32 @@ const CreateNodeModal = ({
         return true;
     };
 
-    const editNode = () => {
+    const editNode = async () => {
         if (!validateInputs()) return;
 
-        mutationCall(
+        const newNode = await mutationCall(
             "editNode",
             { ID: 0 },
             {
                 nodeID: node.ID,
                 title,
                 content,
-                pictureURL: pictureField,
+                // pictureURL: pictureField,
                 hidden:
-                    shouldHide ||
-                    (hidden !== undefined && !node.pictureUnsafe) ||
+                    // shouldHide ||
+                    (hidden.getValue() !== undefined && !node.pictureUnsafe) ||
                     undefined,
-                pictureUnsafe: shouldHide,
+                // pictureUnsafe: shouldHide,
             }
-        ).then((newNode) => {
-            setNode(newNode);
-            closeModal();
-        });
+        );
+        setNode(newNode);
+        closeModal();
     };
 
-    const createNode = () => {
+    const createNode = async () => {
         if (!validateInputs()) return;
 
-        mutationCall(
+        const newNode = await mutationCall(
             "createNode",
             {
                 ID: 0,
@@ -94,21 +89,19 @@ const CreateNodeModal = ({
                 title,
                 content,
                 featured: featured || false,
-                pictureURL: pictureField,
-                hidden: shouldHide || undefined,
-                pictureUnsafe: shouldHide || undefined,
+                // pictureURL: pictureField,
+                // hidden: shouldHide || undefined,
+                // pictureUnsafe: shouldHide || undefined,
             }
-        ).then((newNode) => {
-            router.push(`/node/${newNode.ID}`);
-            closeModal();
-        });
+        );
+        router.push(`/node/${newNode.ID}`);
+        closeModal();
     };
 
-    const deleteNode = () => {
-        mutationCall("deleteNode", undefined, { nodeID: node.ID }).then(() => {
-            router.back();
-            closeAllModals();
-        });
+    const deleteNode = async () => {
+        await mutationCall("deleteNode", undefined, { nodeID: node.ID });
+        router.back();
+        closeAllModals();
     };
 
     return (
@@ -124,10 +117,18 @@ const CreateNodeModal = ({
                 {
                     active: Boolean(node),
                     text: "Delete",
+                    category: "error",
                     onClick: () =>
                         openModal(
                             <ConfirmModal
-                                content="This will erase all suggested choices of this page, and their associated scores. This will NOT delete sub-pages of this page. Are you sure you wish to continue?"
+                                content={
+                                    <span>
+                                        This will erase all suggested choices of
+                                        this page, and their associated scores.
+                                        This will NOT delete sub-pages of this
+                                        page. Are you sure you wish to continue?
+                                    </span>
+                                }
                                 onConfirm={deleteNode}
                                 title="Delete Page"
                             />
@@ -136,7 +137,7 @@ const CreateNodeModal = ({
             ]}
             modalTitle={`${node ? "Editing" : "Creating New"} Page`}
         >
-            {pictureField ? (
+            {node.pictureURL ? (
                 <div
                     style={{
                         borderWidth: 1,
@@ -148,21 +149,21 @@ const CreateNodeModal = ({
                 >
                     <img
                         alt="This text shouldnt be showing!"
-                        src={pictureField}
+                        src={node.pictureURL}
                         style={{
                             padding: 1,
                             borderRadius: 8,
                         }}
                     />
-                    <CloseButton
+                    {/* <CloseButton
                         onClick={() => {
                             setPictureField("");
                             setShouldHide(false);
                         }}
-                    />
+                    /> */}
                 </div>
             ) : null}
-            <div
+            {/* <div
                 style={{
                     flexDirection: "row",
                     justifyContent: "space-between",
@@ -178,13 +179,13 @@ const CreateNodeModal = ({
                         ? "(Use existing picture)"
                         : "(Use new picture)"}
                 </span>
-            </div>
-            <CrowdventureButton
+            </div> */}
+            {/* <CrowdventureButton
                 onClick={() => setShowImageSearch(!showImageSearch)}
             >
                 {pictureField ? "Change" : "Select"} Picture
-            </CrowdventureButton>
-            {showImageSearch ? (
+            </CrowdventureButton> */}
+            {/* {showImageSearch ? (
                 <>
                     <br />
                     <ImageSearch
@@ -196,16 +197,14 @@ const CreateNodeModal = ({
                         }}
                     />
                 </>
-            ) : null}
+            ) : null} */}
             <hr />
-            Title:
-            <CrowdventureTextInput onChangeText={setTitle} value={title} />
-            Content:
-            <CrowdventureTextInput
-                onChangeText={setContent}
-                rows={3}
-                value={content}
-            />
+            <div style={{ gap: 5 }}>
+                Title:
+                <CrowdventureTextInput value={title} />
+                Content:
+                <CrowdventureTextInput rows={3} value={content} />
+            </div>
             {node && user?.isAdmin ? (
                 <>
                     <hr />
@@ -213,19 +212,18 @@ const CreateNodeModal = ({
                     <CrowdventureCheckboxInput
                         checked={hidden}
                         label="Page should be hidden"
-                        onChange={setHidden}
-                        style={{ marginBottom: 10 }}
+                        style={{ marginTop: 10 }}
                     />
                 </>
             ) : null}
             {info || ""}
-            {shouldHide ? (
+            {/* {shouldHide ? (
                 <span style={{ color: "red" }}>
                     The image chosen will cause the page to automatically be
                     hidden. If you would like to not have this happen, change or
                     remove the image.
                 </span>
-            ) : null}
+            ) : null} */}
         </CrowdventureModal>
     );
 };

@@ -65,3 +65,13 @@ export const useDebouncedEffect = (func, dependencies) => {
     const debouncedFunc = useDebounce(func);
     useEffect(debouncedFunc, dependencies);
 };
+
+export const useStatelessValue = (initialValue) => {
+    const ref = useRef();
+    return {
+        getValue: () => ref.current.value,
+        type: "statelessValue",
+        ref,
+        initialValue,
+    };
+};

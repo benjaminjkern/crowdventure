@@ -117,7 +117,6 @@ const NodePage = ({ node: initNode }) => {
                         }}
                     >
                         <CrowdventureButton
-                            // Should be off to the side
                             onClick={() => {
                                 router.back();
                             }}
@@ -166,7 +165,25 @@ const NodePage = ({ node: initNode }) => {
                     </div>
                 </div>
             ) : null}
-            <div style={{ flex: 2, paddingLeft: isMobile ? 0 : 50 }}>
+            <div
+                style={{
+                    flex: 2,
+                    paddingLeft: !node.pictureURL || isMobile ? 0 : 50,
+                }}
+            >
+                {!node.pictureURL && (
+                    <CrowdventureButton
+                        // Should be off to the side
+                        onClick={() => {
+                            router.back();
+                        }}
+                        style={{
+                            width: "fit-content",
+                        }}
+                    >
+                        Go back!
+                    </CrowdventureButton>
+                )}
                 <NodeSidebar node={node} setNode={setNode} />
             </div>
         </div>
