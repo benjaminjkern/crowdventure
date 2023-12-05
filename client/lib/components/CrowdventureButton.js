@@ -11,13 +11,25 @@ const CrowdventureButton = ({
     requireSignedIn,
     onClick,
     href,
+    disabled,
     ...props
 }) => {
     const { user } = useContext(UserContext);
-    const { rootColor, errorColor } = useContext(PaletteContext);
+    const { rootColor, errorColor, grayColor } = useContext(PaletteContext);
 
-    const darkColor = category === "error" ? errorColor[0] : rootColor[0];
-    const lightColor = category === "error" ? errorColor[1] : rootColor[1];
+    // The value that is actually used
+    const isDisabled = disabled || (requireSignedIn && !user);
+
+    const darkColor = isDisabled
+        ? grayColor[0]
+        : category === "error"
+        ? errorColor[0]
+        : rootColor[0];
+    const lightColor = isDisabled
+        ? grayColor[1]
+        : category === "error"
+        ? errorColor[1]
+        : rootColor[1];
 
     if (buttonType === "text")
         return (
@@ -34,7 +46,7 @@ const CrowdventureButton = ({
 
     const button = (
         <button
-            disabled={requireSignedIn ? !user : null}
+            disabled={isDisabled}
             onClick={onClick}
             style={{
                 border: `1px solid ${darkColor}`,
@@ -43,7 +55,7 @@ const CrowdventureButton = ({
                 backgroundColor: lightColor,
                 color: "white",
                 width: "100%",
-                cursor: (!requireSignedIn || user) && "pointer",
+                cursor: isDisabled ? null : "pointer",
                 ...style,
             }}
             {...attachStyleListener("hover", {

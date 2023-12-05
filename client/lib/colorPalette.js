@@ -18,6 +18,7 @@ const getPalette = (unsafeMode) => ({
         ? ["rgb(34,34,34)", "rgb(41,41,41)", "rgb(50,50,50)"]
         : ["white", "white", "white"],
     lightBackgroundColor: unsafeMode ? "rgb(60,60,70)" : "rgb(230,240,255)",
+    grayColor: ["#777", "#888", "#999"],
 });
 
 const PaletteProvider = ({ children }) => {

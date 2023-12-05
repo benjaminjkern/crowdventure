@@ -65,12 +65,13 @@ const AccountPage = ({ account: initAccount }) => {
                         //     />
                         // );
                     }}
+                    style={{ marginTop: 10 }}
                 >
                     Create a New Adventure!
                 </CrowdventureButton>
             ) : null}
 
-            <div style={{ alignItems: "flex-end" }}>
+            <div style={{ alignItems: "flex-end", marginTop: 10 }}>
                 Total views: {account.totalNodeViews} Total score:{" "}
                 {account.totalSuggestionScore}
             </div>

@@ -7,6 +7,7 @@ import CrowdventureButton from "../components/CrowdventureButton";
 import MessageModal from "./MessageModal";
 import EditAccountModal from "./EditAccountModal";
 import { mutationCall } from "../apiUtils";
+import ParagraphText from "../components/ParagraphText";
 
 const AccountHeader = ({ account, setAccount }) => {
     const openModal = useContext(ModalContext);
@@ -32,7 +33,7 @@ const AccountHeader = ({ account, setAccount }) => {
     const loggedInAsThisUser = user?.screenName === account.screenName;
     return (
         <div style={{ flexDirection: "row" }}>
-            <div style={{ flex: 3 }}>
+            <div style={{ flex: 3, gap: 10 }}>
                 <AccountPreview
                     account={account}
                     onClickImage={() => {
@@ -49,11 +50,7 @@ const AccountHeader = ({ account, setAccount }) => {
                     scale={3}
                 />
 
-                {account.bio?.split("\n").map((line, i) => (
-                    <span key={i} style={{ textIndent: "5%" }}>
-                        {line}
-                    </span>
-                ))}
+                <ParagraphText text={account.bio} />
             </div>
             <div style={{ flex: 1, gap: 5 }}>
                 {loggedInAsThisUser ? (

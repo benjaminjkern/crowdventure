@@ -8,6 +8,7 @@ import ActionCard from "../actions/ActionCard";
 import ChoiceModal from "../actions/ChoiceModal";
 import { PaletteContext } from "../colorPalette";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
+import ParagraphText from "../components/ParagraphText";
 
 const NodeSidebar = ({ node, setNode }) => {
     const { user } = useContext(UserContext);
@@ -48,18 +49,8 @@ const NodeSidebar = ({ node, setNode }) => {
                     {node.title}
                 </h1>
 
-                {node.content.split("\n").map((line, i) => (
-                    <div
-                        key={i}
-                        style={{
-                            // justifyContent: ''
-                            textAlign: "justify",
-                            textIndent: "5%",
-                        }}
-                    >
-                        {line}
-                    </div>
-                ))}
+                <ParagraphText text={node.content} />
+
                 {node.canonChoices.length === 0 && (
                     <span style={{ color: mutedTextColor }}>
                         By decree of {node.owner.screenName}, this journey ends

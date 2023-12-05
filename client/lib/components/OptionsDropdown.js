@@ -39,6 +39,7 @@ const OptionsDropdown = ({ dropdownOptions, dropdownStyle = {} }) => {
                         color: backgroundColor[0],
                         width: 200,
                         right: "100%",
+                        zIndex: 2,
                     }}
                 >
                     {dropdownOptions.map(
@@ -46,15 +47,18 @@ const OptionsDropdown = ({ dropdownOptions, dropdownStyle = {} }) => {
                             { active = true, disabled = false, onClick, text },
                             i
                         ) =>
-                            active && (
+                            active &&
+                            (text || onClick ? (
                                 <CrowdventureButton
-                                    disabled={disabled}
+                                    disabled={disabled || !onClick}
                                     key={i}
                                     onClick={onClick}
                                 >
                                     {text}
                                 </CrowdventureButton>
-                            )
+                            ) : (
+                                <hr />
+                            ))
                     )}
                 </div>
             </div>
