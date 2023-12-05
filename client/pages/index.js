@@ -41,10 +41,10 @@ const HomePage = ({ topNodes: initTopNodes, recentNodes: initRecentNodes }) => {
     }, [unsafeMode]);
 
     useEffect(() => {
-        queryCall("recentlyUpdatedNodes", NODE_PREVIEW_GQL, {
-            pageNum: page,
-            allowHidden: unsafeMode,
-        }).then(setRecentNodes);
+        // queryCall("recentlyUpdatedNodes", NODE_PREVIEW_GQL, {
+        //     pageNum: page,
+        //     allowHidden: unsafeMode,
+        // }).then(setRecentNodes);
     }, [unsafeMode, page]);
 
     const goToRandomNode = () => {
@@ -103,14 +103,15 @@ export const getStaticProps = async () => {
             topNodes: await queryCall("featuredNodes", NODE_PREVIEW_GQL, {
                 allowHidden: unsafeMode,
             }),
-            recentNodes: await queryCall(
-                "recentlyUpdatedNodes",
-                NODE_PREVIEW_GQL,
-                {
-                    pageNum: page,
-                    allowHidden: unsafeMode,
-                }
-            ),
+            // recentNodes: await queryCall(
+            //     "recentlyUpdatedNodes",
+            //     NODE_PREVIEW_GQL,
+            //     {
+            //         pageNum: page,
+            //         allowHidden: unsafeMode,
+            //     }
+            // ),
+            recentNodes: [],
         },
     };
 };

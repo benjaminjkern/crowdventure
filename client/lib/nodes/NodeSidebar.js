@@ -36,7 +36,7 @@ const NodeSidebar = ({ node, setNode }) => {
 
     const loggedInAsOwner = node.owner.screenName === user?.screenName;
     return (
-        <div style={{ paddingInline: 10 }}>
+        <div>
             <div
                 style={{
                     gap: 20,

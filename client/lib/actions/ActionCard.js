@@ -237,7 +237,7 @@ const ActionCard = ({ choice: initChoice }) => {
                 like={like}
                 liked={choice.liked}
             />
-            <span style={{ gap: 5 }}>
+            <span style={{ gap: 5, marginTop: 5 }}>
                 Suggested By:{" "}
                 <AccountPreview account={choice.suggestedBy} scale={3 / 4} />
             </span>

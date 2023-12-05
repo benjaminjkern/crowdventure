@@ -11,31 +11,17 @@ export const graphqlClient = new ApolloClient({
     cache: new InMemoryCache(),
 });
 
-const gqlCall = (gqlType, callName, parameters = {}, variables = {}) => {
-    const useVariables = scrubVariables(variables);
-    const call = `${gqlType}${formatVariables(useVariables)} {
-    ${callName}${formatArguments(useVariables)}${formatParameters(parameters)}
-}`;
-    if (DEBUG_CALLS) console.log(call, variables);
-
-    // This is just cuz graphql is dumb and likes to have a bunch of redundent call names
-    const gqlClientCallName = gqlType === "mutation" ? "mutate" : gqlType;
-
-    return graphqlClient[gqlClientCallName]({
-        [gqlType]: gql`
-            ${call}
-        `,
-        variables: useVariables,
-        fetchPolicy: "network-only",
-    })
-        .then(({ data, error }) => {
-            if (error) throw error;
-            return data[callName];
-        })
-        .catch((err) => {
-            console.error(err);
-            throw err;
-        });
+const guessType = (variableValue) => {
+    switch (typeof variableValue) {
+        case "boolean":
+            return "Boolean!";
+        case "number":
+            if (variableValue % 1 === 0) return "Int!";
+            return "Float!";
+        case "string":
+            return "String!";
+    }
+    throw `Could not find a good variable match for ${variableValue}`;
 };
 
 const formatVariables = (variables) => {
@@ -83,17 +69,31 @@ const scrubVariables = (variables) =>
         return { ...p, [varName]: variables[varName] };
     }, {});
 
-const guessType = (variableValue) => {
-    switch (typeof variableValue) {
-        case "boolean":
-            return "Boolean!";
-        case "number":
-            if (variableValue % 1 === 0) return "Int!";
-            return "Float!";
-        case "string":
-            return "String!";
-    }
-    throw `Could not find a good variable match for ${variableValue}`;
+const gqlCall = (gqlType, callName, parameters = {}, variables = {}) => {
+    const useVariables = scrubVariables(variables);
+    const call = `${gqlType}${formatVariables(useVariables)} {
+    ${callName}${formatArguments(useVariables)}${formatParameters(parameters)}
+}`;
+    if (DEBUG_CALLS) console.log(call, variables);
+
+    // This is just cuz graphql is dumb and likes to have a bunch of redundent call names
+    const gqlClientCallName = gqlType === "mutation" ? "mutate" : gqlType;
+
+    return graphqlClient[gqlClientCallName]({
+        [gqlType]: gql`
+            ${call}
+        `,
+        variables: useVariables,
+        fetchPolicy: "network-only",
+    })
+        .then(({ data, error }) => {
+            if (error) throw error;
+            return data[callName];
+        })
+        .catch((err) => {
+            console.error(err);
+            throw err;
+        });
 };
 
 export const queryCall = (callName, parameters, variables) =>

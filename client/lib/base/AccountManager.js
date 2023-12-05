@@ -20,7 +20,7 @@ const AccountManager = ({ wrapperStyle }) => {
     if (!user)
         return (
             <div style={{ alignItems: "center", marginInline: 20 }}>
-                You are not logged in.{" "}
+                You are not logged in.
                 <span style={{ gap: 5 }}>
                     <CrowdventureButton
                         buttonType="text"
@@ -75,10 +75,8 @@ const AccountManager = ({ wrapperStyle }) => {
                 scale={1.5}
                 style={{ color: textColor }}
             />
-            <div style={{ flexDirection: "row", marginTop: 5 }}>
-                <span style={{ color: mutedTextColor, marginRight: 5 }}>
-                    Unsafe Mode:
-                </span>
+            <div style={{ flexDirection: "row", marginTop: 5, gap: 5 }}>
+                <span style={{ color: mutedTextColor }}>Unsafe Mode:</span>
                 <CrowdventureSwitch
                     onChange={(checked) => {
                         setUnsafeMode(checked);
@@ -115,8 +113,9 @@ const AccountManager = ({ wrapperStyle }) => {
                             flagged as unsafe for the general public!
                         </span>
                     }
+                    tooltipStyle={{ top: "100%" }}
                 >
-                    {/* <span className="fa fa-info-circle" /> */}
+                    info{/* <span className="fa fa-info-circle" /> */}
                 </TooltipWrapper>
             </div>
         </div>

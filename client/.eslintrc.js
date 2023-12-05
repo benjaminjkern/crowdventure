@@ -80,6 +80,7 @@ module.exports = {
         "require-unicode-regexp": "off",
         "capitalized-comments": "off",
         "multiline-comment-style": "off",
+        "default-case": "off",
 
         /*
          * I would still like to have a warning for something like these

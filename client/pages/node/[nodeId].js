@@ -166,7 +166,7 @@ const NodePage = ({ node: initNode }) => {
                     </div>
                 </div>
             ) : null}
-            <div style={{ flex: 2 }}>
+            <div style={{ flex: 2, paddingLeft: isMobile ? 0 : 50 }}>
                 <NodeSidebar node={node} setNode={setNode} />
             </div>
         </div>
