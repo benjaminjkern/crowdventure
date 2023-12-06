@@ -69,7 +69,7 @@ const HomePage = ({ topNodes: initTopNodes, recentNodes: initRecentNodes }) => {
 
             <hr />
 
-            <h3>Recently added or updated:</h3>
+            {/* <h3>Recently added or updated:</h3>
             <NodeViewer nodes={recentNodes} />
 
             <hr />
@@ -81,7 +81,7 @@ const HomePage = ({ topNodes: initTopNodes, recentNodes: initRecentNodes }) => {
                 }}
             >
                 Next &gt;
-            </CrowdventureButton>
+            </CrowdventureButton> */}
 
             <CrowdventureButton
                 onClick={() => {

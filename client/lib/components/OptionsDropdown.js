@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import CrowdventureButton from "./CrowdventureButton";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import { PaletteContext } from "../colorPalette";
+import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
 
 const OptionsDropdown = ({
     dropdownOptions,
@@ -38,9 +39,11 @@ const OptionsDropdown = ({
                 ...wrapperStyle,
             }}
         >
-            <CrowdventureButton onClick={() => setOpen((newOpen) => !newOpen)}>
-                Gear
-            </CrowdventureButton>
+            <CrowdventureButton
+                buttonType="icon"
+                icon={faEllipsis}
+                onClick={() => setOpen((newOpen) => !newOpen)}
+            />
             <div
                 style={{
                     position: "absolute",
@@ -71,7 +74,7 @@ const OptionsDropdown = ({
                                 {text}
                             </CrowdventureButton>
                         ) : (
-                            <hr />
+                            <hr key={i} />
                         ))
                 )}
             </div>

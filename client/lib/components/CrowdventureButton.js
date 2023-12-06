@@ -1,8 +1,12 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 import { PaletteContext } from "../colorPalette";
 import { UserContext } from "../user";
 import Link from "next/link";
 import { attachStyleListener } from "../attachStyleListener";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+const DEFAULT_ICON_SIZE = 20;
+
 const CrowdventureButton = ({
     children,
     style,
@@ -12,10 +16,15 @@ const CrowdventureButton = ({
     onClick,
     href,
     disabled,
+    icon,
+    iconScale = 1,
     ...props
 }) => {
     const { user } = useContext(UserContext);
-    const { rootColor, errorColor, grayColor } = useContext(PaletteContext);
+    const { rootColor, errorColor, grayColor, backgroundColor } =
+        useContext(PaletteContext);
+
+    const ref = useRef();
 
     // The value that is actually used
     const isDisabled = disabled || (requireSignedIn && !user);
@@ -31,6 +40,44 @@ const CrowdventureButton = ({
         ? errorColor[1]
         : rootColor[1];
 
+    const commonStyle = {
+        cursor: isDisabled ? "default" : "pointer",
+        ...style,
+    };
+
+    if (buttonType === "icon")
+        return (
+            <span
+                onClick={onClick}
+                ref={ref}
+                style={{
+                    backgroundColor: lightColor,
+                    color: backgroundColor[2],
+                    width: DEFAULT_ICON_SIZE * iconScale,
+                    height: DEFAULT_ICON_SIZE * iconScale,
+                    borderRadius: DEFAULT_ICON_SIZE * iconScale,
+                    ...commonStyle,
+                }}
+                {...attachStyleListener(
+                    "hover",
+                    {
+                        backgroundColor: darkColor,
+                    },
+                    // Need ref because if button is inside of something else that has the event then it won't work
+                    () => ref.current
+                )}
+            >
+                <FontAwesomeIcon
+                    icon={icon}
+                    style={{
+                        width: (DEFAULT_ICON_SIZE - 2) * iconScale,
+                        height: (DEFAULT_ICON_SIZE - 2) * iconScale,
+                        pointerEvents: "none",
+                    }}
+                />
+            </span>
+        );
+
     if (buttonType === "text")
         return (
             <span
@@ -39,9 +86,8 @@ const CrowdventureButton = ({
                     textDecoration: isDisabled ? null : "underline",
                 })}
                 style={{
-                    cursor: isDisabled ? "default" : "pointer",
                     color: lightColor,
-                    ...style,
+                    ...commonStyle,
                 }}
             >
                 {children}
@@ -59,8 +105,7 @@ const CrowdventureButton = ({
                 backgroundColor: lightColor,
                 color: "white",
                 width: "100%",
-                cursor: isDisabled ? "default" : "pointer",
-                ...style,
+                ...commonStyle,
             }}
             {...attachStyleListener("hover", {
                 backgroundColor: darkColor,

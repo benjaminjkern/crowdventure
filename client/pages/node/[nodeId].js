@@ -133,7 +133,6 @@ const NodePage = ({ node: initNode }) => {
                         <Image
                             alt="Image failed to load."
                             fill
-                            objectFit="cover"
                             onClick={() => {
                                 openModal(
                                     <PictureModal
@@ -147,6 +146,7 @@ const NodePage = ({ node: initNode }) => {
                             }}
                             src={node.pictureURL}
                             style={{
+                                objectFit: "cover",
                                 marginLeft: "auto",
                                 marginRight: "auto",
                                 borderWidth: 1,

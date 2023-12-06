@@ -9,6 +9,8 @@ import SignUpModal from "../accounts/SignUpModal";
 import AccountPreview from "../accounts/AccountPreview";
 import CrowdventureSwitch from "../components/CrowdventureSwitch";
 import TooltipWrapper from "../components/TooltipWrapper";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 // import UnsafeModal from "./Modals/UnsafeModal";
 
 const AccountManager = ({ wrapperStyle }) => {
@@ -115,7 +117,10 @@ const AccountManager = ({ wrapperStyle }) => {
                     }
                     tooltipStyle={{ top: "100%" }}
                 >
-                    info{/* <span className="fa fa-info-circle" /> */}
+                    <FontAwesomeIcon
+                        icon={faInfoCircle}
+                        style={{ width: 15, height: 15 }}
+                    />
                 </TooltipWrapper>
             </div>
         </div>
