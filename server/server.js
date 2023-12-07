@@ -1,38 +1,17 @@
-/*
- * NOTE: If you want to run browser GraphQL playground,
- * use "apollo-server", otherwise use "apollo-server-lambda" because
- * that's what we're gonna be using for the final product anyways
- */
-
-const LOCAL = true;
-
-const { ApolloServer } = require(LOCAL
-    ? "apollo-server"
-    : "apollo-server-lambda");
-const SCHEMA = require("./schema.js");
-const RESOLVERS = require("./resolvers/resolvers.js");
+import { ApolloServer } from "@apollo/server";
+import { startStandaloneServer } from "@apollo/server/standalone";
+import typeDefs from "./typeDefs.js";
+import resolvers from "./resolvers.js";
 
 const server = new ApolloServer({
-    typeDefs: SCHEMA.typeDefs,
-    resolvers: RESOLVERS.resolvers,
-    context: LOCAL
-        ? undefined
-        : ({ event, context }) => ({
-              headers: event.headers,
-              functionName: context.functionName,
-              event,
-              context,
-          }),
-    playground: {
-        endpoint: "/dev/graphql",
-    },
+    typeDefs,
+    resolvers,
 });
 
-if (!LOCAL)
-    exports.graphqlHandler = server.createHandler({
-        cors: {
-            origin: "*",
-            credentials: true,
-        },
+(async () => {
+    const { url } = await startStandaloneServer(server, {
+        listen: { port: 4000 },
     });
-else server.listen("4000");
+
+    console.log(`🚀 Server listening at: ${url}`);
+})();

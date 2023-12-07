@@ -7,14 +7,8 @@
         "jest": true
     },
     "parserOptions": {
-        // "sourceType": "module",
+        "sourceType": "module",
         "ecmaVersion": "latest"
     },
     "extends": "eslint:recommended"
-    // "globals": {
-    //     "Atomics": "readonly",
-    //     "SharedArrayBuffer": "readonly"
-    // },
-    // "rules": {
-    // }
 }

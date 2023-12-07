@@ -2,24 +2,20 @@
     "name": "crowdventure_server",
     "version": "1.0.0",
     "description": "yeuh",
-    "main": "server.js",
     "author": "Ben Kern",
+    "type": "module",
     "license": "MIT",
     "repository": "https://github.com/benjaminjkern/crowdventure",
+    "scripts": {
+        "start": "nodemon server.js"
+    },
     "dependencies": {
-        "apollo-server": "^2.16.1",
-        "apollo-server-lambda": "^2.15.0",
-        "aws-sdk": "^2.703.0",
-        "cloudinary": "^1.22.0",
-        "color-thief-node": "^1.0.3",
-        "crypto-js": "^4.2.0",
-        "dotenv": "^8.2.0",
-        "graphql": "^16.8.1",
-        "graphql-type-long": "^0.1.1",
-        "graphql-upload": "^11.0.0"
+        "@apollo/server": "^4.9.5",
+        "graphql": "^16.8.1"
     },
     "devDependencies": {
         "eslint": "^7.12.1",
+        "nodemon": "^3.0.2",
         "prettier": "^2.8.1"
     }
 }
