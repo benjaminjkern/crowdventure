@@ -24,30 +24,27 @@ const CrowdventureCard = ({
 
     const BLURAMOUNT = 20;
 
-    const cardImage = useMemo(
-        () => (
-            <Image
-                alt="Something went wrong!"
-                fill
-                onError={(e) => {
-                    e.target.parentNode.style.display = "none";
+    const cardImage = (
+        <Image
+            alt="Something went wrong!"
+            fill
+            onError={(e) => {
+                e.target.parentNode.style.display = "none";
 
-                    onImageError();
-                }}
-                src={picture}
-                style={{
-                    objectFit: "cover",
-                    // Blur bad images
-                    ...(pictureUnsafe
-                        ? {
-                              "-webkit-filter": `blur(${BLURAMOUNT}px)`, // TODO: Pull blur out to a common style
-                              filter: `blur(${BLURAMOUNT}px)`,
-                          }
-                        : {}),
-                }}
-            />
-        ),
-        [onImageError, picture, pictureUnsafe]
+                onImageError();
+            }}
+            src={picture}
+            style={{
+                objectFit: "cover",
+                // Blur bad images
+                ...(pictureUnsafe
+                    ? {
+                          "-webkit-filter": `blur(${BLURAMOUNT}px)`, // TODO: Pull blur out to a common style
+                          filter: `blur(${BLURAMOUNT}px)`,
+                      }
+                    : {}),
+            }}
+        />
     );
 
     return (
