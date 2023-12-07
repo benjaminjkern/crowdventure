@@ -1,8 +1,10 @@
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 
 // THESE NEED TO BE HIDDEN BETTER
-const backendURL =
-    "https://3yfp7ejc0m.execute-api.us-east-1.amazonaws.com/dev/graphql";
+// const backendURL =
+//     "https://3yfp7ejc0m.execute-api.us-east-1.amazonaws.com/dev/graphql";
+
+const backendURL = "http://localhost:4000/";
 
 const DEBUG_CALLS = false;
 
@@ -21,7 +23,9 @@ const guessType = (variableValue) => {
         case "string":
             return "String!";
     }
-    throw `Could not find a good variable match for ${variableValue}`;
+    throw new Error(
+        `Could not find a good variable match for ${variableValue}`
+    );
 };
 
 const formatVariables = (variables) => {
@@ -91,7 +95,7 @@ const gqlCall = (gqlType, callName, parameters = {}, variables = {}) => {
             return data[callName];
         })
         .catch((err) => {
-            console.error(err);
+            console.error(err.networkError.result);
             throw err;
         });
 };

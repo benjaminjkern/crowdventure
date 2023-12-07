@@ -1,70 +1,74 @@
 export default `#graphql
-    # scalar GraphQLLong
+    scalar GraphQLLong
 
-    # type Account {
-    #     screenName: String!
-    #     dateCreated: String!
-    #     bio: String
-    #     profilePicURL: String
-    #     hidden: Boolean
-    #     isAdmin: Boolean
+    type Account {
+        screenName: String!
+        dateCreated: String!
+        bio: String
+        profilePicURL: String
+        hidden: Boolean
+        isAdmin: Boolean
 
-    #     nodes: [Node!]
-    #     suggestedChoices: [Choice!]
-    #     notifications: [Notification!]
+        # nodes: [Node!]
+        # suggestedChoices: [Choice!]
+        notifications: [Notification!] # TODO: Make this into a query
 
-    #     totalNodeViews: Int!
-    #     totalSuggestionScore: Int!
-    #     featuredNodes: [Node!]
-    # }
+        totalNodeViews: Int!
+        totalSuggestionScore: Int!
+        # featuredNodes: [Node!]
+    }
 
-    # type Notification {
-    #     time: GraphQLLong!
-    #     content: String!
-    #     link: String
-    #     seen: Boolean
-    # }
+    type Notification {
+        time: GraphQLLong!
+        content: String!
+        link: String
+        seen: Boolean! # TODO: Ensure always returned
 
-    # type Node {
-    #     ID: String!
-    #     title: String!
-    #     content: String!
-    #     dateCreated: String!
-    #     lastUpdated: GraphQLLong
-    #     pictureURL: String
-    #     pictureUnsafe: Boolean
-    #     bgColor: String
-    #     fgColor: String
-    #     featured: Boolean
-    #     hidden: Boolean
+        account: Account! # TODO: Make sure these are stored
+    }
 
-    #     owner: Account!
-    #     canonChoices: [Choice!]
-    #     nonCanonChoices: [Choice!]
-    #     allChoices: [Choice!]
-    #     parents: [Node!]
+    type Node {
+        ID: String!
+        title: String!
+        content: String!
+        dateCreated: String!
+        lastUpdated: GraphQLLong
+        pictureURL: String
+        pictureUnsafe: Boolean
+        bgColor: String
+        fgColor: String
+        featured: Boolean
+        hidden: Boolean
 
-    #     views: Int!
-    #     size: Int!
-    # }
+        owner: Account!
+        # canonChoices: [Choice!]
+        # nonCanonChoices: [Choice!]
+        # parents: [Node!]
 
-    # type Choice {
-    #     ID: String!
-    #     action: String!
-    #     dateCreated: String!
-    #     hidden: Boolean
+        allChoices: [Choice!]
 
-    #     likedBy: [Account!]
-    #     dislikedBy: [Account!]
+        views: Int!
+        # size: Int!
+    }
 
-    #     from: Node!
-    #     to: Node
-    #     suggestedBy: Account!
+    type Choice {
+        ID: String!
+        action: String!
+        dateCreated: String!
+        hidden: Boolean! # TODO: Make sure this is always available
+        isCanon: Boolean! # TODO: Migrate this
 
-    #     likes: Int!
-    #     dislikes: Int!
-    #     score: Int!
-    # }
+        # likedBy: [Account!]
+        # dislikedBy: [Account!] # TODO: Put this as a query
+
+        from: Node!
+        to: Node
+        suggestedBy: Account!
+
+        likes: Int!
+        dislikes: Int!
+        score: Int!
+    }
 
     # type Feedback {
     #     ID: String!
@@ -76,124 +80,116 @@ export default `#graphql
     # }
 
     type Query {
-        test: String
-        # allAccounts: [Account!]
-        # allNodes: [Node!]
-        # allChoices: [Choice!]
-        # allFeedback: [Feedback!]
+        featuredNodes(allowHidden: Boolean, count: Int): [Node!]
+        recentlyUpdatedNodes(
+            allowHidden: Boolean
+            pageSize: Int
+            pageNum: Int
+        ): [Node!]
+        randomNode(allowHidden: Boolean, chooseFromLast: Int): Node!
 
-        # featuredNodes(allowHidden: Boolean, count: Int): [Node!]
-        # recentlyUpdatedNodes(
-        #     allowHidden: Boolean
-        #     pageSize: Int
-        #     pageNum: Int
-        # ): [Node!]
-        # randomNode(allowHidden: Boolean, chooseFromLast: Int): Node!
-
-        # getAccount(screenName: String!): Account
-        # getNode(ID: String!): Node
-        # getChoice(ID: String!): Choice
-
-        # searchAccounts(type: String!, query: String!): [Account!]
-        # searchNodes(type: String!, query: String!): [Node!]
-        # searchChoices(type: String!, query: String!): [Choice!]
+        getAccount(screenName: String!): Account
+        getNode(ID: String!): Node
     }
 
-    # type Mutation {
-    #     createAccount(screenName: String!, password: String!): Account
-    #     deleteAccount(screenName: String!): Boolean
-    #     editAccount(
-    #         screenName: String!
-    #         newPassword: String
-    #         bio: String
-    #         profilePicURL: String
-    #         newScreenName: String
-    #         hidden: Boolean
-    #         isAdmin: Boolean
-    #     ): Account
-    #     loginAccount(screenName: String!, password: String): Account
+    type Mutation {
 
-    #     createNode(
-    #         accountScreenName: String!
-    #         title: String!
-    #         content: String!
-    #         pictureURL: String
-    #         bgColor: String
-    #         fgColor: String
-    #         featured: Boolean
-    #         hidden: Boolean
-    #         pictureUnsafe: Boolean
-    #     ): Node
-    #     deleteNode(nodeID: String!): Boolean
-    #     editNode(
-    #         nodeID: String!
-    #         title: String
-    #         content: String
-    #         pictureURL: String
-    #         bgColor: String
-    #         fgColor: String
-    #         featured: Boolean
-    #         hidden: Boolean
-    #         pictureUnsafe: Boolean
-    #     ): Node
+        loginAccount(screenName: String!, password: String): Account
 
-    #     suggestChoice(
-    #         accountScreenName: String!
-    #         fromID: String!
-    #         action: String!
-    #         toID: String!
-    #     ): Choice
-    #     editSuggestion(
-    #         choiceID: String!
-    #         action: String
-    #         toID: String
-    #         hidden: Boolean # isCanon: Boolean
-    #     ): Choice
-    #     removeSuggestion(choiceID: String!): Boolean
+        createAccount(screenName: String!, password: String!): Account
+        deleteAccount(screenName: String!): Boolean
+        editAccount(
+            screenName: String!
+            newPassword: String
+            bio: String
+            profilePicURL: String
+            # newScreenName: String # TODO Add this back in
+            hidden: Boolean
+            isAdmin: Boolean
+        ): Account
 
-    #     # REMOVE
-    #     makeCanon(choiceID: String!): Choice
-    #     makeNonCanon(choiceID: String!): Choice
+        createNode(
+            accountScreenName: String!
+            title: String!
+            content: String!
+            pictureURL: String
+            bgColor: String
+            fgColor: String
+            featured: Boolean
+            hidden: Boolean
+            pictureUnsafe: Boolean
+        ): Node
+        deleteNode(nodeID: String!): Boolean
+        editNode(
+            nodeID: String!
+            title: String
+            content: String
+            pictureURL: String
+            bgColor: String
+            fgColor: String
+            featured: Boolean
+            hidden: Boolean
+            pictureUnsafe: Boolean
+        ): Node
 
-    #     # likeSuggestion(
-    #     #     accountScreenName: String!
-    #     #     choiceID: String!
-    #     #     like: Boolean!
-    #     # ): Choice
-    #     likeSuggestion(accountScreenName: String!, choiceID: String!): Choice
-    #     dislikeSuggestion(accountScreenName: String!, choiceID: String!): Choice
+        suggestChoice(
+            accountScreenName: String!
+            fromID: String!
+            action: String!
+            toID: String!
+        ): Choice
+        editSuggestion(
+            choiceID: String!
+            action: String
+            toID: String
+            hidden: Boolean
+            isCanon: Boolean
+        ): Choice
+        removeSuggestion(choiceID: String!): Boolean
 
-    #     createFeedback(
-    #         accountScreenName: String
-    #         reportingObjectType: String
-    #         reportingObjectID: String
-    #         info: String!
-    #     ): Feedback
-    #     removeFeedback(feedbackID: String!): Boolean
-    #     # removeAllFeedback(
-    #     #     accountScreenName: String
-    #     #     reportingObjectType: String
-    #     #     reportingObjectID: String
-    #     #     info: String
-    #     # ): Boolean
+        # REMOVE
+        # makeCanon(choiceID: String!): Choice
+        # makeNonCanon(choiceID: String!): Choice
 
-    #     createNotification(
-    #         accountScreenName: String!
-    #         content: String!
-    #         link: String
-    #     ): Notification!
-    #     # seeNotification(notificationID: String!, force: Boolean): Boolean
-    #     # removeNotification(notificationID: String!): Boolean
-    #     seeNotification(
-    #         accountScreenName: String!
-    #         index: Int!
-    #         force: Boolean
-    #     ): Boolean
-    #     removeNotification(accountScreenName: String!, index: Int!): Boolean
+        # likeSuggestion(
+        #     accountScreenName: String!
+        #     choiceID: String!
+        #     like: Boolean!
+        # ): Choice
+        # likeSuggestion(accountScreenName: String!, choiceID: String!): Choice
+        # dislikeSuggestion(accountScreenName: String!, choiceID: String!): Choice
 
-    #     clearNotifications(
-    #         accountScreenName: String!
-    #         onlyClearSeen: Boolean
-    #     ): Boolean
-    # }
+        # createFeedback(
+        #     accountScreenName: String
+        #     reportingObjectType: String
+        #     reportingObjectID: String
+        #     info: String!
+        # ): Feedback
+        # removeFeedback(feedbackID: String!): Boolean
+        # removeAllFeedback(
+        #     accountScreenName: String
+        #     reportingObjectType: String
+        #     reportingObjectID: String
+        #     info: String
+        # ): Boolean
+
+        # createNotification(
+        #     accountScreenName: String!
+        #     content: String!
+        #     link: String
+        # ): Notification!
+        # seeNotification(notificationID: String!, force: Boolean): Boolean
+        # removeNotification(notificationID: String!): Boolean
+        # seeNotification(
+        #     accountScreenName: String!
+        #     index: Int!
+        #     force: Boolean
+        # ): Boolean
+        # removeNotification(accountScreenName: String!, index: Int!): Boolean
+
+        # clearNotifications(
+        #     accountScreenName: String!
+        #     onlyClearSeen: Boolean
+        # ): Boolean
+    }
 `;

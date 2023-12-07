@@ -11,6 +11,9 @@ const server = new ApolloServer({
 (async () => {
     const { url } = await startStandaloneServer(server, {
         listen: { port: 4000 },
+        context: ({ req }) => {
+            return { headers: req.headers };
+        },
     });
 
     console.log(`🚀 Server listening at: ${url}`);

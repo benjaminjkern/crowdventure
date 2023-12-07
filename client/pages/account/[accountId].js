@@ -128,8 +128,8 @@ export const FULL_ACCOUNT_GQL = {
     totalSuggestionScore: 0,
     hidden: 0,
     isAdmin: 0,
-    featuredNodes: NODE_PREVIEW_GQL,
-    nodes: NODE_PREVIEW_GQL,
+    // featuredNodes: NODE_PREVIEW_GQL,
+    // nodes: NODE_PREVIEW_GQL,
     notifications: {
         time: 0,
         seen: 0,

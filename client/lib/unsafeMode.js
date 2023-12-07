@@ -18,14 +18,14 @@ const UnsafeModeProvider = ({ children }) => {
 
     useEffect(() => {
         setUnsafeModeReal(
-            user && localStorage.getItem("unsafeMode") === "true"
+            user ? localStorage.getItem("unsafeMode") === "true" : false
         );
     }, [user]);
 
     const setUnsafeMode = useCallback(
         (value) => {
             localStorage.setItem("unsafeMode", String(Boolean(value)));
-            setUnsafeModeReal(user && Boolean(value));
+            setUnsafeModeReal(user ? Boolean(value) : false);
         },
         [user]
     );

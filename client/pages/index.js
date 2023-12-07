@@ -17,7 +17,6 @@ export const NODE_PREVIEW_GQL = {
         profilePicURL: 0,
     },
     views: 0,
-    size: 0,
     pictureURL: 0,
     pictureUnsafe: 0,
     // These arent really used here but are on the account page

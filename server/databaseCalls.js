@@ -2,7 +2,7 @@
 // const NODES = require("./mock-data/mockNodes.js").MOCK_NODES;
 // const CHOICES = require("./mock-data/mockChoices.js").MOCK_CHOICES;
 
-const AWS = require("aws-sdk");
+import AWS from "aws-sdk";
 
 AWS.config.update({ region: "us-east-1" });
 const docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
@@ -451,4 +451,4 @@ const filterVisible = async (tableName, arg, value) =>
               })
         : [];
 
-module.exports = { databaseCalls };
+export default databaseCalls;
