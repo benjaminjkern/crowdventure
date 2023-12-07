@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { mutationCall } from "../apiUtils";
 import { PaletteContext } from "../colorPalette";
 import CloseButton from "../components/CloseButton";
@@ -7,20 +7,23 @@ import EventListener from "../components/EventListener";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import Link from "next/link";
 import NotificationButton from "./NotificationButton";
+import { useDebounce } from "../hooks";
 
-const CrowdventureNotification = ({ notification, idx }) => {
+const CrowdventureNotification = ({
+    notification,
+    idx,
+    deleteNotification = () => {},
+    updateNotification = () => {},
+}) => {
     const { rootColor, backgroundColor, mutedTextColor } =
         useContext(PaletteContext);
-    const { user, setUser } = useContext(UserContext);
+    const { user } = useContext(UserContext);
 
-    const seeNotification = (setSeen) => {
-        if (notification.seen === setSeen) return;
+    const [seen, setSeen] = useState(notification.seen);
 
+    const sendSeeNotificationRequest = useDebounce((newSeen) => {
+        if (newSeen === notification.seen) return;
         const originalSeen = notification.seen;
-        notification.seen = setSeen;
-        setUser({
-            ...user,
-        });
         mutationCall(
             "seeNotification",
             {},
@@ -28,13 +31,20 @@ const CrowdventureNotification = ({ notification, idx }) => {
                 accountScreenName: user.screenName,
                 index: idx,
             }
-        ).catch((error) => {
-            console.error(error);
-            notification.seen = originalSeen;
-            setUser({
-                ...user,
+        )
+            .then(() => {
+                updateNotification(newSeen);
+            })
+            .catch((error) => {
+                console.error(error);
+                updateNotification(originalSeen);
+                setSeen(originalSeen);
             });
-        });
+    });
+
+    const seeNotification = (newSeen) => {
+        setSeen(newSeen);
+        sendSeeNotificationRequest(newSeen);
     };
 
     return (
@@ -78,36 +88,14 @@ const CrowdventureNotification = ({ notification, idx }) => {
                     </Link>
                 )}
             </EventListener>
+            {/* These are hovering over the link so that they don't interfere with it with styles or events*/}
             <NotificationButton
-                onClick={() => seeNotification(!notification.seen)}
-                seen={notification.seen}
+                onClick={() => seeNotification(!seen)}
+                seen={seen}
                 style={{ position: "absolute", left: 10, top: 10 }}
             />
             <CloseButton
-                onClick={() => {
-                    const oldNotifs = user.notifications;
-
-                    const newNotifs = user.notifications.filter(
-                        (notif, i) => i !== idx
-                    );
-                    setUser({
-                        ...user,
-                        notifications: newNotifs,
-                    });
-                    mutationCall(
-                        "removeNotification",
-                        {},
-                        {
-                            accountScreenName: user.screenName,
-                            index: idx,
-                        }
-                    ).catch(() => {
-                        setUser({
-                            ...user,
-                            notification: oldNotifs,
-                        });
-                    });
-                }}
+                onClick={() => deleteNotification()}
                 style={{ position: "absolute", right: 10, top: 10 }}
             />
         </div>
