@@ -3,7 +3,7 @@ import { PaletteContext } from "../colorPalette";
 import { UserContext } from "../user";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useStyleListener } from "../hooks";
+import EventListener from "./EventListener";
 
 const DEFAULT_ICON_SIZE = 20;
 
@@ -43,42 +43,42 @@ const CrowdventureButton = ({
         ...style,
     };
 
-    const backgroundHoverListener = useStyleListener("hover", {
-        backgroundColor: darkColor,
-    });
-
     if (buttonType === "icon")
         return (
-            <span
-                onClick={onClick}
-                style={{
-                    backgroundColor: lightColor,
-                    color: backgroundColor[2],
-                    width: DEFAULT_ICON_SIZE * iconScale,
-                    height: DEFAULT_ICON_SIZE * iconScale,
-                    borderRadius: DEFAULT_ICON_SIZE * iconScale,
-                    ...commonStyle,
-                }}
-                {...backgroundHoverListener}
-            >
-                <FontAwesomeIcon
-                    icon={icon}
-                    style={{
-                        width: (DEFAULT_ICON_SIZE - 2) * iconScale,
-                        height: (DEFAULT_ICON_SIZE - 2) * iconScale,
-                        pointerEvents: "none",
-                    }}
-                />
-            </span>
+            <EventListener event="hover">
+                {([hover, hoverListener]) => (
+                    <span
+                        onClick={onClick}
+                        style={{
+                            backgroundColor: hover ? darkColor : lightColor,
+                            color: backgroundColor[2],
+                            width: DEFAULT_ICON_SIZE * iconScale,
+                            height: DEFAULT_ICON_SIZE * iconScale,
+                            borderRadius: DEFAULT_ICON_SIZE * iconScale,
+                            ...commonStyle,
+                        }}
+                        {...hoverListener}
+                    >
+                        <FontAwesomeIcon
+                            icon={icon}
+                            style={{
+                                width: (DEFAULT_ICON_SIZE - 2) * iconScale,
+                                height: (DEFAULT_ICON_SIZE - 2) * iconScale,
+                                pointerEvents: "none",
+                            }}
+                        />
+                    </span>
+                )}
+            </EventListener>
         );
 
     if (buttonType === "text")
         return (
-            <EventListener eventType="hover">
-                {(hover, elementRef) => (
+            <EventListener event="hover">
+                {([hover, hoverListener]) => (
                     <span
                         onClick={onClick}
-                        ref={elementRef}
+                        {...hoverListener}
                         style={{
                             color: lightColor,
                             textDecoration:
@@ -93,23 +93,27 @@ const CrowdventureButton = ({
         );
 
     const button = (
-        <button
-            disabled={isDisabled}
-            onClick={onClick}
-            style={{
-                border: `1px solid ${darkColor}`,
-                padding: 5,
-                borderRadius: 5,
-                backgroundColor: lightColor,
-                color: "white",
-                width: "100%",
-                ...commonStyle,
-            }}
-            {...backgroundHoverListener}
-            {...props}
-        >
-            {children}
-        </button>
+        <EventListener event="hover">
+            {([hover, hoverListener]) => (
+                <button
+                    disabled={isDisabled}
+                    onClick={onClick}
+                    style={{
+                        border: `1px solid ${darkColor}`,
+                        padding: 5,
+                        borderRadius: 5,
+                        backgroundColor: hover ? darkColor : lightColor,
+                        color: "white",
+                        width: "100%",
+                        ...commonStyle,
+                    }}
+                    {...hoverListener}
+                    {...props}
+                >
+                    {children}
+                </button>
+            )}
+        </EventListener>
     );
     if (!href) return button;
 
