@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { PaletteContext } from "../colorPalette";
 import OptionsDropdown from "./OptionsDropdown";
 import TooltipWrapper from "./TooltipWrapper";
@@ -23,6 +23,32 @@ const CrowdventureCard = ({
         useContext(PaletteContext);
 
     const BLURAMOUNT = 20;
+
+    const cardImage = useMemo(
+        () => (
+            <Image
+                alt="Something went wrong!"
+                fill
+                onError={(e) => {
+                    e.target.parentNode.style.display = "none";
+
+                    onImageError();
+                }}
+                src={picture}
+                style={{
+                    objectFit: "cover",
+                    // Blur bad images
+                    ...(pictureUnsafe
+                        ? {
+                              "-webkit-filter": `blur(${BLURAMOUNT}px)`, // TODO: Pull blur out to a common style
+                              filter: `blur(${BLURAMOUNT}px)`,
+                          }
+                        : {}),
+                }}
+            />
+        ),
+        [onImageError, picture, pictureUnsafe]
+    );
 
     return (
         <EventListener event="hover">
@@ -64,27 +90,7 @@ const CrowdventureCard = ({
                                             aspectRatio: 16 / 9,
                                         }}
                                     >
-                                        <Image
-                                            alt="Something went wrong!"
-                                            fill
-                                            onError={(e) => {
-                                                e.target.parentNode.style.display =
-                                                    "none";
-
-                                                onImageError();
-                                            }}
-                                            src={picture}
-                                            style={{
-                                                objectFit: "cover",
-                                                // Blur bad images
-                                                ...(pictureUnsafe
-                                                    ? {
-                                                          "-webkit-filter": `blur(${BLURAMOUNT}px)`,
-                                                          filter: `blur(${BLURAMOUNT}px)`,
-                                                      }
-                                                    : {}),
-                                            }}
-                                        />
+                                        {cardImage}
                                     </div>
                                 ) : null}
                                 <div
