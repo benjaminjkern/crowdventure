@@ -1,9 +1,9 @@
-import React, { useContext, useRef } from "react";
+import React, { useContext } from "react";
 import { PaletteContext } from "../colorPalette";
 import { UserContext } from "../user";
 import Link from "next/link";
-import { attachStyleListener } from "../attachStyleListener";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useStyleListener } from "../hooks";
 
 const DEFAULT_ICON_SIZE = 20;
 
@@ -24,8 +24,6 @@ const CrowdventureButton = ({
     const { rootColor, errorColor, grayColor, backgroundColor } =
         useContext(PaletteContext);
 
-    const ref = useRef();
-
     // The value that is actually used
     const isDisabled = disabled || (requireSignedIn && !user);
 
@@ -45,11 +43,14 @@ const CrowdventureButton = ({
         ...style,
     };
 
+    const backgroundHoverListener = useStyleListener("hover", {
+        backgroundColor: darkColor,
+    });
+
     if (buttonType === "icon")
         return (
             <span
                 onClick={onClick}
-                ref={ref}
                 style={{
                     backgroundColor: lightColor,
                     color: backgroundColor[2],
@@ -58,14 +59,7 @@ const CrowdventureButton = ({
                     borderRadius: DEFAULT_ICON_SIZE * iconScale,
                     ...commonStyle,
                 }}
-                {...attachStyleListener(
-                    "hover",
-                    {
-                        backgroundColor: darkColor,
-                    },
-                    // Need ref because if button is inside of something else that has the event then it won't work
-                    () => ref.current
-                )}
+                {...backgroundHoverListener}
             >
                 <FontAwesomeIcon
                     icon={icon}
@@ -80,18 +74,22 @@ const CrowdventureButton = ({
 
     if (buttonType === "text")
         return (
-            <span
-                onClick={onClick}
-                {...attachStyleListener("hover", {
-                    textDecoration: isDisabled ? null : "underline",
-                })}
-                style={{
-                    color: lightColor,
-                    ...commonStyle,
-                }}
-            >
-                {children}
-            </span>
+            <EventListener eventType="hover">
+                {(hover, elementRef) => (
+                    <span
+                        onClick={onClick}
+                        ref={elementRef}
+                        style={{
+                            color: lightColor,
+                            textDecoration:
+                                hover && !isDisabled ? "underline" : null,
+                            ...commonStyle,
+                        }}
+                    >
+                        {children}
+                    </span>
+                )}
+            </EventListener>
         );
 
     const button = (
@@ -107,9 +105,7 @@ const CrowdventureButton = ({
                 width: "100%",
                 ...commonStyle,
             }}
-            {...attachStyleListener("hover", {
-                backgroundColor: darkColor,
-            })}
+            {...backgroundHoverListener}
             {...props}
         >
             {children}

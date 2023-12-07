@@ -5,6 +5,8 @@ import { splitIntoRows } from "../utils";
 import CrowdventureTextInput from "./CrowdventureTextInput";
 import TooltipWrapper from "./TooltipWrapper";
 import UnsafeImage from "./UnsafeImage";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faWarning } from "@fortawesome/free-solid-svg-icons";
 
 // Should hide this
 const BING_API_KEY = "8300cebe5f0d452a9ccb4bca67af4659";
@@ -171,28 +173,15 @@ const ImageSearch = ({ onSelectImage }) => {
                                                 </span>
                                             }
                                         >
-                                            <div
-                                                className="fa"
+                                            <FontAwesomeIcon
+                                                color="red"
+                                                icon={faWarning}
                                                 style={{
                                                     position: "absolute",
-                                                    top: "5px",
-                                                    left: "6.5px",
-                                                    color: "red",
-                                                    "-webkit-touch-callout":
-                                                        "none",
-                                                    "-webkit-user-select":
-                                                        "none",
-                                                    "-khtml-user-select":
-                                                        "none",
-                                                    "-moz-user-select": "none",
-                                                    "-ms-user-select": "none",
-                                                    "user-select": "none",
-                                                    "text-shadow":
-                                                        "0 0 1px black",
+                                                    top: 5,
+                                                    left: 5,
                                                 }}
-                                            >
-                                                &#xf056;
-                                            </div>
+                                            />
                                         </TooltipWrapper>
                                     )}
                                 </div>

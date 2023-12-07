@@ -1,16 +1,20 @@
+import React, { Fragment, useRef, useState } from "react";
+
+
 const getEventListeners = (event) => {
     if (event === "hover") return ["onMouseEnter", "onMouseLeave"];
     if (event === "focus") return ["onFocus", "onBlur"];
+    if (event === "mousedown") return ["onMouseDown", "onMouseUp"];
     throw new Error(`Unknown event! ${event}`);
 };
 
-export const attachStyleListener = (
-    event,
-    style,
-    getTarget = (e) => e.target
-) => {
+export const useStyleListener = (event, style, getTargetFunc) => {
+    const ref = useRef();
     const [onEventStart, onEventFinish] = getEventListeners(event);
+
+    const getTarget = getTargetFunc || (() => ref.current);
     return {
+        ref,
         [onEventStart]: (e) => {
             const target = getTarget(e);
             target.previousStyle = {};
@@ -26,3 +30,23 @@ export const attachStyleListener = (
         },
     };
 };
+
+export const attachLoadListener = () => ({
+    onLoad: (e) => {
+        console.log(e.target);
+    },
+});
+
+
+
+const EventListener = ({ eventType, children }) => {
+    const [value, setValue] = useState(false);
+
+    const ref = useRef();
+
+    const listeners = 
+
+    return <Fragment {...listeners}>{children(value, ref)}</Fragment>;
+};
+
+export default EventListener;

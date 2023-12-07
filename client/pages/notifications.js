@@ -11,14 +11,14 @@ const NotificationsPage = () => {
 
     useEffect(() => {
         if (user === null) router.push("/");
-    }, [user]);
+    }, [user, router]);
 
     if (!user) return <LoadingBox />;
 
     const unseen = user.notifications.filter((notif) => !notif.seen);
 
     return (
-        <div style={{ marginBottom: "3em" }}>
+        <div style={{ gap: 5 }}>
             <span>
                 You have {unseen.length} new notification
                 {unseen.length !== 1 ? "s" : ""}
@@ -32,12 +32,7 @@ const NotificationsPage = () => {
                 />
             ))}
 
-            <CrowdventureButton
-                className="float-right"
-                onClick={() => {
-                    router.push(`/account/${user.screenName}`);
-                }}
-            >
+            <CrowdventureButton href={`/account/${user.screenName}`}>
                 Back to account &gt;
             </CrowdventureButton>
         </div>
