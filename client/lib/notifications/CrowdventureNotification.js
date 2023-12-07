@@ -3,29 +3,33 @@ import { mutationCall } from "../apiUtils";
 import { PaletteContext } from "../colorPalette";
 import CloseButton from "../components/CloseButton";
 import { UserContext } from "../user";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faExclamation } from "@fortawesome/free-solid-svg-icons";
 import EventListener from "../components/EventListener";
+import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
+import Link from "next/link";
+import NotificationButton from "./NotificationButton";
 
 const CrowdventureNotification = ({ notification, idx }) => {
-    const { rootColor, backgroundColor } = useContext(PaletteContext);
+    const { rootColor, backgroundColor, mutedTextColor } =
+        useContext(PaletteContext);
     const { user, setUser } = useContext(UserContext);
 
     const seeNotification = (setSeen) => {
         if (notification.seen === setSeen) return;
+
         const originalSeen = notification.seen;
         notification.seen = setSeen;
         setUser({
             ...user,
         });
-        return mutationCall(
+        mutationCall(
             "seeNotification",
             {},
             {
                 accountScreenName: user.screenName,
                 index: idx,
             }
-        ).catch(() => {
+        ).catch((error) => {
+            console.error(error);
             notification.seen = originalSeen;
             setUser({
                 ...user,
@@ -34,101 +38,79 @@ const CrowdventureNotification = ({ notification, idx }) => {
     };
 
     return (
-        <EventListener event="hover">
-            {([hover, hoverListener]) => (
-                <div
-                    onClick={(e) => {
-                        e.stopPropagation();
+        <div style={{ position: "relative" }}>
+            <EventListener event="hover">
+                {([hover, hoverListener]) => (
+                    <Link
+                        href={notification.link || "#"}
+                        onClick={() => seeNotification(true)}
+                        {...hoverListener}
+                        style={{
+                            backgroundColor: backgroundColor[0],
+                            borderRadius: 10,
+                            boxShadow: hover
+                                ? `0 0 6px ${rootColor[0]}`
+                                : `0 0 3px ${rootColor[1]}`,
+                            padding: 10,
+                            gap: 10,
+                            cursor: "pointer",
+                            flexDirection: "column",
+                            paddingLeft: 70, // Make space for buttons
+                            paddingRight: 30,
+                            justifyContent: "space-between",
+                            alignItems: "flex-start",
+                            minHeight: 70,
+                        }}
+                    >
+                        <span style={{ justifyContent: "flex-start" }}>
+                            {notification.content}
+                        </span>
 
-                        console.log("CLICK NOTIFICATION");
-                        // if (e.target !== bigButtonRef.current) return;
-                        // seeNotification().then(() => {
-                        //     console.log(notification.link);
-                        //     if (notification.link)
-                        //         router.push(notification.link);
-                        // });
-                    }}
-                    {...hoverListener}
-                    style={{
-                        backgroundColor: backgroundColor[0],
-                        borderRadius: 10,
-                        boxShadow: hover
-                            ? `0 0 6px ${rootColor[0]}`
-                            : `0 0 3px ${rootColor[1]}`,
-                        padding: 10,
-                        cursor: "pointer",
-                        flexDirection: "row",
-                    }}
-                >
-                    <EventListener events={["hover", "mousedown"]}>
-                        {(
-                            [insideHover, insideHoverListener],
-                            [mousedown, mousedownListener]
-                        ) => (
-                            <div
-                                onClick={() => {
-                                    console.log("CLICK NOTIFICATION INSIDE");
-                                    seeNotification(!notification.seen);
-                                }}
-                                {...insideHoverListener}
-                                {...mousedownListener}
-                                style={{
-                                    backgroundColor: notification.seen
-                                        ? mousedown // TODO: Clean this UP!!!! GROSS
-                                            ? "darkgray"
-                                            : insideHover
-                                            ? "silver"
-                                            : "lightgrey"
-                                        : mousedown
-                                        ? rootColor[0]
-                                        : insideHover
-                                        ? rootColor[1]
-                                        : rootColor[2],
-                                    color: notification.seen ? "grey" : "white",
-                                    borderRadius: "50%",
-                                    aspectRatio: 1,
-                                    textAlign: "center",
-                                }}
-                            >
-                                <FontAwesomeIcon icon={faExclamation} />
-                            </div>
-                        )}
-                    </EventListener>
-
-                    <div>
-                        <span>{notification.content}</span>
-
-                        <span>
+                        <span
+                            style={{
+                                justifyContent: "flex-start",
+                                fontSize: DEFAULT_TEXT_SIZE * 0.8,
+                                color: mutedTextColor,
+                            }}
+                        >
                             {new Date(notification.time).toLocaleString()}
                         </span>
-                    </div>
+                    </Link>
+                )}
+            </EventListener>
+            <NotificationButton
+                onClick={() => seeNotification(!notification.seen)}
+                seen={notification.seen}
+                style={{ position: "absolute", left: 10, top: 10 }}
+            />
+            <CloseButton
+                onClick={() => {
+                    const oldNotifs = user.notifications;
 
-                    <CloseButton
-                        onClick={() => {
-                            const oldNotifs = user.notifications;
-
-                            const newNotifs = user.notifications.filter(
-                                (notif, i) => i !== idx
-                            );
-                            setUser({
-                                ...user,
-                                notifications: newNotifs,
-                            });
-                            mutationCall(
-                                "removeNotification",
-                                {},
-                                {
-                                    accountScreenName: user.screenName,
-                                    index: idx,
-                                }
-                            ).catch(() => {
-                                setUser({ ...user, notification: oldNotifs });
-                            });
-                        }}
-                    />
-                </div>
-            )}
-        </EventListener>
+                    const newNotifs = user.notifications.filter(
+                        (notif, i) => i !== idx
+                    );
+                    setUser({
+                        ...user,
+                        notifications: newNotifs,
+                    });
+                    mutationCall(
+                        "removeNotification",
+                        {},
+                        {
+                            accountScreenName: user.screenName,
+                            index: idx,
+                        }
+                    ).catch(() => {
+                        setUser({
+                            ...user,
+                            notification: oldNotifs,
+                        });
+                    });
+                }}
+                style={{ position: "absolute", right: 10, top: 10 }}
+            />
+        </div>
     );
 };
 
