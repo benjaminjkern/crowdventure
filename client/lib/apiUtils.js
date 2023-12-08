@@ -99,7 +99,7 @@ const gqlCall =
                 return data[callName];
             })
             .catch((err) => {
-                console.error(err);
+                console.error(err?.networkError?.result || err);
                 throw err;
             });
     };

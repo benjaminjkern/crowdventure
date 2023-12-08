@@ -1,5 +1,10 @@
 import databaseCalls from "../databaseCalls.js";
 
+export const hidden = async (parent) => {
+    // TODO: Migrate full database;
+    return parent.hidden || false;
+};
+
 export const from = async (parent) => await databaseCalls.getNode(parent.from);
 export const to = async (parent) => await databaseCalls.getNode(parent.to);
 export const suggestedBy = async (parent) =>

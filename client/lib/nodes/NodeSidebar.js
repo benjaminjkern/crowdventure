@@ -33,7 +33,9 @@ const NodeSidebar = ({ node, setNode }) => {
         // );
     };
 
-    const choices = [...node.canonChoices, ...node.nonCanonChoices];
+    const choices = node.allChoices;
+
+    const canonChoices = choices.filter((choice) => choice.isCanon);
 
     const loggedInAsOwner = node.owner.screenName === user?.screenName;
     return (
@@ -51,7 +53,7 @@ const NodeSidebar = ({ node, setNode }) => {
 
                 <ParagraphText text={node.content} />
 
-                {node.canonChoices.length === 0 && (
+                {canonChoices.length === 0 && (
                     <span style={{ color: mutedTextColor }}>
                         By decree of {node.owner.screenName}, this journey ends
                         here.

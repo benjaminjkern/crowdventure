@@ -56,13 +56,8 @@ const NodePage = ({ node: initNode }) => {
     // Dumb hack because backend is bad
     if (node.pictureURL === "null") node.pictureURL = null;
 
-    node.canonChoices.forEach((choice) => {
-        choice.from = node;
-        choice.canon = true;
-    });
-    node.nonCanonChoices.forEach((choice) => {
-        choice.from = node;
-        choice.canon = false;
+    node.allChoices.forEach((choice) => {
+        choice.from = node; // TODO: ????????
     });
 
     if (node.hidden && !unsafeMode)
@@ -198,8 +193,6 @@ export const getStaticPaths = () => ({
 const FULL_CHOICE_GQL = {
     ID: 0,
     action: 0,
-    likedBy: { screenName: 0 },
-    dislikedBy: { screenName: 0 },
     score: 0,
     suggestedBy: {
         hidden: 0,
@@ -215,6 +208,7 @@ const FULL_CHOICE_GQL = {
         ID: 0,
         hidden: 0,
     },
+    isCanon: 0,
 };
 
 const FULL_NODE_GQL = {
@@ -232,8 +226,7 @@ const FULL_NODE_GQL = {
         profilePicURL: 0,
         hidden: 0,
     },
-    canonChoices: FULL_CHOICE_GQL,
-    nonCanonChoices: FULL_CHOICE_GQL,
+    allChoices: FULL_CHOICE_GQL,
 };
 
 export const getStaticProps = async ({ params: { nodeId } }) => {
