@@ -20,18 +20,18 @@ const AccountPage = ({ account: initAccount }) => {
 
     const setSearchQuery = useDebounce((searchQuery) => {
         setSearchedNodes([
-            ...account.nodes.filter((node) =>
-                node.title.toLowerCase().includes(searchQuery.toLowerCase())
-            ),
-            ...account.nodes.filter(
-                (node) =>
-                    !node.title
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase()) &&
-                    node.content
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase())
-            ),
+            // ...account.nodes.filter((node) =>
+            //     node.title.toLowerCase().includes(searchQuery.toLowerCase())
+            // ),
+            // ...account.nodes.filter(
+            //     (node) =>
+            //         !node.title
+            //             .toLowerCase()
+            //             .includes(searchQuery.toLowerCase()) &&
+            //         node.content
+            //             .toLowerCase()
+            //             .includes(searchQuery.toLowerCase())
+            // ),
         ]);
     });
 

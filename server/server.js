@@ -6,7 +6,7 @@ import databaseCalls from "./databaseCalls.js";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import express from "express";
-// import cors from "cors";
+import cors from "cors";
 
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import http from "http";
@@ -22,13 +22,10 @@ const server = new ApolloServer({
     await server.start();
     app.use(
         "/graphql",
-        // cors({
-        //     origin: [
-        //         "https://sandbox.embed.apollographql.com",
-        //         "http://localhost:3000",
-        //     ],
-        //     credentials: true,
-        // }),
+        cors({
+            origin: "*",
+            credentials: true,
+        }),
         express.json(),
         expressMiddleware(server, {
             context: async ({ req, res }) => {

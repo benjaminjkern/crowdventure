@@ -8,17 +8,20 @@ export const loginAccount = async (parent, args, context) => {
     if (args.password) {
         if (encrypt(args.password) !== account.encryptedPassword) return null;
 
-        context.res.set(
-            "token",
-            jwt.sign(
+        context.res.set({
+            "Access-Control-Expose-Headers": "token",
+            token: jwt.sign(
                 { accountScreenName: account.screenName },
                 process.env.JWT_SECRET,
                 {
                     expiresIn: "1d",
                 }
-            )
-        );
-    } else if (context.loggedInAccount.screenName !== account.screenName)
+            ),
+        });
+    } else if (
+        !context.loggedInAccount ||
+        context.loggedInAccount.screenName !== account.screenName
+    )
         return null;
 
     return account;

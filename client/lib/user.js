@@ -7,12 +7,6 @@ export const UserContext = createContext();
 const UserProvider = ({ children }) => {
     const [user, setUser] = useState();
 
-    const relogin = (savedUser) => {
-        mutationCall("loginAccount", FULL_ACCOUNT_GQL, {
-            screenName: savedUser.screenName,
-        }).then(setUser);
-    };
-
     const saveUser = (newUser) => {
         if (newUser) {
             const smallerUser = {
@@ -25,6 +19,12 @@ const UserProvider = ({ children }) => {
         } else localStorage.removeItem("savedUser");
 
         setUser(newUser);
+    };
+
+    const relogin = (savedUser) => {
+        mutationCall("loginAccount", FULL_ACCOUNT_GQL, {
+            screenName: savedUser.screenName,
+        }).then(saveUser);
     };
 
     useEffect(() => {
