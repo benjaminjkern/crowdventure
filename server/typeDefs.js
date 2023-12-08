@@ -109,7 +109,7 @@ export default `#graphql
         ): Account
 
         createNode(
-            accountScreenName: String!
+            # accountScreenName: String # TODO: allow admins to create nodes on behalf of other people
             title: String!
             content: String!
             pictureURL: String
@@ -121,6 +121,7 @@ export default `#graphql
         ): Node
         deleteNode(nodeID: String!): Boolean
         editNode(
+            # accountScreenName: String # TODO: allow admins to transfer ownership of nodes
             nodeID: String!
             title: String
             content: String
@@ -133,12 +134,13 @@ export default `#graphql
         ): Node
 
         suggestChoice(
-            accountScreenName: String!
+            # accountScreenName: String # TODO: allow admins to create choices on behalf of other people
             fromID: String!
             action: String!
             toID: String!
         ): Choice
         editSuggestion(
+            # accountScreenName: String # TODO: allow admins to transfer ownership
             choiceID: String!
             action: String
             toID: String

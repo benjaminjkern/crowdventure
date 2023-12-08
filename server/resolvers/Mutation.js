@@ -48,12 +48,15 @@ export const createAccount = async (parent, args, context) => {
         totalNodeViews: 0,
     });
 };
-export const deleteAccount = async (parent, args) => {
+export const deleteAccount = async (parent, args, context) => {
     const account = await databaseCalls.getAccount(args.screenName);
-
-    // TODO: Must be an admin or this account
-
     if (!account) throw new Error("That account doesnt exist!");
+
+    if (
+        !context.loggedInAccount?.isAdmin &&
+        context.loggedInAccount?.screenName !== account.screenName
+    )
+        throw new Error("No permission!");
 
     console.log(`Deleting Account ${account.screenName}`);
 
@@ -72,11 +75,15 @@ export const deleteAccount = async (parent, args) => {
     return await databaseCalls.removeAccount(account.screenName);
 };
 
-export const editAccount = async (parent, args) => {
-    // TODO: Must be an admin or this account
-
+export const editAccount = async (parent, args, context) => {
     const account = await databaseCalls.getAccount(args.screenName);
     if (!account) throw new Error("That account doesnt exist!");
+
+    if (
+        !context.loggedInAccount?.isAdmin &&
+        context.loggedInAccount?.screenName !== account.screenName
+    )
+        throw new Error("No permission!");
 
     console.log(`Editing Account ${account.screenName}`);
     // TODO: Don't update if nothing is changing
@@ -92,8 +99,10 @@ export const editAccount = async (parent, args) => {
     }
     if (args.profilePicURL !== undefined)
         account.profilePicURL = args.profilePicURL;
-    if (args.hidden !== undefined) account.hidden = args.hidden; // TODO: Must be admin to do this
-    if (args.isAdmin !== undefined) account.isAdmin = args.isAdmin; // TODO: Must be admin to do this
+    if (context.loggedInAccount?.isAdmin && args.hidden !== undefined)
+        account.hidden = args.hidden;
+    if (context.loggedInAccount?.isAdmin && args.isAdmin !== undefined)
+        account.isAdmin = args.isAdmin;
 
     // await MutationResolvers.createNotification(
     //     account,
@@ -107,16 +116,17 @@ export const editAccount = async (parent, args) => {
     return await databaseCalls.addAccount(account);
 };
 
-export const createNode = async (parent, args) => {
-    // TODO: Must be logged in
-    const account = await databaseCalls.getAccount(args.accountScreenName);
-    if (!account) throw new Error("That account doesnt exist!");
+export const createNode = async (parent, args, context) => {
+    if (!context.loggedInAccount)
+        throw new Error("Must be logged in to do that!");
+
+    const account = context.loggedInAccount;
+    if (!args.title) throw new Error("Title cannot be empty!");
+    if (!args.content) throw new Error("Content cannot be empty!");
 
     console.log(
         `Creating new node with title ${args.title} and owner ${account.screenName}`
     );
-    if (!args.title) throw new Error("Title cannot be empty!");
-    if (!args.content) throw new Error("Content cannot be empty!");
 
     const now = new Date();
 
@@ -130,7 +140,7 @@ export const createNode = async (parent, args) => {
         featured: args.featured || false,
         hidden:
             // TODO: Let user know if its flagged and they didnt mean it to be hidden
-            // TODO: Also only admins hsould be able to do this
+            // TODO: Also only admins hsould be able to do this (?)
             flagContent(args.title) || flagContent(args.content) || args.hidden,
         dateCreated: now.toJSON(),
         lastUpdated: now.getTime(),
@@ -139,10 +149,15 @@ export const createNode = async (parent, args) => {
 
     return await databaseCalls.addNode(newNode);
 };
-export const deleteNode = async (parent, args) => {
-    // TODO: Must be an admin or own this node
+export const deleteNode = async (parent, args, context) => {
     const node = await databaseCalls.getNode(args.nodeID);
     if (!node) throw new Error("That node doesnt exist!");
+
+    if (
+        !context.loggedInAccount?.isAdmin &&
+        !context.loggedInAccount?.screenName !== node.owner
+    )
+        throw new Error("No permission!");
 
     console.log(`Deleting node ${node.ID} (${node.title})`);
 
@@ -168,10 +183,15 @@ export const deleteNode = async (parent, args) => {
 
     return await databaseCalls.removeNode(node.ID);
 };
-export const editNode = async (parent, args) => {
-    // TODO: Must be an admin or own this node
+export const editNode = async (parent, args, context) => {
     const node = await databaseCalls.getNode(args.nodeID);
     if (!node) throw new Error("That node doesnt exist!");
+
+    if (
+        !context.loggedInAccount?.isAdmin &&
+        !context.loggedInAccount?.screenName !== node.owner
+    )
+        throw new Error("No permission!");
 
     console.log(`Editing node ${node.ID} (${node.title})`);
 
@@ -190,8 +210,7 @@ export const editNode = async (parent, args) => {
     if (args.fgColor) node.fgColor = args.fgColor;
     if (args.pictureUnsafe !== undefined)
         node.pictureUnsafe = args.pictureUnsafe;
-    if (args.hidden !== undefined) {
-        // TODO: Should only be done by admins
+    if (context.loggedInAccount?.isAdmin && args.hidden !== undefined) {
         node.hidden = args.hidden;
     }
     if (args.featured !== undefined) node.featured = args.featured;
@@ -208,10 +227,11 @@ export const editNode = async (parent, args) => {
 
     return await databaseCalls.addNode(node);
 };
-export const suggestChoice = async (parent, args) => {
-    const account = await databaseCalls.getAccount(args.accountScreenName);
-    if (!account) throw new Error("That account doesnt exist!");
+export const suggestChoice = async (parent, args, context) => {
+    if (!context.loggedInAccount)
+        throw new Error("Must be logged in to do that!");
 
+    const account = context.loggedInAccount;
     const node = await databaseCalls.getNode(args.fromID);
     if (!node) throw new Error("From node doesnt exist!");
 
@@ -255,16 +275,25 @@ export const suggestChoice = async (parent, args) => {
 
     return await databaseCalls.addChoice(newChoice);
 };
-export const editSuggestion = async (parent, args) => {
-    // TODO: Only allow this if you are an admin, or if you own the suggestion and it's not canon, or if you own the node
+export const editSuggestion = async (parent, args, context) => {
     const choice = await databaseCalls.getChoice(args.choiceID);
     if (!choice) throw new Error("That choice doesnt exist!");
+
+    const fromNode = await databaseCalls.getNode(choice.from);
+
+    if (
+        !context.loggedInAccount?.isAdmin &&
+        !context.loggedInAccount?.screenName !== fromNode.owner &&
+        (choice.isCanon ||
+            context.loggedInAccount?.screenName !== choice.suggestedBy)
+    )
+        throw new Error("No permission!");
 
     console.log(`Editing suggestion ${choice.ID} (${choice.action})`);
 
     // const daddy = await databaseCalls.getNode(choice.from);
 
-    if (args.hidden !== undefined)
+    if (context.loggedInAccount?.isAdmin && args.hidden !== undefined)
         // Should only be able to be done by admins
         choice.hidden = args.hidden;
     if (args.toID && choice.to !== args.toID) {
@@ -273,7 +302,12 @@ export const editSuggestion = async (parent, args) => {
         //     updateTime(daddy);
         // }
     }
-    if (args.isCanon !== undefined) choice.isCanon = args.isCanon;
+    if (
+        context.loggedInAccount?.isAdmin ||
+        (context.loggedInAccount?.screenName === fromNode.owner &&
+            args.isCanon !== undefined)
+    )
+        choice.isCanon = args.isCanon;
     if (args.action) {
         choice.action = args.action;
         if (flagContent(args.action)) choice.hidden = true;
@@ -292,10 +326,19 @@ export const editSuggestion = async (parent, args) => {
 
     return await databaseCalls.addChoice(choice);
 };
-export const removeSuggestion = async (parent, args) => {
-    // TODO: Only allow this if you are an admin, or if you own the suggestion and it's not canon, or if you own the node
+export const removeSuggestion = async (parent, args, context) => {
     const choice = await databaseCalls.getChoice(args.choiceID);
     if (!choice) throw new Error("That choice doesnt exist!");
+
+    const fromNode = await databaseCalls.getNode(choice.from);
+
+    if (
+        !context.loggedInAccount?.isAdmin &&
+        !context.loggedInAccount?.screenName !== fromNode.owner &&
+        (choice.isCanon ||
+            context.loggedInAccount?.screenName !== choice.suggestedBy)
+    )
+        throw new Error("No permission!");
 
     console.log(`Removing suggestion ${choice.ID} (${choice.action})`);
     return await databaseCalls.removeChoice(choice.ID);
