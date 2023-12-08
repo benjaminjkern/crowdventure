@@ -1,15 +1,37 @@
-import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
+import {
+    ApolloClient,
+    InMemoryCache,
+    gql,
+    createHttpLink,
+} from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
 
 // THESE NEED TO BE HIDDEN BETTER
 // const backendURL =
 //     "https://3yfp7ejc0m.execute-api.us-east-1.amazonaws.com/dev/graphql";
 
-const backendURL = "http://localhost:4000/";
+const backendURL = "http://localhost:4000/graphql";
 
 const DEBUG_CALLS = false;
 
-export const graphqlClient = new ApolloClient({
+const httpLink = createHttpLink({
     uri: backendURL,
+});
+
+const authLink = setContext((_, { headers }) => {
+    // get the authentication token from local storage if it exists
+    const token = localStorage.getItem("token");
+    // return the headers to the context so httpLink can read them
+    return {
+        headers: {
+            ...headers,
+            authorization: token || "",
+        },
+    };
+});
+
+const graphqlClient = new ApolloClient({
+    link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
 });
 
@@ -90,12 +112,13 @@ const gqlCall = (gqlType, callName, parameters = {}, variables = {}) => {
         variables: useVariables,
         fetchPolicy: "network-only",
     })
-        .then(({ data, error }) => {
+        .then(({ data, error, headers }) => {
+            console.log(headers);
             if (error) throw error;
             return data[callName];
         })
         .catch((err) => {
-            console.error(err.networkError.result);
+            console.error(err);
             throw err;
         });
 };
