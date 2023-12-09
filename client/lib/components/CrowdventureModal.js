@@ -9,6 +9,7 @@ const CrowdventureModal = ({
     children,
     modalButtons,
     modalStyle,
+    contentStyle,
 }) => {
     const { closeModal } = useContext(ModalContext);
     const { backgroundColor, lightBackgroundColor } =
@@ -56,10 +57,10 @@ const CrowdventureModal = ({
                     {modalTitle}
                     <CloseButton
                         onClick={closeModal}
-                        style={{ top: 0, right: 0 }}
+                        style={{ position: "absolute", top: 0, right: 0 }}
                     />
                 </div>
-                {children}
+                <div style={contentStyle}>{children}</div>
                 {modalButtons.length ? (
                     <>
                         <hr />

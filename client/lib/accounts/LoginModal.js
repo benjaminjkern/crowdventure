@@ -54,6 +54,7 @@ const LoginModal = () => {
 
     return (
         <CrowdventureModal
+            contentStyle={{ gap: 5 }}
             modalButtons={[{ text: "Log in", onClick: login }]}
             modalTitle="Log in"
         >
