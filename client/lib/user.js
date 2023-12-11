@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
-import { FULL_ACCOUNT_GQL } from "../pages/account/[accountId]";
 import { mutationCall } from "./apiUtils";
+import { LOGGED_IN_USER_GQL } from "./gqlDefs";
 
 export const UserContext = createContext();
 
@@ -12,7 +12,6 @@ const UserProvider = ({ children }) => {
             const smallerUser = {
                 screenName: newUser.screenName,
                 isAdmin: newUser.isAdmin,
-                notifications: newUser.notifications,
             };
 
             localStorage.setItem("savedUser", JSON.stringify(smallerUser));
@@ -22,7 +21,7 @@ const UserProvider = ({ children }) => {
     };
 
     const relogin = (savedUser) => {
-        mutationCall("loginAccount", FULL_ACCOUNT_GQL, {
+        mutationCall("loginAccount", LOGGED_IN_USER_GQL, {
             screenName: savedUser.screenName,
         }).then(saveUser);
     };

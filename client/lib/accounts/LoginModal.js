@@ -5,40 +5,28 @@ import CrowdventureModal from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { UserContext } from "../user";
 import { mutationCall } from "../apiUtils";
-import { FULL_ACCOUNT_GQL } from "../../pages/account/[accountId]";
+import { useStatelessValue } from "../hooks";
+import { LOGGED_IN_USER_GQL } from "../gqlDefs";
 
 const LoginModal = () => {
-    const [info, setInfo] = useState("");
-    const [screenName, setScreenName] = useState("");
-    const [password, setPassword] = useState("");
+    const screenName = useStatelessValue();
+    const password = useStatelessValue();
+    const [error, setError] = useState();
 
     const { setUser } = useContext(UserContext);
     const { closeModal } = useContext(ModalContext);
 
     const login = () => {
-        if (!screenName)
-            return setInfo(
-                <span style={{ color: "red" }}>
-                    Please enter your password!
-                </span>
-            );
-        if (!password)
-            return setInfo(
-                <span style={{ color: "red" }}>
-                    Please enter your screenName!
-                </span>
-            );
+        if (!screenName) return setError("Please enter your password!");
+        if (!password) return setError("Please enter your screenName!");
 
-        mutationCall("loginAccount", FULL_ACCOUNT_GQL, {
+        mutationCall("loginAccount", LOGGED_IN_USER_GQL, {
             screenName,
             password,
         }).then((newUser) => {
             if (!newUser) {
-                setInfo(
-                    <div style={{ color: "red" }}>
-                        That account does not exist or the password did not
-                        match!
-                    </div>
+                setError(
+                    "That account does not exist or the password did not match!"
                 );
                 return;
             }
@@ -49,7 +37,7 @@ const LoginModal = () => {
     };
 
     useEffect(() => {
-        setInfo("");
+        setError();
     }, [screenName, password]);
 
     return (
@@ -59,17 +47,10 @@ const LoginModal = () => {
             modalTitle="Log in"
         >
             Screen Name:
-            <CrowdventureTextInput
-                onChangeText={setScreenName}
-                value={screenName}
-            />
+            <CrowdventureTextInput statelessValue={screenName} />
             Password:
-            <CrowdventureTextInput
-                onChangeText={setPassword}
-                type="password"
-                value={password}
-            />
-            {info ? info : ""}
+            <CrowdventureTextInput statelessValue={password} type="password" />
+            {error ? <span style={{ color: "red" }}>{error}</span> : null}
         </CrowdventureModal>
     );
 };

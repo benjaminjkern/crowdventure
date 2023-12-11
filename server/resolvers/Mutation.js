@@ -2,22 +2,25 @@ import databaseCalls from "../databaseCalls.js";
 import { encrypt, flagContent, getIP, uniqueID } from "../utils.js";
 import jwt from "jsonwebtoken";
 
+const sendLoginToken = (context, screenName) =>
+    context.res.set({
+        "Access-Control-Expose-Headers": "token",
+        token: jwt.sign(
+            { accountScreenName: screenName },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "1d",
+            }
+        ),
+    });
+
 export const loginAccount = async (parent, args, context) => {
     const account = await databaseCalls.getAccount(args.screenName);
     if (!account) throw new Error("That account doesnt exist!");
     if (args.password) {
         if (encrypt(args.password) !== account.encryptedPassword) return null;
 
-        context.res.set({
-            "Access-Control-Expose-Headers": "token",
-            token: jwt.sign(
-                { accountScreenName: account.screenName },
-                process.env.JWT_SECRET,
-                {
-                    expiresIn: "1d",
-                }
-            ),
-        });
+        sendLoginToken(context, account.screenName);
     } else if (
         !context.loggedInAccount ||
         context.loggedInAccount.screenName !== account.screenName
@@ -35,6 +38,8 @@ export const createAccount = async (parent, args, context) => {
         throw new Error("That screen name already exists!");
 
     console.log(`Creating new account with name ${args.screenName}`);
+
+    sendLoginToken(context, args.screenName);
 
     return await databaseCalls.addAccount({
         screenName: args.screenName,

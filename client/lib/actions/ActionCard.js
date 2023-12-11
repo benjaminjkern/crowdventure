@@ -101,22 +101,6 @@ const ActionCard = ({ choice: initChoice }) => {
         });
     };
 
-    const reportSuggestion = (choiceID) => {
-        mutationCall(
-            "createFeedback",
-            {
-                accountScreenName: user?.screenName,
-                info: "This is inappropriate",
-                reportingObjectType: "Choice",
-                reportingObjectID: choiceID,
-            },
-            { info: 0, reporting: 0 }
-        ).then(() => {
-            alert("Successfully reported action!");
-            window.location.reload(false);
-        });
-    };
-
     // Hide hidden actions, but show if you
     // 1. are in unsafeMode,
     // 2. suggested the action, or

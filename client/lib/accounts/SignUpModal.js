@@ -1,46 +1,30 @@
 import React, { useContext, useState } from "react";
 import { UserContext } from "../user";
-import { FULL_ACCOUNT_GQL } from "../../pages/account/[accountId]";
 import { mutationCall, queryCall } from "../apiUtils";
 import { ModalContext } from "../modal";
 import CrowdventureModal from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
+import { useStatelessValue } from "../hooks";
+import { LOGGED_IN_USER_GQL } from "../gqlDefs";
 
 const SignUpModal = () => {
     const { closeModal } = useContext(ModalContext);
     const { setUser } = useContext(UserContext);
-    const [info, setInfo] = useState("");
+    const [error, setError] = useState();
 
-    const [screenName, setScreenName] = useState("");
-    const [pass1, setPass1] = useState("");
-    const [pass2, setPass2] = useState("");
+    const screenName = useStatelessValue();
+    const pass1 = useStatelessValue();
+    const pass2 = useStatelessValue();
 
     const handleSubmitSignUp = () => {
-        if (!screenName)
-            return setInfo(
-                <span style={{ color: "red" }}>
-                    Please enter a screen name!
-                </span>
-            );
-        if (!pass1)
-            return setInfo(
-                <span style={{ color: "red" }}>Please enter a password!</span>
-            );
-        if (pass1 !== pass2)
-            return setInfo(
-                <div style={{ color: "red" }}>Passwords must match!</div>
-            );
+        if (!screenName) return setError("Please enter a screen name!");
+        if (!pass1) return setError("Please enter a password!");
+        if (pass1 !== pass2) return setError("Passwords must match!");
 
         queryCall("getAccount", { screenName: 0 }, { screenName })
-            .catch(() =>
-                setInfo(
-                    <div style={{ color: "red" }}>
-                        That account already exists!
-                    </div>
-                )
-            )
+            .catch(() => setError("That account already exists!"))
             .then(() =>
-                mutationCall("createAccount", FULL_ACCOUNT_GQL, {
+                mutationCall("createAccount", LOGGED_IN_USER_GQL, {
                     screenName,
                     password: pass1,
                 })
@@ -53,27 +37,17 @@ const SignUpModal = () => {
 
     return (
         <CrowdventureModal
+            contentStyle={{ gap: 5 }}
             modalButtons={[{ text: "Sign Up", onClick: handleSubmitSignUp }]}
             modalTitle="Sign Up for Crowdventure!"
         >
             Screen Name:
-            <CrowdventureTextInput
-                onChangeText={setScreenName}
-                value={screenName}
-            />
+            <CrowdventureTextInput statelessValue={screenName} />
             Create Password:
-            <CrowdventureTextInput
-                onChangeText={setPass1}
-                type="password"
-                value={pass1}
-            />
+            <CrowdventureTextInput statelessValue={pass1} type="password" />
             Confirm Password:
-            <CrowdventureTextInput
-                onChangeText={setPass2}
-                type="password"
-                value={pass2}
-            />
-            {info ? info : ""}
+            <CrowdventureTextInput statelessValue={pass2} type="password" />
+            {error ? <span style={{ color: "red" }}>{error}</span> : ""}
         </CrowdventureModal>
     );
 };
