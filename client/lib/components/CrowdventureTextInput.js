@@ -3,7 +3,7 @@ import { PaletteContext } from "../colorPalette";
 import EventListener from "./EventListener";
 
 const CrowdventureTextInput = ({
-    value = "",
+    statelessValue,
     onChangeText = () => {},
     style = {},
     rows = 1,
@@ -34,10 +34,11 @@ const CrowdventureTextInput = ({
                     ...listener,
                     ...props,
                 };
-                if (value.type === "statelessValue") {
-                    appliedProps.value = value.initialValue;
-                    appliedProps.ref = value.ref;
+                if (statelessValue.type === "statelessValue") {
+                    appliedProps.defaultValue = statelessValue.initialValue;
+                    appliedProps.ref = statelessValue.ref;
                 }
+
                 if (rows > 1) return <textarea {...appliedProps} />;
                 return <input {...appliedProps} />;
             }}

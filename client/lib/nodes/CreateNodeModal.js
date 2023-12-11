@@ -137,7 +137,7 @@ const CreateNodeModal = ({
             ]}
             modalTitle={`${node ? "Editing" : "Creating New"} Page`}
         >
-            {node.pictureURL ? (
+            {node?.pictureURL ? (
                 <div
                     style={{
                         borderWidth: 1,
