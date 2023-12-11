@@ -3,6 +3,7 @@
 // const CHOICES = require("./mock-data/mockChoices.js").MOCK_CHOICES;
 
 import AWS from "aws-sdk";
+import fs from "fs";
 
 AWS.config.update({ region: "us-east-1" });
 const docClient = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
@@ -64,6 +65,25 @@ const databaseCalls = {
     allNodes: async () => await getFullTable(NODE_TABLE),
     allChoices: async () => await getFullTable(CHOICE_TABLE),
     allFeedback: async () => await getFullTable(FEEDBACK_TABLE),
+
+    saveFullDbLocally: async () => {
+        fs.mkdirSync("savedDb");
+        for (const table of [
+            ACCOUNT_TABLE,
+            NODE_TABLE,
+            CHOICE_TABLE,
+            FEEDBACK_TABLE,
+            NOTIFICATION_TABLE,
+            VIEW_TABLE,
+            REACTION_TABLE,
+            SORTED_NODE_TABLE,
+        ]) {
+            fs.writeFileSync(
+                `savedDb/${table}.json`,
+                JSON.stringify(await getFullTable(table))
+            );
+        }
+    },
 
     getAccount: async (accountScreenName) =>
         await getItem(ACCOUNT_TABLE, { screenName: accountScreenName }),
