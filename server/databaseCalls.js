@@ -67,7 +67,10 @@ const databaseCalls = {
     allFeedback: async () => await getFullTable(FEEDBACK_TABLE),
 
     saveFullDbLocally: async () => {
-        fs.mkdirSync("savedDb");
+        try {
+            fs.mkdirSync("savedDb", {});
+        } catch (err) {}
+
         for (const table of [
             ACCOUNT_TABLE,
             NODE_TABLE,
@@ -235,6 +238,24 @@ const databaseCalls = {
             },
             FilterExpression: `#n = :ni AND #ip = :ip`,
         });
+    },
+    searchNodes: async (query, pageSize) => {
+        return (
+            (
+                await docClient
+                    .scan({
+                        TableName: NODE_TABLE,
+                        FilterExpression: `contains(#a, :r)`,
+                        ExpressionAttributeValues: {
+                            ":r": query,
+                        },
+                        ExpressionAttributeNames: {
+                            "#a": "searchTitle",
+                        },
+                    })
+                    .promise()
+            ).Items.slice(0, pageSize) || []
+        );
     },
 };
 

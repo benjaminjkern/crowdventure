@@ -88,6 +88,8 @@ export default `#graphql
         ): [Node!]
         randomNode(allowHidden: Boolean, chooseFromLast: Int): Node!
 
+        searchNodes(query: String!, limit: Int): [Node!]
+
         getAccount(screenName: String!): Account
         getNode(ID: String!): Node
     }

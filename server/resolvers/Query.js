@@ -36,3 +36,7 @@ export const getAccount = async (parent, { screenName }) => {
 
 export const getNode = async (parent, { ID }) =>
     await databaseCalls.getNode(ID);
+
+export const searchNodes = async (parent, { query, limit = 10 }) => {
+    return await databaseCalls.searchNodes(query, limit);
+};

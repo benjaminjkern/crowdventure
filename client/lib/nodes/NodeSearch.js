@@ -30,13 +30,17 @@ const NodeSearch = ({ onSelectNode, toNode }) => {
         onSelectNode(node);
     };
 
-    // useEffect(() => {
-    //     queryCall("allNodes", {
-    //         title: 0,
-    //         owner: { screenName: 0, profilePicURL: 0 },
-    //         ID: 0,
-    //     }).then(setAllNodes);
-    // }, []);
+    useEffect(() => {
+        queryCall(
+            "searchNodes",
+            {
+                title: 0,
+                owner: { screenName: 0, profilePicURL: 0 },
+                ID: 0,
+            },
+            { query }
+        ).then(setAllNodes);
+    }, []);
 
     if (!allNodes) return <div>Loading...</div>;
 

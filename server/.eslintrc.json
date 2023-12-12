@@ -10,5 +10,8 @@
         "sourceType": "module",
         "ecmaVersion": "latest"
     },
-    "extends": "eslint:recommended"
+    "extends": "eslint:recommended",
+    "rules": {
+        "no-empty": "warn"
+    }
 }
