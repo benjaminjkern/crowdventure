@@ -63,15 +63,22 @@ export const useDebounce = (func, delay = 500) => {
 
 export const useDebouncedEffect = (func, dependencies) => {
     const debouncedFunc = useDebounce(func);
-    useEffect(debouncedFunc, dependencies);
+    useEffect(debouncedFunc, dependencies); // eslint-disable-line react-hooks/exhaustive-deps
 };
 
-export const useStatelessValue = (initialValue) => {
+export const useInputForm = (initialForm) => {
     const ref = useRef();
-    return {
-        getValue: () => ref.current.value,
-        type: "statelessValue",
-        ref,
-        initialValue,
-    };
+    const form = { getValues: () => ref.current };
+
+    useEffect(() => {
+        ref.current = initialForm;
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    for (const key of Object.keys(initialForm))
+        form[key] = {
+            defaultValue: initialForm[key],
+            setValue: (value) => (ref.current[key] = value),
+        };
+
+    return form;
 };

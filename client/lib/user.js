@@ -8,14 +8,8 @@ const UserProvider = ({ children }) => {
     const [user, setUser] = useState();
 
     const saveUser = (newUser) => {
-        if (newUser) {
-            const smallerUser = {
-                screenName: newUser.screenName,
-                isAdmin: newUser.isAdmin,
-            };
-
-            localStorage.setItem("savedUser", JSON.stringify(smallerUser));
-        } else localStorage.removeItem("savedUser");
+        if (newUser) localStorage.setItem("savedUser", JSON.stringify(newUser));
+        else localStorage.removeItem("savedUser");
 
         setUser(newUser);
     };

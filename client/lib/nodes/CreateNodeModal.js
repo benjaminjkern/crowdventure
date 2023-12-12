@@ -13,7 +13,7 @@ import { ModalContext } from "../modal";
 import ImageSearch from "../components/ImageSearch";
 import CloseButton from "../components/CloseButton";
 import { PaletteContext } from "../colorPalette";
-import { useStatelessValue } from "../hooks";
+import { useInputForm } from "../hooks";
 
 // import SearchImage from "../SearchImage";
 
@@ -21,15 +21,17 @@ const CreateNodeModal = ({
     callback,
     node,
     setNode,
-    picture,
-    pictureUnsafe,
-    featured,
+    featured: initFeatured,
 }) => {
-    const title = useStatelessValue(node?.title || "");
-    const content = useStatelessValue(node?.content || "");
-    const hidden = useStatelessValue(node?.hidden || false);
+    const nodeForm = useInputForm({
+        title: node?.title || "",
+        content: node?.content || "",
+        featured: node?.featured ?? (initFeatured || false),
+        hidden: node?.content || "",
+        pictureUnsafe: node?.pictureUnsafe || false,
+    });
 
-    const [info, setInfo] = useState("");
+    const [error, setError] = useState("");
 
     const { user } = useContext(UserContext);
     const { openModal, closeModal, closeAllModals } = useContext(ModalContext);
@@ -37,17 +39,14 @@ const CreateNodeModal = ({
     const router = useRouter();
 
     const validateInputs = () => {
+        const { title, content } = nodeForm.getValues();
         if (!title.getValue()) {
-            setInfo(
-                <span style={{ color: "red" }}>Content cannot be empty!</span>
-            );
+            setError("Content cannot be empty!");
             return false;
         }
 
         if (!content.getValue()) {
-            setInfo(
-                <span style={{ color: "red" }}>Title cannot be empty!</span>
-            );
+            setError("Title cannot be empty!");
             return false;
         }
 
@@ -55,7 +54,8 @@ const CreateNodeModal = ({
     };
 
     const editNode = async () => {
-        if (!validateInputs()) return;
+        const { title, content, featured, hidden, pictureUnsafe } =
+            nodeForm.getValues();
 
         const newNode = await mutationCall(
             "editNode",
@@ -65,11 +65,9 @@ const CreateNodeModal = ({
                 title,
                 content,
                 // pictureURL: pictureField,
-                hidden:
-                    // shouldHide ||
-                    (hidden.getValue() !== undefined && !node.pictureUnsafe) ||
-                    undefined,
-                // pictureUnsafe: shouldHide,
+                hidden,
+                featured,
+                pictureUnsafe,
             }
         );
         setNode(newNode);
@@ -77,7 +75,7 @@ const CreateNodeModal = ({
     };
 
     const createNode = async () => {
-        if (!validateInputs()) return;
+        const { title, content, featured } = nodeForm.getValues();
 
         const newNode = await mutationCall(
             "createNode",
@@ -85,13 +83,10 @@ const CreateNodeModal = ({
                 ID: 0,
             },
             {
-                accountScreenName: user.screenName,
                 title,
                 content,
-                featured: featured || false,
+                featured,
                 // pictureURL: pictureField,
-                // hidden: shouldHide || undefined,
-                // pictureUnsafe: shouldHide || undefined,
             }
         );
         router.push(`/node/${newNode.ID}`);
@@ -110,6 +105,7 @@ const CreateNodeModal = ({
                 {
                     text: `${node ? "Edit" : "Create"} Page!`,
                     onClick: () => {
+                        if (!validateInputs()) return;
                         if (node) editNode();
                         else createNode();
                     },
@@ -216,7 +212,7 @@ const CreateNodeModal = ({
                     />
                 </>
             ) : null}
-            {info || ""}
+            {error ? <span style={{ color: "red" }}>{error}</span> : null}
             {/* {shouldHide ? (
                 <span style={{ color: "red" }}>
                     The image chosen will cause the page to automatically be

@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
 
-import { NODE_PREVIEW_GQL } from "..";
 import { queryCall } from "../../lib/apiUtils";
 import { UserContext } from "../../lib/user";
 import LoadingBox from "../../lib/components/LoadingBox";
@@ -8,36 +7,17 @@ import { UnsafeModeContext } from "../../lib/unsafeMode";
 import CrowdventureAlert from "../../lib/components/CrowdventureAlert";
 import NodeViewer from "../../lib/nodes/NodeViewer";
 import CrowdventureButton from "../../lib/components/CrowdventureButton";
-import CrowdventureTextInput from "../../lib/components/CrowdventureTextInput";
 import AccountHeader from "../../lib/accounts/AccountHeader";
-import { useDebounce } from "../../lib/hooks";
+import { ModalContext } from "../../lib/modal";
+import CreateNodeModal from "../../lib/nodes/CreateNodeModal";
 
 const AccountPage = ({ account: initAccount }) => {
-    const [searchedNodes, setSearchedNodes] = useState([]);
     const [account, setAccount] = useState(initAccount);
     const { user } = useContext(UserContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
+    const { openModal } = useContext(ModalContext);
 
-    const setSearchQuery = useDebounce((searchQuery) => {
-        setSearchedNodes([
-            // ...account.nodes.filter((node) =>
-            //     node.title.toLowerCase().includes(searchQuery.toLowerCase())
-            // ),
-            // ...account.nodes.filter(
-            //     (node) =>
-            //         !node.title
-            //             .toLowerCase()
-            //             .includes(searchQuery.toLowerCase()) &&
-            //         node.content
-            //             .toLowerCase()
-            //             .includes(searchQuery.toLowerCase())
-            // ),
-        ]);
-    });
-
-    useEffect(() => {
-        setSearchQuery("");
-    }, []);
+    const accountNodes = [];
 
     useEffect(() => {
         if (initAccount) setAccount(initAccount);
@@ -72,20 +52,7 @@ const AccountPage = ({ account: initAccount }) => {
 
             {loggedInAsThisUser ? (
                 <CrowdventureButton
-                    onClick={() => {
-                        // showModal(
-                        //     <CreateNodeModal
-                        //         close={() => showModal(undefined)}
-                        //         loggedInAs={loggedInAs}
-                        //         featured={true}
-                        //         callback={(res) =>
-                        //             setRedirect(
-                        //                 <Redirect to={`/node/${res.ID}`} />
-                        //             )
-                        //         }
-                        //     />
-                        // );
-                    }}
+                    onClick={() => openModal(<CreateNodeModal featured />)}
                     style={{ marginTop: 10 }}
                 >
                     Create a New Adventure!
@@ -99,18 +66,8 @@ const AccountPage = ({ account: initAccount }) => {
 
             {/* <hr /> */}
 
-            {/* <h3>Featured Stories:</h3>
-            <NodeViewer nodes={account.featuredNodes} /> */}
-
-            <hr />
-
-            <h3>Search All Pages Authored by {account.screenName}:</h3>
-            <CrowdventureTextInput
-                onChangeText={setSearchQuery}
-                placeholder="Search for a page..."
-                style={{ marginTop: 5 }}
-            />
-            <NodeViewer nodes={searchedNodes} />
+            <h3>Featured Stories:</h3>
+            <NodeViewer nodes={accountNodes} />
         </>
     );
 };
@@ -128,14 +85,6 @@ export const FULL_ACCOUNT_GQL = {
     totalSuggestionScore: 0,
     hidden: 0,
     isAdmin: 0,
-    // featuredNodes: NODE_PREVIEW_GQL,
-    // nodes: NODE_PREVIEW_GQL,
-    notifications: {
-        time: 0,
-        seen: 0,
-        content: 0,
-        link: 0,
-    },
 };
 
 export const getStaticProps = async ({ params: { accountId } }) => {

@@ -215,8 +215,6 @@ const FULL_NODE_GQL = {
     hidden: 0,
     pictureURL: 0,
     pictureUnsafe: 0,
-    fgColor: 0,
-    bgColor: 0,
     ID: 0,
     title: 0,
     content: 0,

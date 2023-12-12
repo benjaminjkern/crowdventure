@@ -25,6 +25,8 @@ const guessType = (variableValue) => {
         case "string":
             return "String!";
     }
+    console.trace();
+    console.log(variableValue);
     throw new Error(
         `Could not find a good variable match for ${variableValue}`
     );

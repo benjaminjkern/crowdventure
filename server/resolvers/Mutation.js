@@ -2,30 +2,33 @@ import databaseCalls from "../databaseCalls.js";
 import { encrypt, flagContent, getIP, uniqueID } from "../utils.js";
 import jwt from "jsonwebtoken";
 
-const sendLoginToken = (context, screenName) =>
+const sendLoginToken = (context, account) => {
     context.res.set({
         "Access-Control-Expose-Headers": "token",
         token: jwt.sign(
-            { accountScreenName: screenName },
+            { accountScreenName: account.screenName },
             process.env.JWT_SECRET,
             {
                 expiresIn: "1d",
             }
         ),
     });
+    context.loggedInAccount = account;
+};
 
 export const loginAccount = async (parent, args, context) => {
     const account = await databaseCalls.getAccount(args.screenName);
     if (!account) throw new Error("That account doesnt exist!");
     if (args.password) {
-        if (encrypt(args.password) !== account.encryptedPassword) return null;
+        if (encrypt(args.password) !== account.encryptedPassword)
+            throw new Error("Incorrect password!");
 
-        sendLoginToken(context, account.screenName);
+        sendLoginToken(context, account);
     } else if (
         !context.loggedInAccount ||
         context.loggedInAccount.screenName !== account.screenName
     )
-        return null;
+        throw new Error("Failed to re-login!");
 
     return account;
 };
@@ -39,9 +42,7 @@ export const createAccount = async (parent, args, context) => {
 
     console.log(`Creating new account with name ${args.screenName}`);
 
-    sendLoginToken(context, args.screenName);
-
-    return await databaseCalls.addAccount({
+    const account = await databaseCalls.addAccount({
         screenName: args.screenName,
         bio: flagContent(args.bio) ? undefined : args.bio,
         encryptedPassword: encrypt(args.password),
@@ -52,6 +53,10 @@ export const createAccount = async (parent, args, context) => {
         totalSuggestionScore: 0,
         totalNodeViews: 0,
     });
+
+    sendLoginToken(context, account);
+
+    return account;
 };
 export const deleteAccount = async (parent, args, context) => {
     const account = await databaseCalls.getAccount(args.screenName);
@@ -141,12 +146,11 @@ export const createNode = async (parent, args, context) => {
         title: args.title,
         content: args.content,
         pictureURL: args.pictureURL,
-        pictureUnsafe: args.pictureUnsafe, // TODO: Do this on the backend
+        pictureUnsafe: false,
         featured: args.featured || false,
         hidden:
             // TODO: Let user know if its flagged and they didnt mean it to be hidden
-            // TODO: Also only admins hsould be able to do this (?)
-            flagContent(args.title) || flagContent(args.content) || args.hidden,
+            flagContent(args.title) || flagContent(args.content),
         dateCreated: now.toJSON(),
         lastUpdated: now.getTime(),
         views: 0,
@@ -211,8 +215,6 @@ export const editNode = async (parent, args, context) => {
         // TODO: Let users know it was flagged
     }
     if (args.pictureURL !== undefined) node.pictureURL = args.pictureURL;
-    if (args.bgColor) node.bgColor = args.bgColor;
-    if (args.fgColor) node.fgColor = args.fgColor;
     if (args.pictureUnsafe !== undefined)
         node.pictureUnsafe = args.pictureUnsafe;
     if (context.loggedInAccount?.isAdmin && args.hidden !== undefined) {

@@ -239,6 +239,28 @@ const databaseCalls = {
             FilterExpression: `#n = :ni AND #ip = :ip`,
         });
     },
+
+    //-------------- Definitely using
+    getUnseenNotificationCount: async (accountScreenName) => {
+        return (
+            (
+                await docClient
+                    .scan({
+                        TableName: NOTIFICATION_TABLE,
+                        FilterExpression: `#a = :a AND #b = :b`,
+                        ExpressionAttributeValues: {
+                            ":a": accountScreenName,
+                            ":b": false,
+                        },
+                        ExpressionAttributeNames: {
+                            "#a": "account",
+                            "#b": "seen",
+                        },
+                    })
+                    .promise()
+            ).Count || 0
+        );
+    },
     searchNodes: async (query, pageSize) => {
         return (
             (
@@ -247,14 +269,14 @@ const databaseCalls = {
                         TableName: NODE_TABLE,
                         FilterExpression: `contains(#a, :r)`,
                         ExpressionAttributeValues: {
-                            ":r": query,
+                            ":r": query.toLowerCase(),
                         },
                         ExpressionAttributeNames: {
                             "#a": "searchTitle",
                         },
                     })
                     .promise()
-            ).Items.slice(0, pageSize) || []
+            ).Items?.slice(0, pageSize) || []
         );
     },
 };

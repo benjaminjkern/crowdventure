@@ -3,7 +3,7 @@ import { PaletteContext } from "../colorPalette";
 import EventListener from "./EventListener";
 
 const CrowdventureTextInput = ({
-    statelessValue,
+    formElement,
     onChangeText = () => {},
     style = {},
     rows = 1,
@@ -16,7 +16,10 @@ const CrowdventureTextInput = ({
         <EventListener event="focus">
             {([focus, listener]) => {
                 const appliedProps = {
-                    onChange: (e) => onChangeText(e.target.value),
+                    onChange: (e) => {
+                        onChangeText(e.target.value);
+                        if (formElement) formElement.setValue(e.target.value);
+                    },
                     style: {
                         backgroundColor: focus
                             ? lightBackgroundColor
@@ -30,15 +33,11 @@ const CrowdventureTextInput = ({
                         outline: focus ? "none" : null,
                         ...style,
                     },
+                    defaultValue: formElement?.defaultValue,
                     rows,
                     ...listener,
                     ...props,
                 };
-                if (statelessValue.type === "statelessValue") {
-                    appliedProps.defaultValue = statelessValue.initialValue;
-                    appliedProps.ref = statelessValue.ref;
-                }
-
                 if (rows > 1) return <textarea {...appliedProps} />;
                 return <input {...appliedProps} />;
             }}

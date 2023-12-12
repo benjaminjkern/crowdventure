@@ -45,17 +45,13 @@ const AccountManager = ({ wrapperStyle }) => {
             </div>
         );
 
-    const seenNotifications = user.notifications.filter(
-        (notif) => !notif.seen
-    ).length;
-
     return (
         <div style={{ alignItems: "flex-end", ...wrapperStyle }}>
             <AccountPreview
                 account={user}
                 imgSide="right"
                 overlay={
-                    seenNotifications > 0 && (
+                    user.unseenNotifications > 0 && (
                         <div
                             style={{
                                 position: "absolute",
@@ -70,7 +66,7 @@ const AccountManager = ({ wrapperStyle }) => {
                                 color: "white",
                             }}
                         >
-                            {seenNotifications}
+                            {user.unseenNotifications}
                         </div>
                     )
                 }

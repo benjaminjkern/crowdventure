@@ -37,16 +37,9 @@ const AccountHeader = ({ account, setAccount }) => {
                 {loggedInAsThisUser ? (
                     <CrowdventureButton href="/notifications">
                         Notifications{" "}
-                        {user.notifications.filter((notif) => !notif.seen)
-                            .length ? (
+                        {user.unseenNotifications ? (
                             <span style={{ color: "red" }}>
-                                (
-                                {
-                                    user.notifications.filter(
-                                        (notif) => !notif.seen
-                                    ).length
-                                }{" "}
-                                New)
+                                ({user.unseenNotifications} New)
                             </span>
                         ) : null}
                     </CrowdventureButton>
