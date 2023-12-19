@@ -3,7 +3,10 @@
 // const CHOICES = require("./mock-data/mockChoices.js").MOCK_CHOICES;
 
 import AWS from "aws-sdk";
-import { type PutItemInputAttributeMap } from "aws-sdk/clients/dynamodb";
+import {
+    type AttributeMap,
+    type PutItemInputAttributeMap,
+} from "aws-sdk/clients/dynamodb";
 import fs from "fs";
 
 AWS.config.update({ region: "us-east-1" });
@@ -19,6 +22,19 @@ export enum TABLES {
     REACTION_TABLE = "Reactions",
     SORTED_NODE_TABLE = "SortedNodes",
 }
+
+export const saveFullDbLocally = async () => {
+    try {
+        fs.mkdirSync("savedDb", {});
+    } catch (err) {}
+
+    for (const table of Object.keys(TABLES)) {
+        fs.writeFileSync(
+            `savedDb/${table}.json`,
+            JSON.stringify(await getFullTable(table as TABLES))
+        );
+    }
+};
 
 // const databaseCalls = {
 //     filterFeatured: async (allowHidden: boolean) => {
@@ -61,28 +77,6 @@ export enum TABLES {
 //             );
 //         }
 //         return recentNodes[Math.floor(Math.random() * recentNodes.length)];
-//     },
-
-//     saveFullDbLocally: async () => {
-//         try {
-//             fs.mkdirSync("savedDb", {});
-//         } catch (err) {}
-
-//         for (const table of [
-//             ACCOUNT_TABLE,
-//             NODE_TABLE,
-//             CHOICE_TABLE,
-//             FEEDBACK_TABLE,
-//             NOTIFICATION_TABLE,
-//             VIEW_TABLE,
-//             REACTION_TABLE,
-//             SORTED_NODE_TABLE,
-//         ]) {
-//             fs.writeFileSync(
-//                 `savedDb/${table}.json`,
-//                 JSON.stringify(await getFullTable(table))
-//             );
-//         }
 //     },
 
 //     removeAccount: async (accountScreenName) =>
@@ -338,19 +332,25 @@ export const addItem = async <T>(tableName: TABLES, item: T) =>
 //         await addItem(NOTIFICATION_TABLE, notification),
 //     addView: async (view) => await addItem(VIEW_TABLE, view),
 
-export const getFullTable = async (tableName: TABLES, lastEvaluatedKey) => {
-    const items = await docClient
+// @ts-ignore
+export const getFullTable: <T>(
+    tableName: TABLES,
+    lastEvaluatedKey?: AWS.DynamoDB.DocumentClient.Key
+) => Promise<T[]> = async (
+    tableName: TABLES,
+    lastEvaluatedKey?: AWS.DynamoDB.DocumentClient.Key
+) => {
+    const { Items, LastEvaluatedKey } = await docClient
         .scan({
             TableName: tableName,
             ExclusiveStartKey: lastEvaluatedKey,
         })
         .promise();
 
-    if (items.LastEvaluatedKey === undefined) return items.Items;
-    return [
-        ...items.Items,
-        ...(await getFullTable(tableName, items.LastEvaluatedKey)),
-    ];
+    const items = (Items ?? []) as AttributeMap[];
+
+    if (LastEvaluatedKey === undefined) return items;
+    return [...items, ...(await getFullTable(tableName, LastEvaluatedKey))];
 };
 
 //     allAccounts: async () => await getFullTable(ACCOUNT_TABLE),

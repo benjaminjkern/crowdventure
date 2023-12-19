@@ -1,4 +1,7 @@
 {
+    "ts-node": {
+        "require": ["tsconfig-paths/register"]
+    },
     "compilerOptions": {
         /* Base Options: */
         "esModuleInterop": true,
@@ -37,7 +40,8 @@
         "**/*.tsx",
         "**/*.cjs",
         "**/*.js",
-        ".next/types/**/*.ts"
+        ".next/types/**/*.ts",
+        "../types/*.ts"
     ],
     "exclude": ["node_modules"]
 }
