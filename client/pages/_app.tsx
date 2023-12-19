@@ -1,8 +1,6 @@
 import React from "react";
 import Head from "next/head";
 
-import { api } from "+/utils/api";
-
 import Footer from "../lib/base/Footer";
 import Navbar from "../lib/base/Navbar";
 

@@ -1,11 +1,10 @@
-import { TABLES, addItem, getItem } from "../databaseCalls";
+import { TABLES, addItem, getItem } from "+/databaseCalls";
 
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "+/server/api/trpc";
-import { type Account } from "+/types/models";
-import { type StoredAccount } from "+/types/storedTypes";
-import { encrypt, flagContent } from "../utils";
+import { type Account } from "@/types/models";
+import { type StoredAccount } from "@/types/storedTypes";
+import { encrypt, flagContent } from "+/utils";
 
 export const getAccount = async (screenName: string) =>
     getItem<StoredAccount>(TABLES.ACCOUNT_TABLE, {
@@ -21,6 +20,8 @@ export const serializeAccount: (
     const { encryptedPassword, ...smallAccount } = account;
     return smallAccount;
 };
+
+export const accountRouter;
 
 export const accountRouter = createTRPCRouter({
     get: publicProcedure

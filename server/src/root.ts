@@ -1,18 +1,10 @@
-import { createTRPCRouter } from "+/server/api/trpc";
-import { accountRouter } from "+/server/api/routers/Account";
-import { nodeRouter } from "+/server/api/routers/Node";
-import { choiceRouter } from "+/server/api/routers/Choice";
+import { accountRouter } from "+/routers/Account";
+import { nodeRouter } from "+/routers/Node";
+import { choiceRouter } from "+/routers/Choice";
+import { Router } from "express";
 
-/**
- * This is the primary router for your server.
- *
- * All routers added in /api/routers should be manually added here.
- */
-export const appRouter = createTRPCRouter({
-    account: accountRouter,
-    choice: choiceRouter,
-    node: nodeRouter,
-});
+export const appRouter = Router();
 
-// export type definition of API
-export type AppRouter = typeof appRouter;
+appRouter.use("account", accountRouter);
+appRouter.use("choice", choiceRouter);
+appRouter.use("node", nodeRouter);

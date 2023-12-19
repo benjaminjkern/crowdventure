@@ -7,7 +7,6 @@ const config = {
     plugins: ["@typescript-eslint"],
     extends: [
         // TODO: Add this: "plugin:@typescript-eslint/all",
-        "plugin:@next/next/recommended",
         "plugin:@typescript-eslint/recommended-type-checked",
         "plugin:@typescript-eslint/stylistic-type-checked",
     ],

@@ -6,7 +6,7 @@ import React, {
 } from "react";
 import { mutationCall } from "./apiUtils";
 import { LOGGED_IN_USER_GQL } from "./gqlDefs";
-import { type Account } from "+/types/models";
+import { type Account } from "@/types/models";
 import LoadingBox from "./components/LoadingBox";
 
 type UserContextType = {
@@ -18,7 +18,7 @@ export const UserContext = createContext<UserContextType>(
     {} as UserContextType
 );
 
-const UserProvider = ({ children }: { children: ReactNode }) => {
+const UserProvider = ({ children }: { readonly children: ReactNode }) => {
     const [user, setUser] = useState<Account | undefined | null>();
 
     const saveUser = (newUser?: Account) => {
