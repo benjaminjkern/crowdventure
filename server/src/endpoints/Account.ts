@@ -6,18 +6,17 @@ import { defaultEndpointsFactory } from "express-zod-api";
 import { type StoredAccount } from "@/types/storedTypes";
 import { encrypt, flagContent } from "+/utils";
 import { AccountSchema } from "+/schemas";
-import { getAccount } from "+/modelHelpers";
+import { getAccount, serializeAccount } from "+/modelHelpers";
 
 export const accountEndpoints = {
     getAccount: defaultEndpointsFactory.build({
         methods: ["get"],
         input: z.object({ screenName: z.string() }),
-        // @ts-ignore
-        output: AccountSchema.optional(),
+        output: z.object({ account: AccountSchema.optional() }),
         handler: async ({ input: { screenName } }) => {
             const account = await getAccount(screenName);
-            if (!account) return;
-            return serializeAccount(account);
+            if (!account) return {};
+            return { account: serializeAccount(account) };
         },
     }),
     login: defaultEndpointsFactory.build({
@@ -104,7 +103,7 @@ export const accountEndpoints = {
         },
     }),
     editAccount: defaultEndpointsFactory.build({
-        methods: ["put"],
+        methods: ["patch"],
         input: z.object({
             screenName: z.string(),
             oldPassword: z.string().optional(),
@@ -138,22 +137,29 @@ export const accountEndpoints = {
             console.log(`Editing Account ${account.screenName}`);
             // TODO: Don't update if nothing is changing
 
-            if (args.newPassword)
-                account.encryptedPassword = encrypt(args.newPassword);
-            if (args.bio !== undefined) {
-                if (flagContent(args.bio)) {
+            if (newPassword) {
+                if (
+                    oldPassword &&
+                    encrypt(oldPassword) === account.encryptedPassword
+                )
+                    account.encryptedPassword = encrypt(newPassword);
+
+                // TODO: Let user know that password failed
+            }
+            if (bio !== undefined) {
+                if (flagContent(bio)) {
                     account.hidden = true;
                     // TODO: Send notification (Maybe also put a check on the frontend)
                     // TODO: Find a way to either only hide the bio or make it so if they change the thing that's bad then they'll get unhidden
                 }
-                account.bio = args.bio;
+                account.bio = bio;
             }
-            if (args.profilePicURL !== undefined)
-                account.profilePicURL = args.profilePicURL;
-            if (context.loggedInAccount?.isAdmin && args.hidden !== undefined)
-                account.hidden = args.hidden;
-            if (context.loggedInAccount?.isAdmin && args.isAdmin !== undefined)
-                account.isAdmin = args.isAdmin;
+            if (profilePicURL !== undefined)
+                account.profilePicURL = profilePicURL;
+            if (context.loggedInAccount?.isAdmin && hidden !== undefined)
+                account.hidden = hidden;
+            if (context.loggedInAccount?.isAdmin && isAdmin !== undefined)
+                account.isAdmin = isAdmin;
 
             // await MutationResolvers.createNotification(
             //     account,
@@ -164,7 +170,7 @@ export const accountEndpoints = {
             //     context
             // );
 
-            return await databaseCalls.addAccount(account);
+            return await addItem(TABLES.ACCOUNT_TABLE, account);
         },
     }),
 };

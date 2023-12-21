@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { defaultEndpointsFactory } from "express-zod-api";
-import { TABLES, addItem, getFullTable, removeItem } from "+/databaseCalls";
-import { ChoiceSchema } from "+/schemas";
+import { TABLES, addItem, getMany, deleteItem } from "+/databaseCalls";
+import { ChoiceSchema, makePaginationSchema } from "+/schemas";
 import { flagContent, uniqueID } from "+/utils";
 import { type Choice } from "@/types/models";
 import { getChoice, getNode } from "+/modelHelpers";
@@ -11,17 +11,17 @@ export const choiceEndpoints = {
     getChoice: defaultEndpointsFactory.build({
         methods: ["get"],
         input: z.object({ choiceID: z.string() }),
-        // @ts-ignore
-        output: ChoiceSchema.optional(),
-        handler: async ({ input: { choiceID } }) => await getChoice(choiceID),
+        output: z.object({ choice: ChoiceSchema.optional() }),
+        handler: async ({ input: { choiceID } }) => ({
+            choice: await getChoice(choiceID),
+        }),
     }),
     getChoicesForNode: defaultEndpointsFactory.build({
         methods: ["get"],
         input: z.object({ nodeID: z.string() }),
-        // @ts-ignore
-        output: ChoiceSchema.array(),
+        output: makePaginationSchema(ChoiceSchema),
         handler: async ({ input: { nodeID } }) => {
-            return await getFullTable(TABLES.CHOICE_TABLE, {
+            return await getMany<Choice>(TABLES.CHOICE_TABLE, {
                 filters: { from: nodeID },
             });
         },
@@ -156,11 +156,10 @@ export const choiceEndpoints = {
             return await addItem(TABLES.CHOICE_TABLE, choice);
         },
     }),
-    removeChoice: defaultEndpointsFactory.build({
+    deleteChoice: defaultEndpointsFactory.build({
         methods: ["delete"],
         input: z.object({ choiceID: z.string() }),
-        // @ts-ignore
-        output: z.boolean(),
+        output: z.object({ deleted: z.boolean() }),
         handler: async ({ input: { choiceID } }) => {
             const choice = await getChoice(choiceID);
             if (!choice) throw new Error("That choice doesnt exist!");
@@ -179,8 +178,12 @@ export const choiceEndpoints = {
             )
                 throw new Error("No permission!");
 
-            console.log(`Removing suggestion ${choice.ID} (${choice.action})`);
-            return await removeItem(TABLES.CHOICE_TABLE, { ID: choice.ID });
+            console.log(`Deleting suggestion ${choice.ID} (${choice.action})`);
+            return {
+                deleted: await deleteItem(TABLES.CHOICE_TABLE, {
+                    ID: choice.ID,
+                }),
+            };
         },
     }),
     // reactToChoice: defaultEndpointsFactory.build({

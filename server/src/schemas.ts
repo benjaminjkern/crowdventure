@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z, type ZodTypeAny } from "zod";
 
 // TODO: Use z.date() instead of z.string() for dateCreated
 
@@ -86,3 +86,15 @@ export const NodeSchema = z.object({
     hidden: z.boolean().optional(),
     pictureUnsafe: z.boolean().optional(),
 });
+
+// type PaginatedResults<T> = {
+//     results: T[];
+//     lastEvaluatedKey?: AWS.DynamoDB.DocumentClient.Key;
+// };
+
+export const makePaginationSchema = <T extends ZodTypeAny>(schema: T) => {
+    return z.object({
+        results: schema.array(),
+        lastEvaluatedKey: z.record(z.string(), z.string()).optional(),
+    });
+};

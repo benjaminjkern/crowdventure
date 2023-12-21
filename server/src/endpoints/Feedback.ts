@@ -1,15 +1,15 @@
-export const reporting = async (parent) => {
-    if (!parent.reporting.type) return null;
-    switch (parent.reporting.type) {
-        case "Account":
-        case "Node":
-        case "Choice":
-            return parent.reporting.type + " : " + parent.reporting.ID;
-        default:
-    }
+// export const reporting = async (parent) => {
+//     if (!parent.reporting.type) return null;
+//     switch (parent.reporting.type) {
+//         case "Account":
+//         case "Node":
+//         case "Choice":
+//             return parent.reporting.type + " : " + parent.reporting.ID;
+//         default:
+//     }
 
-    throw new Error("The parent's reporting object type is invalid");
-};
+//     throw new Error("The parent's reporting object type is invalid");
+// };
 
 // createFeedback: async (parent, args, context) => {
 //     let account;

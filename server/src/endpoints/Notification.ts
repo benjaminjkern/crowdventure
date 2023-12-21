@@ -1,5 +1,25 @@
 // Nothing here I think
 
+// export const getUnseenNotificationCount = async (accountScreenName: string) => {
+//     return (
+//         (
+//             await docClient
+//                 .scan({
+//                     TableName: TABLES.NOTIFICATION_TABLE,
+//                     FilterExpression: `#a = :a AND #b = :b`,
+//                     ExpressionAttributeValues: {
+//                         ":a": accountScreenName,
+//                         ":b": false,
+//                     },
+//                     ExpressionAttributeNames: {
+//                         "#a": "account",
+//                         "#b": "seen",
+//                     },
+//                 })
+//                 .promise()
+//         ).Count ?? 0
+//     );
+// };
 // createNotification: async (parent, args) => {
 //     let account;
 //     if (parent) {

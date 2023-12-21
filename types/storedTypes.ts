@@ -8,6 +8,7 @@ export type StoredAccount = {
     screenName: string;
     isAdmin: boolean;
     totalSuggestionScore: number;
+    // TODO: ACTUALLY ENCRYPT PASSWORD
     encryptedPassword: string; // Hide in real account
     profilePicURL?: null | string; // TODO: Should get rid of null
     bio?: null | string; // TODO: Should get rid of null

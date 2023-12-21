@@ -1,6 +1,6 @@
-import { TABLES, getItem } from "+/databaseCalls.js";
+import { TABLES, addItem, getItem } from "+/databaseCalls.js";
 import { type StoredNode } from "@/types/storedTypes.js";
-import { getIP, uniqueID } from "../utils.js";
+import { flagContent, getIP, uniqueID } from "../utils.js";
 import { defaultEndpointsFactory } from "express-zod-api";
 import { z } from "zod";
 import { getNode } from "+/modelHelpers.js";
@@ -14,32 +14,163 @@ import { NodeSchema } from "+/schemas.js";
 // });
 
 export const nodeEndpoints = {
+    featuredNodes: defaultEndpointsFactory.build({
+        methods: ["get"],
+        input: z.object({
+            allowHidden: z.boolean().optional(),
+        }),
+        output: z.object({ nodes: NodeSchema.array() }),
+        handler: async ({ input: {} }) => {
+            scramble(
+                await databaseCalls.filterFeatured(args.allowHidden)
+            ).slice(0, args.count || 10);
+        },
+    }),
     getNode: defaultEndpointsFactory.build({
         methods: ["get"],
         input: z.object({ nodeID: z.string() }),
-        // @ts-ignore
-        output: NodeSchema.optional(),
+        output: z.object({ node: NodeSchema.optional() }),
         handler: async ({ input: { nodeID } }) => {
-            return await getNode(nodeID);
+            return { node: await getNode(nodeID) };
         },
     }),
     createNode: defaultEndpointsFactory.build({
-        methods: undefined,
-        input: undefined,
-        output: undefined,
-        handler: async ({ input: {} }) => {},
+        methods: ["post"],
+        input: z.object({
+            title: z.string().min(1),
+            content: z.string().min(1),
+            pictureURL: z.string().min(1).optional(),
+            featured: z.boolean().optional(),
+        }),
+        output: NodeSchema,
+        handler: async ({
+            input: { title, content, pictureURL, featured },
+        }) => {
+            if (!context.loggedInAccount)
+                throw new Error("Must be logged in to do that!");
+
+            const account = context.loggedInAccount;
+            if (!title) throw new Error("Title cannot be empty!");
+            if (!ontent) throw new Error("Content cannot be empty!");
+
+            console.log(
+                `Creating new node with title ${title} and owner ${account.screenName}`
+            );
+
+            const now = new Date();
+
+            const newNode: StoredNode = {
+                ID: await uniqueID(getNode),
+                owner: account.screenName,
+                searchTitle: title.toLowerCase(),
+                title,
+                content,
+                pictureURL,
+                pictureUnsafe: false,
+                featured: featured || false,
+                hidden:
+                    // TODO: Let user know if its flagged and they didnt mean it to be hidden
+                    flagContent(title) || flagContent(content),
+                dateCreated: now.toJSON(),
+                lastUpdated: now.getTime(),
+                views: 0,
+            };
+
+            return await addItem(TABLES.NODE_TABLE, newNode);
+        },
     }),
     editNode: defaultEndpointsFactory.build({
-        methods: undefined,
-        input: undefined,
-        output: undefined,
-        handler: async ({ input: {} }) => {},
+        methods: ["patch"],
+        input: z.object({
+            nodeID: z.string(),
+            title: z.string().min(1).optional(),
+            content: z.string().min(1).optional(),
+            pictureURL: z.string().min(1).optional(),
+            pictureUnsafe: z.boolean().optional(),
+            hidden: z.boolean().optional(),
+            featured: z.boolean().optional(),
+        }),
+        output: NodeSchema,
+        handler: async ({
+            input: { nodeID, title, content, pictureUnsafe, hidden, featured },
+        }) => {
+            const node = await getNode(nodeID);
+            if (!node) throw new Error("That node doesnt exist!");
+
+            if (
+                !context.loggedInAccount?.isAdmin &&
+                !context.loggedInAccount?.screenName !== node.owner
+            )
+                throw new Error("No permission!");
+
+            console.log(`Editing node ${node.ID} (${node.title})`);
+
+            if (title) {
+                node.title = title;
+                node.searchTitle = title.toLowerCase();
+                if (flagContent(title)) node.hidden = true;
+                // TODO: Let users know it was flagged
+            }
+            if (content) {
+                node.content = content;
+                if (flagContent(content)) node.hidden = true;
+                // TODO: Let users know it was flagged
+            }
+            if (pictureURL !== undefined) node.pictureURL = pictureURL;
+            if (context.loggedInAccount?.isAdmin && pictureUnsafe !== undefined)
+                node.pictureUnsafe = pictureUnsafe;
+            if (context.loggedInAccount?.isAdmin && hidden !== undefined) {
+                node.hidden = hidden;
+            }
+            if (featured !== undefined) node.featured = featured;
+
+            // MutationResolvers.createNotification(
+            //     undefined,
+            //     {
+            //         accountScreenName: node.owner,
+            //         content: `Your page titled "${node.title}" was edited by an administrator.`,
+            //         link: `/node/${node.ID}`,
+            //     },
+            //     context
+            // );
+
+            return await addItem(TABLES.NODE_TABLE, node);
+        },
     }),
     deleteNode: defaultEndpointsFactory.build({
-        methods: undefined,
-        input: undefined,
-        output: undefined,
-        handler: async ({ input: {} }) => {},
+        methods: ["delete"],
+        input: z.object({ nodeID: z.string() }),
+        output: z.object({ deleted: z.boolean() }),
+        handler: async ({ input: { nodeID } }) => {
+            const node = await getNode(nodeID);
+            if (!node) throw new Error("That node doesnt exist!");
+
+            if (
+                !context.loggedInAccount?.isAdmin &&
+                !context.loggedInAccount?.screenName !== node.owner
+            )
+                throw new Error("No permission!");
+
+            console.log(`Deleting node ${node.ID} (${node.title})`);
+
+            // TODO: Combine these into a single call
+            for (const { ID } of await databaseCalls.getChoicesForNode(
+                node.ID
+            )) {
+                await databaseCalls.removeChoice(ID);
+            }
+            // MutationResolvers.createNotification(
+            //     undefined,
+            //     {
+            //         accountScreenName: node.owner,
+            //         content: `Your page titled "${node.title}" was deleted by an administrator.`,
+            //         link: `/node/${node.ID}`,
+            //     },
+            //     context
+            // );
+
+            return await databaseCalls.removeNode(node.ID);
+        },
     }),
 };
 
@@ -98,120 +229,6 @@ export const views = async (parent) => {
 //     }
 //     return newVisited;
 // };
-
-export const createNode = async (parent, args, context) => {
-    if (!context.loggedInAccount)
-        throw new Error("Must be logged in to do that!");
-
-    const account = context.loggedInAccount;
-    if (!args.title) throw new Error("Title cannot be empty!");
-    if (!args.content) throw new Error("Content cannot be empty!");
-
-    console.log(
-        `Creating new node with title ${args.title} and owner ${account.screenName}`
-    );
-
-    const now = new Date();
-
-    const newNode = {
-        ID: await uniqueID(databaseCalls.getNode),
-        owner: args.accountScreenName,
-        title: args.title,
-        content: args.content,
-        pictureURL: args.pictureURL,
-        pictureUnsafe: false,
-        featured: args.featured || false,
-        hidden:
-            // TODO: Let user know if its flagged and they didnt mean it to be hidden
-            flagContent(args.title) || flagContent(args.content),
-        dateCreated: now.toJSON(),
-        lastUpdated: now.getTime(),
-        views: 0,
-    };
-
-    return await databaseCalls.addNode(newNode);
-};
-export const deleteNode = async (parent, args, context) => {
-    const node = await databaseCalls.getNode(args.nodeID);
-    if (!node) throw new Error("That node doesnt exist!");
-
-    if (
-        !context.loggedInAccount?.isAdmin &&
-        !context.loggedInAccount?.screenName !== node.owner
-    )
-        throw new Error("No permission!");
-
-    console.log(`Deleting node ${node.ID} (${node.title})`);
-
-    // TODO: Combine these into a single call
-    for (const { ID } of await databaseCalls.getCanonChoicesForNode(node.ID)) {
-        await databaseCalls.removeChoice(ID);
-    }
-    for (const { ID } of await databaseCalls.getNonCanonChoicesForNode(
-        node.ID
-    )) {
-        await databaseCalls.removeChoice(ID);
-    }
-
-    // MutationResolvers.createNotification(
-    //     undefined,
-    //     {
-    //         accountScreenName: node.owner,
-    //         content: `Your page titled "${node.title}" was deleted by an administrator.`,
-    //         link: `/node/${node.ID}`,
-    //     },
-    //     context
-    // );
-
-    return await databaseCalls.removeNode(node.ID);
-};
-export const editNode = async (parent, args, context) => {
-    const node = await databaseCalls.getNode(args.nodeID);
-    if (!node) throw new Error("That node doesnt exist!");
-
-    if (
-        !context.loggedInAccount?.isAdmin &&
-        !context.loggedInAccount?.screenName !== node.owner
-    )
-        throw new Error("No permission!");
-
-    console.log(`Editing node ${node.ID} (${node.title})`);
-
-    if (args.title) {
-        node.title = args.title;
-        if (flagContent(args.title)) node.hidden = true;
-        // TODO: Let users know it was flagged
-    }
-    if (args.content) {
-        node.content = args.content;
-        if (flagContent(args.content)) node.hidden = true;
-        // TODO: Let users know it was flagged
-    }
-    if (args.pictureURL !== undefined) node.pictureURL = args.pictureURL;
-    if (args.pictureUnsafe !== undefined)
-        node.pictureUnsafe = args.pictureUnsafe;
-    if (context.loggedInAccount?.isAdmin && args.hidden !== undefined) {
-        node.hidden = args.hidden;
-    }
-    if (args.featured !== undefined) node.featured = args.featured;
-
-    // MutationResolvers.createNotification(
-    //     undefined,
-    //     {
-    //         accountScreenName: node.owner,
-    //         content: `Your page titled "${node.title}" was edited by an administrator.`,
-    //         link: `/node/${node.ID}`,
-    //     },
-    //     context
-    // );
-
-    return await databaseCalls.addNode(node);
-};
-export const featuredNodes = async (parent, args) =>
-    scramble(await databaseCalls.filterFeatured(args.allowHidden)).slice(
-        0,
-        args.count || 10
-    );
 
 // export const recentlyUpdatedNodes = async (parent, args) =>
 //     await databaseCalls
