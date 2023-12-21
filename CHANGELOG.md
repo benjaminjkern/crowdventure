@@ -1,6 +1,27 @@
 # Crowdventure Changelog
 
-# 1.0 - Move frontend to next and redesign/optimize where necessary
+# 1.0 - Giant overhaul
+
+- Switched full stack to Typescript & added tons of eslint rules to make sure everything is clean and good
+- Overhauled the structure of all the code to be a lot more streamlined, less repeaty, and overall cleaner
+  - Made sure no dumb calls are being made
+    - Loading a whole table into the frontend and then sorting rather than filtering and paginating on backend
+      - I was doing this for likes / dislikes, searching for choices, and on the account page and it was slowing everything down
+  - Accounts are called accounts, nodes are called nodes, and choices are called choices
+  - Got rid of things I wasn't using or weren't fully fleshed out yet (I want to add these back in later but I didn't need them in rn)
+    - Send message
+    - Report nodes / accounts / choices
+    - Fgcolor / bgcolor of nodes
+- Frontend
+  - Switched frontend to NextJS so it's smoother
+  - Got rid of bootstrap in favor of custom css so I have more control over making stuff consistent and looking nice
+  - Made the node screen a little nicer
+    - Image shows to the left in desktop mode instead of being stretched on top
+    - Merged canon & noncanon choices
+- Backend
+  - Switched backend to Express Zod API so I can have more control over the db calls that are made and the data that is returned
+  - Made sure passwords are actually being encrypted (lol)
+  - Switched database to postgres so I can make the data more structured (Also dynamodb kinda sucked anyways)
 
 # 0.2 - Beta / Streamlining and bug fixing
 

@@ -8,7 +8,7 @@
     "repository": "https://github.com/benjaminjkern/crowdventure",
     "scripts": {
         "start": "nodemon --ext '*' --exec 'tsx index.ts'",
-        "save-db": "node scripts/saveDb.js"
+        "save-db": "tsx scripts/saveDb.ts"
     },
     "dependencies": {
         "aws-sdk": "^2.1514.0",
