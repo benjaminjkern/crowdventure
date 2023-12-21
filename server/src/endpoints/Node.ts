@@ -1,5 +1,13 @@
-import databaseCalls from "../databaseCalls.js";
+import { TABLES, getItem } from "+/databaseCalls.js";
+import { type StoredNode } from "@/types/storedTypes.js";
 import { getIP, uniqueID } from "../utils.js";
+
+// defaultEndpointsFactory.build({
+//     methods: undefined,
+//     input: undefined,
+//     output: undefined,
+//     handler: async ({ input: {} }) => {
+//     }})
 
 export const content = async (parent, args, context) => {
     const IP = getIP(context);
@@ -23,13 +31,6 @@ export const content = async (parent, args, context) => {
     }
     return parent.content;
 };
-export const owner = async (parent) =>
-    await databaseCalls.getAccount(parent.owner);
-
-export const allChoices = async (parent) => [
-    ...(await databaseCalls.getCanonChoicesForNode(parent.ID)),
-    ...(await databaseCalls.getNonCanonChoicesForNode(parent.ID)),
-];
 
 export const views = async (parent) => {
     // TODO: Do this on view instead of spawning process to calculate

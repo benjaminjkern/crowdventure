@@ -13,8 +13,8 @@ export const scramble = (list: object[]) => {
     return newList;
 };
 
-export const uniqueID = async (
-    fetchFunc: (id: string) => Promise<object>,
+export const uniqueID = async <T>(
+    fetchFunc: (id: string) => Promise<T | undefined>,
     prefix = "",
     upperCase = true
 ) => {

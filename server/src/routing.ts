@@ -1,10 +1,10 @@
 import { type Routing } from "express-zod-api";
-import { getAccountEndpoint } from "./endpoints/Account";
+import { accountEndpoints } from "./endpoints/Account";
+import { choiceEndpoints } from "./endpoints/Choice";
+import { nodeEndpoints } from "./endpoints/Node";
 
 export const routing: Routing = {
-    account: {
-        getAccount: getAccountEndpoint,
-    },
-    // choice: choiceRouter,
-    // node: nodeRouter,
+    account: accountEndpoints,
+    choice: choiceEndpoints,
+    node: nodeEndpoints,
 };

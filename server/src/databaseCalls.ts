@@ -36,16 +36,6 @@ export const saveFullDbLocally = async () => {
     }
 };
 
-// const databaseCalls = {
-//     filterFeatured: async (allowHidden: boolean) => {
-//         if (allowHidden) return await filter(NODE_TABLE, "featured", true);
-//         return await filterVisible(NODE_TABLE, "featured", true);
-//     },
-//     filterParents: async (nodeID, allowHidden) => {
-//         if (allowHidden) return await filter(CHOICE_TABLE, "to", nodeID);
-//         return await filterVisible(CHOICE_TABLE, "to", nodeID);
-//     },
-
 //     sortedNodes: async (pageSize, pageNum, allowHidden) => {
 //         if (allowHidden)
 //             return await getPaginatedTable(
@@ -79,68 +69,8 @@ export const saveFullDbLocally = async () => {
 //         return recentNodes[Math.floor(Math.random() * recentNodes.length)];
 //     },
 
-//     removeAccount: async (accountScreenName) =>
-//         await removeItem(ACCOUNT_TABLE, { screenName: accountScreenName }),
-//     removeNode: async (nodeID) => {
-//         await removeItem(NODE_TABLE, { ID: nodeID });
-//         await removeItem(SORTED_NODE_TABLE, { ID: nodeID });
-//     },
-//     removeChoice: async (choiceID) =>
-//         await removeItem(CHOICE_TABLE, { ID: choiceID }),
-//     removeFeedback: async (feedbackID) =>
-//         await removeItem(FEEDBACK_TABLE, { ID: feedbackID }),
-//     removeReaction: async (reactionID) =>
-//         await removeItem(REACTION_TABLE, { ID: reactionID }),
-//     removeNotification: async (notificationID) =>
-//         await removeItem(NOTIFICATION_TABLE, { ID: notificationID }),
-
 //     // New calls
 
-//     getNodesOwnedByAccount: async (screenName) => {
-//         return await filter(NODE_TABLE, "owner", screenName);
-//     },
-//     getChoicesSuggestedByAccount: async (screenName) => {
-//         return await filter(CHOICE_TABLE, "suggestedBy", screenName);
-//     },
-//     getNotificationsForAccount: async (screenName) => {
-//         return await filter(NOTIFICATION_TABLE, "account", screenName);
-//     },
-//     getFeaturedNodesOwnedByAccount: async (screenName) => {
-//         return await multiFilter(NODE_TABLE, {
-//             ExpressionAttributeNames: {
-//                 "#o": "owner",
-//             },
-//             ExpressionAttributeValues: {
-//                 ":sn": screenName,
-//                 ":t": true,
-//             },
-//             FilterExpression: `#o = :sn AND featured = :t`,
-//         });
-//     },
-//     getLikedByForChoice: async (choiceID) => {
-//         return await multiFilter(REACTION_TABLE, {
-//             ExpressionAttributeNames: {
-//                 "#l": "like",
-//             },
-//             ExpressionAttributeValues: {
-//                 ":ci": choiceID,
-//                 ":t": true,
-//             },
-//             FilterExpression: `choice = :ci AND #l = :t`,
-//         });
-//     },
-//     getDisikedByForChoice: async (choiceID) => {
-//         return await multiFilter(REACTION_TABLE, {
-//             ExpressionAttributeNames: {
-//                 "#l": "like",
-//             },
-//             ExpressionAttributeValues: {
-//                 ":ci": choiceID,
-//                 ":f": false,
-//             },
-//             FilterExpression: `choice = :ci AND #l = :f`,
-//         });
-//     },
 //     getReactionByAccountAndChoice: async (screenName, choiceID) => {
 //         return (
 //             await multiFilter(REACTION_TABLE, {
@@ -155,35 +85,6 @@ export const saveFullDbLocally = async () => {
 //                 FilterExpression: `#c = :ci AND #a = :sn`,
 //             })
 //         )[0];
-//     },
-//     getViewsForNode: async (nodeID) => {
-//         return await filter(VIEW_TABLE, "node", nodeID);
-//     },
-//     getCanonChoicesForNode: async (nodeID) => {
-//         return await multiFilter(CHOICE_TABLE, {
-//             ExpressionAttributeNames: {
-//                 "#n": "from",
-//                 "#ic": "isCanon",
-//             },
-//             ExpressionAttributeValues: {
-//                 ":ni": nodeID,
-//                 ":t": true,
-//             },
-//             FilterExpression: `#n = :ni AND #ic = :t`,
-//         });
-//     },
-//     getNonCanonChoicesForNode: async (nodeID) => {
-//         return await multiFilter(CHOICE_TABLE, {
-//             ExpressionAttributeNames: {
-//                 "#n": "from",
-//                 "#ic": "isCanon",
-//             },
-//             ExpressionAttributeValues: {
-//                 ":ni": nodeID,
-//                 ":f": false,
-//             },
-//             FilterExpression: `#n = :ni AND #ic = :f`,
-//         });
 //     },
 //     getViewByNodeAndIP: async (nodeID, IP) => {
 //         return await multiFilter(VIEW_TABLE, {
@@ -313,7 +214,6 @@ export const addItem = async <T>(tableName: TABLES, item: T) =>
         .promise()
         .then(() => item);
 
-//     addAccount: async (account) => await addItem(ACCOUNT_TABLE, account),
 //     addNode: async (node) => {
 //         await addItem(SORTED_NODE_TABLE, {
 //             idx: "Node",
@@ -325,42 +225,67 @@ export const addItem = async <T>(tableName: TABLES, item: T) =>
 //         });
 //         return await addItem(NODE_TABLE, node);
 //     },
-//     addChoice: async (choice) => await addItem(CHOICE_TABLE, choice),
-//     addFeedback: async (feedback) => await addItem(FEEDBACK_TABLE, feedback),
-//     addReaction: async (reaction) => await addItem(REACTION_TABLE, reaction),
-//     addNotification: async (notification) =>
-//         await addItem(NOTIFICATION_TABLE, notification),
-//     addView: async (view) => await addItem(VIEW_TABLE, view),
 
-// @ts-ignore
-export const getFullTable: <T>(
+type GetFullTableOptions = {
+    lastEvaluatedKey?: AWS.DynamoDB.DocumentClient.Key;
+    filters?: Record<string, unknown>;
+};
+
+export const getFullTable: (
     tableName: TABLES,
-    lastEvaluatedKey?: AWS.DynamoDB.DocumentClient.Key
-) => Promise<T[]> = async (
-    tableName: TABLES,
-    lastEvaluatedKey?: AWS.DynamoDB.DocumentClient.Key
+    options?: GetFullTableOptions
+) => Promise<AttributeMap[]> = async (
+    tableName,
+    { lastEvaluatedKey, filters } = {}
 ) => {
+    let filterExpression = {};
+    if (filters) {
+        const filterExpressionsList = [];
+        const keys = Object.keys(filters);
+        if (keys.length > 26) throw new Error("DONT DO THAT MANY FILTERS");
+
+        filterExpression = {
+            ExpressionAttributeNames: {},
+            ExpressionAttributeValues: {},
+        };
+
+        for (let k = 0; k <= keys.length; k++) {
+            const variable = String.fromCharCode(97 + k);
+            const key = keys[k];
+            // @ts-ignore
+            filterExpression.ExpressionAttributeNames[`#${variable}`] = key; // eslint-disable-line
+            // @ts-ignore
+            filterExpression.ExpressionAttributeValues[`:${variable}`] = // eslint-disable-line
+                // @ts-ignore
+                filters[key];
+            filterExpressionsList.push(`#${variable} = :${variable}`);
+        }
+        // @ts-ignore
+        filterExpression.FilterExpression = filterExpressionsList.join(" AND ");
+    }
     const { Items, LastEvaluatedKey } = await docClient
         .scan({
             TableName: tableName,
             ExclusiveStartKey: lastEvaluatedKey,
+            ...filterExpression,
         })
         .promise();
 
     const items = (Items ?? []) as AttributeMap[];
 
     if (LastEvaluatedKey === undefined) return items;
-    return [...items, ...(await getFullTable(tableName, LastEvaluatedKey))];
+    return [
+        ...items,
+        ...(await getFullTable(tableName, {
+            lastEvaluatedKey: LastEvaluatedKey,
+            filters,
+        })),
+    ];
 };
-
-//     allAccounts: async () => await getFullTable(ACCOUNT_TABLE),
-//     allNodes: async () => await getFullTable(NODE_TABLE),
-//     allChoices: async () => await getFullTable(CHOICE_TABLE),
-//     allFeedback: async () => await getFullTable(FEEDBACK_TABLE),
 
 export const getItem = async <T>(
     tableName: TABLES,
-    key: Record<string, string>
+    key: AWS.DynamoDB.DocumentClient.Key
 ) =>
     await docClient
         .get({
@@ -368,34 +293,16 @@ export const getItem = async <T>(
             Key: key,
         })
         .promise()
-        .then((data) => data.Item as T | undefined)
-        .catch((err) => {
-            console.log(err);
-            throw err;
-        });
+        .then((data) => data.Item as T | undefined);
 
-//     getAccount: async (accountScreenName) =>
-//         await getItem(ACCOUNT_TABLE, { screenName: accountScreenName }),
-//     getNode: async (nodeID) => await getItem(NODE_TABLE, { ID: nodeID }),
-//     getChoice: async (choiceID) =>
-//         await getItem(CHOICE_TABLE, { ID: choiceID }),
-//     getFeedback: async (feedbackID) =>
-//         await getItem(FEEDBACK_TABLE, { ID: feedbackID }),
-//     getReaction: async (reactionID) =>
-//         await getItem(REACTION_TABLE, { ID: reactionID }),
-//     getNotification: async (notificationID) =>
-//         await getItem(NOTIFICATION_TABLE, { ID: notificationID }),
-//     getView: async (viewID) => await getItem(VIEW_TABLE, { ID: viewID }),
-
-// const removeItem = async (tableName, key) =>
-//     await docClient
-//         .delete({ TableName: tableName, Key: key })
-//         .promise()
-//         .then(() => true)
-//         .catch((err) => {
-//             console.log(err);
-//             return err;
-//         });
+export const removeItem = async (
+    tableName: TABLES,
+    key: AWS.DynamoDB.DocumentClient.Key
+) =>
+    await docClient
+        .delete({ TableName: tableName, Key: key })
+        .promise()
+        .then(() => true);
 
 // // const removeMultiple = async (tableName, keys) =>
 // //     await docClient
@@ -412,66 +319,6 @@ export const getItem = async <T>(
 // //             console.log(err);
 // //             return err;
 // //         });
-
-// const multiFilter = async (tableName, filterExpression) => {
-//     if (!DBON) return [];
-
-//     return await docClient
-//         .scan({
-//             TableName: tableName,
-//             ...filterExpression,
-//         })
-//         .promise()
-//         .then((data) => data.Items)
-//         .catch((err) => {
-//             console.log(err);
-//             return err;
-//         });
-// };
-
-// const filter = async (tableName, arg, value) =>
-//     DBON
-//         ? await docClient
-//               .scan({
-//                   TableName: tableName,
-//                   ExpressionAttributeValues: {
-//                       ":r": value,
-//                   },
-//                   ExpressionAttributeNames: {
-//                       "#a": arg,
-//                   },
-//                   FilterExpression: `#a = :r`,
-//               })
-//               .promise()
-//               .then((data) => data.Items)
-//               .catch((err) => {
-//                   console.log(err);
-//                   return err;
-//               })
-//         : [];
-
-// const filterVisible = async (tableName, arg, value) =>
-//     DBON
-//         ? await docClient
-//               .scan({
-//                   TableName: tableName,
-//                   ExpressionAttributeValues: {
-//                       ":r": value,
-//                       ":t": true,
-//                   },
-//                   ExpressionAttributeNames: {
-//                       "#a": arg,
-//                       "#h": "hidden",
-//                   },
-//                   FilterExpression: `#a = :r AND #h <> :t AND pictureUnsafe <> :t`,
-//               })
-//               .promise()
-//               .then((data) => data.Items)
-//               .catch((err) => {
-//                   console.log(err);
-//                   return err;
-//               })
-//         : [];
 
 export const getUnseenNotificationCount = async (accountScreenName: string) => {
     return (

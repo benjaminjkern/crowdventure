@@ -26,3 +26,29 @@ export const AccountSchema = z.object({
     bio: z.string().optional().nullable(),
     hidden: z.boolean().optional(),
 });
+
+// export type StoredChoice = {
+//     action: string;
+//     dateCreated: string;
+//     lastUpdated?: number; // TODO: Was never included before for some reason
+//     from: string;
+//     score: number;
+//     suggestedBy: string;
+//     ID: string;
+//     to: string;
+//     isCanon: boolean;
+//     hidden?: boolean; // TODO: Should migrate this to be always available
+// };
+
+export const ChoiceSchema = z.object({
+    action: z.string(),
+    dateCreated: z.string(),
+    lastUpdated: z.string().optional(),
+    from: z.string(),
+    score: z.number(),
+    suggestedBy: z.string(),
+    ID: z.string(),
+    to: z.string(),
+    isCanon: z.boolean(),
+    hidden: z.boolean().optional(),
+});
