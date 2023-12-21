@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { defaultEndpointsFactory } from "express-zod-api";
-import { TABLES, addItem, getFullTable } from "+/databaseCalls";
+import { TABLES, addItem, getFullTable, removeItem } from "+/databaseCalls";
 import { ChoiceSchema } from "+/schemas";
-import { uniqueID } from "+/utils";
+import { flagContent, uniqueID } from "+/utils";
 import { type Choice } from "@/types/models";
 import { getChoice, getNode } from "+/modelHelpers";
 
@@ -32,9 +32,12 @@ export const choiceEndpoints = {
             fromNodeID: z.string(),
             toNodeID: z.string(),
             action: z.string().min(1),
+            content: z.string().min(1),
         }),
         output: ChoiceSchema,
-        handler: async ({ input: { fromNodeID, toNodeID, action } }) => {
+        handler: async ({
+            input: { fromNodeID, toNodeID, action, content },
+        }) => {
             if (!context.loggedInAccount)
                 throw new Error("Must be logged in to do that!");
 
@@ -49,19 +52,22 @@ export const choiceEndpoints = {
                 `${account.screenName} is suggesting a new choice (${action}) to node ${fromNode.ID} (${fromNode.title}), which goes to node ${toNode.ID} (${toNode.title})`
             );
 
+            const now = new Date();
+
             const newChoice: Choice = {
                 ID: await uniqueID(getChoice, `${fromNode.ID}-`, false),
                 from: fromNode.ID,
                 action,
-                dateCreated: new Date().toJSON(),
+                dateCreated: now.toJSON(),
+                lastUpdated: now.getTime(),
                 to: toNode.ID,
                 suggestedBy: account.screenName,
-                hidden: flagContent(args.content) || undefined, // Let users know if its flagged
+                hidden: flagContent(content) || undefined, // Let users know if its flagged
                 score: 0,
                 isCanon: false,
             };
 
-            if (account.screenName === node.owner) {
+            if (account.screenName === fromNode.owner) {
                 newChoice.isCanon = true;
                 // updateTime(node);
             } else {
@@ -83,13 +89,26 @@ export const choiceEndpoints = {
     }),
     editChoice: defaultEndpointsFactory.build({
         methods: ["patch"],
-        input: undefined,
-        output: undefined,
-        handler: async ({ input: {} }) => {
-            const choice = await databaseCalls.getChoice(args.choiceID);
+        input: z.object({
+            choiceID: z.string(),
+            hidden: z.boolean().optional(),
+            toNodeID: z.string().optional(),
+            isCanon: z.boolean().optional(),
+            action: z.string().min(1).optional(),
+        }),
+        output: ChoiceSchema,
+        handler: async ({
+            input: { choiceID, toNodeID, hidden, isCanon, action },
+        }) => {
+            const choice = await getChoice(choiceID);
             if (!choice) throw new Error("That choice doesnt exist!");
 
-            const fromNode = await databaseCalls.getNode(choice.from);
+            const fromNode = await getNode(choice.from);
+
+            if (!fromNode) {
+                throw new Error("That choice's from node disappeared!");
+                // TODO: Fix this when this happens
+            }
 
             if (
                 !context.loggedInAccount?.isAdmin &&
@@ -101,26 +120,26 @@ export const choiceEndpoints = {
 
             console.log(`Editing suggestion ${choice.ID} (${choice.action})`);
 
+            // TODO: Have to change at least one thing
+
             // const daddy = await databaseCalls.getNode(choice.from);
 
-            if (context.loggedInAccount?.isAdmin && args.hidden !== undefined)
+            if (context.loggedInAccount?.isAdmin && hidden !== undefined)
                 // Should only be able to be done by admins
-                choice.hidden = args.hidden;
-            if (args.toID && choice.to !== args.toID) {
-                choice.to = args.toID;
-                // if (daddy.canonChoices.includes(choice.ID)) {
-                //     updateTime(daddy);
-                // }
+                choice.hidden = hidden;
+            if (toNodeID && choice.to !== toNodeID) {
+                const toNode = await getNode(toNodeID);
+                if (toNode) choice.to = toNodeID; // TODO: Should let users know that it didnt work
             }
             if (
-                context.loggedInAccount?.isAdmin ||
-                (context.loggedInAccount?.screenName === fromNode.owner &&
-                    args.isCanon !== undefined)
+                (context.loggedInAccount?.isAdmin ||
+                    context.loggedInAccount?.screenName === fromNode.owner) &&
+                isCanon !== undefined
             )
-                choice.isCanon = args.isCanon;
-            if (args.action) {
-                choice.action = args.action;
-                if (flagContent(args.action)) choice.hidden = true;
+                choice.isCanon = isCanon;
+            if (action) {
+                choice.action = action;
+                if (flagContent(action)) choice.hidden = true;
                 // TODO: Notify users of flagged content
             }
 
@@ -134,18 +153,23 @@ export const choiceEndpoints = {
             //     context
             // );
 
-            return await databaseCalls.addChoice(choice);
+            return await addItem(TABLES.CHOICE_TABLE, choice);
         },
     }),
     removeChoice: defaultEndpointsFactory.build({
         methods: ["delete"],
-        input: undefined,
-        output: undefined,
-        handler: async ({ input: {} }) => {
-            const choice = await databaseCalls.getChoice(args.choiceID);
+        input: z.object({ choiceID: z.string() }),
+        // @ts-ignore
+        output: z.boolean(),
+        handler: async ({ input: { choiceID } }) => {
+            const choice = await getChoice(choiceID);
             if (!choice) throw new Error("That choice doesnt exist!");
 
-            const fromNode = await databaseCalls.getNode(choice.from);
+            const fromNode = await getNode(choice.from);
+            if (!fromNode) {
+                throw new Error("That choice's from node disappeared!");
+                // TODO: Fix this when this happens
+            }
 
             if (
                 !context.loggedInAccount?.isAdmin &&
@@ -156,57 +180,57 @@ export const choiceEndpoints = {
                 throw new Error("No permission!");
 
             console.log(`Removing suggestion ${choice.ID} (${choice.action})`);
-            return await databaseCalls.removeChoice(choice.ID);
+            return await removeItem(TABLES.CHOICE_TABLE, { ID: choice.ID });
         },
     }),
-    reactToChoice: defaultEndpointsFactory.build({
-        methods: ["post"],
-        input: undefined,
-        output: undefined,
-        handler: async ({ input: {} }) => {
-            const choice = await databaseCalls.getChoice(args.choiceID);
-            if (!choice) {
-                throw new UserInputError("That node doesnt exist!", {
-                    invalidArgs: Object.keys(args),
-                });
-            }
-            const account = await databaseCalls.getAccount(
-                args.accountScreenName
-            );
-            if (!account) {
-                throw new UserInputError("That account doesnt exist!", {
-                    invalidArgs: Object.keys(args),
-                });
-            }
+    // reactToChoice: defaultEndpointsFactory.build({
+    //     methods: ["post"],
+    //     input: z.object({
+    //         choiceID: z.string(),
+    //         like: z.boolean(),
+    //     }),
+    //     // @ts-ignore
+    //     output: z.number().int(),
+    //     handler: async ({ input: { choiceID, like } }) => {
+    //         const choice = await getChoice(choiceID);
+    //         if (!choice) throw new Error("That node doesnt exist!");
 
-            console.log(
-                `${account.screenName} is liking choice ${choice.ID} (${choice.action})`
-            );
+    //         if (
+    //             !context.loggedInAccount?.isAdmin &&
+    //             !context.loggedInAccount?.screenName !== fromNode.owner &&
+    //             (choice.isCanon ||
+    //                 context.loggedInAccount?.screenName !== choice.suggestedBy)
+    //         )
+    //             throw new Error("No permission!");
 
-            const reaction = await databaseCalls.getReactionByAccountAndChoice(
-                args.accountScreenName,
-                args.choiceID
-            );
+    //         console.log(
+    //             `${context.loggedInAccount.screenName} is ${like ? 'liking' : 'disliking'} choice ${choice.ID} (${choice.action})`
+    //         );
 
-            if (!reaction) {
-                await changeScore(choice, 1);
+    //         const reaction = await databaseCalls.getReactionByAccountAndChoice(
+    //             args.accountScreenName,
+    //             args.choiceID
+    //         );
 
-                return await databaseCalls.addReaction({
-                    ID: await uniqueID(databaseCalls.getReaction),
-                    account: args.accountScreenName,
-                    choice: args.choiceID,
-                    like: true,
-                });
-            } else if (reaction.like === true) {
-                await changeScore(choice, -1);
-                // replace with reaction.like === args.like
-                // If it already matches what you are trying to do, turn it off
-                return await databaseCalls.removeReaction(reaction.ID);
-            } else {
-                await changeScore(choice, 2);
-                reaction.like = true;
-                return await databaseCalls.addReaction(reaction);
-            }
-        },
-    }),
+    //         if (!reaction) {
+    //             await changeScore(choice, 1);
+
+    //             return await databaseCalls.addReaction({
+    //                 ID: await uniqueID(databaseCalls.getReaction),
+    //                 account: args.accountScreenName,
+    //                 choice: args.choiceID,
+    //                 like: true,
+    //             });
+    //         } else if (reaction.like === true) {
+    //             await changeScore(choice, -1);
+    //             // replace with reaction.like === args.like
+    //             // If it already matches what you are trying to do, turn it off
+    //             return await databaseCalls.removeReaction(reaction.ID);
+    //         } else {
+    //             await changeScore(choice, 2);
+    //             reaction.like = true;
+    //             return await databaseCalls.addReaction(reaction);
+    //         }
+    //     },
+    // }),
 };

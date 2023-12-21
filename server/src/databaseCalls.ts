@@ -302,7 +302,8 @@ export const removeItem = async (
     await docClient
         .delete({ TableName: tableName, Key: key })
         .promise()
-        .then(() => true);
+        .then(() => true)
+        .catch(() => false);
 
 // // const removeMultiple = async (tableName, keys) =>
 // //     await docClient

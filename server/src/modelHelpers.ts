@@ -7,7 +7,7 @@ import { TABLES, getItem } from "./databaseCalls";
 import { type Account } from "@/types/models";
 
 export const getAccount = async (screenName: string) =>
-    getItem<StoredAccount>(TABLES.ACCOUNT_TABLE, {
+    await getItem<StoredAccount>(TABLES.ACCOUNT_TABLE, {
         screenName,
     });
 
@@ -19,11 +19,11 @@ export const serializeAccount = (account: StoredAccount) => {
 };
 
 export const getChoice = async (ID: string) =>
-    getItem<StoredChoice>(TABLES.CHOICE_TABLE, {
+    await getItem<StoredChoice>(TABLES.CHOICE_TABLE, {
         ID,
     });
 
 export const getNode = async (ID: string) =>
-    getItem<StoredNode>(TABLES.NODE_TABLE, {
+    await getItem<StoredNode>(TABLES.NODE_TABLE, {
         ID,
     });
