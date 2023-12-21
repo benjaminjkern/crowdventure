@@ -22,6 +22,8 @@
   - Switched backend to Express Zod API so I can have more control over the db calls that are made and the data that is returned
   - Made sure passwords are actually being encrypted (lol)
   - Switched database to postgres so I can make the data more structured (Also dynamodb kinda sucked anyways)
+  - Made datecreated and updated at into dates
+  - Added ids to everything instead of using slugs to refer to everything
 
 # 0.2 - Beta / Streamlining and bug fixing
 
