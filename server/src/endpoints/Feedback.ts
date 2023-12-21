@@ -11,6 +11,20 @@
 //     throw new Error("The parent's reporting object type is invalid");
 // };
 
+/*
+
+
+
+        createFeedback(
+            reportingObjectType: String
+            reportingObjectID: String
+            info: String!
+        ): Feedback!
+        removeFeedback(feedbackID: String!): Boolean!
+        removeAllFeedback(
+            reportingObjectType: String
+            reportingObjectID: String
+        ): Boolean!*/
 // createFeedback: async (parent, args, context) => {
 //     let account;
 //     if (args.accountScreenName) {

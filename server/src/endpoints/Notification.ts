@@ -1,4 +1,13 @@
-// Nothing here I think
+//
+// seeNotification(
+//     notificationID: String!
+//     setSeen: Boolean
+// ): Boolean!
+// removeNotification(notificationID: String!): Boolean!
+
+// clearNotifications(
+//     onlyClearSeen: Boolean
+// ): Boolean!
 
 // export const getUnseenNotificationCount = async (accountScreenName: string) => {
 //     return (
