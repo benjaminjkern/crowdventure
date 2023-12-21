@@ -1,4 +1,4 @@
-export const scramble = (list: object[]) => {
+export const scramble = <T>(list: T[]) => {
     const newList = [...list];
     for (let i = 0; i < newList.length; i++) {
         const r = Math.floor(Math.random() * list.length);

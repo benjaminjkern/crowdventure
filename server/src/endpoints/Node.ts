@@ -30,11 +30,21 @@ export const nodeEndpoints = {
         output: z.object({ nodes: NodeSchema.array() }),
         handler: async ({ input: { allowHidden, count = 10 } }) => {
             // TODO: Do this better
-            const allFeatured = await getMany(TABLES.NODE_TABLE, {
-                filters: { featured: true, hidden: allowHidden },
-                filterExpressions: { hidden: (v, a) => `${v} <> ${a}` },
-            });
-            scramble(allFeatued).slice(0, args.count || 10);
+            const { results: allFeatured } = await getMany<StoredNode>(
+                TABLES.NODE_TABLE,
+                {
+                    filters: {
+                        featured: true,
+                        hidden: allowHidden ? undefined : true,
+                        pictureUnsafe: allowHidden ? undefined : true,
+                    },
+                    filterExpressions: {
+                        hidden: (v, a) => `${v} <> ${a}`,
+                        pictureUnsafe: (v, a) => `${v} <> ${a}`,
+                    },
+                }
+            );
+            return { nodes: scramble(allFeatured).slice(0, count) };
         },
     }),
     getNode: defaultEndpointsFactory.build({
