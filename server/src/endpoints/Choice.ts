@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { defaultEndpointsFactory } from "express-zod-api";
 import { TABLES, addItem, getMany, deleteItem } from "+/databaseCalls";
-import { ChoiceSchema, makePaginationSchema } from "+/schemas";
+import { ChoiceSchema } from "+/schemas";
 import { flagContent, uniqueID } from "+/utils";
 import { type Choice } from "@/types/models";
 import { getChoice, getNode } from "+/modelHelpers";
@@ -19,11 +19,15 @@ export const choiceEndpoints = {
     getChoicesForNode: defaultEndpointsFactory.build({
         methods: ["get"],
         input: z.object({ nodeID: z.string() }),
-        output: makePaginationSchema(ChoiceSchema),
+        output: z.object({ choices: ChoiceSchema.array() }),
         handler: async ({ input: { nodeID } }) => {
-            return await getMany<Choice>(TABLES.CHOICE_TABLE, {
-                filters: { from: nodeID },
-            });
+            return {
+                choices: (
+                    await getMany<Choice>(TABLES.CHOICE_TABLE, {
+                        filters: { from: nodeID },
+                    })
+                ).results,
+            };
         },
     }),
     createChoice: defaultEndpointsFactory.build({

@@ -1,4 +1,4 @@
-import { TABLES, addItem } from "+/databaseCalls";
+import { TABLES, addItem, deleteItem } from "+/databaseCalls";
 
 import { z } from "zod";
 import { defaultEndpointsFactory } from "express-zod-api";
@@ -72,7 +72,9 @@ export const accountEndpoints = {
         input: z.object({
             screenName: z.string(),
         }),
-        output: AccountSchema,
+        output: z.object({
+            deleted: z.boolean(),
+        }),
         handler: async ({ input: { screenName } }) => {
             const account = await getAccount(screenName);
             if (!account) throw new Error("That account doesnt exist!");
@@ -85,21 +87,9 @@ export const accountEndpoints = {
 
             console.log(`Deleting Account ${account.screenName}`);
 
-            // TODO: Make these all one database call instead of O(N) calls
-            for (const {
-                ID,
-            } of await databaseCalls.getChoicesSuggestedByAccount(
-                account.screenName
-            )) {
-                await databaseCalls.removeChoice(ID);
-            }
-            for (const { ID } of await databaseCalls.getNodesOwnedByAccount(
-                account.screenName
-            )) {
-                await databaseCalls.removeNode(ID);
-            }
-
-            return await databaseCalls.removeAccount(account.screenName);
+            return {
+                deleted: await deleteItem(TABLES.ACCOUNT_TABLE, { screenName }),
+            };
         },
     }),
     editAccount: defaultEndpointsFactory.build({

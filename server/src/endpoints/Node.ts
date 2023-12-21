@@ -1,6 +1,13 @@
-import { TABLES, addItem, getItem } from "+/databaseCalls.js";
+import {
+    TABLES,
+    addItem,
+    deleteItem,
+    deleteMany,
+    getItem,
+    getMany,
+} from "+/databaseCalls.js";
 import { type StoredNode } from "@/types/storedTypes.js";
-import { flagContent, getIP, uniqueID } from "../utils.js";
+import { flagContent, getIP, scramble, uniqueID } from "../utils.js";
 import { defaultEndpointsFactory } from "express-zod-api";
 import { z } from "zod";
 import { getNode } from "+/modelHelpers.js";
@@ -18,12 +25,16 @@ export const nodeEndpoints = {
         methods: ["get"],
         input: z.object({
             allowHidden: z.boolean().optional(),
+            count: z.number().int().min(1).optional(),
         }),
         output: z.object({ nodes: NodeSchema.array() }),
-        handler: async ({ input: {} }) => {
-            scramble(
-                await databaseCalls.filterFeatured(args.allowHidden)
-            ).slice(0, args.count || 10);
+        handler: async ({ input: { allowHidden, count = 10 } }) => {
+            // TODO: Do this better
+            const allFeatured = await getMany(TABLES.NODE_TABLE, {
+                filters: { featured: true, hidden: allowHidden },
+                filterExpressions: { hidden: (v, a) => `${v} <> ${a}` },
+            });
+            scramble(allFeatued).slice(0, args.count || 10);
         },
     }),
     getNode: defaultEndpointsFactory.build({
@@ -152,13 +163,6 @@ export const nodeEndpoints = {
                 throw new Error("No permission!");
 
             console.log(`Deleting node ${node.ID} (${node.title})`);
-
-            // TODO: Combine these into a single call
-            for (const { ID } of await databaseCalls.getChoicesForNode(
-                node.ID
-            )) {
-                await databaseCalls.removeChoice(ID);
-            }
             // MutationResolvers.createNotification(
             //     undefined,
             //     {
@@ -169,7 +173,9 @@ export const nodeEndpoints = {
             //     context
             // );
 
-            return await databaseCalls.removeNode(node.ID);
+            return {
+                deleted: await deleteItem(TABLES.NODE_TABLE, { ID: node.ID }),
+            };
         },
     }),
 };

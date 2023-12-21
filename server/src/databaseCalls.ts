@@ -40,6 +40,7 @@ export const saveFullDbLocally = async () => {
 
 type GetManyOptions = {
     filters?: Record<string, unknown>;
+    filterExpressions?: Record<string, (v: string, a: string) => string>;
     amount?: number;
     scanLimit?: number;
 };
@@ -49,7 +50,10 @@ type PaginatedResults<T> = {
     lastEvaluatedKey?: AWS.DynamoDB.DocumentClient.Key;
 };
 
-const getFilterExpressionFromFilters = (filters?: Record<string, unknown>) => {
+const getFilterExpressionFromFilters = (
+    filters?: Record<string, unknown>,
+    filterExpressions?: Record<string, (v: string, a: string) => string>
+) => {
     if (!filters) return {};
     const filterExpressionsList = [];
     const keys = Object.keys(filters);
@@ -65,14 +69,17 @@ const getFilterExpressionFromFilters = (filters?: Record<string, unknown>) => {
 
     for (let k = 0; k <= keys.length; k++) {
         const variable = String.fromCharCode(97 + k);
-        const key = keys[k];
+        const key = keys[k]!;
+        if (filters[key] === undefined) continue;
         // @ts-ignore
         filterExpression.ExpressionAttributeNames[`#${variable}`] = key; // eslint-disable-line
         // @ts-ignore
         filterExpression.ExpressionAttributeValues[`:${variable}`] = // eslint-disable-line
-            // @ts-ignore
             filters[key];
-        filterExpressionsList.push(`#${variable} = :${variable}`);
+        filterExpressionsList.push(
+            filterExpressions?.[key]?.(`#${variable}`, `:${variable}`) ??
+                `#${variable} = :${variable}`
+        );
     }
     // @ts-ignore
     filterExpression.FilterExpression = filterExpressionsList.join(" AND ");
@@ -84,8 +91,16 @@ export const getMany = async <T>(
     options: GetManyOptions = {},
     lastEvaluatedKey?: AWS.DynamoDB.DocumentClient.Key
 ): Promise<PaginatedResults<T>> => {
-    const { filters, amount = -1, scanLimit = 100 } = options;
-    const filterExpression = getFilterExpressionFromFilters(filters);
+    const {
+        filters,
+        filterExpressions,
+        amount = -1,
+        scanLimit = 100,
+    } = options;
+    const filterExpression = getFilterExpressionFromFilters(
+        filters,
+        filterExpressions
+    );
     const { Items, LastEvaluatedKey } = await docClient
         .query({
             TableName: tableName,
@@ -143,21 +158,27 @@ export const deleteItem = async (
         .then(() => true)
         .catch(() => false);
 
-// const removeMultiple = async (tableName, keys) =>
-//     await docClient
-//         .batchWrite({
-//             RequestItems: {
-//                 [tableName]: keys.map((key) => ({
-//                     DeleteRequest: { Key: key },
-//                 })),
-//             },
-//         })
-//         .promise()
-//         .then(() => true)
-//         .catch((err) => {
-//             console.log(err);
-//             return err;
-//         });
+export const deleteMany = async <T extends AWS.DynamoDB.DocumentClient.Key>(
+    tableName: TABLES,
+    filters: Record<string, string>,
+    forEach?: (t: T) => Promise<unknown>
+) => {
+    const { results: itemsToDelete } = await getMany<T>(tableName, { filters });
+
+    if (forEach) await Promise.all(itemsToDelete.map(forEach));
+
+    return await docClient
+        .batchWrite({
+            RequestItems: {
+                [tableName]: itemsToDelete.map((key) => ({
+                    DeleteRequest: { Key: key },
+                })),
+            },
+        })
+        .promise()
+        .then(() => true)
+        .catch(() => false);
+};
 
 export const searchNodes = async (query: string, pageSize: number) => {
     return (
