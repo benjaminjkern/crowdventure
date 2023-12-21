@@ -1,13 +1,47 @@
 import { TABLES, getItem } from "+/databaseCalls.js";
 import { type StoredNode } from "@/types/storedTypes.js";
 import { getIP, uniqueID } from "../utils.js";
+import { defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+import { getNode } from "+/modelHelpers.js";
+import { NodeSchema } from "+/schemas.js";
 
 // defaultEndpointsFactory.build({
 //     methods: undefined,
 //     input: undefined,
 //     output: undefined,
-//     handler: async ({ input: {} }) => {
-//     }})
+//     handler: async ({ input: {} }) => {},
+// });
+
+export const nodeEndpoints = {
+    getNode: defaultEndpointsFactory.build({
+        methods: ["get"],
+        input: z.object({ nodeID: z.string() }),
+        // @ts-ignore
+        output: NodeSchema.optional(),
+        handler: async ({ input: { nodeID } }) => {
+            return await getNode(nodeID);
+        },
+    }),
+    createNode: defaultEndpointsFactory.build({
+        methods: undefined,
+        input: undefined,
+        output: undefined,
+        handler: async ({ input: {} }) => {},
+    }),
+    editNode: defaultEndpointsFactory.build({
+        methods: undefined,
+        input: undefined,
+        output: undefined,
+        handler: async ({ input: {} }) => {},
+    }),
+    deleteNode: defaultEndpointsFactory.build({
+        methods: undefined,
+        input: undefined,
+        output: undefined,
+        handler: async ({ input: {} }) => {},
+    }),
+};
 
 export const content = async (parent, args, context) => {
     const IP = getIP(context);
@@ -179,26 +213,23 @@ export const featuredNodes = async (parent, args) =>
         args.count || 10
     );
 
-export const recentlyUpdatedNodes = async (parent, args) =>
-    await databaseCalls
-        .sortedNodes(
-            args.pageSize ? Math.min(args.pageSize, 100) : 10,
-            args.pageNum || 0,
-            args.allowHidden
-        )
-        .then((nodes) =>
-            Promise.all(nodes.map((node) => databaseCalls.getNode(node.ID)))
-        );
+// export const recentlyUpdatedNodes = async (parent, args) =>
+//     await databaseCalls
+//         .sortedNodes(
+//             args.pageSize ? Math.min(args.pageSize, 100) : 10,
+//             args.pageNum || 0,
+//             args.allowHidden
+//         )
+//         .then((nodes) =>
+//             Promise.all(nodes.map((node) => databaseCalls.getNode(node.ID)))
+//         );
 
-export const randomNode = async (parent, args) =>
-    await databaseCalls.randomNode(
-        args.chooseFromLast || 1000,
-        args.allowHidden
-    );
+// export const randomNode = async (parent, args) =>
+//     await databaseCalls.randomNode(
+//         args.chooseFromLast || 1000,
+//         args.allowHidden
+//     );
 
-export const getNode = async (parent, { ID }) =>
-    await databaseCalls.getNode(ID);
-
-export const searchNodes = async (parent, { query, limit = 10 }) => {
-    return await databaseCalls.searchNodes(query, limit);
-};
+// export const searchNodes = async (parent, { query, limit = 10 }) => {
+//     return await databaseCalls.searchNodes(query, limit);
+// };

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+// TODO: Use z.date() instead of z.string() for dateCreated
+
 // export type StoredAccount = {
 //     lastIP?: string; // TODO: Deprecated
 //     dateCreated: string;
@@ -51,4 +53,36 @@ export const ChoiceSchema = z.object({
     to: z.string(),
     isCanon: z.boolean(),
     hidden: z.boolean().optional(),
+});
+
+// export type StoredNode = {
+//     content: string;
+//     dateCreated: string;
+//     lastUpdated: number;
+//     searchTitle: string;
+//     storedViews?: number; // TODO: Make this always available
+//     views: number;
+//     owner: string;
+//     ID: string;
+//     featured: boolean;
+//     title: string;
+//     pictureURL?: string;
+//     hidden?: boolean; // TODO: Make this always available
+//     pictureUnsafe?: boolean; // TODO: Make this always available (ALSO Change this to pictureSafe)
+// };
+
+export const NodeSchema = z.object({
+    content: z.string(),
+    dateCreated: z.string(),
+    lastUpdated: z.number().int().gte(0),
+    searchTitle: z.string(),
+    storedViews: z.number().int().gte(0).optional(),
+    views: z.number().int().gte(0),
+    owner: z.string(),
+    ID: z.string(),
+    featured: z.boolean(),
+    title: z.string(),
+    pictureURL: z.string().optional(),
+    hidden: z.boolean().optional(),
+    pictureUnsafe: z.boolean().optional(),
 });

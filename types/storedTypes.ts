@@ -1,3 +1,5 @@
+// TODO: Make the dateCreated and lastUpdated the same type
+
 export type StoredAccount = {
     lastIP?: string; // TODO: Deprecated
     dateCreated: string;
@@ -38,7 +40,7 @@ export type StoredNode = {
     content: string;
     dateCreated: string;
     lastUpdated: number;
-    searchTitle: string;
+    searchTitle: string; // TODO: I would like to not have to have this
     storedViews?: number; // TODO: Make this always available
     views: number;
     owner: string;
