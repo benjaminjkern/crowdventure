@@ -19,12 +19,19 @@ export const nodeEndpoints = {
                 .string()
                 .transform((x) => parseInt(x))
                 .optional(),
+            ownedByAccount: z
+                .string()
+                .transform((x) => parseInt(x))
+                .optional(),
         }),
         output: z.object({ nodes: NodeSchema.array() }),
-        handler: async ({ input: { allowHidden, count = 10 } }) => {
+        handler: async ({
+            input: { allowHidden, count = 10, ownedByAccount },
+        }) => {
             // TODO: Do this better (Dont load the whole thing into js & Dont show hidden if owner is hidden
             const allFeatured = await prisma.node.findMany({
                 where: {
+                    ownerId: ownedByAccount,
                     featured: true,
                     hidden: allowHidden ? undefined : false,
                     pictureUnsafe: allowHidden ? undefined : false,

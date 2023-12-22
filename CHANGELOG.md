@@ -12,6 +12,9 @@
     - Send message
     - Report nodes / accounts / choices
     - Fgcolor / bgcolor of nodes
+    - Recently updated nodes on home page
+    - Search for nodes in account page
+    - Go to random page on home page
 - Frontend
   - Switched frontend to NextJS so it's smoother
   - Got rid of bootstrap in favor of custom css so I have more control over making stuff consistent and looking nice

@@ -5,6 +5,7 @@ import React, {
     useState,
     type CSSProperties,
 } from "react";
+import { blurImageStyle } from "../styles";
 
 const UnsafeImage = ({
     style,
@@ -46,12 +47,7 @@ const UnsafeImage = ({
         <img
             style={{
                 ...style,
-                ...(unsafe
-                    ? {
-                          "-webkit-filter": `blur(${blurAmount}px)`,
-                          filter: `blur(${blurAmount}px)`,
-                      }
-                    : undefined),
+                ...blurImageStyle(unsafe, blurAmount),
             }}
             {...props}
             onMouseEnter={() => {

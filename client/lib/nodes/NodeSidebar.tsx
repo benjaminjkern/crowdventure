@@ -21,24 +21,6 @@ const NodeSidebar = ({
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
     const { mutedTextColor } = useContext(PaletteContext);
-    const reportNode = () => {
-        // mutation_call(
-        //     "createFeedback",
-        //     {
-        //         ...(loggedInAs
-        //             ? { accountScreenName: loggedInAs.screenName }
-        //             : {}),
-        //         info: "This is inappropriate",
-        //         reportingObjectType: "Node",
-        //         reportingObjectID: node.ID,
-        //     },
-        //     { info: 0, reporting: 0 },
-        //     () => {
-        //         alert("Successfully reported page!");
-        //         window.location.reload(false);
-        //     }
-        // );
-    };
 
     const choices = node.allChoices;
 

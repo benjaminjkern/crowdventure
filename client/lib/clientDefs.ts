@@ -239,6 +239,7 @@ type DeleteChoiceDeleteChoiceResponse = {
 type GetNodeFeaturedNodesInput = {
     allowHidden?: string | undefined;
     count?: string | undefined;
+    ownedByAccount?: string | undefined;
 };
 
 type GetNodeFeaturedNodesResponse = {

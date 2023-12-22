@@ -12,20 +12,15 @@ import { PaletteContext } from "+/lib/colorPalette";
 import { useMediaQuery, useWindowSize } from "+/lib/hooks";
 import NodeSidebar from "+/lib/nodes/NodeSidebar";
 import CrowdventureButton from "+/lib/components/CrowdventureButton";
+import { blurImageStyle } from "+/lib/styles";
 
 import { type Node } from "@/types/models";
-
-// import EditNodeModal from "../Modals/EditNodeModal";
-// import SuggestChoiceModal from "../Modals/SuggestChoiceModal";
-
-// import ChoiceColumns from "./ChoiceColumns";
+import apiClient from "+/lib/apiClient";
 
 const NAVBAR_HEIGHT = 100;
 const FOOTER_HEIGHT = 78;
 
 const NodePage = ({ node: initNode }: { readonly node: Node }) => {
-    const BLURAMOUNT = 40;
-
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { openModal } = useContext(ModalContext);
     const { lightBackgroundColor } = useContext(PaletteContext);
@@ -36,17 +31,6 @@ const NodePage = ({ node: initNode }: { readonly node: Node }) => {
         setNode(deepCopy(initNode));
     }, [initNode]);
 
-    // if (node === null)
-    //     return (
-    //         <Alert variant="danger">
-    //             <title>Error! Node: {match.params.id}</title>
-    //             <Alert.Heading>Oh snap! You ran into an error</Alert.Heading>
-    //                 This page does not exist, or maybe our database is down. Who
-    //                 knows? Not you. Hahahaha
-    //             </p>
-    //         </Alert>
-    //     );
-
     const { effectiveContentWidth } = useWindowSize();
 
     const router = useRouter();
@@ -54,9 +38,6 @@ const NodePage = ({ node: initNode }: { readonly node: Node }) => {
     const isMobile = useMediaQuery(`(max-width: 800px)`);
 
     if (!node) return <LoadingBox />;
-
-    // Dumb hack because backend is bad
-    if (node.pictureURL === "null") node.pictureURL = undefined; // TODO: Just migrate db to not have this happen
 
     if (node.hidden && !unsafeMode)
         return (
@@ -76,6 +57,7 @@ const NodePage = ({ node: initNode }: { readonly node: Node }) => {
             </CrowdventureAlert>
         );
 
+    // TODO: Figure out where to put this (Alert but still show page)
     // {(node.hidden || node.owner.hidden) &&
     //     node.owner.screenName === user?.screenName &&
     //     !unsafeMode ? (
@@ -129,13 +111,13 @@ const NodePage = ({ node: initNode }: { readonly node: Node }) => {
                             onClick={() => {
                                 openModal(
                                     <PictureModal
-                                        pictureURL={node.pictureURL}
+                                        pictureURL={node.pictureURL!}
                                         title={node.title}
                                     />
                                 );
                             }}
                             onError={() => {
-                                setNode({ ...node, pictureURL: undefined });
+                                setNode({ ...node, pictureURL: null });
                             }}
                             src={node.pictureURL}
                             style={{
@@ -147,12 +129,7 @@ const NodePage = ({ node: initNode }: { readonly node: Node }) => {
                                 borderColor: lightBackgroundColor,
                                 borderRadius: 8,
                                 cursor: "pointer",
-                                ...(node.pictureUnsafe
-                                    ? {
-                                          "-webkit-filter": `blur(${BLURAMOUNT}px)`,
-                                          filter: `blur(${BLURAMOUNT}px)`,
-                                      }
-                                    : {}),
+                                ...blurImageStyle(node.pictureUnsafe, 40),
                             }}
                         />
                     </div>
@@ -166,7 +143,6 @@ const NodePage = ({ node: initNode }: { readonly node: Node }) => {
             >
                 {!node.pictureURL && (
                     <CrowdventureButton
-                        // Should be off to the side
                         onClick={() => {
                             router.back();
                         }}
@@ -188,51 +164,19 @@ export const getStaticPaths = () => ({
     fallback: "blocking",
 });
 
-const FULL_CHOICE_GQL = {
-    ID: 0,
-    action: 0,
-    score: 0,
-    suggestedBy: {
-        hidden: 0,
-        screenName: 0,
-        profilePicURL: 0,
-    },
-    hidden: 0,
-    to: {
-        owner: {
-            screenName: 0,
-            hidden: 0,
-        },
-        ID: 0,
-        hidden: 0,
-    },
-    isCanon: 0,
-};
-
-const FULL_NODE_GQL = {
-    hidden: 0,
-    pictureURL: 0,
-    pictureUnsafe: 0,
-    ID: 0,
-    title: 0,
-    content: 0,
-    views: 0,
-    owner: {
-        screenName: 0,
-        profilePicURL: 0,
-        hidden: 0,
-    },
-    allChoices: FULL_CHOICE_GQL,
-};
-
 export const getStaticProps = async ({
-    params: { nodeId },
+    params: { slug },
 }: {
-    params: { nodeId: string };
+    params: { slug: string };
 }) => {
-    const node = (await queryCall("getNode", FULL_NODE_GQL, {
-        ID: nodeId,
-    })) as CrowdventureNode;
+    const nodeResponse = await apiClient.provide("get", "/node/getNode", {
+        slug,
+    });
+
+    if (nodeResponse.status === "error")
+        throw new Error(nodeResponse.error.message);
+
+    const node = nodeResponse.data.node;
 
     if (!node) return { notFound: true };
 

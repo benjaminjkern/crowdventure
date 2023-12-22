@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
 
-import { type GetStaticPropsContext } from "next";
 import { UserContext } from "+/lib/user";
 import LoadingBox from "+/lib/components/LoadingBox";
 import { UnsafeModeContext } from "+/lib/unsafeMode";
@@ -12,18 +11,38 @@ import { ModalContext } from "+/lib/modal";
 import CreateNodeModal from "+/lib/nodes/CreateNodeModal";
 
 import { type Node, type Account } from "@/types/models";
+import apiClient from "+/lib/apiClient";
+import { useSafeGuardedNodes } from "+/lib/specialHooks";
+
+const getAccountNodes = async (accountId: number, unsafeMode: boolean) => {
+    const nodesResponse = await apiClient.provide(
+        "get",
+        "/node/featuredNodes",
+        {
+            allowHidden: String(unsafeMode),
+            ownedByAccount: String(accountId),
+        }
+    );
+    if (nodesResponse.status === "error")
+        throw new Error(nodesResponse.error.message);
+
+    return nodesResponse.data.nodes;
+};
 
 const AccountPage = ({
     account: initAccount,
+    accountNodes: initAccountNodes,
 }: {
     readonly account: Account;
+    readonly accountNodes: Node[];
 }) => {
     const [account, setAccount] = useState(initAccount);
+    const accountNodes = useSafeGuardedNodes(initAccountNodes, () =>
+        getAccountNodes(account.id, true)
+    );
     const { user } = useContext(UserContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { openModal } = useContext(ModalContext);
-
-    const accountNodes: Node[] = [];
 
     useEffect(() => {
         if (initAccount) setAccount(initAccount);
@@ -70,8 +89,6 @@ const AccountPage = ({
                 {account.totalSuggestionScore}
             </div>
 
-            {/* <hr /> */}
-
             <h3>Featured Stories:</h3>
             <NodeViewer nodes={accountNodes} />
         </>
@@ -84,13 +101,25 @@ export const getStaticPaths = () => ({
 });
 
 export const getStaticProps = async ({
-    params,
-}: GetStaticPropsContext<{ accountScreenName: string }>) => {
-    const account = {};
+    params: { accountScreenName },
+}: {
+    params: { accountScreenName: string };
+}) => {
+    const accountResponse = await apiClient.provide(
+        "get",
+        "/account/getAccount",
+        { screenName: accountScreenName }
+    );
+    if (accountResponse.status === "error")
+        throw new Error(accountResponse.error.message);
+    const account = accountResponse.data.account;
+
+    if (!account) return { notFound: true };
 
     return {
         props: {
             account,
+            accountNodes: await getAccountNodes(account.id, false),
             pageTitle: `${account.screenName} on Crowdventure!`,
             previewImage: account.profilePicURL,
         },
