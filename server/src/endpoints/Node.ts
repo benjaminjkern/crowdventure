@@ -1,14 +1,11 @@
-import { flagContent, getIP, scramble, uniqueID } from "../utils.js";
+import { flagContent, scramble, uniqueID } from "../utils.js";
 import { defaultEndpointsFactory } from "express-zod-api";
 import { z } from "zod";
 import { NodeSchema } from "+/schemas.js";
-
-// defaultEndpointsFactory.build({
-//     methods: undefined,
-//     input: undefined,
-//     output: undefined,
-//     handler: async ({ input: {} }) => {},
-// });
+import authMiddleware from "+/auth.js";
+import { getNode, getNodeBySlug } from "+/commonQueries.js";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 export const nodeEndpoints = {
     featuredNodes: defaultEndpointsFactory.build({
@@ -19,33 +16,25 @@ export const nodeEndpoints = {
         }),
         output: z.object({ nodes: NodeSchema.array() }),
         handler: async ({ input: { allowHidden, count = 10 } }) => {
-            // TODO: Do this better
-            const { results: allFeatured } = await getMany<StoredNode>(
-                TABLES.NODE_TABLE,
-                {
-                    filters: {
-                        featured: true,
-                        hidden: allowHidden ? undefined : true,
-                        pictureUnsafe: allowHidden ? undefined : true,
-                    },
-                    filterExpressions: {
-                        hidden: (v, a) => `${v} <> ${a}`,
-                        pictureUnsafe: (v, a) => `${v} <> ${a}`,
-                    },
-                }
-            );
+            // TODO: Do this better (Dont load the whole thing into js & Dont show hidden if owner is hidden
+            const allFeatured = await prisma.node.findMany({
+                where: {
+                    hidden: allowHidden ? undefined : false,
+                    pictureUnsafe: allowHidden ? undefined : false,
+                },
+            });
             return { nodes: scramble(allFeatured).slice(0, count) };
         },
     }),
     getNode: defaultEndpointsFactory.build({
         methods: ["get"],
-        input: z.object({ nodeID: z.string() }),
+        input: z.object({ slug: z.string() }),
         output: z.object({ node: NodeSchema.optional() }),
-        handler: async ({ input: { nodeID } }) => {
-            return { node: await getNode(nodeID) };
+        handler: async ({ input: { slug } }) => {
+            return { node: (await getNodeBySlug(slug)) ?? undefined };
         },
     }),
-    createNode: defaultEndpointsFactory.build({
+    createNode: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["post"],
         input: z.object({
             title: z.string().min(1),
@@ -56,44 +45,40 @@ export const nodeEndpoints = {
         output: NodeSchema,
         handler: async ({
             input: { title, content, pictureURL, featured },
+            options: { loggedInAccount },
         }) => {
-            if (!context.loggedInAccount)
+            if (!loggedInAccount)
                 throw new Error("Must be logged in to do that!");
 
-            const account = context.loggedInAccount;
-            if (!title) throw new Error("Title cannot be empty!");
-            if (!ontent) throw new Error("Content cannot be empty!");
+            const account = loggedInAccount;
 
             console.log(
                 `Creating new node with title ${title} and owner ${account.screenName}`
             );
 
-            const now = new Date();
+            const newNode = await prisma.node.create({
+                data: {
+                    slug: await uniqueID(getNodeBySlug),
+                    ownerId: account.id,
+                    title,
+                    content,
+                    pictureURL,
+                    featured,
+                    hidden:
+                        // TODO: Let user know if its flagged and they didnt mean it to be hidden
+                        flagContent(title) || flagContent(content),
+                    storedViews: 0,
+                    views: 0,
+                },
+            });
 
-            const newNode: StoredNode = {
-                ID: await uniqueID(getNode),
-                owner: account.screenName,
-                searchTitle: title.toLowerCase(),
-                title,
-                content,
-                pictureURL,
-                pictureUnsafe: false,
-                featured: featured || false,
-                hidden:
-                    // TODO: Let user know if its flagged and they didnt mean it to be hidden
-                    flagContent(title) || flagContent(content),
-                dateCreated: now.toJSON(),
-                lastUpdated: now.getTime(),
-                views: 0,
-            };
-
-            return await addItem(TABLES.NODE_TABLE, newNode);
+            return newNode;
         },
     }),
-    editNode: defaultEndpointsFactory.build({
+    editNode: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["patch"],
         input: z.object({
-            nodeID: z.string(),
+            id: z.number(),
             title: z.string().min(1).optional(),
             content: z.string().min(1).optional(),
             pictureURL: z.string().min(1).optional(),
@@ -103,22 +88,32 @@ export const nodeEndpoints = {
         }),
         output: NodeSchema,
         handler: async ({
-            input: { nodeID, title, content, pictureUnsafe, hidden, featured },
+            input: {
+                id,
+                title,
+                content,
+                pictureURL,
+                pictureUnsafe,
+                hidden,
+                featured,
+            },
+            options: { loggedInAccount },
         }) => {
-            const node = await getNode(nodeID);
+            const node = await getNode(id);
             if (!node) throw new Error("That node doesnt exist!");
 
+            // TODO: Do this in one prisma or sql call
+
             if (
-                !context.loggedInAccount?.isAdmin &&
-                !context.loggedInAccount?.screenName !== node.owner
+                !loggedInAccount?.isAdmin &&
+                loggedInAccount?.id !== node.ownerId
             )
                 throw new Error("No permission!");
 
-            console.log(`Editing node ${node.ID} (${node.title})`);
+            console.log(`Editing node ${node.id} (${node.title})`);
 
             if (title) {
                 node.title = title;
-                node.searchTitle = title.toLowerCase();
                 if (flagContent(title)) node.hidden = true;
                 // TODO: Let users know it was flagged
             }
@@ -128,9 +123,9 @@ export const nodeEndpoints = {
                 // TODO: Let users know it was flagged
             }
             if (pictureURL !== undefined) node.pictureURL = pictureURL;
-            if (context.loggedInAccount?.isAdmin && pictureUnsafe !== undefined)
+            if (loggedInAccount?.isAdmin && pictureUnsafe !== undefined)
                 node.pictureUnsafe = pictureUnsafe;
-            if (context.loggedInAccount?.isAdmin && hidden !== undefined) {
+            if (loggedInAccount?.isAdmin && hidden !== undefined) {
                 node.hidden = hidden;
             }
             if (featured !== undefined) node.featured = featured;
@@ -145,24 +140,24 @@ export const nodeEndpoints = {
             //     context
             // );
 
-            return await addItem(TABLES.NODE_TABLE, node);
+            return await prisma.node.update({ where: { id }, data: node });
         },
     }),
-    deleteNode: defaultEndpointsFactory.build({
+    deleteNode: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["delete"],
-        input: z.object({ nodeID: z.string() }),
+        input: z.object({ id: z.number() }),
         output: z.object({ deleted: z.boolean() }),
-        handler: async ({ input: { nodeID } }) => {
-            const node = await getNode(nodeID);
+        handler: async ({ input: { id }, options: { loggedInAccount } }) => {
+            const node = await getNode(id);
             if (!node) throw new Error("That node doesnt exist!");
 
             if (
-                !context.loggedInAccount?.isAdmin &&
-                !context.loggedInAccount?.screenName !== node.owner
+                !loggedInAccount?.isAdmin &&
+                loggedInAccount?.id !== node.ownerId
             )
                 throw new Error("No permission!");
 
-            console.log(`Deleting node ${node.ID} (${node.title})`);
+            console.log(`Deleting node ${node.id} (${node.title})`);
             // MutationResolvers.createNotification(
             //     undefined,
             //     {
@@ -174,48 +169,48 @@ export const nodeEndpoints = {
             // );
 
             return {
-                deleted: await deleteItem(TABLES.NODE_TABLE, { ID: node.ID }),
+                deleted: !!(await prisma.node.delete({ where: { id } })),
             };
         },
     }),
 };
 
-export const content = async (parent, args, context) => {
-    const IP = getIP(context);
-    if (IP) {
-        // update views
-        const existingView = await databaseCalls.getViewByNodeAndIP(parent.ID);
-        if (!existingView) {
-            await databaseCalls.addView({
-                ID: await uniqueID(databaseCalls.getView),
-                node: parent.ID,
-                IP,
-            });
-            // Fetch the actual node from database so we dont write any weird intermittent data
-            const node = await databaseCalls.getNode(parent.ID);
-            node.views = (node.views || 0) + 1;
-            await databaseCalls.addNode(node);
-            const account = await databaseCalls.getAccount(node.owner);
-            account.totalNodeViews = (account.totalNodeViews || 0) + 1;
-            await databaseCalls.addAccount(account);
-        }
-    }
-    return parent.content;
-};
+// export const content = async (parent, args, context) => {
+//     const IP = getIP(context);
+//     if (IP) {
+//         // update views
+//         const existingView = await databaseCalls.getViewByNodeAndIP(parent.ID);
+//         if (!existingView) {
+//             await databaseCalls.addView({
+//                 ID: await uniqueID(databaseCalls.getView),
+//                 node: parent.ID,
+//                 IP,
+//             });
+//             // Fetch the actual node from database so we dont write any weird intermittent data
+//             const node = await databaseCalls.getNode(parent.ID);
+//             node.views = (node.views || 0) + 1;
+//             await databaseCalls.addNode(node);
+//             const account = await databaseCalls.getAccount(node.owner);
+//             account.totalNodeViews = (account.totalNodeViews || 0) + 1;
+//             await databaseCalls.addAccount(account);
+//         }
+//     }
+//     return parent.content;
+// };
 
-export const views = async (parent) => {
-    // TODO: Do this on view instead of spawning process to calculate
-    // (async () => {
-    //     const node = await databaseCalls.getNode(parent.ID);
-    //     const views = node.views;
-    //     node.views =
-    //         node.storedViews +
-    //         (await databaseCalls.getViewsForNode(node.ID)).length;
-    //     if (views !== node.views) await databaseCalls.addNode(node);
-    // })();
+// export const views = async (parent) => {
+//     // TODO: Do this on view instead of spawning process to calculate
+//     // (async () => {
+//     //     const node = await databaseCalls.getNode(parent.ID);
+//     //     const views = node.views;
+//     //     node.views =
+//     //         node.storedViews +
+//     //         (await databaseCalls.getViewsForNode(node.ID)).length;
+//     //     if (views !== node.views) await databaseCalls.addNode(node);
+//     // })();
 
-    return parent.views;
-};
+//     return parent.views;
+// };
 
 // all nodes that can possible be reached from this node
 // const allConnected = async (node, visited = {}) => {
