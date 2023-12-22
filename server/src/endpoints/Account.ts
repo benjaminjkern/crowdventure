@@ -1,11 +1,13 @@
 import { z } from "zod";
 import { defaultEndpointsFactory } from "express-zod-api";
-import { flagContent } from "+/utils";
+import { flagContent, getIP } from "+/utils";
 import { AccountSchema } from "+/schemas";
 import bcrypt from "bcrypt";
-
+import jwt from "jsonwebtoken";
 import { type Account, PrismaClient } from "@prisma/client";
 import { getAccount, getAccountByScreenName } from "+/commonQueries";
+import authMiddleware from "+/auth";
+import { type Response } from "express";
 const prisma = new PrismaClient();
 
 export const accountEndpoints = {
@@ -20,57 +22,60 @@ export const accountEndpoints = {
             };
         },
     }),
-    login: defaultEndpointsFactory.build({
+    login: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["post"],
         input: z.object({ screenName: z.string(), password: z.string() }),
         output: AccountSchema,
-        handler: async ({ input: { screenName, password } }) => {
+        handler: async ({
+            input: { screenName, password },
+            options: { response, loggedInAccount },
+        }) => {
             const account = await getAccountByScreenName(screenName);
             if (!account) throw new Error("That account doesnt exist!");
             if (password) {
                 if (!bcrypt.compareSync(password, account.encryptedPassword))
                     throw new Error("Incorrect password!");
-
-                sendLoginToken(context, account); // TODO: Figure out context
+                sendLoginToken(response, account);
             } else if (
-                !context.loggedInAccount || // TODO: Figure out context
-                context.loggedInAccount.screenName !== account.screenName // TODO: Figure out context
+                !loggedInAccount ||
+                loggedInAccount.screenName !== account.screenName
             )
                 throw new Error("Failed to re-login!");
 
             return account;
         },
     }),
-    createAccount: defaultEndpointsFactory.build({
+    createAccount: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["post"],
         input: z.object({ screenName: z.string(), password: z.string() }),
         output: AccountSchema,
-        handler: async ({ input: { screenName, password } }) => {
+        handler: async ({
+            input: { screenName, password },
+            options: { request, response },
+        }) => {
             if (flagContent(screenName)) throw new Error("Bad word");
-            // TODO: Dont fetch full object
             if (await getAccountByScreenName(screenName))
                 throw new Error("That screen name already exists!");
 
             console.log(`Creating new account with name ${screenName}`);
 
-            const account: Account = {
-                screenName,
-                encryptedPassword: bcrypt.hashSync(password, 10),
-                lastIP: getIP(context),
-                dateCreated: new Date().toJSON(),
-                isAdmin: false,
-                totalSuggestionScore: 0,
-                totalNodeViews: 0,
-            };
+            const account = await prisma.account.create({
+                data: {
+                    screenName,
+                    encryptedPassword: bcrypt.hashSync(password, 10),
+                    lastIP: getIP(request),
+                    isAdmin: false,
+                    totalSuggestionScore: 0,
+                    totalNodeViews: 0,
+                },
+            });
 
-            await prisma.account.create({ data: account });
-
-            sendLoginToken(context, account);
+            sendLoginToken(response, account);
 
             return account;
         },
     }),
-    deleteAccount: defaultEndpointsFactory.build({
+    deleteAccount: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["delete"],
         input: z.object({
             id: z.number(),
@@ -78,13 +83,13 @@ export const accountEndpoints = {
         output: z.object({
             deleted: z.boolean(),
         }),
-        handler: async ({ input: { id } }) => {
+        handler: async ({ input: { id }, options: { loggedInAccount } }) => {
             const account = await getAccount(id);
             if (!account) throw new Error("That account doesnt exist!");
 
             if (
-                !context.loggedInAccount?.isAdmin &&
-                context.loggedInAccount?.screenName !== account.screenName
+                !loggedInAccount?.isAdmin &&
+                loggedInAccount?.screenName !== account.screenName
             )
                 throw new Error("No permission!");
 
@@ -97,7 +102,7 @@ export const accountEndpoints = {
             };
         },
     }),
-    editAccount: defaultEndpointsFactory.build({
+    editAccount: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["patch"],
         input: z.object({
             id: z.number(),
@@ -121,13 +126,14 @@ export const accountEndpoints = {
                 hidden,
                 isAdmin,
             },
+            options: { loggedInAccount },
         }) => {
             const account = await getAccount(id);
             if (!account) throw new Error("That account doesnt exist!");
 
             if (
-                !context.loggedInAccount?.isAdmin &&
-                context.loggedInAccount?.screenName !== account.screenName
+                !loggedInAccount?.isAdmin &&
+                loggedInAccount?.screenName !== account.screenName
             )
                 throw new Error("No permission!");
 
@@ -156,9 +162,9 @@ export const accountEndpoints = {
             }
             if (profilePicURL !== undefined)
                 account.profilePicURL = profilePicURL;
-            if (context.loggedInAccount?.isAdmin && hidden !== undefined)
+            if (loggedInAccount?.isAdmin && hidden !== undefined)
                 account.hidden = hidden;
-            if (context.loggedInAccount?.isAdmin && isAdmin !== undefined)
+            if (loggedInAccount?.isAdmin && isAdmin !== undefined)
                 account.isAdmin = isAdmin;
 
             // await MutationResolvers.createNotification(
@@ -178,16 +184,15 @@ export const accountEndpoints = {
     }),
 };
 
-const sendLoginToken = (context, account) => {
-    context.res.set({
-        "Access-Control-Expose-Headers": "token",
-        token: jwt.sign(
-            { accountScreenName: account.screenName },
-            process.env.JWT_SECRET,
+const sendLoginToken = (response: Response, account: Account) => {
+    response.set({
+        "Access-Control-Expose-Headers": "authToken",
+        authToken: jwt.sign(
+            { accountId: account.id },
+            process.env.JWT_SECRET!,
             {
                 expiresIn: "1d",
             }
         ),
     });
-    context.loggedInAccount = account;
 };

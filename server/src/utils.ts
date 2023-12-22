@@ -1,3 +1,5 @@
+import { type Request } from "express";
+
 export const scramble = <T>(list: T[]) => {
     const newList = [...list];
     for (let i = 0; i < newList.length; i++) {
@@ -34,4 +36,4 @@ const BAD_WORDS = new RegExp(
 export const flagContent = (content: string) =>
     content.toLowerCase().match(BAD_WORDS) !== null;
 
-export const getIP = (context) => "poop";
+export const getIP = (request: Request) => "poop";
