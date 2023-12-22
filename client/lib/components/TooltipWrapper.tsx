@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from "react";
+import React, { type CSSProperties, type ReactNode, useContext } from "react";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import { PaletteContext } from "../colorPalette";
 import EventListener from "./EventListener";
@@ -7,8 +7,11 @@ const TooltipWrapper = ({
     tooltip,
     children,
     tooltipStyle = { bottom: "100%" },
+}: {
+    readonly tooltip: string | ReactNode;
+    readonly children: ReactNode;
+    readonly tooltipStyle?: CSSProperties;
 }) => {
-    const ref = useRef();
     const { textColor, backgroundColor } = useContext(PaletteContext);
     return (
         <div
@@ -23,7 +26,6 @@ const TooltipWrapper = ({
                     <>
                         <div {...listener}>{children}</div>
                         <div
-                            ref={ref}
                             style={{
                                 position: "absolute",
                                 textAlign: "center",

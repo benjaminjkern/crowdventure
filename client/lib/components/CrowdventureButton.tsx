@@ -1,6 +1,7 @@
 import React, { useContext, type CSSProperties, type ReactNode } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { type IconProp } from "@fortawesome/fontawesome-svg-core";
 import { PaletteContext } from "../colorPalette";
 import { UserContext } from "../user";
 import EventListener, { type EventListenerPair } from "./EventListener";
@@ -8,7 +9,7 @@ import EventListener, { type EventListenerPair } from "./EventListener";
 const DEFAULT_ICON_SIZE = 20;
 
 export type CrowdventureButtonProps = {
-    readonly children: ReactNode;
+    readonly children?: ReactNode;
     readonly style?: CSSProperties;
     readonly buttonType?: "icon" | "text";
     readonly category?: "error";
@@ -16,7 +17,7 @@ export type CrowdventureButtonProps = {
     readonly onClick: (e: MouseEvent) => unknown;
     readonly href?: string;
     readonly disabled?: boolean;
-    readonly icon?: ReactNode;
+    readonly icon?: IconProp;
     readonly iconScale?: number;
 };
 
@@ -38,6 +39,7 @@ const CrowdventureButton = ({
         useContext(PaletteContext);
 
     // The value that is actually used
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const isDisabled = disabled || (requireSignedIn && !user);
 
     const darkColor = isDisabled
@@ -61,6 +63,7 @@ const CrowdventureButton = ({
             <EventListener event="hover">
                 {([hover, hoverListener]: EventListenerPair) => (
                     <span
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         // @ts-ignore
                         onClick={onClick}
                         style={{
@@ -71,18 +74,18 @@ const CrowdventureButton = ({
                             borderRadius: DEFAULT_ICON_SIZE * iconScale,
                             ...commonStyle,
                         }}
-                        // @ts-ignore
                         {...hoverListener}
                     >
-                        <FontAwesomeIcon
-                            // @ts-ignore
-                            icon={icon}
-                            style={{
-                                width: (DEFAULT_ICON_SIZE - 2) * iconScale,
-                                height: (DEFAULT_ICON_SIZE - 2) * iconScale,
-                                pointerEvents: "none",
-                            }}
-                        />
+                        {icon ? (
+                            <FontAwesomeIcon
+                                icon={icon}
+                                style={{
+                                    width: (DEFAULT_ICON_SIZE - 2) * iconScale,
+                                    height: (DEFAULT_ICON_SIZE - 2) * iconScale,
+                                    pointerEvents: "none",
+                                }}
+                            />
+                        ) : null}
                     </span>
                 )}
             </EventListener>
@@ -93,9 +96,9 @@ const CrowdventureButton = ({
             <EventListener event="hover">
                 {([hover, hoverListener]) => (
                     <span
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         // @ts-ignore
                         onClick={onClick}
-                        // @ts-ignore
                         {...hoverListener}
                         style={{
                             color: lightColor,
@@ -115,6 +118,7 @@ const CrowdventureButton = ({
             {([hover, hoverListener]) => (
                 <button
                     disabled={isDisabled}
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     onClick={onClick}
                     style={{
@@ -126,7 +130,6 @@ const CrowdventureButton = ({
                         width: "100%",
                         ...commonStyle,
                     }}
-                    // @ts-ignore
                     {...hoverListener}
                     {...props}
                 >

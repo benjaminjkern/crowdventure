@@ -2,9 +2,9 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import AccountManager from "./AccountManager";
-import { type StaticImport } from "next/dist/shared/lib/get-img-props";
 
 const Navbar = () => (
+    // TODO: Should collapse on smaller width screens
     <nav
         style={{
             height: 100,
@@ -17,14 +17,13 @@ const Navbar = () => (
             <Image
                 alt="Crowdventure Logo"
                 height={75}
-                src={require("../../public/logo.png") as StaticImport}
+                src={require("../../public/logo.png")}
             />
         </Link>
 
         <AccountManager wrapperStyle={{ marginRight: 50, marginTop: 5 }} />
 
         {/* // <CrowdventureCollapse>
-            Should collapse on smaller width screens
         // </CrowdventureCollapse> */}
     </nav>
 );

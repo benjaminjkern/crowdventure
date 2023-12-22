@@ -2,6 +2,7 @@ import React, {
     type CSSProperties,
     type MouseEventHandler,
     useContext,
+    type ReactNode,
 } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -16,6 +17,7 @@ const AccountPreview = ({
     isLink = true,
     onClickImage,
     style,
+    badgeNumber = 0,
 }: {
     readonly account: Account;
     readonly imgSide?: "left" | "right";
@@ -23,6 +25,7 @@ const AccountPreview = ({
     readonly isLink?: boolean;
     readonly onClickImage?: MouseEventHandler;
     readonly style?: CSSProperties;
+    readonly badgeNumber?: number;
 }) => {
     const imageSize = 30 * scale;
     const textSize = DEFAULT_TEXT_SIZE * scale;
@@ -33,6 +36,7 @@ const AccountPreview = ({
         ...style,
     };
 
+    // TODO: Overlay notification badge
     const inside = (
         <>
             {imgSide === "right" && (
@@ -40,6 +44,27 @@ const AccountPreview = ({
                     {account.screenName}
                 </span>
             )}
+
+            {/* overlay={
+                    unseenNotifications > 0 && (
+                        <div
+                            style={{
+                                position: "absolute",
+                                right: "1.5em",
+                                top: "-0.5em",
+                                borderRadius: "1em",
+                                backgroundColor: "red",
+                                width: "2em",
+                                height: "2em",
+                                lineHeight: "2em",
+                                fontSize: "0.5em",
+                                color: "white",
+                            }}
+                        >
+                            {unseenNotifications}
+                        </div>
+                    )
+                } */}
             <Image
                 alt={`${account.screenName}'s Profile Pic`}
                 height={imageSize}

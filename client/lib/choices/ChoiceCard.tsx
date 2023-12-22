@@ -1,14 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
+import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import AccountPreview from "../accounts/AccountPreview";
-import { mutationCall } from "../apiUtils";
 import CrowdventureCard from "../components/CrowdventureCard";
 import LikeDislikeController from "../components/LikeDislikeController";
 import { UnsafeModeContext } from "../unsafeMode";
 import { UserContext } from "../user";
-import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
-import { type Choice } from "+/types/models";
+import { type Choice } from "@/types/models";
 
-const ChoiceCard = ({ choice: initChoice }: { choice: Choice }) => {
+const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { user } = useContext(UserContext);
 

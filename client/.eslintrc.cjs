@@ -35,6 +35,7 @@ module.exports = {
         "prefer-named-capture-group": "warn",
         "react/no-unescaped-entities": "warn",
         "no-alert": "warn",
+        "react/jsx-sort-props": "warn",
 
         // Import ones that are turned off for some reason
         "import/no-deprecated": "error",
@@ -62,7 +63,6 @@ module.exports = {
         "import/no-named-default": "error",
         "import/no-namespace": "error",
         "import/no-unassigned-import": "error",
-        "import/prefer-default-export": "error",
 
         "import/order": "warn",
         "import/consistent-type-specifier-style": ["warn", "prefer-inline"],
@@ -139,6 +139,7 @@ module.exports = {
         "react/no-object-type-as-default-prop": "off",
         "react/require-default-props": "off",
         "import/no-unresolved": "off",
+        "import/prefer-default-export": "off",
 
         /*
          * Doesnt exist here but it does exist in eslint-plugin-unicorn

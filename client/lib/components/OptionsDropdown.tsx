@@ -1,13 +1,30 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import CrowdventureButton from "./CrowdventureButton";
+import React, {
+    type CSSProperties,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
+import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import { PaletteContext } from "../colorPalette";
-import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
+import CrowdventureButton from "./CrowdventureButton";
+
+export type DropDownOption = {
+    active?: boolean;
+    disabled?: boolean;
+    onClick?: () => void;
+    text?: string;
+};
 
 const OptionsDropdown = ({
     dropdownOptions,
     wrapperStyle = { justifyContent: "center", alignItems: "flex-end" },
     dropdownStyle = { top: "100%" },
+}: {
+    readonly dropdownOptions: DropDownOption[];
+    readonly wrapperStyle?: CSSProperties;
+    readonly dropdownStyle?: CSSProperties;
 }) => {
     const ref = useRef();
     const [open, setOpen] = useState(false);

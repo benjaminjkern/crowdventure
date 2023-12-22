@@ -1,12 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
-import React, { useContext, useMemo } from "react";
-import { PaletteContext } from "../colorPalette";
-import OptionsDropdown from "./OptionsDropdown";
-import TooltipWrapper from "./TooltipWrapper";
-import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
+import React, { type ReactNode, useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { type IconProp } from "@fortawesome/fontawesome-svg-core";
+import { PaletteContext } from "../colorPalette";
+import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
+import { blurImageStyle } from "../styles";
+import OptionsDropdown, { type DropDownOption } from "./OptionsDropdown";
+import TooltipWrapper from "./TooltipWrapper";
 import EventListener from "./EventListener";
+
+type OverlayIcon = {
+    active: boolean;
+    tooltip: string | ReactNode;
+    icon: IconProp;
+    iconColor: string;
+};
 
 const CrowdventureCard = ({
     href,
@@ -18,31 +27,35 @@ const CrowdventureCard = ({
     children,
     disabled,
     onImageError = () => {},
+}: {
+    readonly href: string;
+    readonly picture: string;
+    readonly pictureUnsafe: boolean;
+    readonly dropdownOptions: DropDownOption[];
+    readonly overlayIcons: OverlayIcon[];
+    readonly text: string;
+    readonly children: ReactNode;
+    readonly disabled: boolean;
+    readonly onImageError?: () => void;
 }) => {
     const { rootColor, backgroundColor, lightBackgroundColor, mutedTextColor } =
         useContext(PaletteContext);
 
-    const BLURAMOUNT = 20;
+    const [showImage, setShowImage] = useState(true);
 
     const cardImage = (
         <Image
             alt="Something went wrong!"
             fill
-            onError={(e) => {
-                e.target.parentNode.style.display = "none";
-
+            onError={() => {
+                setShowImage(false);
                 onImageError();
             }}
             src={picture}
             style={{
                 objectFit: "cover",
                 // Blur bad images
-                ...(pictureUnsafe
-                    ? {
-                          "-webkit-filter": `blur(${BLURAMOUNT}px)`, // TODO: Pull blur out to a common style
-                          filter: `blur(${BLURAMOUNT}px)`,
-                      }
-                    : {}),
+                ...blurImageStyle(pictureUnsafe),
             }}
         />
     );
@@ -68,14 +81,14 @@ const CrowdventureCard = ({
                             href={href}
                             {...listener}
                             style={{
-                                color: disabled ? "grey" : null,
+                                color: disabled ? "grey" : undefined,
                                 pointerEvents: disabled ? "none" : "auto",
                                 justifyContent: "center",
                                 flex: 1,
                             }}
                         >
                             <div style={{ width: "100%" }}>
-                                {picture ? (
+                                {picture && showImage ? (
                                     <div
                                         style={{
                                             backgroundColor: "white",

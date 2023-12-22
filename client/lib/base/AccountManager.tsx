@@ -1,4 +1,6 @@
 import React, { type CSSProperties, useContext } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { UserContext } from "../user";
 import { ModalContext } from "../modal";
 import { UnsafeModeContext } from "../unsafeMode";
@@ -9,11 +11,13 @@ import SignUpModal from "../accounts/SignUpModal";
 import AccountPreview from "../accounts/AccountPreview";
 import CrowdventureSwitch from "../components/CrowdventureSwitch";
 import TooltipWrapper from "../components/TooltipWrapper";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 // import UnsafeModal from "./Modals/UnsafeModal";
 
-const AccountManager = ({ wrapperStyle }: { wrapperStyle: CSSProperties }) => {
+const AccountManager = ({
+    wrapperStyle,
+}: {
+    readonly wrapperStyle: CSSProperties;
+}) => {
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
     const { unsafeMode, setUnsafeMode } = useContext(UnsafeModeContext);
@@ -45,31 +49,14 @@ const AccountManager = ({ wrapperStyle }: { wrapperStyle: CSSProperties }) => {
             </div>
         );
 
+    const unseenNotifications = 0; // TODO: Do this
+
     return (
         <div style={{ alignItems: "flex-end", ...wrapperStyle }}>
             <AccountPreview
                 account={user}
+                badgeNumber={unseenNotifications}
                 imgSide="right"
-                overlay={
-                    unseenNotifications > 0 && (
-                        <div
-                            style={{
-                                position: "absolute",
-                                right: "1.5em",
-                                top: "-0.5em",
-                                borderRadius: "1em",
-                                backgroundColor: "red",
-                                width: "2em",
-                                height: "2em",
-                                lineHeight: "2em",
-                                fontSize: "0.5em",
-                                color: "white",
-                            }}
-                        >
-                            {unseenNotifications}
-                        </div>
-                    )
-                }
                 scale={1.5}
                 style={{ color: textColor }}
             />

@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import { mutationCall } from "../apiUtils";
 import CrowdventureCheckboxInput from "../components/CrowdventureCheckboxInput";
 import CrowdventureModal from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
@@ -8,8 +7,15 @@ import { ModalContext } from "../modal";
 import CreateNodeModal from "../nodes/CreateNodeModal";
 import NodeSearch from "../nodes/NodeSearch";
 import { UserContext } from "../user";
+import { type Choice } from "@/types/models";
 
-const ChoiceModal = ({ fromNode, choice }) => {
+const ChoiceModal = ({
+    fromNode,
+    choice,
+}: {
+    readonly fromNode: Node;
+    readonly choice: Choice;
+}) => {
     const [info, setInfo] = useState("");
 
     const [toPage, setToPage] = useState(choice?.to.ID || "");

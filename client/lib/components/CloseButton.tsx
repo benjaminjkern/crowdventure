@@ -1,7 +1,13 @@
-import React from "react";
+import React, { type MouseEventHandler, type CSSProperties } from "react";
 import EventListener from "./EventListener";
 
-const CloseButton = ({ onClick, style }) => (
+const CloseButton = ({
+    onClick,
+    style,
+}: {
+    readonly onClick: MouseEventHandler;
+    readonly style?: CSSProperties;
+}) => (
     <EventListener event="hover">
         {([hover, listener]) => (
             <span
