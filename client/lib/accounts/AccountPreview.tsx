@@ -7,8 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { PaletteContext } from "../colorPalette";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
-import { type Account } from "+/types/models";
-import { type StaticImport } from "next/dist/shared/lib/get-img-props";
+import { type Account } from "@/types/models";
 
 const AccountPreview = ({
     account,
@@ -18,12 +17,12 @@ const AccountPreview = ({
     onClickImage,
     style,
 }: {
-    account: Account;
-    imgSide?: "left" | "right";
-    scale?: number;
-    isLink?: boolean;
-    onClickImage?: MouseEventHandler;
-    style?: CSSProperties;
+    readonly account: Account;
+    readonly imgSide?: "left" | "right";
+    readonly scale?: number;
+    readonly isLink?: boolean;
+    readonly onClickImage?: MouseEventHandler;
+    readonly style?: CSSProperties;
 }) => {
     const imageSize = 30 * scale;
     const textSize = DEFAULT_TEXT_SIZE * scale;
@@ -47,8 +46,7 @@ const AccountPreview = ({
                 onClick={onClickImage}
                 src={
                     account.profilePicURL ??
-                    // eslint-disable-next-line @typescript-eslint/no-var-requires
-                    (require("../../public/defaultProfilePic.jpg") as StaticImport)
+                    require("../../public/defaultProfilePic.jpg")
                 }
                 style={{
                     objectFit: "cover",
@@ -68,7 +66,7 @@ const AccountPreview = ({
         </>
     );
 
-    if (onClickImage || !isLink)
+    if (onClickImage ?? !isLink)
         return <span style={wrapperStyle}>{inside}</span>;
 
     return (

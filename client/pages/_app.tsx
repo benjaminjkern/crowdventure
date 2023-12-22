@@ -1,15 +1,15 @@
 import React from "react";
 import Head from "next/head";
-
-import Footer from "../lib/base/Footer";
-import Navbar from "../lib/base/Navbar";
-
-import PaletteProvider from "../lib/colorPalette";
-import ModalProvider from "../lib/modal";
-import UserProvider from "../lib/user";
-import UnsafeModeProvider from "../lib/unsafeMode";
-import { MAX_CONTENT_WIDTH } from "../lib/hooks";
 import { type AppType } from "next/app";
+
+import Footer from "+/lib/base/Footer";
+import Navbar from "+/lib/base/Navbar";
+
+import PaletteProvider from "+/lib/colorPalette";
+import ModalProvider from "+/lib/modal";
+import UserProvider from "+/lib/user";
+import UnsafeModeProvider from "+/lib/unsafeMode";
+import { MAX_CONTENT_WIDTH } from "+/lib/hooks";
 
 // Crowdventure! - Page not found! - for 404 page (NONEXISTENT RIGHT NOW)
 

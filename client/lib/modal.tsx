@@ -10,7 +10,7 @@ export const ModalContext = createContext<ModalContextType>(
     {} as ModalContextType
 );
 
-const ModalProvider = ({ children }: { children: ReactNode }) => {
+const ModalProvider = ({ children }: { readonly children: ReactNode }) => {
     const [modalStack, setModalStack] = useState<ReactNode[]>([]); // TODO: Specifically type cast modals as a type of react node (?)
     const openModal = (newModal: ReactNode) =>
         setModalStack([...modalStack, newModal]);

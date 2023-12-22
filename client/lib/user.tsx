@@ -4,10 +4,9 @@ import React, {
     useEffect,
     useState,
 } from "react";
-import { mutationCall } from "./apiUtils";
-import { LOGGED_IN_USER_GQL } from "./gqlDefs";
-import { type Account } from "@/types/models";
 import LoadingBox from "./components/LoadingBox";
+import apiClient from "./apiClient";
+import { type Account } from "@/types/models";
 
 type UserContextType = {
     user: Account | null;
@@ -19,7 +18,7 @@ export const UserContext = createContext<UserContextType>(
 );
 
 const UserProvider = ({ children }: { readonly children: ReactNode }) => {
-    const [user, setUser] = useState<Account | undefined | null>();
+    const [user, setUser] = useState<Account>();
 
     const saveUser = (newUser?: Account) => {
         if (newUser) localStorage.setItem("savedUser", JSON.stringify(newUser));
@@ -28,16 +27,18 @@ const UserProvider = ({ children }: { readonly children: ReactNode }) => {
         setUser(newUser);
     };
 
-    const relogin = (savedUser: Account) => {
-        mutationCall("loginAccount", LOGGED_IN_USER_GQL, {
+    const relogin = async (savedUser: Account) => {
+        const response = await apiClient.provide("post", "/account/login", {
             screenName: savedUser.screenName,
-        }).then(saveUser);
+        });
+        if (response.status === "error") return alert(response.error);
+        setUser(response.data);
     };
 
     useEffect(() => {
         const savedUserJSON = localStorage.getItem("savedUser");
         if (!savedUserJSON) {
-            setUser(null);
+            setUser(undefined);
             return;
         }
         const savedUser = JSON.parse(savedUserJSON) as Account;

@@ -22,7 +22,7 @@ module.exports = {
                 unnamedComponents: "arrow-function",
             },
         ],
-        "no-unused-vars": "warn",
+        // "no-unused-vars": "warn",
         "react/forbid-component-props": ["error", { forbid: ["className"] }],
         "max-len": ["warn", { code: 120 }],
         curly: ["error", "multi"],
@@ -33,6 +33,8 @@ module.exports = {
         "no-plusplus": ["warn", { allowForLoopAfterthoughts: true }],
         "prefer-named-capture-group": "warn",
         "react/no-unescaped-entities": "warn",
+        "no-alert": "warn",
+        "import/order": "warn",
 
         // Completely disagree
         "quote-props": "off",
@@ -68,6 +70,7 @@ module.exports = {
         "space-before-function-paren": "off",
         "brace-style": "off",
         "array-bracket-newline": "off",
+        "no-continue": "off",
 
         // Can maybe see where they're coming from but I disagree
         "react/no-multi-comp": "off",
@@ -84,6 +87,7 @@ module.exports = {
         "capitalized-comments": "off",
         "multiline-comment-style": "off",
         "default-case": "off",
+        "react/hook-use-state": "off",
 
         /*
          * I would still like to have a warning for something like these
@@ -102,6 +106,8 @@ module.exports = {
         "max-lines": "off",
         "no-negated-condition": "off",
         "react/no-object-type-as-default-prop": "off",
+        "react/require-default-props": "off",
+        "import/no-unresolved": "off",
 
         /*
          * Doesnt exist here but it does exist in eslint-plugin-unicorn
@@ -121,7 +127,7 @@ module.exports = {
         "no-mixed-operators": "off",
         "no-confusing-arrow": "off", // This one would actually be sorta nice but prettier makes it annoying
 
-        // Ben-added rules
+        // Ben-added typescript rules
 
         // Nextjs images allow for static imports inline
         "@typescript-eslint/no-var-requires": "off",
@@ -129,10 +135,10 @@ module.exports = {
         "@typescript-eslint/ban-ts-comment": "warn",
         // This is nice for undefined or nulls, but when something is a boolean | undefined this shouldnt really come in here because it might be the case that I delibrately am using ||
         "@typescript-eslint/prefer-nullish-coalescing": "warn",
-        // I want TODOs to show up
-        "no-warning-comments": "warn",
         // There are places where I want the default function to be an empty function and it's nicer to write () => {} than () => undefined
         "@typescript-eslint/no-empty-function": "off",
+        // Runs on types!!!! Super dumb and should just use typescript version
+        "no-unused-vars": "off",
 
         //-----------------
 
@@ -166,5 +172,5 @@ module.exports = {
         es6: true,
         node: true,
     },
-    ignorePatterns: ["**/*.html"],
+    ignorePatterns: ["**/*.html", "lib/clientDefs.ts"],
 };

@@ -1,18 +1,20 @@
-import Image from "next/image";
 import React, { useContext, useEffect, useState } from "react";
-import { queryCall } from "../../lib/apiUtils";
-import CrowdventureAlert from "../../lib/components/CrowdventureAlert";
-import LoadingBox from "../../lib/components/LoadingBox";
-import PictureModal from "../../lib/components/PictureModal";
-import { ModalContext } from "../../lib/modal";
-import { UnsafeModeContext } from "../../lib/unsafeMode";
-import { deepCopy } from "../../lib/utils";
-import { PaletteContext } from "../../lib/colorPalette";
-import { useMediaQuery, useWindowSize } from "../../lib/hooks";
-import NodeSidebar from "../../lib/nodes/NodeSidebar";
-import CrowdventureButton from "../../lib/components/CrowdventureButton";
 import { useRouter } from "next/router";
-import { type CrowdventureNode } from "+/types/models";
+import Image from "next/image";
+
+import { queryCall } from "+/lib/apiUtils";
+import CrowdventureAlert from "+/lib/components/CrowdventureAlert";
+import LoadingBox from "+/lib/components/LoadingBox";
+import PictureModal from "+/lib/components/PictureModal";
+import { ModalContext } from "+/lib/modal";
+import { UnsafeModeContext } from "+/lib/unsafeMode";
+import { deepCopy } from "+/lib/utils";
+import { PaletteContext } from "+/lib/colorPalette";
+import { useMediaQuery, useWindowSize } from "+/lib/hooks";
+import NodeSidebar from "+/lib/nodes/NodeSidebar";
+import CrowdventureButton from "+/lib/components/CrowdventureButton";
+
+import { type Node } from "@/types/models";
 
 // import EditNodeModal from "../Modals/EditNodeModal";
 // import SuggestChoiceModal from "../Modals/SuggestChoiceModal";
@@ -22,7 +24,7 @@ import { type CrowdventureNode } from "+/types/models";
 const NAVBAR_HEIGHT = 100;
 const FOOTER_HEIGHT = 78;
 
-const NodePage = ({ node: initNode }: { node: CrowdventureNode }) => {
+const NodePage = ({ node: initNode }: { readonly node: Node }) => {
     const BLURAMOUNT = 40;
 
     const { unsafeMode } = useContext(UnsafeModeContext);

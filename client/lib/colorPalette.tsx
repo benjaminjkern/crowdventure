@@ -5,8 +5,8 @@ import React, {
     useEffect,
     useState,
 } from "react";
-import { UnsafeModeContext } from "./unsafeMode";
 import { ThemeProvider } from "react-jss";
+import { UnsafeModeContext } from "./unsafeMode";
 import GlobalStyleProvider from "./dynamicGlobalStyles";
 
 const getPalette = (unsafeMode: boolean) => ({
@@ -37,7 +37,7 @@ export type PaletteType = {
 
 export const PaletteContext = createContext<PaletteType>(getPalette(false)); // Unsafe mode default value = false
 
-const PaletteProvider = ({ children }: { children: ReactNode }) => {
+const PaletteProvider = ({ children }: { readonly children: ReactNode }) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
 
     const [palette, setPalette] = useState(getPalette(unsafeMode));

@@ -1,28 +1,23 @@
 import React, { useState, useContext, useEffect } from "react";
-
-import { createServerSideHelpers } from "@trpc/react-query/server";
-import { UserContext } from "../../lib/user";
-import LoadingBox from "../../lib/components/LoadingBox";
-import { UnsafeModeContext } from "../../lib/unsafeMode";
-import CrowdventureAlert from "../../lib/components/CrowdventureAlert";
-import NodeViewer from "../../lib/nodes/NodeViewer";
-import CrowdventureButton from "../../lib/components/CrowdventureButton";
-import AccountHeader from "../../lib/accounts/AccountHeader";
-import { ModalContext } from "../../lib/modal";
-import CreateNodeModal from "../../lib/nodes/CreateNodeModal";
-import { type Node, type Account } from "+/types/models";
-import { api } from "+/utils/api";
 import { type GetStaticPropsContext } from "next";
-import { appRouter } from "+/server/api/root";
-import superjson from "superjson";
 
-const AccountPage = ({ accountScreenName }: { accountScreenName: string }) => {
-    const initAccount = api.account.get.useQuery({
-        screenName: accountScreenName,
-    }).data;
+import { UserContext } from "+/lib/user";
+import LoadingBox from "+/lib/components/LoadingBox";
+import { UnsafeModeContext } from "+/lib/unsafeMode";
+import CrowdventureAlert from "+/lib/components/CrowdventureAlert";
+import NodeViewer from "+/lib/nodes/NodeViewer";
+import CrowdventureButton from "+/lib/components/CrowdventureButton";
+import AccountHeader from "+/lib/accounts/AccountHeader";
+import { ModalContext } from "+/lib/modal";
+import CreateNodeModal from "+/lib/nodes/CreateNodeModal";
 
-    if (!initAccount) return <>Not found!</>;
+import { type Node, type Account } from "@/types/models";
 
+const AccountPage = ({
+    account: initAccount,
+}: {
+    readonly account: Account;
+}) => {
     const [account, setAccount] = useState(initAccount);
     const { user } = useContext(UserContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
@@ -91,18 +86,11 @@ export const getStaticPaths = () => ({
 export const getStaticProps = async ({
     params,
 }: GetStaticPropsContext<{ accountScreenName: string }>) => {
-    const helpers = createServerSideHelpers({
-        router: appRouter,
-        ctx: {},
-        transformer: superjson, // optional - adds superjson serialization
-    });
-    const { accountScreenName } = params ?? {};
-    await helpers.account.get.prefetch({ screenName: accountScreenName });
+    const account = {};
 
     return {
         props: {
-            trpcState: helpers.dehydrate(),
-            accountScreenName,
+            account,
             pageTitle: `${account.screenName} on Crowdventure!`,
             previewImage: account.profilePicURL,
         },

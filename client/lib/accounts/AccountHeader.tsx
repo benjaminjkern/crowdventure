@@ -1,19 +1,20 @@
 import React, { type Dispatch, type SetStateAction, useContext } from "react";
-import AccountPreview from "./AccountPreview";
+
 import PictureModal from "../components/PictureModal";
 import { ModalContext } from "../modal";
 import { UserContext } from "../user";
 import CrowdventureButton from "../components/CrowdventureButton";
-import EditAccountModal from "./EditAccountModal";
 import ParagraphText from "../components/ParagraphText";
-import { type Account } from "+/types/models";
+import EditAccountModal from "./EditAccountModal";
+import AccountPreview from "./AccountPreview";
+import { type Account } from "@/types/models";
 
 const AccountHeader = ({
     account,
     setAccount,
 }: {
-    account: Account;
-    setAccount: Dispatch<SetStateAction<Account>>;
+    readonly account: Account;
+    readonly setAccount: Dispatch<SetStateAction<Account>>;
 }) => {
     const { openModal } = useContext(ModalContext);
 
@@ -30,8 +31,7 @@ const AccountHeader = ({
                             <PictureModal
                                 pictureURL={
                                     account.profilePicURL ??
-                                    // eslint-disable-next-line @typescript-eslint/no-var-requires
-                                    (require("../../public/defaultProfilePic.jpg") as string) // TODO: This might not work correctly
+                                    require("../../public/defaultProfilePic.jpg")
                                 }
                                 title={account.screenName}
                             />

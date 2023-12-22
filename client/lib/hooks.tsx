@@ -1,12 +1,12 @@
-import {
+import React, {
     type DependencyList,
     type EffectCallback,
     useEffect,
     useRef,
     useState,
-    Dispatch,
-    ReactNode,
-    SetStateAction,
+    type Dispatch,
+    type ReactNode,
+    type SetStateAction,
 } from "react";
 
 export const MAX_CONTENT_WIDTH = 1400;
@@ -69,7 +69,7 @@ export const useDebounce = (
     func: (...args: unknown[]) => void,
     delay = 500
 ) => {
-    const timerRef = useRef() as { current: NodeJS.Timeout };
+    const timerRef = useRef() as { current: ReturnType<typeof setTimeout> };
 
     return (...args: unknown[]) => {
         clearTimeout(timerRef.current);
@@ -82,7 +82,7 @@ export const useDebouncedEffect = (
     dependencies?: DependencyList
 ) => {
     const debouncedFunc = useDebounce(func);
-    useEffect(debouncedFunc, dependencies);
+    useEffect(debouncedFunc, dependencies); // eslint-disable-line react-hooks/exhaustive-deps
 };
 
 type FormType = Record<string, string | boolean>;

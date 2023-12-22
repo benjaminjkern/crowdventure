@@ -1,10 +1,11 @@
 import React, { useEffect, useContext } from "react";
 import { useRouter } from "next/router";
-import { UserContext } from "../lib/user";
-import CrowdventureButton from "../lib/components/CrowdventureButton";
-import CrowdventureNotification from "../lib/notifications/CrowdventureNotification";
-import LoadingBox from "../lib/components/LoadingBox";
-import { mutationCall } from "../lib/apiUtils";
+
+import { UserContext } from "+/lib/user";
+import CrowdventureButton from "+/lib/components/CrowdventureButton";
+import CrowdventureNotification from "+/lib/notifications/CrowdventureNotification";
+import LoadingBox from "+/lib/components/LoadingBox";
+import { mutationCall } from "+/lib/apiUtils";
 
 const NotificationsPage = () => {
     const router = useRouter();

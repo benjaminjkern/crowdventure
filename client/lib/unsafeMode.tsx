@@ -18,7 +18,7 @@ export const UnsafeModeContext = createContext<UnsafeModeContextType>({
     unsafeMode: false,
 } as UnsafeModeContextType);
 
-const UnsafeModeProvider = ({ children }: { children: ReactNode }) => {
+const UnsafeModeProvider = ({ children }: { readonly children: ReactNode }) => {
     const [unsafeMode, setUnsafeModeReal] = useState(false);
 
     const { user } = useContext(UserContext);

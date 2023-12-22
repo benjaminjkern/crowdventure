@@ -1,12 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
-import CrowdventureButton from "../lib/components/CrowdventureButton";
-import { ModalContext } from "../lib/modal";
-import NodeViewer from "../lib/nodes/NodeViewer";
-import CreateNodeModal from "../lib/nodes/CreateNodeModal";
-import { UnsafeModeContext } from "../lib/unsafeMode";
-import { queryCall } from "../lib/apiUtils";
+import CrowdventureButton from "+/lib/components/CrowdventureButton";
+import { ModalContext } from "+/lib/modal";
+import NodeViewer from "+/lib/nodes/NodeViewer";
+import CreateNodeModal from "+/lib/nodes/CreateNodeModal";
+import { UnsafeModeContext } from "+/lib/unsafeMode";
+import { queryCall } from "+/lib/apiUtils";
+
+import { type Node } from "@/types/models";
 
 export const NODE_PREVIEW_GQL = {
     hidden: 0,
@@ -28,8 +30,8 @@ const HomePage = ({
     topNodes: initTopNodes,
     recentNodes: initRecentNodes,
 }: {
-    topNodes: Node[];
-    recentNodes: Node[];
+    readonly topNodes: Node[];
+    readonly recentNodes: Node[];
 }) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { openModal } = useContext(ModalContext);

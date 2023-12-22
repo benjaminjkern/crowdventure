@@ -1,28 +1,29 @@
 import React, {
-    useState,
-    useContext,
     type Dispatch,
     type SetStateAction,
+    useContext,
+    useState,
 } from "react";
+import { useRouter } from "next/router";
 
 import CrowdventureModal from "../components/CrowdventureModal";
 import ModalImage from "../components/ModalImage";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import CrowdventureCheckboxInput from "../components/CrowdventureCheckboxInput";
+import ConfirmModal from "../components/ConfirmModal";
+
 import { UserContext } from "../user";
 import { ModalContext } from "../modal";
-import ConfirmModal from "../components/ConfirmModal";
-import { mutationCall } from "../apiUtils";
-import { useRouter } from "next/router";
-import { type Account } from "+/types/models";
 import { useInputForm } from "../hooks";
+
+import { type Account } from "@/types/models";
 
 const EditAccountModal = ({
     account,
     setAccount,
 }: {
-    account: Account;
-    setAccount: Dispatch<SetStateAction<Account>>;
+    readonly account: Account;
+    readonly setAccount: Dispatch<SetStateAction<Account>>;
 }) => {
     const [error, setError] = useState("");
     const { user, setUser } = useContext(UserContext);
