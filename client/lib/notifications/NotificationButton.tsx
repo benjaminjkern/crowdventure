@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
-import EventListener from "../components/EventListener";
-import { PaletteContext } from "../colorPalette";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamation } from "@fortawesome/free-solid-svg-icons";
+import EventListener from "../components/EventListener";
+import { PaletteContext } from "../colorPalette";
 
 const NotificationButton = ({ onClick, seen, style }) => {
     const { rootColor } = useContext(PaletteContext);

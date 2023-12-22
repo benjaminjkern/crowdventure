@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
-import { type GetStaticPropsContext } from "next";
 
+import { type GetStaticPropsContext } from "next";
 import { UserContext } from "+/lib/user";
 import LoadingBox from "+/lib/components/LoadingBox";
 import { UnsafeModeContext } from "+/lib/unsafeMode";

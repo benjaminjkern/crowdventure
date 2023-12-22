@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 
-import { queryCall } from "+/lib/apiUtils";
 import CrowdventureAlert from "+/lib/components/CrowdventureAlert";
 import LoadingBox from "+/lib/components/LoadingBox";
 import PictureModal from "+/lib/components/PictureModal";

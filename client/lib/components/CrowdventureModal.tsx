@@ -18,11 +18,11 @@ const CrowdventureModal = ({
     modalStyle,
     contentStyle,
 }: {
-    modalTitle?: string;
-    children: ReactNode;
-    modalButtons: ModalButton[];
-    modalStyle?: CSSProperties;
-    contentStyle?: CSSProperties;
+    readonly modalTitle?: string;
+    readonly children: ReactNode;
+    readonly modalButtons: ModalButton[];
+    readonly modalStyle?: CSSProperties;
+    readonly contentStyle?: CSSProperties;
 }) => {
     const { closeModal } = useContext(ModalContext);
     const { backgroundColor, lightBackgroundColor } =

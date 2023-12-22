@@ -1,12 +1,11 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 
 import { ModalContext } from "../modal";
 import CrowdventureModal from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { UserContext } from "../user";
-import { mutationCall } from "../apiUtils";
-import { LOGGED_IN_USER_GQL } from "../gqlDefs";
 import { useInputForm } from "../hooks";
+import apiClient from "../apiClient";
 
 const LoginModal = () => {
     const loginForm = useInputForm({ screenName: "", password: "" });
@@ -14,27 +13,21 @@ const LoginModal = () => {
     const { setUser } = useContext(UserContext);
     const { closeModal } = useContext(ModalContext);
 
-    const login = () => {
+    const login = async () => {
         const { screenName, password } = loginForm.getValues();
         if (!screenName)
             return loginForm.setError("Please enter your password!");
         if (!password)
             return loginForm.setError("Please enter your screenName!");
 
-        mutationCall("loginAccount", LOGGED_IN_USER_GQL, {
+        const response = await apiClient.provide("post", "/account/login", {
             screenName,
             password,
-        }).then((newUser) => {
-            if (!newUser) {
-                loginForm.setError(
-                    "That account does not exist or the password did not match!"
-                );
-                return;
-            }
-
-            setUser(newUser);
-            closeModal();
         });
+        if (response.status === "error")
+            return loginForm.setError(response.error.message);
+        setUser(response.data);
+        closeModal();
     };
 
     return (

@@ -6,25 +6,8 @@ import { ModalContext } from "+/lib/modal";
 import NodeViewer from "+/lib/nodes/NodeViewer";
 import CreateNodeModal from "+/lib/nodes/CreateNodeModal";
 import { UnsafeModeContext } from "+/lib/unsafeMode";
-import { queryCall } from "+/lib/apiUtils";
 
 import { type Node } from "@/types/models";
-
-export const NODE_PREVIEW_GQL = {
-    hidden: 0,
-    ID: 0,
-    title: 0,
-    owner: {
-        screenName: 0,
-        profilePicURL: 0,
-    },
-    views: 0,
-    pictureURL: 0,
-    pictureUnsafe: 0,
-    // These arent really used here but are on the account page
-    featured: 0,
-    content: 0,
-};
 
 const HomePage = ({
     topNodes: initTopNodes,

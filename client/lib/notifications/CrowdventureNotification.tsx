@@ -1,13 +1,12 @@
 import React, { useContext, useState } from "react";
-import { mutationCall } from "../apiUtils";
+import Link from "next/link";
 import { PaletteContext } from "../colorPalette";
 import CloseButton from "../components/CloseButton";
 import { UserContext } from "../user";
 import EventListener from "../components/EventListener";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
-import Link from "next/link";
-import NotificationButton from "./NotificationButton";
 import { useDebounce } from "../hooks";
+import NotificationButton from "./NotificationButton";
 
 const CrowdventureNotification = ({
     notification,

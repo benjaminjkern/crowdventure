@@ -91,13 +91,15 @@ export type FormElement<T = string | boolean> = {
     defaultValue: T;
     setValue: (value: T) => unknown;
 };
-type FormWithValues = {
-    getValues: () => FormType;
+type FormWithValues<T extends FormType> = {
+    getValues: () => T;
     getError: () => ReactNode;
     setError: Dispatch<SetStateAction<string>>;
-} & Record<string, FormElement>;
+} & Record<keyof T, FormElement>;
 
-export const useInputForm = (initialForm: FormType) => {
+export const useInputForm = <T extends FormType>(
+    initialForm: T
+): FormWithValues<T> => {
     const ref = useRef() as { current: FormType };
     const [error, setError] = useState("");
     const form = {
@@ -105,11 +107,11 @@ export const useInputForm = (initialForm: FormType) => {
         getError: () =>
             error ? <span style={{ color: "red" }}>{error}</span> : null,
         setError,
-    } as FormWithValues;
+    } as FormWithValues<T>;
 
     useEffect(() => {
         ref.current = initialForm;
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     for (const key of Object.keys(initialForm)) {
         const defaultValue = initialForm[key];

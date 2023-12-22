@@ -1,28 +1,23 @@
-import React, {
-    useContext,
-    type CSSProperties,
-    type ReactNode,
-    type MouseEventHandler,
-} from "react";
-import { PaletteContext } from "../colorPalette";
-import { UserContext } from "../user";
+import React, { useContext, type CSSProperties, type ReactNode } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { PaletteContext } from "../colorPalette";
+import { UserContext } from "../user";
 import EventListener, { type EventListenerPair } from "./EventListener";
 
 const DEFAULT_ICON_SIZE = 20;
 
 export type CrowdventureButtonProps = {
-    children: ReactNode;
-    style?: CSSProperties;
-    buttonType?: "icon" | "text";
-    category?: "error";
-    requireSignedIn?: boolean;
-    onClick: (e?: MouseEventHandler) => void;
-    href?: string;
-    disabled?: boolean;
-    icon?: ReactNode;
-    iconScale?: number;
+    readonly children: ReactNode;
+    readonly style?: CSSProperties;
+    readonly buttonType?: "icon" | "text";
+    readonly category?: "error";
+    readonly requireSignedIn?: boolean;
+    readonly onClick: (e: MouseEvent) => unknown;
+    readonly href?: string;
+    readonly disabled?: boolean;
+    readonly icon?: ReactNode;
+    readonly iconScale?: number;
 };
 
 const CrowdventureButton = ({
