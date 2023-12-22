@@ -1,5 +1,9 @@
-import { type Prisma } from "@prisma/client";
+import {
+    type Account as PrismaAccount,
+    type Node as PrismaNode,
+    type Choice as PrismaChoice,
+} from "@prisma/client";
 
-export type Account = Omit<Prisma.AccountGetPayload<true>, "encryptedPassword">;
-export type Node = Prisma.NodeGetPayload<true>;
-export type Choice = Prisma.ChoiceGetPayload<true>;
+export type Account = Omit<PrismaAccount, "encryptedPassword">;
+export type Node = PrismaNode;
+export type Choice = PrismaChoice;

@@ -1,12 +1,12 @@
-import { TABLES, addItem, deleteItem } from "+/databaseCalls";
-
 import { z } from "zod";
 import { defaultEndpointsFactory } from "express-zod-api";
-
-import { type StoredAccount } from "@/types/storedTypes";
-import { encrypt, flagContent } from "+/utils";
+import { flagContent } from "+/utils";
 import { AccountSchema } from "+/schemas";
-import { getAccount, serializeAccount } from "+/modelHelpers";
+import bcrypt from "bcrypt";
+
+import { type Account, PrismaClient } from "@prisma/client";
+import { getAccount, getAccountByScreenName } from "+/commonQueries";
+const prisma = new PrismaClient();
 
 export const accountEndpoints = {
     getAccount: defaultEndpointsFactory.build({
@@ -14,9 +14,10 @@ export const accountEndpoints = {
         input: z.object({ screenName: z.string() }),
         output: z.object({ account: AccountSchema.optional() }),
         handler: async ({ input: { screenName } }) => {
-            const account = await getAccount(screenName);
-            if (!account) return {};
-            return { account: serializeAccount(account) };
+            return {
+                account:
+                    (await getAccountByScreenName(screenName)) ?? undefined,
+            };
         },
     }),
     login: defaultEndpointsFactory.build({
@@ -24,10 +25,10 @@ export const accountEndpoints = {
         input: z.object({ screenName: z.string(), password: z.string() }),
         output: AccountSchema,
         handler: async ({ input: { screenName, password } }) => {
-            const account = await getAccount(screenName);
+            const account = await getAccountByScreenName(screenName);
             if (!account) throw new Error("That account doesnt exist!");
             if (password) {
-                if (encrypt(password) !== account.encryptedPassword)
+                if (!bcrypt.compareSync(password, account.encryptedPassword))
                     throw new Error("Incorrect password!");
 
                 sendLoginToken(context, account); // TODO: Figure out context
@@ -37,7 +38,7 @@ export const accountEndpoints = {
             )
                 throw new Error("Failed to re-login!");
 
-            return serializeAccount(account);
+            return account;
         },
     }),
     createAccount: defaultEndpointsFactory.build({
@@ -47,20 +48,22 @@ export const accountEndpoints = {
         handler: async ({ input: { screenName, password } }) => {
             if (flagContent(screenName)) throw new Error("Bad word");
             // TODO: Dont fetch full object
-            if (await getAccount(screenName))
+            if (await getAccountByScreenName(screenName))
                 throw new Error("That screen name already exists!");
 
             console.log(`Creating new account with name ${screenName}`);
 
-            const account = await addItem<StoredAccount>(TABLES.ACCOUNT_TABLE, {
+            const account: Account = {
                 screenName,
-                encryptedPassword: encrypt(password),
+                encryptedPassword: bcrypt.hashSync(password, 10),
                 lastIP: getIP(context),
                 dateCreated: new Date().toJSON(),
                 isAdmin: false,
                 totalSuggestionScore: 0,
                 totalNodeViews: 0,
-            });
+            };
+
+            await prisma.account.create({ data: account });
 
             sendLoginToken(context, account);
 
@@ -70,13 +73,13 @@ export const accountEndpoints = {
     deleteAccount: defaultEndpointsFactory.build({
         methods: ["delete"],
         input: z.object({
-            screenName: z.string(),
+            id: z.number(),
         }),
         output: z.object({
             deleted: z.boolean(),
         }),
-        handler: async ({ input: { screenName } }) => {
-            const account = await getAccount(screenName);
+        handler: async ({ input: { id } }) => {
+            const account = await getAccount(id);
             if (!account) throw new Error("That account doesnt exist!");
 
             if (
@@ -88,14 +91,17 @@ export const accountEndpoints = {
             console.log(`Deleting Account ${account.screenName}`);
 
             return {
-                deleted: await deleteItem(TABLES.ACCOUNT_TABLE, { screenName }),
+                deleted: !!(await prisma.account.delete({
+                    where: { screenName: account.screenName },
+                })),
             };
         },
     }),
     editAccount: defaultEndpointsFactory.build({
         methods: ["patch"],
         input: z.object({
-            screenName: z.string(),
+            id: z.number(),
+            screenName: z.string().optional(),
             oldPassword: z.string().optional(),
             newPassword: z.string().min(1).optional(),
             bio: z.string().min(1).optional(),
@@ -106,6 +112,7 @@ export const accountEndpoints = {
         output: AccountSchema,
         handler: async ({
             input: {
+                id,
                 screenName,
                 oldPassword,
                 newPassword,
@@ -115,7 +122,7 @@ export const accountEndpoints = {
                 isAdmin,
             },
         }) => {
-            const account = await getAccount(screenName);
+            const account = await getAccount(id);
             if (!account) throw new Error("That account doesnt exist!");
 
             if (
@@ -130,9 +137,12 @@ export const accountEndpoints = {
             if (newPassword) {
                 if (
                     oldPassword &&
-                    encrypt(oldPassword) === account.encryptedPassword
+                    bcrypt.compareSync(oldPassword, account.encryptedPassword)
                 )
-                    account.encryptedPassword = encrypt(newPassword);
+                    account.encryptedPassword = bcrypt.hashSync(
+                        newPassword,
+                        10
+                    );
 
                 // TODO: Let user know that password failed
             }
@@ -160,7 +170,10 @@ export const accountEndpoints = {
             //     context
             // );
 
-            return await addItem(TABLES.ACCOUNT_TABLE, account);
+            return await prisma.account.update({
+                data: account,
+                where: { screenName: account.screenName },
+            });
         },
     }),
 };

@@ -27,12 +27,11 @@ export const uniqueID = async <T>(
     return ID;
 };
 
-// ABSOLUTELY FIX THIS AT SOME POINT BUT WHATEVER
-export const encrypt = (word: string) => word;
-
 const BAD_WORDS = new RegExp(
     ["nigg", "fag"].map((word) => word.split("").join(".{0,4}")).join("|")
 );
 
 export const flagContent = (content: string) =>
     content.toLowerCase().match(BAD_WORDS) !== null;
+
+export const getIP = (context) => "poop";

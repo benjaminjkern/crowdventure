@@ -1,69 +1,55 @@
 import { z } from "zod";
 import { defaultEndpointsFactory } from "express-zod-api";
-import { TABLES, addItem, getMany, deleteItem } from "+/databaseCalls";
 import { ChoiceSchema } from "+/schemas";
 import { flagContent, uniqueID } from "+/utils";
 import { type Choice } from "@/types/models";
-import { getChoice, getNode } from "+/modelHelpers";
+import { getChoice, getNode } from "+/commonQueries";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 export const choiceEndpoints = {
-    // This one kind of isn't necessary but whatever
-    getChoice: defaultEndpointsFactory.build({
-        methods: ["get"],
-        input: z.object({ choiceID: z.string() }),
-        output: z.object({ choice: ChoiceSchema.optional() }),
-        handler: async ({ input: { choiceID } }) => ({
-            choice: await getChoice(choiceID),
-        }),
-    }),
     getChoicesForNode: defaultEndpointsFactory.build({
         methods: ["get"],
-        input: z.object({ nodeID: z.string() }),
+        input: z.object({ fromNodeId: z.number() }),
         output: z.object({ choices: ChoiceSchema.array() }),
-        handler: async ({ input: { nodeID } }) => {
+        handler: async ({ input: { fromNodeId } }) => {
             return {
-                choices: (
-                    await getMany<Choice>(TABLES.CHOICE_TABLE, {
-                        filters: { from: nodeID },
-                    })
-                ).results,
+                choices: await prisma.choice.findMany({
+                    where: { fromNodeId },
+                }),
             };
         },
     }),
     createChoice: defaultEndpointsFactory.build({
         methods: ["post"],
         input: z.object({
-            fromNodeID: z.string(),
-            toNodeID: z.string(),
+            fromNodeId: z.number(),
+            toNodeId: z.number(),
             action: z.string().min(1),
             content: z.string().min(1),
         }),
         output: ChoiceSchema,
         handler: async ({
-            input: { fromNodeID, toNodeID, action, content },
+            input: { fromNodeId, toNodeId, action, content },
         }) => {
             if (!context.loggedInAccount)
                 throw new Error("Must be logged in to do that!");
 
             const account = context.loggedInAccount;
-            const fromNode = await getNode(fromNodeID);
+            const fromNode = await getNode(fromNodeId);
             if (!fromNode) throw new Error("From node doesnt exist!");
 
-            const toNode = await getNode(toNodeID);
+            const toNode = await getNode(toNodeId);
             if (!toNode) throw new Error("To node doesnt exist!");
 
             console.log(
                 `${account.screenName} is suggesting a new choice (${action}) to node ${fromNode.ID} (${fromNode.title}), which goes to node ${toNode.ID} (${toNode.title})`
             );
 
-            const now = new Date();
-
             const newChoice: Choice = {
                 ID: await uniqueID(getChoice, `${fromNode.ID}-`, false),
                 from: fromNode.ID,
                 action,
-                dateCreated: now.toJSON(),
-                lastUpdated: now.getTime(),
                 to: toNode.ID,
                 suggestedBy: account.screenName,
                 hidden: flagContent(content) || undefined, // Let users know if its flagged
