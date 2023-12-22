@@ -1,16 +1,23 @@
-import React, { useContext } from "react";
+import React, { type Dispatch, type SetStateAction, useContext } from "react";
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import CrowdventureButton from "../components/CrowdventureButton";
 import { UserContext } from "../user";
-import CreateNodeModal from "./CreateNodeModal";
 import AccountPreview from "../accounts/AccountPreview";
 import { ModalContext } from "../modal";
-import ActionCard from "../actions/ActionCard";
-import ChoiceModal from "../actions/ChoiceModal";
+import ChoiceCard from "../choices/ChoiceCard";
+import ChoiceModal from "../choices/ChoiceModal";
 import { PaletteContext } from "../colorPalette";
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import ParagraphText from "../components/ParagraphText";
+import CreateNodeModal from "./CreateNodeModal";
+import { type Node } from "@/types/models";
 
-const NodeSidebar = ({ node, setNode }) => {
+const NodeSidebar = ({
+    node,
+    setNode,
+}: {
+    readonly node: Node;
+    readonly setNode: Dispatch<SetStateAction<Node>>;
+}) => {
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
     const { mutedTextColor } = useContext(PaletteContext);
@@ -116,7 +123,7 @@ const NodeSidebar = ({ node, setNode }) => {
                 >
                     <Masonry>
                         {choices.map((choice, idx) => (
-                            <ActionCard choice={choice} key={idx} />
+                            <ChoiceCard choice={choice} key={idx} />
                         ))}
                     </Masonry>
                 </ResponsiveMasonry>

@@ -100,7 +100,7 @@ type FormWithValues<T extends FormType> = {
 export const useInputForm = <T extends FormType>(
     initialForm: T
 ): FormWithValues<T> => {
-    const ref = useRef() as { current: FormType };
+    const ref = useRef() as { current: T };
     const [error, setError] = useState("");
     const form = {
         getValues: () => ref.current,
@@ -116,8 +116,12 @@ export const useInputForm = <T extends FormType>(
     for (const key of Object.keys(initialForm)) {
         const defaultValue = initialForm[key];
         if (defaultValue === undefined) continue;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         form[key] = {
             defaultValue,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             setValue: (value: string | boolean) => (ref.current[key] = value),
         };
     }

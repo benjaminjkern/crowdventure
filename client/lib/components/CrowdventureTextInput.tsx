@@ -5,11 +5,10 @@ import React, {
     type InputHTMLAttributes,
     type TextareaHTMLAttributes,
     type ChangeEvent,
-    type MouseEventHandler,
 } from "react";
 import { PaletteContext } from "../colorPalette";
-import EventListener, { type EventListenerPair } from "./EventListener";
 import { type FormElement } from "../hooks";
+import EventListener, { type EventListenerPair } from "./EventListener";
 
 const CrowdventureTextInput = ({
     formElement,
@@ -18,10 +17,10 @@ const CrowdventureTextInput = ({
     rows = 1,
     ...props
 }: {
-    formElement?: FormElement;
-    onChangeText?: (e: string) => void;
-    style?: CSSProperties;
-    rows?: number;
+    readonly formElement?: FormElement;
+    readonly onChangeText?: (e: string) => void;
+    readonly style?: CSSProperties;
+    readonly rows?: number;
 } & (
     | DetailedHTMLProps<
           TextareaHTMLAttributes<HTMLTextAreaElement>,

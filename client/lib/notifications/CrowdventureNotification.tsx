@@ -7,11 +7,14 @@ import EventListener from "../components/EventListener";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import { useDebounce } from "../hooks";
 import NotificationButton from "./NotificationButton";
+import { type Notification } from "@/types/models";
 
 const CrowdventureNotification = ({
     notification,
     deleteNotification = () => {},
     updateNotification = () => {},
+}: {
+    readonly notification: Notification;
 }) => {
     const { rootColor, backgroundColor, mutedTextColor } =
         useContext(PaletteContext);

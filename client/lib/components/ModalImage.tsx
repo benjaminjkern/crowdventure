@@ -1,7 +1,15 @@
-import React from "react";
+import React, { type CSSProperties } from "react";
 import Image from "next/image";
 
-const ModalImage = ({ src, alt, style }) => {
+const ModalImage = ({
+    src,
+    alt,
+    style,
+}: {
+    readonly src: string;
+    readonly alt: string;
+    readonly style: CSSProperties;
+}) => {
     if (!src) return;
     return (
         <Image

@@ -19,10 +19,10 @@ const getEventListeners = (event: string) => {
 
 const EventListener = ({
     event,
-    events = [event],
+    events = event ? [event] : [],
     children,
 }: {
-    event: string;
+    event?: string;
     events?: string[];
     children: (...args: EventListenerPair[]) => ReactNode;
 }) => {

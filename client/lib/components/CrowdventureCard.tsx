@@ -35,7 +35,7 @@ const CrowdventureCard = ({
     readonly overlayIcons: OverlayIcon[];
     readonly text: string;
     readonly children: ReactNode;
-    readonly disabled: boolean;
+    readonly disabled?: boolean;
     readonly onImageError?: () => void;
 }) => {
     const { rootColor, backgroundColor, lightBackgroundColor, mutedTextColor } =

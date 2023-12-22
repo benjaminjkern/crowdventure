@@ -1,4 +1,3 @@
-import Image from "next/image";
 import React, { useContext } from "react";
 import { ModalContext } from "../modal";
 import CrowdventureModal from "./CrowdventureModal";
@@ -7,10 +6,11 @@ const PictureModal = ({
     title,
     pictureURL,
 }: {
-    title: string;
-    pictureURL: string;
+    readonly title: string;
+    readonly pictureURL: string;
 }) => {
     const { closeModal } = useContext(ModalContext);
+    // TODO: Figure out how to do this well with the next/image
     return (
         <CrowdventureModal
             modalButtons={[

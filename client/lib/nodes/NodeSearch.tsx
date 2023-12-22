@@ -1,17 +1,22 @@
 import React, { useState } from "react";
 import AccountPreview from "../accounts/AccountPreview";
-import { queryCall } from "../apiUtils";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
-import { NODE_PREVIEW_GQL } from "../gqlModels";
 import { useDebounce } from "../hooks";
+import { type Node } from "@/types/models";
 
-const NodeSearch = ({ onSelectNode, toNode }) => {
-    const [resultNodes, setResultNodes] = useState(undefined);
+const NodeSearch = ({
+    onSelectNode,
+    toNode,
+}: {
+    readonly onSelectNode: (node: Node) => void;
+    readonly toNode: Node;
+}) => {
+    const [resultNodes, setResultNodes] = useState<Node[]>(undefined);
 
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState(toNode?.title);
 
-    const selectNode = (node) => {
+    const selectNode = (node: Node) => {
         setQuery(node.title);
         setOpen(false);
         onSelectNode(node);

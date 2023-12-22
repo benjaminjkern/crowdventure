@@ -7,10 +7,10 @@ const CrowdventureSwitch = ({
     size = 20,
     padding = 2,
 }: {
-    value: boolean;
-    onChange: (s: boolean) => void;
-    size?: number;
-    padding?: number;
+    readonly value: boolean;
+    readonly onChange: (s: boolean) => void;
+    readonly size?: number;
+    readonly padding?: number;
 }) => {
     const { lightBackgroundColor, rootColor, backgroundColor } =
         useContext(PaletteContext);

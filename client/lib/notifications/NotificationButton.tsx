@@ -1,10 +1,18 @@
-import React, { useContext } from "react";
+import React, { type CSSProperties, useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamation } from "@fortawesome/free-solid-svg-icons";
 import EventListener from "../components/EventListener";
 import { PaletteContext } from "../colorPalette";
 
-const NotificationButton = ({ onClick, seen, style }) => {
+const NotificationButton = ({
+    onClick,
+    seen,
+    style,
+}: {
+    readonly onClick: () => void;
+    readonly seen: boolean;
+    readonly style: CSSProperties;
+}) => {
     const { rootColor } = useContext(PaletteContext);
 
     return (

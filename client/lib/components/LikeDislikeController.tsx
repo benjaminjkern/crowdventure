@@ -2,7 +2,19 @@ import React, { useContext } from "react";
 import { UnsafeModeContext } from "../unsafeMode";
 import CrowdventureButton from "./CrowdventureButton";
 
-const LikeDislikeController = ({ count, liked, like, disliked, dislike }) => {
+const LikeDislikeController = ({
+    count,
+    liked,
+    like,
+    disliked,
+    dislike,
+}: {
+    readonly count: number;
+    readonly liked: boolean;
+    readonly like: () => void;
+    readonly disliked: boolean;
+    readonly dislike: () => void;
+}) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
     return (
         <span style={{ gap: 5 }}>

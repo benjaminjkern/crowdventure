@@ -5,14 +5,13 @@ const CrowdventureCheckboxInput = ({
     onChange = () => {},
     checked = false,
     ...props
+}: {
+    readonly label: string;
+    readonly onChange?: (b: boolean) => void;
+    readonly checked: boolean;
 }) => {
-    const appliedProps = {};
-
-    if (checked.type === "statelessValue") {
-        appliedProps.value = checked.initialValue;
-        appliedProps.ref = checked.ref;
-        checked.getValue = () => checked.ref.current.checked;
-    }
+    // TODO: Make this work with the nicer form element I made
+    const appliedProps = { checked };
     return (
         <div style={{ flexDirection: "row", justifyContent: "space-between" }}>
             {label}

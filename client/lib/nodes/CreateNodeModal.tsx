@@ -11,7 +11,6 @@ import CrowdventureButton from "../components/CrowdventureButton";
 import CrowdventureModal from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { UserContext } from "../user";
-import { mutationCall } from "../apiUtils";
 import ConfirmModal from "../components/ConfirmModal";
 import CrowdventureCheckboxInput from "../components/CrowdventureCheckboxInput";
 import { ModalContext } from "../modal";
@@ -19,7 +18,7 @@ import ImageSearch from "../components/ImageSearch";
 import CloseButton from "../components/CloseButton";
 import { PaletteContext } from "../colorPalette";
 import { useInputForm } from "../hooks";
-import { type CrowdventureNode } from "+/types/models";
+import { type Node } from "@/types/models";
 
 // import SearchImage from "../SearchImage";
 
@@ -29,9 +28,9 @@ const CreateNodeModal = ({
     setNode,
     featured: initFeatured,
 }: {
-    node?: CrowdventureNode;
-    setNode?: Dispatch<SetStateAction<CrowdventureNode | undefined>>;
-    featured?: boolean;
+    readonly node?: Node;
+    readonly setNode?: Dispatch<SetStateAction<Node>>;
+    readonly featured?: boolean;
 }) => {
     const nodeForm = useInputForm({
         title: node?.title || "",
@@ -128,17 +127,14 @@ const CreateNodeModal = ({
                     onClick: () =>
                         openModal(
                             <ConfirmModal
-                                content={
-                                    <span>
-                                        This will erase all suggested choices of
-                                        this page, and their associated scores.
-                                        This will NOT delete sub-pages of this
-                                        page. Are you sure you wish to continue?
-                                    </span>
-                                }
                                 onConfirm={deleteNode}
                                 title="Delete Page"
-                            />
+                            >
+                                This will erase all suggested choices of this
+                                page, and their associated scores. This will NOT
+                                delete sub-pages of this page. Are you sure you
+                                wish to continue?
+                            </ConfirmModal>
                         ),
                 },
             ]}

@@ -1,9 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, {
+    type DetailedHTMLProps,
+    type ImgHTMLAttributes,
+    useEffect,
+    useState,
+    type CSSProperties,
+} from "react";
 
-const UnsafeImage = ({ style, unsafe, ...props }) => {
+const UnsafeImage = ({
+    style,
+    unsafe,
+    ...props
+}: {
+    readonly style: CSSProperties;
+    readonly unsafe: boolean;
+} & DetailedHTMLProps<
+    ImgHTMLAttributes<HTMLImageElement>,
+    HTMLImageElement
+>) => {
     const BLUR_MAX = 10;
 
-    const [blurAmount, setBlurAmount] = useState(unsafe * BLUR_MAX);
+    const [blurAmount, setBlurAmount] = useState(Number(unsafe) * BLUR_MAX);
     const [blurDelta, setBlurDelta] = useState(0);
 
     useEffect(() => {

@@ -1,9 +1,10 @@
 import React from "react";
 
-import NodePreview from "./NodePreview";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
+import NodePreview from "./NodePreview";
+import { type Node } from "@/types/models";
 
-const NodeViewer = ({ nodes }) => (
+const NodeViewer = ({ nodes }: { readonly nodes: Node[] }) => (
     <ResponsiveMasonry columnsCountBreakPoints={{ 0: 1, 700: 2, 1000: 3 }}>
         <Masonry
             style={{

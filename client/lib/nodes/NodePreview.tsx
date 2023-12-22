@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
+import { faMinusCircle, faStar } from "@fortawesome/free-solid-svg-icons";
 import AccountPreview from "../accounts/AccountPreview";
 import ConfirmModal from "../components/ConfirmModal";
 import CrowdventureCard from "../components/CrowdventureCard";
 import { ModalContext } from "../modal";
 import { UnsafeModeContext } from "../unsafeMode";
 import { UserContext } from "../user";
-import { faMinusCircle, faStar } from "@fortawesome/free-solid-svg-icons";
 
 // import ConfirmModal from "./Modals/ConfirmModal";
 
@@ -62,29 +62,27 @@ const NodePreview = ({ node }) => {
         <CrowdventureCard
             dropdownOptions={[
                 {
-                    active: user,
+                    active: Boolean(user),
                     onClick: () => featurePage(node, node.featured),
                     disabled: !(user?.isAdmin || userOwnsNode),
                     text: `${node.featured ? "Un-f" : "F"}eature page`,
                 },
                 {
-                    active: user,
+                    active: Boolean(user),
                     onClick: () => {
                         openModal(
                             <ConfirmModal
-                                content={
-                                    <span>
-                                        This will erase all suggested choices of
-                                        this page, and their associated scores.
-                                        This will NOT delete sub-pages of this
-                                        page. Are you sure you wish to continue?
-                                    </span>
-                                }
                                 onConfirm={() => deleteNode(node)}
                                 title="Delete Page"
-                            />
+                            >
+                                This will erase all suggested choices of this
+                                page, and their associated scores. This will NOT
+                                delete sub-pages of this page. Are you sure you
+                                wish to continue?
+                            </ConfirmModal>
                         );
                     },
+                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                     disabled: !(user?.isAdmin || userOwnsNode),
                     text: "Delete",
                 },
@@ -93,7 +91,7 @@ const NodePreview = ({ node }) => {
                 //     disabled: true,
                 //     text: "Make Private",
                 // },
-                { active: user },
+                { active: Boolean(user) },
                 { onClick: () => reportNode(node.ID), text: "Report" },
                 { active: user?.isAdmin },
                 {

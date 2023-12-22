@@ -24,9 +24,8 @@ const UnsafeModal = () => {
             &quot;unsafe&quot;. Before you can continue, you must acknowledge
             and agree to the terms of service:
             <CrowdventureTextInput
-                as="textarea"
                 disabled
-                rows="5"
+                rows={5}
                 value={`Please read these terms of service ("terms", "terms of service") carefully before using the Crowdventure website (the "service").
             
 I. Conditions of Use
@@ -59,7 +58,6 @@ IX. User Account
   We reserve all rights to terminate accounts, edit or remove content and cancel orders in their sole discretion.`}
             />
             <CrowdventureCheckboxInput
-                // style={{ float: "right" }}
                 checked={understand}
                 label="I agree to the terms of service."
                 onChange={setUnderstand}
