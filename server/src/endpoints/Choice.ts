@@ -2,9 +2,9 @@ import { z } from "zod";
 import { defaultEndpointsFactory } from "express-zod-api";
 import { ChoiceSchema } from "+/schemas";
 import { flagContent, uniqueID } from "+/utils";
-import { type Choice } from "@/types/models";
-import { getChoice, getNode } from "+/commonQueries";
+import { getChoice, getChoiceBySlug, getNode } from "+/commonQueries";
 import { PrismaClient } from "@prisma/client";
+import authMiddleware from "+/auth";
 const prisma = new PrismaClient();
 
 export const choiceEndpoints = {
@@ -20,7 +20,7 @@ export const choiceEndpoints = {
             };
         },
     }),
-    createChoice: defaultEndpointsFactory.build({
+    createChoice: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["post"],
         input: z.object({
             fromNodeId: z.number(),
@@ -31,11 +31,12 @@ export const choiceEndpoints = {
         output: ChoiceSchema,
         handler: async ({
             input: { fromNodeId, toNodeId, action, content },
+            options: { loggedInAccount },
         }) => {
-            if (!context.loggedInAccount)
+            if (!loggedInAccount)
                 throw new Error("Must be logged in to do that!");
 
-            const account = context.loggedInAccount;
+            const account = loggedInAccount;
             const fromNode = await getNode(fromNodeId);
             if (!fromNode) throw new Error("From node doesnt exist!");
 
@@ -43,24 +44,27 @@ export const choiceEndpoints = {
             if (!toNode) throw new Error("To node doesnt exist!");
 
             console.log(
-                `${account.screenName} is suggesting a new choice (${action}) to node ${fromNode.ID} (${fromNode.title}), which goes to node ${toNode.ID} (${toNode.title})`
+                `${account.screenName} is suggesting a new choice (${action}) to node ${fromNode.id} (${fromNode.title}), which goes to node ${toNode.id} (${toNode.title})`
             );
 
-            const newChoice: Choice = {
-                ID: await uniqueID(getChoice, `${fromNode.ID}-`, false),
-                from: fromNode.ID,
-                action,
-                to: toNode.ID,
-                suggestedBy: account.screenName,
-                hidden: flagContent(content) || undefined, // Let users know if its flagged
-                score: 0,
-                isCanon: false,
-            };
+            const choice = await prisma.choice.create({
+                data: {
+                    slug: await uniqueID(
+                        getChoiceBySlug,
+                        `${fromNode.slug}-`,
+                        false
+                    ),
+                    fromNodeId: fromNode.id,
+                    action,
+                    toNodeId: toNode.id,
+                    suggestedByAccountId: account.id,
+                    hidden: flagContent(content) || undefined, // Let users know if its flagged
+                    score: 0,
+                    isCanon: account.id === fromNode.ownerId,
+                },
+            });
 
-            if (account.screenName === fromNode.owner) {
-                newChoice.isCanon = true;
-                // updateTime(node);
-            } else {
+            if (account.id !== fromNode.ownerId) {
                 // MutationResolvers.createNotification(
                 //     undefined,
                 //     {
@@ -74,26 +78,27 @@ export const choiceEndpoints = {
 
             // MutationResolvers.createNotification(undefined, { accountScreenName: toNode.owner, content: `${account.screenName} suggested a new choice that leads to your page "${toNode.title}"!`, link: `/node/${node.ID}` }, context);
 
-            return await addItem(TABLES.CHOICE_TABLE, newChoice);
+            return choice;
         },
     }),
-    editChoice: defaultEndpointsFactory.build({
+    editChoice: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["patch"],
         input: z.object({
-            choiceID: z.string(),
+            id: z.number(),
             hidden: z.boolean().optional(),
-            toNodeID: z.string().optional(),
+            toNodeId: z.number().optional(),
             isCanon: z.boolean().optional(),
             action: z.string().min(1).optional(),
         }),
         output: ChoiceSchema,
         handler: async ({
-            input: { choiceID, toNodeID, hidden, isCanon, action },
+            input: { id, toNodeId, hidden, isCanon, action },
+            options: { loggedInAccount },
         }) => {
-            const choice = await getChoice(choiceID);
+            const choice = await getChoice(id);
             if (!choice) throw new Error("That choice doesnt exist!");
 
-            const fromNode = await getNode(choice.from);
+            const fromNode = await getNode(choice.fromNodeId);
 
             if (!fromNode) {
                 throw new Error("That choice's from node disappeared!");
@@ -101,29 +106,29 @@ export const choiceEndpoints = {
             }
 
             if (
-                !context.loggedInAccount?.isAdmin &&
-                !context.loggedInAccount?.screenName !== fromNode.owner &&
+                !loggedInAccount?.isAdmin &&
+                loggedInAccount?.id !== fromNode.ownerId &&
                 (choice.isCanon ||
-                    context.loggedInAccount?.screenName !== choice.suggestedBy)
+                    loggedInAccount?.id !== choice.suggestedByAccountId)
             )
                 throw new Error("No permission!");
 
-            console.log(`Editing suggestion ${choice.ID} (${choice.action})`);
+            console.log(`Editing suggestion ${choice.id} (${choice.action})`);
 
             // TODO: Have to change at least one thing
 
             // const daddy = await databaseCalls.getNode(choice.from);
 
-            if (context.loggedInAccount?.isAdmin && hidden !== undefined)
+            if (loggedInAccount?.isAdmin && hidden !== undefined)
                 // Should only be able to be done by admins
                 choice.hidden = hidden;
-            if (toNodeID && choice.to !== toNodeID) {
-                const toNode = await getNode(toNodeID);
-                if (toNode) choice.to = toNodeID; // TODO: Should let users know that it didnt work
+            if (toNodeId && choice.toNodeId !== toNodeId) {
+                const toNode = await getNode(toNodeId);
+                if (toNode) choice.toNodeId = toNodeId; // TODO: Should let users know that it didnt work
             }
             if (
-                (context.loggedInAccount?.isAdmin ||
-                    context.loggedInAccount?.screenName === fromNode.owner) &&
+                (loggedInAccount?.isAdmin ||
+                    loggedInAccount?.id === fromNode.ownerId) &&
                 isCanon !== undefined
             )
                 choice.isCanon = isCanon;
@@ -143,36 +148,37 @@ export const choiceEndpoints = {
             //     context
             // );
 
-            return await addItem(TABLES.CHOICE_TABLE, choice);
+            return await prisma.choice.update({
+                where: { id: choice.id },
+                data: choice,
+            });
         },
     }),
-    deleteChoice: defaultEndpointsFactory.build({
+    deleteChoice: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["delete"],
-        input: z.object({ choiceID: z.string() }),
+        input: z.object({ id: z.number() }),
         output: z.object({ deleted: z.boolean() }),
-        handler: async ({ input: { choiceID } }) => {
-            const choice = await getChoice(choiceID);
+        handler: async ({ input: { id }, options: { loggedInAccount } }) => {
+            const choice = await getChoice(id);
             if (!choice) throw new Error("That choice doesnt exist!");
 
-            const fromNode = await getNode(choice.from);
+            const fromNode = await getNode(choice.fromNodeId);
             if (!fromNode) {
                 throw new Error("That choice's from node disappeared!");
                 // TODO: Fix this when this happens
             }
 
             if (
-                !context.loggedInAccount?.isAdmin &&
-                !context.loggedInAccount?.screenName !== fromNode.owner &&
+                !loggedInAccount?.isAdmin &&
+                loggedInAccount?.id !== fromNode.ownerId &&
                 (choice.isCanon ||
-                    context.loggedInAccount?.screenName !== choice.suggestedBy)
+                    loggedInAccount?.id !== choice.suggestedByAccountId)
             )
                 throw new Error("No permission!");
 
-            console.log(`Deleting suggestion ${choice.ID} (${choice.action})`);
+            console.log(`Deleting suggestion ${choice.id} (${choice.action})`);
             return {
-                deleted: await deleteItem(TABLES.CHOICE_TABLE, {
-                    ID: choice.ID,
-                }),
+                deleted: !!(await prisma.choice.delete({ where: { id } })),
             };
         },
     }),
