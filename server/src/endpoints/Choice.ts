@@ -10,7 +10,9 @@ const prisma = new PrismaClient();
 export const choiceEndpoints = {
     getChoicesForNode: defaultEndpointsFactory.build({
         methods: ["get"],
-        input: z.object({ fromNodeId: z.number() }),
+        input: z.object({
+            fromNodeId: z.string().transform((id) => parseInt(id)),
+        }),
         output: z.object({ choices: ChoiceSchema.array() }),
         handler: async ({ input: { fromNodeId } }) => {
             return {
@@ -156,7 +158,7 @@ export const choiceEndpoints = {
     }),
     deleteChoice: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["delete"],
-        input: z.object({ id: z.number() }),
+        input: z.object({ id: z.string().transform((x) => parseInt(x)) }),
         output: z.object({ deleted: z.boolean() }),
         handler: async ({ input: { id }, options: { loggedInAccount } }) => {
             const choice = await getChoice(id);

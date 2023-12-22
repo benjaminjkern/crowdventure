@@ -11,14 +11,21 @@ export const nodeEndpoints = {
     featuredNodes: defaultEndpointsFactory.build({
         methods: ["get"],
         input: z.object({
-            allowHidden: z.boolean().optional(),
-            count: z.number().int().min(1).optional(),
+            allowHidden: z
+                .string()
+                .transform((x) => x === "true")
+                .optional(),
+            count: z
+                .string()
+                .transform((x) => parseInt(x))
+                .optional(),
         }),
         output: z.object({ nodes: NodeSchema.array() }),
         handler: async ({ input: { allowHidden, count = 10 } }) => {
             // TODO: Do this better (Dont load the whole thing into js & Dont show hidden if owner is hidden
             const allFeatured = await prisma.node.findMany({
                 where: {
+                    featured: true,
                     hidden: allowHidden ? undefined : false,
                     pictureUnsafe: allowHidden ? undefined : false,
                 },
@@ -145,7 +152,7 @@ export const nodeEndpoints = {
     }),
     deleteNode: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["delete"],
-        input: z.object({ id: z.number() }),
+        input: z.object({ id: z.string().transform((x) => parseInt(x)) }),
         output: z.object({ deleted: z.boolean() }),
         handler: async ({ input: { id }, options: { loggedInAccount } }) => {
             const node = await getNode(id);

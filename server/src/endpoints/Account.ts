@@ -24,7 +24,10 @@ export const accountEndpoints = {
     }),
     login: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["post"],
-        input: z.object({ screenName: z.string(), password: z.string() }),
+        input: z.object({
+            screenName: z.string(),
+            password: z.string().optional(),
+        }),
         output: AccountSchema,
         handler: async ({
             input: { screenName, password },
@@ -47,7 +50,10 @@ export const accountEndpoints = {
     }),
     createAccount: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["post"],
-        input: z.object({ screenName: z.string(), password: z.string() }),
+        input: z.object({
+            screenName: z.string().min(1),
+            password: z.string().min(1),
+        }),
         output: AccountSchema,
         handler: async ({
             input: { screenName, password },
@@ -75,38 +81,11 @@ export const accountEndpoints = {
             return account;
         },
     }),
-    deleteAccount: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
-        methods: ["delete"],
-        input: z.object({
-            id: z.number(),
-        }),
-        output: z.object({
-            deleted: z.boolean(),
-        }),
-        handler: async ({ input: { id }, options: { loggedInAccount } }) => {
-            const account = await getAccount(id);
-            if (!account) throw new Error("That account doesnt exist!");
-
-            if (
-                !loggedInAccount?.isAdmin &&
-                loggedInAccount?.screenName !== account.screenName
-            )
-                throw new Error("No permission!");
-
-            console.log(`Deleting Account ${account.screenName}`);
-
-            return {
-                deleted: !!(await prisma.account.delete({
-                    where: { screenName: account.screenName },
-                })),
-            };
-        },
-    }),
     editAccount: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["patch"],
         input: z.object({
             id: z.number(),
-            screenName: z.string().optional(),
+            screenName: z.string().min(1).optional(),
             oldPassword: z.string().optional(),
             newPassword: z.string().min(1).optional(),
             bio: z.string().min(1).optional(),
@@ -152,6 +131,14 @@ export const accountEndpoints = {
 
                 // TODO: Let user know that password failed
             }
+            if (screenName) {
+                if (flagContent(screenName)) {
+                    account.hidden = true;
+                    // TODO: Send notification (Maybe also put a check on the frontend)
+                    // TODO: Find a way to either only hide the bio or make it so if they change the thing that's bad then they'll get unhidden
+                }
+                account.screenName = screenName;
+            }
             if (bio !== undefined) {
                 if (flagContent(bio)) {
                     account.hidden = true;
@@ -178,8 +165,35 @@ export const accountEndpoints = {
 
             return await prisma.account.update({
                 data: account,
-                where: { screenName: account.screenName },
+                where: { id },
             });
+        },
+    }),
+    deleteAccount: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
+        methods: ["delete"],
+        input: z.object({
+            id: z.string().transform((x) => parseInt(x)),
+        }),
+        output: z.object({
+            deleted: z.boolean(),
+        }),
+        handler: async ({ input: { id }, options: { loggedInAccount } }) => {
+            const account = await getAccount(id);
+            if (!account) throw new Error("That account doesnt exist!");
+
+            if (
+                !loggedInAccount?.isAdmin &&
+                loggedInAccount?.screenName !== account.screenName
+            )
+                throw new Error("No permission!");
+
+            console.log(`Deleting Account ${account.screenName}`);
+
+            return {
+                deleted: !!(await prisma.account.delete({
+                    where: { screenName: account.screenName },
+                })),
+            };
         },
     }),
 };

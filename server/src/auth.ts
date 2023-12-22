@@ -8,7 +8,7 @@ const authMiddleware = createMiddleware({
     input: z.object({}),
     middleware: async ({ input: {}, request, response }) => {
         try {
-            const token = request.headers.authorization ?? "";
+            const token = request.headers.authorization?.split(" ")[1] ?? "";
             const { accountId } = jwt.verify(
                 token,
                 process.env.JWT_SECRET!
