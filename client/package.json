@@ -5,6 +5,7 @@
     "repository": "https://github.com/benjaminjkern/crowdventure.git",
     "author": "benjaminjkern <benkern@pixelgate.net>",
     "license": "MIT",
+    "type": "module",
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^6.5.1",
         "@fortawesome/free-brands-svg-icons": "^6.5.1",

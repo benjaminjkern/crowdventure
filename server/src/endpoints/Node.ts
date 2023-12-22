@@ -1,9 +1,9 @@
 import { flagContent, scramble, uniqueID } from "../utils.js";
 import { defaultEndpointsFactory } from "express-zod-api";
 import { z } from "zod";
-import { NodeSchema } from "+/schemas.js";
+import { AccountSchema, NodeSchema } from "+/schemas.js";
 import authMiddleware from "+/auth.js";
-import { getNode, getNodeBySlug } from "+/commonQueries.js";
+import { getAccount, getNode, getNodeBySlug } from "+/commonQueries.js";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
@@ -43,9 +43,18 @@ export const nodeEndpoints = {
     getNode: defaultEndpointsFactory.build({
         methods: ["get"],
         input: z.object({ slug: z.string() }),
-        output: z.object({ node: NodeSchema.optional() }),
+        output: z.object({
+            node: NodeSchema.optional(),
+            owner: AccountSchema.optional(),
+        }),
         handler: async ({ input: { slug } }) => {
-            return { node: (await getNodeBySlug(slug)) ?? undefined };
+            const node = await getNodeBySlug(slug);
+            if (!node) return {};
+            // TODO: Dont make a new call for the account, just group them
+            const owner = node.ownerId
+                ? await getAccount(node.ownerId)
+                : undefined;
+            return { node, owner: owner ?? undefined };
         },
     }),
     createNode: defaultEndpointsFactory.addMiddleware(authMiddleware).build({

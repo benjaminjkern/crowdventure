@@ -290,6 +290,20 @@ type GetNodeGetNodeResponse = {
             views: number;
             ownerId: number | null;
         } | undefined;
+        owner?: {
+            id: number;
+            screenName: string;
+            createdAt: any;
+            updatedAt: any;
+            isAdmin: boolean;
+            hidden: boolean;
+            profilePicURL: string | null;
+            profilePicUnsafe: boolean;
+            bio: string | null;
+            lastIP: string;
+            totalNodeViews: number;
+            totalSuggestionScore: number;
+        } | undefined;
     };
 } | {
     status: "error";

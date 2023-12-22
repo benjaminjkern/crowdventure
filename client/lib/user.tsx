@@ -31,7 +31,7 @@ const UserProvider = ({ children }: { readonly children: ReactNode }) => {
         const response = await apiClient.provide("post", "/account/login", {
             screenName: savedUser.screenName,
         });
-        if (response.status === "error") return alert(response.error);
+        if (response.status === "error") return alert(response.error.message);
         setUser(response.data);
     };
 
