@@ -166,7 +166,7 @@ module.exports = {
         // I fucking hate typescript and sometimes I need to turn it completely off
         "@typescript-eslint/ban-ts-comment": "warn",
         // This is nice for undefined or nulls, but when something is a boolean | undefined this shouldnt really come in here because it might be the case that I delibrately am using ||
-        "@typescript-eslint/prefer-nullish-coalescing": "warn",
+        "@typescript-eslint/prefer-nullish-coalescing": "off",
         // There are places where I want the default function to be an empty function and it's nicer to write () => {} than () => undefined
         "@typescript-eslint/no-empty-function": "off",
         // Runs on types!!!! Super dumb and should just use typescript version

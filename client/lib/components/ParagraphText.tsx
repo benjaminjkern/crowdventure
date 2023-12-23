@@ -1,6 +1,6 @@
 import React from "react";
 
-const ParagraphText = ({ text }: { readonly text: string }) => {
+const ParagraphText = ({ text }: { readonly text?: string }) => {
     if (!text) return null;
 
     return (
@@ -9,7 +9,6 @@ const ParagraphText = ({ text }: { readonly text: string }) => {
                 <div
                     key={i}
                     style={{
-                        // justifyContent: ''
                         textAlign: "justify",
                         textIndent: "5%",
                     }}

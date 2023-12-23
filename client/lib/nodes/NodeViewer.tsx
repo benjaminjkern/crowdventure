@@ -12,18 +12,9 @@ const NodeViewer = ({ nodes }: { readonly nodes: Node[] }) => (
                 marginBottom: "5px",
             }}
         >
-            {nodes
-                // .filter(
-                //     (node) =>
-                //         (loggedInAs &&
-                //             (loggedInAs.unsafeMode ||
-                //                 user.screenName ===
-                //                     node.owner.screenName)) ||
-                //         !node.hidden
-                // )
-                .map((node, i) => (
-                    <NodePreview key={i} node={node} />
-                ))}
+            {nodes.map((node, i) => (
+                <NodePreview key={i} node={node} />
+            ))}
         </Masonry>
     </ResponsiveMasonry>
 );

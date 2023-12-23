@@ -13,7 +13,7 @@ import CrowdventureButton from "./CrowdventureButton";
 export type DropDownOption = {
     active?: boolean;
     disabled?: boolean;
-    onClick?: () => void;
+    onClick?: () => unknown;
     text?: string;
 };
 

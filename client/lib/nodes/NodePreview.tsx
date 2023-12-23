@@ -6,64 +6,43 @@ import CrowdventureCard from "../components/CrowdventureCard";
 import { ModalContext } from "../modal";
 import { UnsafeModeContext } from "../unsafeMode";
 import { UserContext } from "../user";
+import apiClient from "../apiClient";
+import { type Node } from "@/types/models";
 
 // import ConfirmModal from "./Modals/ConfirmModal";
 
-const NodePreview = ({ node }) => {
+const NodePreview = ({ node }: { readonly node: Node }) => {
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
 
-    const reportNode = (nodeID) => {
-        // mutation_call(
-        //     "createFeedback",
-        //     {
-        //         ...(loggedInAs
-        //             ? { accountScreenName: loggedInAs.screenName }
-        //             : {}),
-        //         info: "This is inappropriate",
-        //         reportingObjectType: "Node",
-        //         reportingObjectID: nodeID,
-        //     },
-        //     { info: 0, reporting: 0 },
-        //     () => {
-        //         alert("Successfully reported page!");
-        //         window.location.reload(false);
-        //     }
-        // );
+    const hideNode = async (hidden: boolean) => {
+        const response = await apiClient.provide("patch", "/node/editNode", {
+            id: node.id,
+            hidden,
+        });
     };
 
-    const hidePage = (node) => {
-        // mutation_call(
-        //     "editNode",
-        //     { nodeID: node.ID, hidden: !node.hidden },
-        //     { title: 0 },
-        //     () => window.location.reload(false)
-        // );
+    const featureNode = async (featured: boolean) => {
+        const response = await apiClient.provide("patch", "/node/editNode", {
+            id: node.id,
+            featured,
+        });
+    };
+    const deleteNode = async () => {
+        const response = await apiClient.provide("delete", "/node/deleteNode", {
+            id: String(node.id),
+        });
     };
 
-    const featurePage = (node, alreadyFeatured) => {
-        // mutation_call(
-        //     "editNode",
-        //     { nodeID: node.ID, featured: !alreadyFeatured },
-        //     { title: 0 },
-        //     () => window.location.reload(false)
-        // );
-    };
-    const deleteNode = (node) => {
-        // mutation_call("deleteNode", { nodeID: node.ID }, 0, () => {
-        //     window.location.reload(false);
-        // });
-    };
-
-    const userOwnsNode = user?.screenName === node.owner.screenName;
+    const userOwnsNode = user?.id === node.ownerId;
 
     return (
         <CrowdventureCard
             dropdownOptions={[
                 {
                     active: Boolean(user),
-                    onClick: () => featurePage(node, node.featured),
+                    onClick: () => featureNode(!node.featured),
                     disabled: !(user?.isAdmin || userOwnsNode),
                     text: `${node.featured ? "Un-f" : "F"}eature page`,
                 },
@@ -72,7 +51,7 @@ const NodePreview = ({ node }) => {
                     onClick: () => {
                         openModal(
                             <ConfirmModal
-                                onConfirm={() => deleteNode(node)}
+                                onConfirm={() => deleteNode()}
                                 title="Delete Page"
                             >
                                 This will erase all suggested choices of this
@@ -92,15 +71,15 @@ const NodePreview = ({ node }) => {
                 //     text: "Make Private",
                 // },
                 { active: Boolean(user) },
-                { onClick: () => reportNode(node.ID), text: "Report" },
+                // { onClick: () => reportNode(), text: "Report" },
                 { active: user?.isAdmin },
                 {
                     active: user?.isAdmin,
-                    onClick: () => hidePage(node),
+                    onClick: () => hideNode(),
                     text: `${node.hidden ? "Un-h" : "H"}ide page`,
                 },
             ]}
-            href={`/node/${node.ID}`}
+            href={`/node/${node.slug}`}
             onImageError={() => {
                 // Set to null so it doesnt keep trying to recall image
                 node.pictureURL = null;
