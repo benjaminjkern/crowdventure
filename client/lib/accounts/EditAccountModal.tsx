@@ -16,6 +16,7 @@ import { UserContext } from "../user";
 import { ModalContext } from "../modal";
 import { useInputForm } from "../hooks";
 
+import apiClient from "../apiClient";
 import { type Account } from "@/types/models";
 
 const EditAccountModal = ({
@@ -25,61 +26,75 @@ const EditAccountModal = ({
     readonly account: Account;
     readonly setAccount: Dispatch<SetStateAction<Account>>;
 }) => {
-    const [error, setError] = useState("");
     const { user, setUser } = useContext(UserContext);
     const { openModal, closeModal, closeAllModals } = useContext(ModalContext);
     const router = useRouter();
 
     const editAccountForm = useInputForm({
-        bio: account.bio,
+        bio: account.bio ?? "",
+        screenName: account.screenName,
         profilePicURL: account.profilePicURL ?? "",
+        oldPassword: "",
         pass1: "",
         pass2: "",
         hidden: account.hidden,
         isAdmin: account.isAdmin,
     });
 
-    const editPage = () => {
-        const { pass1, pass2 } = editAccountForm.getValues();
+    const editPage = async () => {
+        const {
+            pass1,
+            pass2,
+            bio,
+            screenName,
+            profilePicURL,
+            oldPassword,
+            hidden,
+            isAdmin,
+        } = editAccountForm.getValues();
         if (pass1 && pass2 && pass1 !== pass2) {
-            setError("Passwords must match!");
+            editAccountForm.setError("Passwords must match!");
             return;
         }
 
-        const params = { screenName: account.screenName };
+        const params: {
+            id: number;
+            screenName?: string | undefined;
+            oldPassword?: string | undefined;
+            newPassword?: string | undefined;
+            bio?: string | undefined;
+            profilePicURL?: string | undefined;
+            hidden?: boolean | undefined;
+            isAdmin?: boolean | undefined;
+        } = { id: account.id, bio, profilePicURL: profilePicURL || undefined };
 
-        if (bioField !== account.bio) params.bio = bioField;
-        if (profilePictureField !== account.profilePicURL)
-            params.profilePicURL = profilePictureField;
+        if (bio && bio !== account.bio) params.bio = bio;
+        if (profilePicURL && profilePicURL !== account.profilePicURL)
+            params.profilePicURL = profilePicURL;
         if (pass1) params.newPassword = pass1;
         if (user.isAdmin) {
             params.hidden = hidden;
             params.isAdmin = isAdmin;
         }
 
-        mutationCall("editAccount", FULL_ACCOUNT_GQL, params).then(
-            (newAccount) => {
-                if (account.screenName === user?.screenName)
-                    setUser(newAccount);
-
-                setAccount(newAccount);
-                closeModal();
-            }
+        const response = await apiClient.provide(
+            "patch",
+            "/account/editAccount",
+            params
         );
+        if (response.status === "error") return alert(response.error.message);
+        setAccount(response.data);
+        closeModal();
     };
 
-    const deleteAccount = () => {
-        mutationCall(
-            "deleteAccount",
-            {},
-            { screenName: account.screenName }
-        ).then(() => {
-            if (account.screenName === user?.screenName) setUser();
-
-            setAccount();
-            void router.push("/");
-            closeAllModals();
+    const deleteAccount = async () => {
+        const response = await apiClient.provide("delete", "/node/deleteNode", {
+            id: String(account.id),
         });
+        if (response.status === "error") return alert(response.error.message);
+
+        closeAllModals();
+        router.push("/");
     };
 
     return (
@@ -91,10 +106,14 @@ const EditAccountModal = ({
                     onClick: () => {
                         openModal(
                             <ConfirmModal
-                                content="This will erase all content created by this account, including all pages and suggested choices, and liked and disliked content. Are you sure you wish to continue?"
                                 onConfirm={deleteAccount}
                                 title="Delete Account"
-                            />
+                            >
+                                This will erase all content created by this
+                                account, including all pages and suggested
+                                choices, and liked and disliked content. Are you
+                                sure you wish to continue?
+                            </ConfirmModal>
                         );
                     },
                 },

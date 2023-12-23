@@ -1,6 +1,6 @@
 import React from "react";
 
-const ParagraphText = ({ text }: { readonly text?: string }) => {
+const ParagraphText = ({ text }: { readonly text: string | null }) => {
     if (!text) return null;
 
     return (

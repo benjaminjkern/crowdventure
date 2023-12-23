@@ -2,7 +2,6 @@ import React, {
     type CSSProperties,
     type MouseEventHandler,
     useContext,
-    type ReactNode,
 } from "react";
 import Link from "next/link";
 import Image from "next/image";

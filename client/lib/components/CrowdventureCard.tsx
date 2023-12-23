@@ -29,7 +29,7 @@ const CrowdventureCard = ({
     onImageError = () => {},
 }: {
     readonly href: string;
-    readonly picture: string;
+    readonly picture?: string;
     readonly pictureUnsafe: boolean;
     readonly dropdownOptions: DropDownOption[];
     readonly overlayIcons: OverlayIcon[];
@@ -43,7 +43,7 @@ const CrowdventureCard = ({
 
     const [showImage, setShowImage] = useState(true);
 
-    const cardImage = (
+    const cardImage = picture ? (
         <Image
             alt="Something went wrong!"
             fill
@@ -58,7 +58,7 @@ const CrowdventureCard = ({
                 ...blurImageStyle(pictureUnsafe),
             }}
         />
-    );
+    ) : null;
 
     return (
         <EventListener event="hover">

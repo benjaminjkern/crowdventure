@@ -7,7 +7,8 @@
   - Made sure no dumb calls are being made
     - Loading a whole table into the frontend and then sorting rather than filtering and paginating on backend
       - I was doing this for likes / dislikes, searching for choices, and on the account page and it was slowing everything down
-  - Accounts are called accounts, nodes are called nodes, and choices are called choices
+  - Better / more consistent names for things
+    - Accounts, nodes, choices, images
   - Got rid of things I wasn't using or weren't fully fleshed out yet (I want to add these back in later but I didn't need them in rn)
     - Send message
     - Report nodes / accounts / choices

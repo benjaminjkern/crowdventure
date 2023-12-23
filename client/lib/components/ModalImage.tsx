@@ -6,7 +6,7 @@ const ModalImage = ({
     alt,
     style,
 }: {
-    readonly src: string;
+    readonly src: string | null;
     readonly alt: string;
     readonly style: CSSProperties;
 }) => {
