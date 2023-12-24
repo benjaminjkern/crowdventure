@@ -5,7 +5,7 @@ type GetAccountGetAccountInput = {
 type GetAccountGetAccountResponse = {
     status: "success";
     data: {
-        account?: {
+        account: {
             id: number;
             screenName: string;
             createdAt: any;
@@ -15,10 +15,9 @@ type GetAccountGetAccountResponse = {
             profilePicURL: string | null;
             profilePicUnsafe: boolean;
             bio: string | null;
-            lastIP: string;
             totalNodeViews: number;
             totalSuggestionScore: number;
-        } | undefined;
+        } | null;
     };
 } | {
     status: "error";
@@ -44,7 +43,6 @@ type PostAccountLoginResponse = {
         profilePicURL: string | null;
         profilePicUnsafe: boolean;
         bio: string | null;
-        lastIP: string;
         totalNodeViews: number;
         totalSuggestionScore: number;
     };
@@ -72,7 +70,6 @@ type PostAccountCreateAccountResponse = {
         profilePicURL: string | null;
         profilePicUnsafe: boolean;
         bio: string | null;
-        lastIP: string;
         totalNodeViews: number;
         totalSuggestionScore: number;
     };
@@ -106,7 +103,6 @@ type PatchAccountEditAccountResponse = {
         profilePicURL: string | null;
         profilePicUnsafe: boolean;
         bio: string | null;
-        lastIP: string;
         totalNodeViews: number;
         totalSuggestionScore: number;
     };
@@ -152,6 +148,19 @@ type GetChoiceGetChoicesForNodeResponse = {
             fromNodeId: number;
             toNodeId: number | null;
             suggestedByAccountId: number | null;
+            suggestedBy: {
+                id: number;
+                screenName: string;
+                createdAt: any;
+                updatedAt: any;
+                isAdmin: boolean;
+                hidden: boolean;
+                profilePicURL: string | null;
+                profilePicUnsafe: boolean;
+                bio: string | null;
+                totalNodeViews: number;
+                totalSuggestionScore: number;
+            } | null;
         }[];
     };
 } | {
@@ -182,6 +191,19 @@ type PostChoiceCreateChoiceResponse = {
         fromNodeId: number;
         toNodeId: number | null;
         suggestedByAccountId: number | null;
+        suggestedBy: {
+            id: number;
+            screenName: string;
+            createdAt: any;
+            updatedAt: any;
+            isAdmin: boolean;
+            hidden: boolean;
+            profilePicURL: string | null;
+            profilePicUnsafe: boolean;
+            bio: string | null;
+            totalNodeViews: number;
+            totalSuggestionScore: number;
+        } | null;
     };
 } | {
     status: "error";
@@ -212,6 +234,19 @@ type PatchChoiceEditChoiceResponse = {
         fromNodeId: number;
         toNodeId: number | null;
         suggestedByAccountId: number | null;
+        suggestedBy: {
+            id: number;
+            screenName: string;
+            createdAt: any;
+            updatedAt: any;
+            isAdmin: boolean;
+            hidden: boolean;
+            profilePicURL: string | null;
+            profilePicUnsafe: boolean;
+            bio: string | null;
+            totalNodeViews: number;
+            totalSuggestionScore: number;
+        } | null;
     };
 } | {
     status: "error";
@@ -259,6 +294,19 @@ type GetNodeFeaturedNodesResponse = {
             hidden: boolean;
             views: number;
             ownerId: number | null;
+            owner: {
+                id: number;
+                screenName: string;
+                createdAt: any;
+                updatedAt: any;
+                isAdmin: boolean;
+                hidden: boolean;
+                profilePicURL: string | null;
+                profilePicUnsafe: boolean;
+                bio: string | null;
+                totalNodeViews: number;
+                totalSuggestionScore: number;
+            } | null;
         }[];
     };
 } | {
@@ -275,7 +323,7 @@ type GetNodeGetNodeInput = {
 type GetNodeGetNodeResponse = {
     status: "success";
     data: {
-        node?: {
+        node: {
             id: number;
             slug: string;
             title: string;
@@ -289,21 +337,20 @@ type GetNodeGetNodeResponse = {
             hidden: boolean;
             views: number;
             ownerId: number | null;
-        } | undefined;
-        owner?: {
-            id: number;
-            screenName: string;
-            createdAt: any;
-            updatedAt: any;
-            isAdmin: boolean;
-            hidden: boolean;
-            profilePicURL: string | null;
-            profilePicUnsafe: boolean;
-            bio: string | null;
-            lastIP: string;
-            totalNodeViews: number;
-            totalSuggestionScore: number;
-        } | undefined;
+            owner: {
+                id: number;
+                screenName: string;
+                createdAt: any;
+                updatedAt: any;
+                isAdmin: boolean;
+                hidden: boolean;
+                profilePicURL: string | null;
+                profilePicUnsafe: boolean;
+                bio: string | null;
+                totalNodeViews: number;
+                totalSuggestionScore: number;
+            } | null;
+        } | null;
     };
 } | {
     status: "error";
@@ -335,6 +382,19 @@ type PostNodeCreateNodeResponse = {
         hidden: boolean;
         views: number;
         ownerId: number | null;
+        owner: {
+            id: number;
+            screenName: string;
+            createdAt: any;
+            updatedAt: any;
+            isAdmin: boolean;
+            hidden: boolean;
+            profilePicURL: string | null;
+            profilePicUnsafe: boolean;
+            bio: string | null;
+            totalNodeViews: number;
+            totalSuggestionScore: number;
+        } | null;
     };
 } | {
     status: "error";
@@ -369,6 +429,19 @@ type PatchNodeEditNodeResponse = {
         hidden: boolean;
         views: number;
         ownerId: number | null;
+        owner: {
+            id: number;
+            screenName: string;
+            createdAt: any;
+            updatedAt: any;
+            isAdmin: boolean;
+            hidden: boolean;
+            profilePicURL: string | null;
+            profilePicUnsafe: boolean;
+            bio: string | null;
+            totalNodeViews: number;
+            totalSuggestionScore: number;
+        } | null;
     };
 } | {
     status: "error";

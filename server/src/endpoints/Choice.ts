@@ -18,6 +18,9 @@ export const choiceEndpoints = {
             return {
                 choices: await prisma.choice.findMany({
                     where: { fromNodeId },
+                    include: {
+                        suggestedBy: true,
+                    },
                 }),
             };
         },
@@ -63,6 +66,9 @@ export const choiceEndpoints = {
                     hidden: flagContent(content) || undefined, // Let users know if its flagged
                     score: 0,
                     isCanon: account.id === fromNode.ownerId,
+                },
+                include: {
+                    suggestedBy: true,
                 },
             });
 
@@ -153,6 +159,9 @@ export const choiceEndpoints = {
             return await prisma.choice.update({
                 where: { id: choice.id },
                 data: choice,
+                include: {
+                    suggestedBy: true,
+                },
             });
         },
     }),

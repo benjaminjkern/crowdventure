@@ -7,11 +7,11 @@ import { ModalContext } from "../modal";
 import { UnsafeModeContext } from "../unsafeMode";
 import { UserContext } from "../user";
 import apiClient from "../apiClient";
-import { type Node } from "@/types/models";
+import { type NodeWithOwner } from "@/types/models";
 
 // import ConfirmModal from "./Modals/ConfirmModal";
 
-const NodePreview = ({ node }: { readonly node: Node }) => {
+const NodePreview = ({ node }: { readonly node: NodeWithOwner }) => {
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
@@ -75,7 +75,7 @@ const NodePreview = ({ node }: { readonly node: Node }) => {
                 { active: user?.isAdmin },
                 {
                     active: user?.isAdmin,
-                    onClick: () => hideNode(),
+                    onClick: () => hideNode(!node.hidden),
                     text: `${node.hidden ? "Un-h" : "H"}ide page`,
                 },
             ]}
@@ -104,7 +104,7 @@ const NodePreview = ({ node }: { readonly node: Node }) => {
                     iconColor: "red",
                 },
             ]}
-            picture={node.pictureURL}
+            picture={node.pictureURL ?? undefined}
             pictureUnsafe={node.pictureUnsafe}
             text={node.title}
         >

@@ -5,9 +5,16 @@ import {
     NodeSchema as ZodNodeSchema,
 } from "../prisma/generated/zod";
 
-export const AccountSchema = ZodAccountSchema.omit({ encryptedPassword: true });
-export const ChoiceSchema = ZodChoiceSchema;
-export const NodeSchema = ZodNodeSchema;
+export const AccountSchema = ZodAccountSchema.omit({
+    encryptedPassword: true,
+    lastIP: true,
+});
+export const ChoiceSchema = ZodChoiceSchema.extend({
+    suggestedBy: AccountSchema.nullable(),
+});
+export const NodeSchema = ZodNodeSchema.extend({
+    owner: AccountSchema.nullable(),
+});
 
 // type PaginatedResults<T> = {
 //     results: T[];

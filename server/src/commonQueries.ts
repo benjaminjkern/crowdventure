@@ -14,7 +14,10 @@ export const getAccount = async (id: number) =>
 // TODO: Make sure accounts are getting their passwords scraped out
 
 export const getChoiceBySlug = async (slug: string) =>
-    await prisma.choice.findUnique({ where: { slug } });
+    await prisma.choice.findUnique({
+        where: { slug },
+        include: { suggestedBy: true },
+    });
 
 export const getChoice = async (id: number) =>
     await prisma.choice.findUnique({
@@ -22,7 +25,10 @@ export const getChoice = async (id: number) =>
     });
 
 export const getNodeBySlug = async (slug: string) =>
-    await prisma.node.findUnique({ where: { slug } });
+    await prisma.node.findUnique({
+        where: { slug },
+        include: { owner: true },
+    });
 
 export const getNode = async (id: number) =>
     await prisma.node.findUnique({

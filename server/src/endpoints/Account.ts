@@ -14,11 +14,10 @@ export const accountEndpoints = {
     getAccount: defaultEndpointsFactory.build({
         methods: ["get"],
         input: z.object({ screenName: z.string() }),
-        output: z.object({ account: AccountSchema.optional() }),
+        output: z.object({ account: AccountSchema.nullable() }),
         handler: async ({ input: { screenName } }) => {
             return {
-                account:
-                    (await getAccountByScreenName(screenName)) ?? undefined,
+                account: await getAccountByScreenName(screenName),
             };
         },
     }),

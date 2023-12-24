@@ -24,19 +24,29 @@ export const nodeEndpoints = {
                 .transform((x) => parseInt(x))
                 .optional(),
         }),
-        output: z.object({ nodes: NodeSchema.array() }),
+        output: z.object({
+            nodes: NodeSchema.array(),
+        }),
         handler: async ({
             input: { allowHidden, count = 10, ownedByAccount },
         }) => {
-            // TODO: Do this better (Dont load the whole thing into js & Dont show hidden if owner is hidden
+            // TODO: Do this better (Dont load the whole thing into js
             const allFeatured = await prisma.node.findMany({
                 where: {
                     ownerId: ownedByAccount,
                     featured: true,
                     hidden: allowHidden ? undefined : false,
                     pictureUnsafe: allowHidden ? undefined : false,
+                    owner: {
+                        hidden: allowHidden ? undefined : false,
+                        profilePicUnsafe: allowHidden ? undefined : false,
+                    },
+                },
+                include: {
+                    owner: true,
                 },
             });
+
             return { nodes: scramble(allFeatured).slice(0, count) };
         },
     }),
@@ -44,17 +54,10 @@ export const nodeEndpoints = {
         methods: ["get"],
         input: z.object({ slug: z.string() }),
         output: z.object({
-            node: NodeSchema.optional(),
-            owner: AccountSchema.optional(),
+            node: NodeSchema.nullable(),
         }),
         handler: async ({ input: { slug } }) => {
-            const node = await getNodeBySlug(slug);
-            if (!node) return {};
-            // TODO: Dont make a new call for the account, just group them
-            const owner = node.ownerId
-                ? await getAccount(node.ownerId)
-                : undefined;
-            return { node, owner: owner ?? undefined };
+            return { node: await getNodeBySlug(slug) };
         },
     }),
     createNode: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
@@ -92,6 +95,9 @@ export const nodeEndpoints = {
                         flagContent(title) || flagContent(content),
                     storedViews: 0,
                     views: 0,
+                },
+                include: {
+                    owner: true,
                 },
             });
 
@@ -163,7 +169,13 @@ export const nodeEndpoints = {
             //     context
             // );
 
-            return await prisma.node.update({ where: { id }, data: node });
+            return await prisma.node.update({
+                where: { id },
+                data: node,
+                include: {
+                    owner: true,
+                },
+            });
         },
     }),
     deleteNode: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
