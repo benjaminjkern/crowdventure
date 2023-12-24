@@ -18,7 +18,7 @@ const AccountPreview = ({
     style,
     badgeNumber = 0,
 }: {
-    readonly account: Account;
+    readonly account: Account | null;
     readonly imgSide?: "left" | "right";
     readonly scale?: number;
     readonly isLink?: boolean;
@@ -34,13 +34,20 @@ const AccountPreview = ({
         justifyContent: "flex-start",
         ...style,
     };
+    const screenName = account?.screenName ?? "(Account deleted)";
 
     // TODO: Overlay notification badge
     const inside = (
         <>
             {imgSide === "right" && (
-                <span style={{ marginRight: 5, fontSize: textSize }}>
-                    {account.screenName}
+                <span
+                    style={{
+                        marginRight: 5,
+                        fontSize: textSize,
+                        color: account ? undefined : mutedTextColor,
+                    }}
+                >
+                    {screenName}
                 </span>
             )}
 
@@ -65,11 +72,11 @@ const AccountPreview = ({
                     )
                 } */}
             <Image
-                alt={`${account.screenName}'s Profile Pic`}
+                alt={`${screenName}'s Profile Pic`}
                 height={imageSize}
                 onClick={onClickImage}
                 src={
-                    account.profilePicURL ??
+                    account?.profilePicURL ??
                     require("../../public/defaultProfilePic.jpg")
                 }
                 style={{
@@ -84,13 +91,13 @@ const AccountPreview = ({
             />
             {imgSide === "left" && (
                 <span style={{ marginLeft: 5, fontSize: textSize }}>
-                    {account.screenName}
+                    {screenName}
                 </span>
             )}
         </>
     );
 
-    if (onClickImage ?? !isLink)
+    if (!account || (onClickImage ?? !isLink))
         return <span style={wrapperStyle}>{inside}</span>;
 
     return (

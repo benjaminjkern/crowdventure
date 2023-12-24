@@ -20,13 +20,7 @@ import apiClient from "+/lib/apiClient";
 const NAVBAR_HEIGHT = 100;
 const FOOTER_HEIGHT = 78;
 
-const NodePage = ({
-    node: initNode,
-    owner,
-}: {
-    readonly node: Node;
-    readonly owner: Account;
-}) => {
+const NodePage = ({ node: initNode }: { readonly node: Node }) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { openModal } = useContext(ModalContext);
     const { lightBackgroundColor } = useContext(PaletteContext);
@@ -54,7 +48,7 @@ const NodePage = ({
             </CrowdventureAlert>
         );
 
-    if (owner.hidden && !unsafeMode)
+    if (node.owner?.hidden && !unsafeMode)
         return (
             <CrowdventureAlert title="Unsafe!">
                 This page has been hidden from general users, because the author
@@ -186,12 +180,9 @@ export const getStaticProps = async ({
 
     if (!node) return { notFound: true };
 
-    const owner = nodeResponse.data.owner;
-
     return {
         props: {
             node,
-            owner,
             pageTitle: `Crowdventure! - ${node.title}`,
             previewImage: node.pictureURL,
         },

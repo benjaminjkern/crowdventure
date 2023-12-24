@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { type ReactNode, useContext } from "react";
 import { ModalContext } from "../modal";
 import CrowdventureModal from "./CrowdventureModal";
 

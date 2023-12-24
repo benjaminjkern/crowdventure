@@ -7,11 +7,11 @@ import { ModalContext } from "../modal";
 import { UnsafeModeContext } from "../unsafeMode";
 import { UserContext } from "../user";
 import apiClient from "../apiClient";
-import { type NodeWithOwner } from "@/types/models";
+import { type Node } from "@/types/models";
 
 // import ConfirmModal from "./Modals/ConfirmModal";
 
-const NodePreview = ({ node }: { readonly node: NodeWithOwner }) => {
+const NodePreview = ({ node }: { readonly node: Node }) => {
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
@@ -87,7 +87,9 @@ const NodePreview = ({ node }: { readonly node: NodeWithOwner }) => {
             overlayIcons={[
                 {
                     active: node.featured,
-                    tooltip: `This page has been starred by ${node.owner.screenName}!`,
+                    tooltip: `This page has been starred by ${
+                        node.owner?.screenName ?? "its owner"
+                    }!`,
                     icon: faStar,
                     iconColor: "yellow",
                 },
