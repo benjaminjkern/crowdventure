@@ -1,9 +1,4 @@
-import React, {
-    type Dispatch,
-    type SetStateAction,
-    useContext,
-    useState,
-} from "react";
+import React, { type Dispatch, type SetStateAction, useContext } from "react";
 import { useRouter } from "next/router";
 
 import CrowdventureModal from "../components/CrowdventureModal";
@@ -30,16 +25,19 @@ const EditAccountModal = ({
     const { openModal, closeModal, closeAllModals } = useContext(ModalContext);
     const router = useRouter();
 
-    const editAccountForm = useInputForm({
-        bio: account.bio ?? "",
-        screenName: account.screenName,
-        profilePicURL: account.profilePicURL ?? "",
-        oldPassword: "",
-        pass1: "",
-        pass2: "",
-        hidden: account.hidden,
-        isAdmin: account.isAdmin,
-    });
+    const editAccountForm = useInputForm(
+        {
+            bio: account.bio ?? "",
+            screenName: account.screenName,
+            profilePicURL: account.profilePicURL ?? "",
+            oldPassword: "",
+            pass1: "",
+            pass2: "",
+            hidden: account.hidden,
+            isAdmin: account.isAdmin,
+        },
+        ["profilePicURL", "pass1"]
+    );
 
     const editPage = async () => {
         const {
@@ -62,17 +60,19 @@ const EditAccountModal = ({
             screenName?: string | undefined;
             oldPassword?: string | undefined;
             newPassword?: string | undefined;
-            bio?: string | undefined;
-            profilePicURL?: string | undefined;
+            bio?: string | null | undefined;
+            profilePicURL?: string | null | undefined;
             hidden?: boolean | undefined;
             isAdmin?: boolean | undefined;
-        } = { id: account.id, bio, profilePicURL: profilePicURL || undefined };
-
-        if (bio && bio !== account.bio) params.bio = bio;
-        if (profilePicURL && profilePicURL !== account.profilePicURL)
-            params.profilePicURL = profilePicURL;
-        if (pass1) params.newPassword = pass1;
-        if (user.isAdmin) {
+        } = {
+            id: account.id,
+            screenName,
+            bio: bio || null,
+            profilePicURL: profilePicURL || null,
+            oldPassword,
+            newPassword: pass1,
+        };
+        if (user?.isAdmin) {
             params.hidden = hidden;
             params.isAdmin = isAdmin;
         }
@@ -84,16 +84,22 @@ const EditAccountModal = ({
         );
         if (response.status === "error") return alert(response.error.message);
         setAccount(response.data);
+        if (user?.id === account.id) setUser(response.data);
         closeModal();
     };
 
     const deleteAccount = async () => {
-        const response = await apiClient.provide("delete", "/node/deleteNode", {
-            id: String(account.id),
-        });
+        const response = await apiClient.provide(
+            "delete",
+            "/account/deleteAccount",
+            {
+                id: String(account.id),
+            }
+        );
         if (response.status === "error") return alert(response.error.message);
 
         closeAllModals();
+        if (user?.id === account.id) setUser(undefined);
         router.push("/");
     };
 
@@ -125,36 +131,37 @@ const EditAccountModal = ({
                 src={account.profilePicURL}
                 style={{
                     opacity:
-                        account.profilePicURL === profilePictureField ? 1 : 0.2,
+                        account.profilePicURL ===
+                        editAccountForm.getValues().profilePicURL
+                            ? 1
+                            : 0.2,
                 }}
             />
             {account.screenName}
             Profile Pic URL:
             <CrowdventureTextInput
-                onChangeText={setProfilePictureField}
-                value={profilePictureField}
+                formElement={editAccountForm.profilePicURL}
             />
             Bio:
-            <CrowdventureTextInput
-                onChangeText={setBioField}
-                rows={3}
-                value={bioField}
-            />
+            <CrowdventureTextInput formElement={editAccountForm.bio} rows={3} />
             Change your password:
             <CrowdventureTextInput
-                onChangeText={setPass1}
-                placeholder="••••••••"
+                formElement={editAccountForm.oldPassword}
+                placeholder="Old password"
                 type="password"
-                value={pass1}
             />
-            {pass1 ? (
+            <CrowdventureTextInput
+                formElement={editAccountForm.pass1}
+                placeholder="New password"
+                type="password"
+            />
+            {editAccountForm.getValues().pass1 ? (
                 <>
                     Confirm password:
                     <CrowdventureTextInput
-                        onChangeText={setPass2}
-                        placeholder="••••••••"
+                        formElement={editAccountForm.pass2}
+                        placeholder="New password again"
                         type="password"
-                        value={pass2}
                     />
                 </>
             ) : null}
@@ -162,18 +169,16 @@ const EditAccountModal = ({
                 <>
                     Admin Controls:
                     <CrowdventureCheckboxInput
-                        checked={hidden}
+                        formElement={editAccountForm.hidden}
                         label="Account should be hidden"
-                        onChange={setHidden}
                     />
                     <CrowdventureCheckboxInput
-                        checked={isAdmin}
+                        formElement={editAccountForm.pass2}
                         label="Account is an admin"
-                        onChange={setAdmin}
                     />
                 </>
             ) : null}
-            {info}
+            {editAccountForm.getError()}
         </CrowdventureModal>
     );
 };

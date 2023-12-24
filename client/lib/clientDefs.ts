@@ -88,8 +88,8 @@ type PatchAccountEditAccountInput = {} & {
     screenName?: string | undefined;
     oldPassword?: string | undefined;
     newPassword?: string | undefined;
-    bio?: string | undefined;
-    profilePicURL?: string | undefined;
+    bio?: (string | null) | undefined;
+    profilePicURL?: (string | null) | undefined;
     hidden?: boolean | undefined;
     isAdmin?: boolean | undefined;
 };

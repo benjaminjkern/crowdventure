@@ -1,30 +1,30 @@
-import React from "react";
+import React, { type DetailedHTMLProps, type InputHTMLAttributes } from "react";
+import { type FormElement } from "../hooks";
 
 const CrowdventureCheckboxInput = ({
+    formElement,
     label,
     onChange = () => {},
-    checked = false,
     ...props
 }: {
+    readonly formElement?: FormElement;
     readonly label: string;
     readonly onChange?: (b: boolean) => void;
-    readonly checked: boolean;
-}) => {
-    // TODO: Make this work with the nicer form element I made
-    const appliedProps = { checked };
-    return (
-        <div style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            {label}
-            <input
-                onChange={(e) => {
-                    onChange(e.target.checked);
-                }}
-                type="checkbox"
-                {...appliedProps}
-                {...props}
-            />
-        </div>
-    );
-};
-
+} & DetailedHTMLProps<
+    InputHTMLAttributes<HTMLInputElement>,
+    HTMLInputElement
+>) => (
+    <div style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        {label}
+        <input
+            defaultChecked={formElement?.defaultValue as boolean}
+            onChange={(e) => {
+                onChange(e.target.checked);
+                formElement?.setValue(e.target.checked);
+            }}
+            type="checkbox"
+            {...props}
+        />
+    </div>
+);
 export default CrowdventureCheckboxInput;

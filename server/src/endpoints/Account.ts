@@ -88,8 +88,8 @@ export const accountEndpoints = {
             screenName: z.string().min(1).optional(),
             oldPassword: z.string().optional(),
             newPassword: z.string().min(1).optional(),
-            bio: z.string().min(1).optional(),
-            profilePicURL: z.string().min(1).optional(),
+            bio: z.string().min(1).nullable().optional(),
+            profilePicURL: z.string().min(1).nullable().optional(),
             hidden: z.boolean().optional(),
             isAdmin: z.boolean().optional(),
         }),
@@ -119,19 +119,24 @@ export const accountEndpoints = {
             console.log(`Editing Account ${account.screenName}`);
             // TODO: Don't update if nothing is changing
 
-            if (newPassword) {
-                if (
-                    oldPassword &&
-                    bcrypt.compareSync(oldPassword, account.encryptedPassword)
-                )
-                    account.encryptedPassword = bcrypt.hashSync(
-                        newPassword,
-                        10
-                    );
+            if (newPassword !== undefined) {
+                if (!loggedInAccount?.isAdmin) {
+                    if (oldPassword === undefined)
+                        throw new Error(
+                            "If you want to reset your password, you must provide your old password!"
+                        );
 
-                // TODO: Let user know that password failed
+                    if (
+                        !bcrypt.compareSync(
+                            oldPassword,
+                            account.encryptedPassword
+                        )
+                    )
+                        throw new Error("Old password is incorrect!");
+                }
+                account.encryptedPassword = bcrypt.hashSync(newPassword, 10);
             }
-            if (screenName) {
+            if (screenName !== undefined) {
                 if (flagContent(screenName)) {
                     account.hidden = true;
                     // TODO: Send notification (Maybe also put a check on the frontend)
@@ -140,7 +145,7 @@ export const accountEndpoints = {
                 account.screenName = screenName;
             }
             if (bio !== undefined) {
-                if (flagContent(bio)) {
+                if (bio && flagContent(bio)) {
                     account.hidden = true;
                     // TODO: Send notification (Maybe also put a check on the frontend)
                     // TODO: Find a way to either only hide the bio or make it so if they change the thing that's bad then they'll get unhidden

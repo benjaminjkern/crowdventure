@@ -98,10 +98,12 @@ type FormWithValues<T extends FormType> = {
 } & Record<keyof T, FormElement>;
 
 export const useInputForm = <T extends FormType>(
-    initialForm: T
+    initialForm: T,
+    inputTriggers: (keyof T)[] = []
 ): FormWithValues<T> => {
     const ref = useRef() as { current: T };
     const [error, setError] = useState("");
+    const [rerender, setRerender] = useState({}); // eslint-disable-line @typescript-eslint/no-unused-vars
     const form = {
         getValues: () => ref.current,
         getError: () =>
@@ -120,9 +122,12 @@ export const useInputForm = <T extends FormType>(
         // @ts-ignore
         form[key] = {
             defaultValue,
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            setValue: (value: string | boolean) => (ref.current[key] = value),
+            setValue: (value: string | boolean) => {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                ref.current[key] = value;
+                if (inputTriggers.includes(key)) setRerender({});
+            },
         };
     }
 
