@@ -18,32 +18,39 @@ export const UserContext = createContext<UserContextType>(
 );
 
 const UserProvider = ({ children }: { readonly children: ReactNode }) => {
-    const [user, setUser] = useState<Account>();
+    const [user, setUser] = useState<Account | null>();
 
     const saveUser = (newUser?: Account) => {
         if (newUser) localStorage.setItem("savedUser", JSON.stringify(newUser));
         else localStorage.removeItem("savedUser");
 
-        setUser(newUser);
+        setUser(newUser ?? null);
     };
 
     const relogin = async (savedUser: Account) => {
         const response = await apiClient.provide("post", "/account/login", {
             screenName: savedUser.screenName,
         });
-        if (response.status === "error") return alert(response.error.message);
+        if (response.status === "error") {
+            saveUser();
+            return;
+        }
         setUser(response.data);
     };
 
     useEffect(() => {
+        console.log("RUN");
         const savedUserJSON = localStorage.getItem("savedUser");
         if (!savedUserJSON) {
-            setUser(undefined);
+            setUser(null);
             return;
         }
-        const savedUser = JSON.parse(savedUserJSON) as Account;
-        setUser(savedUser);
-        relogin(savedUser);
+        try {
+            const savedUser = JSON.parse(savedUserJSON) as Account;
+            relogin(savedUser);
+        } catch {
+            saveUser();
+        }
     }, []);
 
     if (user === undefined) return <LoadingBox />;

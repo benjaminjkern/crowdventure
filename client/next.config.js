@@ -4,7 +4,7 @@
  */
 /** @type {import("next").NextConfig} */
 const config = {
-    reactStrictMode: true,
+    reactStrictMode: false,
 
     // swcMinify: true, // TODO: Idk if this makes a difference
 

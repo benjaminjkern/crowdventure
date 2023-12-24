@@ -9,7 +9,10 @@ export const config = createConfig({
         compression: true, // affects sendAvatarEndpoint
         rawParser: express.raw(), // required for rawAcceptingEndpoint
     },
-    cors: true,
+    cors: ({ defaultHeaders, request, endpoint, logger }) => ({
+        ...defaultHeaders,
+        "Access-Control-Allow-Headers": "*",
+    }),
     logger: {
         level: "debug",
         color: true,
