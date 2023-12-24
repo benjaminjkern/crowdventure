@@ -14,7 +14,7 @@ import NodeSidebar from "+/lib/nodes/NodeSidebar";
 import CrowdventureButton from "+/lib/components/CrowdventureButton";
 import { blurImageStyle } from "+/lib/styles";
 
-import { type Account, type Node } from "@/types/models";
+import { type Node } from "@/types/models";
 import apiClient from "+/lib/apiClient";
 
 const NAVBAR_HEIGHT = 100;
@@ -25,7 +25,7 @@ const NodePage = ({ node: initNode }: { readonly node: Node }) => {
     const { openModal } = useContext(ModalContext);
     const { lightBackgroundColor } = useContext(PaletteContext);
 
-    const [node, setNode] = useState(deepCopy(initNode));
+    const [node, setNode] = useState(deepCopy(initNode)); // TODO: ?????
 
     useEffect(() => {
         setNode(deepCopy(initNode));

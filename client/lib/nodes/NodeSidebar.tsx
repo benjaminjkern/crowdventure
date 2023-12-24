@@ -9,24 +9,24 @@ import ChoiceModal from "../choices/ChoiceModal";
 import { PaletteContext } from "../colorPalette";
 import ParagraphText from "../components/ParagraphText";
 import CreateNodeModal from "./CreateNodeModal";
-import { type Node } from "@/types/models";
+import { type Choice, type Node } from "@/types/models";
 
 const NodeSidebar = ({
     node,
     setNode,
+    choices,
 }: {
     readonly node: Node;
     readonly setNode: Dispatch<SetStateAction<Node>>;
+    readonly choices: Choice[];
 }) => {
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
     const { mutedTextColor } = useContext(PaletteContext);
 
-    const choices = node.allChoices;
-
     const canonChoices = choices.filter((choice) => choice.isCanon);
 
-    const loggedInAsOwner = node.owner.screenName === user?.screenName;
+    const loggedInAsOwner = node.ownerId === user?.id;
     return (
         <div>
             <div

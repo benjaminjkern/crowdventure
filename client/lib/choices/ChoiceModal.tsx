@@ -7,7 +7,7 @@ import { ModalContext } from "../modal";
 import CreateNodeModal from "../nodes/CreateNodeModal";
 import NodeSearch from "../nodes/NodeSearch";
 import { UserContext } from "../user";
-import { type Choice } from "@/types/models";
+import { type Node, type Choice } from "@/types/models";
 
 const ChoiceModal = ({
     fromNode,
