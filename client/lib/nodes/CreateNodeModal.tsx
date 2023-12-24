@@ -18,12 +18,13 @@ import ImageSearch from "../components/ImageSearch";
 import CloseButton from "../components/CloseButton";
 import { PaletteContext } from "../colorPalette";
 import { useInputForm } from "../hooks";
+import apiClient from "../apiClient";
 import { type Node } from "@/types/models";
 
 // import SearchImage from "../SearchImage";
 
 const CreateNodeModal = ({
-    // callback,
+    callback,
     node,
     setNode,
     featured: initFeatured,
@@ -66,19 +67,15 @@ const CreateNodeModal = ({
         const { title, content, featured, hidden, pictureUnsafe } =
             nodeForm.getValues();
 
-        const newNode = (await mutationCall(
-            "editNode",
-            { ID: 0 },
-            {
-                nodeID: node.ID,
-                title,
-                content,
-                // pictureURL: pictureField,
-                hidden,
-                featured,
-                pictureUnsafe,
-            }
-        )) as CrowdventureNode;
+        const response = apiClient.provide("patch", "/node/editNode", {
+            nodeID: node.ID,
+            title,
+            content,
+            // pictureURL: pictureField,
+            hidden,
+            featured,
+            pictureUnsafe,
+        });
         setNode(newNode);
         closeModal();
     };

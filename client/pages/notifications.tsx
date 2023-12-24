@@ -1,6 +1,8 @@
 import React, { useEffect, useContext } from "react";
 import { useRouter } from "next/router";
 
+import { GetStaticProps, type GetStaticPropsResult } from "next";
+import { type DefaultPageProps } from "./_app";
 import { UserContext } from "+/lib/user";
 import CrowdventureButton from "+/lib/components/CrowdventureButton";
 import CrowdventureNotification from "+/lib/notifications/CrowdventureNotification";
@@ -72,7 +74,10 @@ const NotificationsPage = () => {
     );
 };
 
-export const getStaticProps = () => ({
+export const getStaticProps = async (): Promise<
+    GetStaticPropsResult<DefaultPageProps>
+    // eslint-disable-next-line require-await
+> => ({
     props: {
         pageTitle: "Crowdventure - Notifications", // Ideally this would say number of notifications but I dont wanna worry about that rn
     },

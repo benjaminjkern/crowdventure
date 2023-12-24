@@ -14,7 +14,7 @@ export type CrowdventureButtonProps = {
     readonly buttonType?: "icon" | "text";
     readonly category?: "error";
     readonly requireSignedIn?: boolean;
-    readonly onClick: (e: MouseEvent) => unknown;
+    readonly onClick?: (e: MouseEvent) => unknown;
     readonly href?: string;
     readonly disabled?: boolean;
     readonly icon?: IconProp;

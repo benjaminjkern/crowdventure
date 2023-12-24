@@ -1,5 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 
+import { type GetStaticPropsResult } from "next";
+import { type DefaultPageProps } from "../_app";
 import { UserContext } from "+/lib/user";
 import LoadingBox from "+/lib/components/LoadingBox";
 import { UnsafeModeContext } from "+/lib/unsafeMode";
@@ -29,13 +31,15 @@ const getAccountNodes = async (accountId: number, unsafeMode: boolean) => {
     return nodesResponse.data.nodes;
 };
 
+type AccountPageProps = {
+    readonly account: Account;
+    readonly accountNodes: Node[];
+};
+
 const AccountPage = ({
     account: initAccount,
     accountNodes: initAccountNodes,
-}: {
-    readonly account: Account;
-    readonly accountNodes: Node[];
-}) => {
+}: AccountPageProps) => {
     const [account, setAccount] = useState(initAccount);
     const accountNodes = useSafeGuardedNodes(initAccountNodes, () =>
         getAccountNodes(account.id, true)
@@ -104,7 +108,7 @@ export const getStaticProps = async ({
     params: { accountScreenName },
 }: {
     params: { accountScreenName: string };
-}) => {
+}): Promise<GetStaticPropsResult<AccountPageProps & DefaultPageProps>> => {
     const accountResponse = await apiClient.provide(
         "get",
         "/account/getAccount",

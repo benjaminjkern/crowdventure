@@ -44,8 +44,8 @@ const NodeSidebar = ({
 
                 {canonChoices.length === 0 && (
                     <span style={{ color: mutedTextColor }}>
-                        By decree of {node.owner.screenName}, this journey ends
-                        here.
+                        By decree of {node.owner?.screenName ?? "Crowdventure"},
+                        this journey ends here.
                     </span>
                 )}
             </div>
@@ -90,9 +90,9 @@ const NodeSidebar = ({
                 >
                     Suggest New Choice
                 </CrowdventureButton>
-                <CrowdventureButton category="error" onClick={reportNode}>
+                {/* <CrowdventureButton category="error" onClick={reportNode}>
                     Report Page
-                </CrowdventureButton>
+                </CrowdventureButton> */}
             </div>
             <hr />
             {choices.length > 0 ? (

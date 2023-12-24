@@ -13,10 +13,12 @@ import { MAX_CONTENT_WIDTH } from "+/lib/hooks";
 
 // Crowdventure! - Page not found! - for 404 page (NONEXISTENT RIGHT NOW)
 
-const App: AppType<{ pageTitle?: string; previewImage?: string }> = ({
-    Component,
-    pageProps,
-}) => {
+export type DefaultPageProps = {
+    pageTitle?: string;
+    previewImage?: string | null;
+};
+
+const App: AppType<DefaultPageProps> = ({ Component, pageProps }) => {
     const { pageTitle, previewImage, ...otherPageProps } = pageProps;
 
     return (

@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 
+import { type GetStaticPropsResult } from "next";
+import { type DefaultPageProps } from "../_app";
 import CrowdventureAlert from "+/lib/components/CrowdventureAlert";
 import LoadingBox from "+/lib/components/LoadingBox";
 import PictureModal from "+/lib/components/PictureModal";
@@ -14,13 +16,18 @@ import NodeSidebar from "+/lib/nodes/NodeSidebar";
 import CrowdventureButton from "+/lib/components/CrowdventureButton";
 import { blurImageStyle } from "+/lib/styles";
 
-import { type Node } from "@/types/models";
+import { type Choice, type Node } from "@/types/models";
 import apiClient from "+/lib/apiClient";
 
 const NAVBAR_HEIGHT = 100;
 const FOOTER_HEIGHT = 78;
 
-const NodePage = ({ node: initNode }: { readonly node: Node }) => {
+type NodePageProps = {
+    readonly node: Node;
+    readonly choices: Choice[];
+};
+
+const NodePage = ({ node: initNode, choices }: NodePageProps) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { openModal } = useContext(ModalContext);
     const { lightBackgroundColor } = useContext(PaletteContext);
@@ -153,7 +160,7 @@ const NodePage = ({ node: initNode }: { readonly node: Node }) => {
                         Go back!
                     </CrowdventureButton>
                 )}
-                <NodeSidebar node={node} setNode={setNode} />
+                <NodeSidebar choices={choices} node={node} setNode={setNode} />
             </div>
         </div>
     );
@@ -168,7 +175,7 @@ export const getStaticProps = async ({
     params: { slug },
 }: {
     params: { slug: string };
-}) => {
+}): Promise<GetStaticPropsResult<NodePageProps & DefaultPageProps>> => {
     const nodeResponse = await apiClient.provide("get", "/node/getNode", {
         slug,
     });
@@ -180,9 +187,20 @@ export const getStaticProps = async ({
 
     if (!node) return { notFound: true };
 
+    const choicesResponse = await apiClient.provide(
+        "get",
+        "/choice/getChoicesForNode",
+        {
+            fromNodeId: String(node.id),
+        }
+    );
+    if (choicesResponse.status === "error")
+        throw new Error(choicesResponse.error.message);
+
     return {
         props: {
             node,
+            choices: choicesResponse.data.choices,
             pageTitle: `Crowdventure! - ${node.title}`,
             previewImage: node.pictureURL,
         },

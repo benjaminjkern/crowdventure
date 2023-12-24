@@ -7,6 +7,8 @@ import { ModalContext } from "../modal";
 import CreateNodeModal from "../nodes/CreateNodeModal";
 import NodeSearch from "../nodes/NodeSearch";
 import { UserContext } from "../user";
+import apiClient from "../apiClient";
+import { useInputForm } from "../hooks";
 import { type Node, type Choice } from "@/types/models";
 
 const ChoiceModal = ({
@@ -14,22 +16,20 @@ const ChoiceModal = ({
     choice,
 }: {
     readonly fromNode: Node;
-    readonly choice: Choice;
+    readonly choice?: Choice;
 }) => {
-    const [info, setInfo] = useState("");
-
-    const [toPage, setToPage] = useState(choice?.to.ID || "");
-    const [suggestAction, setSuggestAction] = useState(choice?.action || "");
-    const [hidden, setHidden] = useState(choice?.hidden);
+    const [toNodeId, setToNodeId] = useState(choice?.toNodeId);
+    const choiceForm = useInputForm({
+        action: choice?.action ?? "",
+        hidden: choice?.action ?? false,
+    });
 
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
 
     const verifyForm = () => {
-        if (!suggestAction) {
-            setInfo(
-                <span style={{ color: "red" }}>Action cannot be empty!</span>
-            );
+        if (!choiceForm.getValues().action) {
+            choiceForm.setError("Action cannot be empty!");
             return false;
         }
         return true;
@@ -45,21 +45,21 @@ const ChoiceModal = ({
         );
     };
 
-    const editAction = () => {
+    const editChoice = () => {
+        if (!choice) return;
         if (!verifyForm()) return;
 
-        if (!toPage) return openCreateNodeModal(editAction);
+        if (!toPage) return openCreateNodeModal(editChoice);
 
-        mutationCall(
-            "editSuggestion",
-            { ID: 0 },
-            {
-                choiceID: choice.ID,
-                action: suggestAction,
-                toID: toPage,
-                ...(hidden !== undefined ? { hidden } : {}),
-            }
-        ).then(() => {});
+        const { action, toNodeId, hidden } = choiceForm.getValues();
+
+        const choiceResponse = await apiClient.provide(
+            "patch",
+            "/choice/editChoice",
+            { id: choice.id, action, toNodeId, hidden }
+        );
+        if (choiceResponse.status === "error")
+            return choiceForm.setError(choiceResponse.error.message);
     };
 
     const createNewAction = () => {
@@ -100,13 +100,12 @@ const ChoiceModal = ({
                 <>
                     Admin Controls:
                     <CrowdventureCheckboxInput
-                        checked={hidden}
+                        formElement={choiceForm.hidden}
                         label="Choice should be hidden"
-                        onChange={setHidden}
                     />
                 </>
             ) : null}
-            {info}
+            {choiceForm.getError()}
         </CrowdventureModal>
     );
 };

@@ -1,5 +1,7 @@
 import React, { useContext } from "react";
 
+import { type GetStaticPropsResult } from "next";
+import { type DefaultPageProps } from "./_app";
 import CrowdventureButton from "+/lib/components/CrowdventureButton";
 import { ModalContext } from "+/lib/modal";
 import NodeViewer from "+/lib/nodes/NodeViewer";
@@ -17,11 +19,11 @@ const getFeaturedNodes = async (unsafeMode: boolean) => {
     return response.data.nodes;
 };
 
-const HomePage = ({
-    featuredNodes: initFeaturedNodes,
-}: {
+type HomePageProps = {
     readonly featuredNodes: Node[];
-}) => {
+};
+
+const HomePage = ({ featuredNodes: initFeaturedNodes }: HomePageProps) => {
     const { openModal } = useContext(ModalContext);
     const featuredNodes = useSafeGuardedNodes(initFeaturedNodes, () =>
         getFeaturedNodes(true)
@@ -44,7 +46,9 @@ const HomePage = ({
     );
 };
 
-export const getStaticProps = async () => ({
+export const getStaticProps = async (): Promise<
+    GetStaticPropsResult<HomePageProps & DefaultPageProps>
+> => ({
     props: {
         featuredNodes: await getFeaturedNodes(false),
     },
