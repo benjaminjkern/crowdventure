@@ -23,32 +23,52 @@ import { type Node } from "@/types/models";
 
 // import SearchImage from "../SearchImage";
 
-const CreateNodeModal = (
-    props: {
-        readonly callback?: () => unknown;
-    } & (
-        | {
-              editing: true;
-              readonly node: Node;
-              readonly setNode: Dispatch<SetStateAction<Node>>;
-          }
-        | { editing: false; readonly featured?: boolean }
-    )
-) => {
-    const { editing } = props;
-    // {
-    //     callback,
-    //     featured: initFeatured,
-    //     node,
-    //     setNode,
-    // }
-    const nodeForm = useInputForm({
-        title: node?.title || "",
-        content: node?.content || "",
-        featured: node?.featured ?? (initFeatured || false),
-        hidden: node?.content || "",
-        pictureUnsafe: node?.pictureUnsafe || false,
-    });
+const NodeModal = ({
+    callback,
+    featured: initFeatured,
+    pictureURL: initPictureURL,
+    pictureUnsafe: initPictureUnsafe,
+    node,
+    setNode,
+}: {
+    readonly callback?: (n: Node) => unknown;
+} & (
+    | {
+          readonly node: Node;
+          readonly setNode: Dispatch<SetStateAction<Node>>;
+
+          readonly featured?: undefined;
+          readonly pictureURL?: undefined;
+          readonly pictureUnsafe?: undefined;
+      }
+    | {
+          readonly node?: undefined;
+          readonly setNode?: undefined;
+
+          readonly featured: boolean;
+          readonly pictureURL?: string | null;
+          readonly pictureUnsafe?: boolean;
+      }
+)) => {
+    const nodeForm = useInputForm(
+        node
+            ? {
+                  title: node.title,
+                  content: node.title,
+                  pictureURL: node.pictureURL ?? "",
+                  pictureUnsafe: node.pictureUnsafe,
+                  hidden: node.hidden,
+                  featured: node.featured,
+              }
+            : {
+                  title: "",
+                  content: "",
+                  pictureURL: initPictureURL ?? "",
+                  pictureUnsafe: initPictureUnsafe ?? false,
+                  hidden: false,
+                  featured: initFeatured,
+              }
+    );
 
     const { user } = useContext(UserContext);
     const { openModal, closeModal, closeAllModals } = useContext(ModalContext);
@@ -72,32 +92,36 @@ const CreateNodeModal = (
 
     const editNode = async () => {
         if (!node) return;
-        const { title, content, featured, hidden, pictureUnsafe } =
+        if (!validateInputs()) return;
+
+        const { title, content, featured, hidden, pictureURL, pictureUnsafe } =
             nodeForm.getValues();
 
         const response = await apiClient.provide("patch", "/node/editNode", {
             id: node.id,
             title,
             content,
-            // pictureURL: pictureField,
             hidden,
             featured,
+            pictureURL: pictureURL || null,
             pictureUnsafe,
         });
         if (response.status === "error")
             return nodeForm.setError(response.error.message);
 
-        setNode?.(response.data);
+        setNode(response.data);
         closeModal();
     };
 
     const createNode = async () => {
-        const { title, content, featured } = nodeForm.getValues();
+        if (!validateInputs()) return;
+        const { title, content, featured, pictureURL } = nodeForm.getValues();
 
         const response = await apiClient.provide("post", "/node/createNode", {
             title,
             content,
             featured,
+            pictureURL: pictureURL || undefined,
         });
         if (response.status === "error")
             return nodeForm.setError(response.error.message);
@@ -110,8 +134,10 @@ const CreateNodeModal = (
         const response = await apiClient.provide("delete", "/node/deleteNode", {
             id: String(node.id),
         });
-        if (response.status === "error") router.back();
+        if (response.status === "error")
+            return nodeForm.setError(response.error.message);
         closeAllModals();
+        router.back();
     };
 
     return (
@@ -120,7 +146,6 @@ const CreateNodeModal = (
                 {
                     text: `${node ? "Edit" : "Create"} Page!`,
                     onClick: () => {
-                        if (!validateInputs()) return;
                         if (node) editNode();
                         else createNode();
                     },
@@ -239,4 +264,4 @@ const CreateNodeModal = (
     );
 };
 
-export default CreateNodeModal;
+export default NodeModal;

@@ -407,7 +407,7 @@ type PatchNodeEditNodeInput = {} & {
     id: number;
     title?: string | undefined;
     content?: string | undefined;
-    pictureURL?: string | undefined;
+    pictureURL?: (string | null) | undefined;
     pictureUnsafe?: boolean | undefined;
     hidden?: boolean | undefined;
     featured?: boolean | undefined;

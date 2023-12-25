@@ -4,7 +4,7 @@ import CrowdventureModal from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { ModalContext } from "../modal";
 
-import CreateNodeModal from "../nodes/CreateNodeModal";
+import NodeModal from "../nodes/NodeModal";
 import NodeSearch from "../nodes/NodeSearch";
 import { UserContext } from "../user";
 import apiClient from "../apiClient";
@@ -35,47 +35,62 @@ const ChoiceModal = ({
         return true;
     };
 
-    const openCreateNodeModal = (callback) => {
+    const openNodeModal = (callback: (n: number) => unknown) => {
         openModal(
-            <CreateNodeModal
-                callback={(node) => callback(node.ID)}
-                picture={fromNode.pictureURL}
+            <NodeModal
+                callback={(node) => callback(node.id)}
+                featured={false}
+                pictureURL={fromNode.pictureURL}
                 pictureUnsafe={fromNode.pictureUnsafe}
             />
         );
     };
 
-    const editChoice = () => {
+    const editChoice = async (newNodeId?: number) => {
         if (!choice) return;
         if (!verifyForm()) return;
 
-        if (!toPage) return openCreateNodeModal(editChoice);
+        if (!newNodeId) return openNodeModal(editChoice);
 
-        const { action, toNodeId, hidden } = choiceForm.getValues();
+        const { action, hidden } = choiceForm.getValues();
 
         const choiceResponse = await apiClient.provide(
             "patch",
             "/choice/editChoice",
-            { id: choice.id, action, toNodeId, hidden }
+            { id: choice.id, action, toNodeId: newNodeId ?? toNodeId, hidden: hidden as boolean }
         );
         if (choiceResponse.status === "error")
             return choiceForm.setError(choiceResponse.error.message);
+
+        // TODO: DO stuff
     };
 
     const createNewAction = () => {
         if (!verifyForm()) return;
 
-        if (!toPage) return openCreateNodeModal(createNewAction);
+        if (!toPage) return openNodeModal(createNewAction);
 
-        mutationCall(
-            "suggestChoice",
-            { ID: 0 },
+        
+        const choiceResponse = await apiClient.provide(
+            "patch",
+            "/choice/editChoice",
+            { id: choice.id, action, toNodeId: newNodeId ?? toNodeId, hidden: hidden as boolean },
             {
                 accountScreenName: user.screenName,
                 fromID: fromNode.ID,
                 action: suggestAction,
                 toID: toPage,
             }
+        );
+        if (choiceResponse.status === "error")
+            return choiceForm.setError(choiceResponse.error.message);
+
+        // TODO: DO stuff
+
+        mutationCall(
+            "suggestChoice",
+            { ID: 0 },
+            
         ).then(() => {});
     };
 
@@ -84,7 +99,9 @@ const ChoiceModal = ({
             modalButtons={[
                 {
                     text: `${choice ? "Edit" : "Submit New"} Choice`,
-                    onClick: () => (choice ? editAction : createNewAction)(),
+                    onClick: () => {
+                        if (choice) editChoice();
+                        else createNewChoice(),
                 },
             ]}
             modalTitle={`${choice ? "Editing" : "Suggesting New"} Choice`}

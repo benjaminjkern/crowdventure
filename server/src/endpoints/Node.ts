@@ -110,7 +110,7 @@ export const nodeEndpoints = {
             id: z.number(),
             title: z.string().min(1).optional(),
             content: z.string().min(1).optional(),
-            pictureURL: z.string().min(1).optional(),
+            pictureURL: z.string().min(1).nullable().optional(),
             pictureUnsafe: z.boolean().optional(),
             hidden: z.boolean().optional(),
             featured: z.boolean().optional(),

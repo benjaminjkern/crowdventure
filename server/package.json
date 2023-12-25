@@ -8,7 +8,7 @@
     "repository": "https://github.com/benjaminjkern/crowdventure",
     "scripts": {
         "gen-client": "tsx scripts/generateClient.ts",
-        "start": "pnpm gen-client && nodemon --ext '*' --exec 'tsx index.ts'",
+        "start": "nodemon --ext '*' --exec 'pnpm gen-client && tsx index.ts'",
         "save-db": "tsx scripts/saveDb.ts"
     },
     "dependencies": {

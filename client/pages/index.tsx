@@ -5,7 +5,7 @@ import { type DefaultPageProps } from "./_app";
 import CrowdventureButton from "+/lib/components/CrowdventureButton";
 import { ModalContext } from "+/lib/modal";
 import NodeViewer from "+/lib/nodes/NodeViewer";
-import CreateNodeModal from "+/lib/nodes/CreateNodeModal";
+import NodeModal from "+/lib/nodes/NodeModal";
 
 import { type Node } from "@/types/models";
 import apiClient from "+/lib/apiClient";
@@ -32,7 +32,7 @@ const HomePage = ({ featuredNodes: initFeaturedNodes }: HomePageProps) => {
     return (
         <>
             <CrowdventureButton
-                onClick={() => openModal(<CreateNodeModal />)}
+                onClick={() => openModal(<NodeModal />)}
                 requireSignedIn
             >
                 Create a New Adventure!

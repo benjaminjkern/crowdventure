@@ -10,7 +10,7 @@ import NodeViewer from "+/lib/nodes/NodeViewer";
 import CrowdventureButton from "+/lib/components/CrowdventureButton";
 import AccountHeader from "+/lib/accounts/AccountHeader";
 import { ModalContext } from "+/lib/modal";
-import CreateNodeModal from "+/lib/nodes/CreateNodeModal";
+import NodeModal from "+/lib/nodes/NodeModal";
 
 import { type Node, type Account } from "@/types/models";
 import apiClient from "+/lib/apiClient";
@@ -81,7 +81,7 @@ const AccountPage = ({
 
             {loggedInAsThisUser ? (
                 <CrowdventureButton
-                    onClick={() => openModal(<CreateNodeModal featured />)}
+                    onClick={() => openModal(<NodeModal featured />)}
                     style={{ marginTop: 10 }}
                 >
                     Create a New Adventure!
