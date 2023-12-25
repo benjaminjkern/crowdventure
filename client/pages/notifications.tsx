@@ -1,14 +1,17 @@
 import React, { useEffect, useContext } from "react";
 import { useRouter } from "next/router";
 
-import { GetStaticProps, type GetStaticPropsResult } from "next";
+import { type GetStaticPropsResult } from "next";
 import { type DefaultPageProps } from "./_app";
 import { UserContext } from "+/lib/user";
 import CrowdventureButton from "+/lib/components/CrowdventureButton";
 import CrowdventureNotification from "+/lib/notifications/CrowdventureNotification";
 import LoadingBox from "+/lib/components/LoadingBox";
+import { type Notification } from "@/types/models";
 
-const NotificationsPage = () => {
+type NotificationsPageProps = { readonly notifications: Notification[] };
+
+const NotificationsPage = ({ notifications }: NotificationsPageProps) => {
     const router = useRouter();
     const { user, setUser } = useContext(UserContext);
 
@@ -18,9 +21,7 @@ const NotificationsPage = () => {
 
     if (!user) return <LoadingBox />;
 
-    const unseenCount = user.notifications.filter(
-        (notif) => !notif.seen
-    ).length;
+    const unseenCount = 0; // TODO: Do this
 
     return (
         <div style={{ gap: 5 }}>
@@ -29,7 +30,7 @@ const NotificationsPage = () => {
                 {unseenCount !== 1 ? "s" : ""}
                 {unseenCount ? "!" : "."}
             </span>
-            {user.notifications.map((notification, idx) => (
+            {notifications.map((notification, idx) => (
                 <CrowdventureNotification
                     deleteNotification={() => {
                         const oldNotifs = user.notifications;
@@ -75,12 +76,16 @@ const NotificationsPage = () => {
 };
 
 export const getStaticProps = async (): Promise<
-    GetStaticPropsResult<DefaultPageProps>
+    GetStaticPropsResult<DefaultPageProps & NotificationsPageProps>
     // eslint-disable-next-line require-await
-> => ({
-    props: {
-        pageTitle: "Crowdventure - Notifications", // Ideally this would say number of notifications but I dont wanna worry about that rn
-    },
-});
+> => {
+    const notifications: Notification[] = []; // TODO: Do this
+    return {
+        props: {
+            notifications,
+            pageTitle: "Crowdventure - Notifications", // Ideally this would say number of notifications but I dont wanna worry about that rn
+        },
+    };
+};
 
 export default NotificationsPage;

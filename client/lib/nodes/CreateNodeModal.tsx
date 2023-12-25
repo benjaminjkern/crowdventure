@@ -29,6 +29,7 @@ const CreateNodeModal = ({
     setNode,
     featured: initFeatured,
 }: {
+    readonly callback?: () => unknown;
     readonly node?: Node;
     readonly setNode?: Dispatch<SetStateAction<Node>>;
     readonly featured?: boolean;
@@ -64,11 +65,12 @@ const CreateNodeModal = ({
     };
 
     const editNode = async () => {
+        if (!node) return;
         const { title, content, featured, hidden, pictureUnsafe } =
             nodeForm.getValues();
 
-        const response = apiClient.provide("patch", "/node/editNode", {
-            nodeID: node.ID,
+        const response = await apiClient.provide("patch", "/node/editNode", {
+            id: node.id,
             title,
             content,
             // pictureURL: pictureField,
@@ -76,6 +78,7 @@ const CreateNodeModal = ({
             featured,
             pictureUnsafe,
         });
+
         setNode(newNode);
         closeModal();
     };
@@ -101,8 +104,10 @@ const CreateNodeModal = ({
 
     const deleteNode = async () => {
         if (!node) throw new Error("Shouldnt have gotten here");
-        await mutationCall("deleteNode", undefined, { nodeID: node.ID });
-        router.back();
+        const response = await apiClient.provide("delete", "/node/deleteNode", {
+            id: String(node.id),
+        });
+        if (response.status === "error") router.back();
         closeAllModals();
     };
 
