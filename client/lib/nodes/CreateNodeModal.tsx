@@ -23,17 +23,25 @@ import { type Node } from "@/types/models";
 
 // import SearchImage from "../SearchImage";
 
-const CreateNodeModal = ({
-    callback,
-    node,
-    setNode,
-    featured: initFeatured,
-}: {
-    readonly callback?: () => unknown;
-    readonly node?: Node;
-    readonly setNode?: Dispatch<SetStateAction<Node>>;
-    readonly featured?: boolean;
-}) => {
+const CreateNodeModal = (
+    props: {
+        readonly callback?: () => unknown;
+    } & (
+        | {
+              editing: true;
+              readonly node: Node;
+              readonly setNode: Dispatch<SetStateAction<Node>>;
+          }
+        | { editing: false; readonly featured?: boolean }
+    )
+) => {
+    const { editing } = props;
+    // {
+    //     callback,
+    //     featured: initFeatured,
+    //     node,
+    //     setNode,
+    // }
     const nodeForm = useInputForm({
         title: node?.title || "",
         content: node?.content || "",
@@ -41,8 +49,6 @@ const CreateNodeModal = ({
         hidden: node?.content || "",
         pictureUnsafe: node?.pictureUnsafe || false,
     });
-
-    const [error, setError] = useState("");
 
     const { user } = useContext(UserContext);
     const { openModal, closeModal, closeAllModals } = useContext(ModalContext);
@@ -52,12 +58,12 @@ const CreateNodeModal = ({
     const validateInputs = () => {
         const { title, content } = nodeForm.getValues();
         if (!title) {
-            setError("Content cannot be empty!");
+            nodeForm.setError("Content cannot be empty!");
             return false;
         }
 
         if (!content) {
-            setError("Title cannot be empty!");
+            nodeForm.setError("Title cannot be empty!");
             return false;
         }
 
@@ -78,28 +84,25 @@ const CreateNodeModal = ({
             featured,
             pictureUnsafe,
         });
+        if (response.status === "error")
+            return nodeForm.setError(response.error.message);
 
-        setNode(newNode);
+        setNode?.(response.data);
         closeModal();
     };
 
     const createNode = async () => {
         const { title, content, featured } = nodeForm.getValues();
 
-        const newNode = (await mutationCall(
-            "createNode",
-            {
-                ID: 0,
-            },
-            {
-                title,
-                content,
-                featured,
-                // pictureURL: pictureField,
-            }
-        )) as CrowdventureNode;
-        void router.push(`/node/${newNode.ID}`);
+        const response = await apiClient.provide("post", "/node/createNode", {
+            title,
+            content,
+            featured,
+        });
+        if (response.status === "error")
+            return nodeForm.setError(response.error.message);
         closeModal();
+        router.push(`/node/${response.data.slug}`);
     };
 
     const deleteNode = async () => {
@@ -206,22 +209,25 @@ const CreateNodeModal = ({
             <hr />
             <div style={{ gap: 5 }}>
                 Title:
-                <CrowdventureTextInput value={title} />
+                <CrowdventureTextInput formElement={nodeForm.title} />
                 Content:
-                <CrowdventureTextInput rows={3} value={content} />
+                <CrowdventureTextInput
+                    formElement={nodeForm.content}
+                    rows={3}
+                />
             </div>
             {node && user?.isAdmin ? (
                 <>
                     <hr />
                     Admin Controls:
                     <CrowdventureCheckboxInput
-                        checked={hidden}
+                        formElement={nodeForm.hidden}
                         label="Page should be hidden"
                         style={{ marginTop: 10 }}
                     />
                 </>
             ) : null}
-            {error ? <span style={{ color: "red" }}>{error}</span> : null}
+            {nodeForm.getError()}
             {/* {shouldHide ? (
                 <span style={{ color: "red" }}>
                     The image chosen will cause the page to automatically be

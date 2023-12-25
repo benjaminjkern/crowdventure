@@ -1,4 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, {
+    type Dispatch,
+    type SetStateAction,
+    useContext,
+    useState,
+} from "react";
 import Link from "next/link";
 import { PaletteContext } from "../colorPalette";
 import CloseButton from "../components/CloseButton";
@@ -6,15 +11,16 @@ import { UserContext } from "../user";
 import EventListener from "../components/EventListener";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import { useDebounce } from "../hooks";
+import apiClient from "../apiClient";
 import NotificationButton from "./NotificationButton";
 import { type Notification } from "@/types/models";
 
 const CrowdventureNotification = ({
     notification,
-    deleteNotification = () => {},
-    updateNotification = () => {},
+    setNotifications,
 }: {
     readonly notification: Notification;
+    readonly setNotifications: Dispatch<SetStateAction<Notification[]>>;
 }) => {
     const { rootColor, backgroundColor, mutedTextColor } =
         useContext(PaletteContext);
@@ -25,28 +31,31 @@ const CrowdventureNotification = ({
     const sendSeeNotificationRequest = useDebounce((newSeen) => {
         if (newSeen === notification.seen) return;
         const originalSeen = notification.seen;
-        mutationCall(
-            "seeNotification",
-            {},
-            {
-                accountScreenName: user.screenName,
-                index: idx,
-            }
-        )
-            .then(() => {
-                updateNotification(newSeen);
-            })
-            .catch((error) => {
-                console.error(error);
-                updateNotification(originalSeen);
-                setSeen(originalSeen);
-            });
+        // const response = apiClient.provide("post")
+        // mutationCall(
+        //     "seeNotification",
+        //     {},
+        //     {
+        //         accountScreenName: user.screenName,
+        //         index: idx,
+        //     }
+        // )
+        //     .then(() => {
+        //         updateNotification(newSeen);
+        //     })
+        //     .catch((error) => {
+        //         console.error(error);
+        //         updateNotification(originalSeen);
+        //         setSeen(originalSeen);
+        //     });
     });
 
-    const seeNotification = (newSeen) => {
+    const seeNotification = (newSeen: boolean) => {
         setSeen(newSeen);
         sendSeeNotificationRequest(newSeen);
     };
+
+    const deleteNotification = () => {};
 
     return (
         <div style={{ position: "relative" }}>
@@ -84,7 +93,7 @@ const CrowdventureNotification = ({
                                 color: mutedTextColor,
                             }}
                         >
-                            {new Date(notification.time).toLocaleString()}
+                            {new Date(notification.createdAt).toLocaleString()}
                         </span>
                     </Link>
                 )}

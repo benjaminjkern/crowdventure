@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { useRouter } from "next/router";
 
 import { type GetStaticPropsResult } from "next";
@@ -11,9 +11,13 @@ import { type Notification } from "@/types/models";
 
 type NotificationsPageProps = { readonly notifications: Notification[] };
 
-const NotificationsPage = ({ notifications }: NotificationsPageProps) => {
+const NotificationsPage = ({
+    notifications: initNotifications,
+}: NotificationsPageProps) => {
     const router = useRouter();
-    const { user, setUser } = useContext(UserContext);
+    const { user } = useContext(UserContext);
+
+    const [notifications, setNotifications] = useState(initNotifications);
 
     useEffect(() => {
         if (user === null) router.push("/");
@@ -21,7 +25,7 @@ const NotificationsPage = ({ notifications }: NotificationsPageProps) => {
 
     if (!user) return <LoadingBox />;
 
-    const unseenCount = 0; // TODO: Do this
+    const unseenCount = notifications.filter(({ seen }) => seen).length;
 
     return (
         <div style={{ gap: 5 }}>
@@ -32,39 +36,9 @@ const NotificationsPage = ({ notifications }: NotificationsPageProps) => {
             </span>
             {notifications.map((notification, idx) => (
                 <CrowdventureNotification
-                    deleteNotification={() => {
-                        const oldNotifs = user.notifications;
-
-                        const newNotifs = user.notifications.filter(
-                            (notif, i) => i !== idx
-                        );
-                        setUser({
-                            ...user,
-                            notifications: newNotifs,
-                        });
-                        mutationCall(
-                            "removeNotification",
-                            {},
-                            {
-                                accountScreenName: user.screenName,
-                                index: idx,
-                            }
-                        ).catch(() => {
-                            setUser({
-                                ...user,
-                                notification: oldNotifs,
-                            });
-                        });
-                    }}
-                    idx={idx}
                     key={idx}
                     notification={notification}
-                    updateNotification={(seen) => {
-                        notification.seen = seen;
-                        setUser({
-                            ...user,
-                        });
-                    }}
+                    setNotifications={setNotifications}
                 />
             ))}
 
