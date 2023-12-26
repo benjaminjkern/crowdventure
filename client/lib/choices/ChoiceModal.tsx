@@ -18,14 +18,14 @@ const ChoiceModal = ({
     readonly fromNode: Node;
     readonly choice?: Choice;
 }) => {
-    const [toNodeId, setToNodeId] = useState(choice?.toNodeId);
+    const [toNodeId, setToNodeId] = useState(choice?.toNodeId ?? null);
     const choiceForm = useInputForm({
         action: choice?.action ?? "",
         hidden: choice?.action ?? false,
     });
 
     const { user } = useContext(UserContext);
-    const { openModal } = useContext(ModalContext);
+    const { openModal, closeAllModals } = useContext(ModalContext);
 
     const verifyForm = () => {
         if (!choiceForm.getValues().action) {
@@ -46,7 +46,7 @@ const ChoiceModal = ({
         );
     };
 
-    const editChoice = async (newNodeId?: number) => {
+    const editChoice = async (newNodeId: number | null) => {
         if (!choice) return;
         if (!verifyForm()) return;
 
@@ -57,29 +57,11 @@ const ChoiceModal = ({
         const choiceResponse = await apiClient.provide(
             "patch",
             "/choice/editChoice",
-            { id: choice.id, action, toNodeId: newNodeId ?? toNodeId, hidden: hidden as boolean }
-        );
-        if (choiceResponse.status === "error")
-            return choiceForm.setError(choiceResponse.error.message);
-
-        // TODO: DO stuff
-    };
-
-    const createNewAction = () => {
-        if (!verifyForm()) return;
-
-        if (!toPage) return openNodeModal(createNewAction);
-
-        
-        const choiceResponse = await apiClient.provide(
-            "patch",
-            "/choice/editChoice",
-            { id: choice.id, action, toNodeId: newNodeId ?? toNodeId, hidden: hidden as boolean },
             {
-                accountScreenName: user.screenName,
-                fromID: fromNode.ID,
-                action: suggestAction,
-                toID: toPage,
+                id: choice.id,
+                action,
+                toNodeId: newNodeId ?? toNodeId,
+                hidden: hidden as boolean,
             }
         );
         if (choiceResponse.status === "error")
@@ -87,11 +69,31 @@ const ChoiceModal = ({
 
         // TODO: DO stuff
 
-        mutationCall(
-            "suggestChoice",
-            { ID: 0 },
-            
-        ).then(() => {});
+        closeAllModals();
+    };
+
+    const createChoice = async (newToNodeId: number | null) => {
+        if (!verifyForm()) return;
+
+        if (!newToNodeId) return openNodeModal(createChoice);
+
+        const { action } = choiceForm.getValues();
+
+        const choiceResponse = await apiClient.provide(
+            "post",
+            "/choice/createChoice",
+            {
+                fromNodeId: fromNode.id,
+                action,
+                toNodeId: newToNodeId,
+            }
+        );
+        if (choiceResponse.status === "error")
+            return choiceForm.setError(choiceResponse.error.message);
+
+        // TODO: DO stuff
+
+        closeAllModals();
     };
 
     return (
@@ -100,19 +102,17 @@ const ChoiceModal = ({
                 {
                     text: `${choice ? "Edit" : "Submit New"} Choice`,
                     onClick: () => {
-                        if (choice) editChoice();
-                        else createNewChoice(),
+                        if (choice) editChoice(toNodeId);
+                        else createChoice(toNodeId);
+                    },
                 },
             ]}
             modalTitle={`${choice ? "Editing" : "Suggesting New"} Choice`}
         >
             Action:
-            <CrowdventureTextInput
-                onChange={setSuggestAction}
-                value={suggestAction}
-            />
+            <CrowdventureTextInput formElement={choiceForm.action} />
             Go to Page:
-            <NodeSearch callback={setToPage} toID={toPage} />
+            <NodeSearch setToNodeId={setToNodeId} toNodeId={toNodeId} />
             {user?.isAdmin ? (
                 <>
                     Admin Controls:

@@ -91,7 +91,7 @@ export type FormElement<T = string | boolean> = {
     defaultValue: T;
     setValue: (value: T) => unknown;
 };
-type FormWithValues<T extends FormType> = {
+export type FormWithValues<T extends FormType> = {
     getValues: () => T;
     getError: () => ReactNode;
     setError: Dispatch<SetStateAction<string>>;

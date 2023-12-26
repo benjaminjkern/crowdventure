@@ -174,7 +174,6 @@ type PostChoiceCreateChoiceInput = {} & {
     fromNodeId: number;
     toNodeId: number;
     action: string;
-    content: string;
 };
 
 type PostChoiceCreateChoiceResponse = {

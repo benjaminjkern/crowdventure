@@ -17,63 +17,28 @@ import { ModalContext } from "../modal";
 import ImageSearch from "../components/ImageSearch";
 import CloseButton from "../components/CloseButton";
 import { PaletteContext } from "../colorPalette";
-import { useInputForm } from "../hooks";
+import { type FormWithValues, useInputForm } from "../hooks";
 import apiClient from "../apiClient";
 import { type Node } from "@/types/models";
 
 // import SearchImage from "../SearchImage";
 
+type NodeForm = {
+    title: string;
+    content: string;
+    pictureURL: string;
+    pictureUnsafe: boolean;
+    hidden: boolean;
+    featured: boolean;
+};
+
 const NodeModal = ({
-    callback,
-    featured: initFeatured,
-    pictureURL: initPictureURL,
-    pictureUnsafe: initPictureUnsafe,
-    node,
-    setNode,
+    nodeForm,
 }: {
-    readonly callback?: (n: Node) => unknown;
-} & (
-    | {
-          readonly node: Node;
-          readonly setNode: Dispatch<SetStateAction<Node>>;
-
-          readonly featured?: undefined;
-          readonly pictureURL?: undefined;
-          readonly pictureUnsafe?: undefined;
-      }
-    | {
-          readonly node?: undefined;
-          readonly setNode?: undefined;
-
-          readonly featured: boolean;
-          readonly pictureURL?: string | null;
-          readonly pictureUnsafe?: boolean;
-      }
-)) => {
-    const nodeForm = useInputForm(
-        node
-            ? {
-                  title: node.title,
-                  content: node.title,
-                  pictureURL: node.pictureURL ?? "",
-                  pictureUnsafe: node.pictureUnsafe,
-                  hidden: node.hidden,
-                  featured: node.featured,
-              }
-            : {
-                  title: "",
-                  content: "",
-                  pictureURL: initPictureURL ?? "",
-                  pictureUnsafe: initPictureUnsafe ?? false,
-                  hidden: false,
-                  featured: initFeatured,
-              }
-    );
-
+    readonly nodeForm: FormWithValues<NodeForm>;
+}) => {
     const { user } = useContext(UserContext);
-    const { openModal, closeModal, closeAllModals } = useContext(ModalContext);
-    const { lightBackgroundColor, mutedTextColor } = useContext(PaletteContext);
-    const router = useRouter();
+    const { lightBackgroundColor } = useContext(PaletteContext);
 
     const validateInputs = () => {
         const { title, content } = nodeForm.getValues();
@@ -90,86 +55,8 @@ const NodeModal = ({
         return true;
     };
 
-    const editNode = async () => {
-        if (!node) return;
-        if (!validateInputs()) return;
-
-        const { title, content, featured, hidden, pictureURL, pictureUnsafe } =
-            nodeForm.getValues();
-
-        const response = await apiClient.provide("patch", "/node/editNode", {
-            id: node.id,
-            title,
-            content,
-            hidden,
-            featured,
-            pictureURL: pictureURL || null,
-            pictureUnsafe,
-        });
-        if (response.status === "error")
-            return nodeForm.setError(response.error.message);
-
-        setNode(response.data);
-        closeModal();
-    };
-
-    const createNode = async () => {
-        if (!validateInputs()) return;
-        const { title, content, featured, pictureURL } = nodeForm.getValues();
-
-        const response = await apiClient.provide("post", "/node/createNode", {
-            title,
-            content,
-            featured,
-            pictureURL: pictureURL || undefined,
-        });
-        if (response.status === "error")
-            return nodeForm.setError(response.error.message);
-        closeModal();
-        router.push(`/node/${response.data.slug}`);
-    };
-
-    const deleteNode = async () => {
-        if (!node) throw new Error("Shouldnt have gotten here");
-        const response = await apiClient.provide("delete", "/node/deleteNode", {
-            id: String(node.id),
-        });
-        if (response.status === "error")
-            return nodeForm.setError(response.error.message);
-        closeAllModals();
-        router.back();
-    };
-
     return (
-        <CrowdventureModal
-            modalButtons={[
-                {
-                    text: `${node ? "Edit" : "Create"} Page!`,
-                    onClick: () => {
-                        if (node) editNode();
-                        else createNode();
-                    },
-                },
-                {
-                    active: Boolean(node),
-                    text: "Delete",
-                    category: "error",
-                    onClick: () =>
-                        openModal(
-                            <ConfirmModal
-                                onConfirm={deleteNode}
-                                title="Delete Page"
-                            >
-                                This will erase all suggested choices of this
-                                page, and their associated scores. This will NOT
-                                delete sub-pages of this page. Are you sure you
-                                wish to continue?
-                            </ConfirmModal>
-                        ),
-                },
-            ]}
-            modalTitle={`${node ? "Editing" : "Creating New"} Page`}
-        >
+        <CrowdventureModal {...modalProps}>
             {node?.pictureURL ? (
                 <div
                     style={{
@@ -241,7 +128,7 @@ const NodeModal = ({
                     rows={3}
                 />
             </div>
-            {node && user?.isAdmin ? (
+            {user?.isAdmin ? (
                 <>
                     <hr />
                     Admin Controls:
@@ -264,4 +151,124 @@ const NodeModal = ({
     );
 };
 
-export default NodeModal;
+export const CreateNodeModal = ({
+    onCreateNode,
+    pictureURL: initPictureURL,
+    pictureUnsafe: initPictureUnsafe,
+    featured: initFeatured,
+}: {
+    readonly onCreateNode?: (n: Node) => unknown;
+    readonly pictureURL?: string | null;
+    readonly pictureUnsafe?: boolean;
+    readonly featured?: boolean;
+}) => {
+    const nodeForm = useInputForm({
+        title: "",
+        content: "",
+        pictureURL: initPictureURL ?? "",
+        pictureUnsafe: initPictureUnsafe ?? false,
+        hidden: false,
+        featured: initFeatured ?? false,
+    });
+    const { closeModal } = useContext(ModalContext);
+    const createNode = async () => {
+        if (!validateInputs()) return;
+        const { title, content, featured, pictureURL } = nodeForm.getValues();
+
+        const response = await apiClient.provide("post", "/node/createNode", {
+            title,
+            content,
+            featured,
+            pictureURL: pictureURL || undefined,
+        });
+        if (response.status === "error")
+            return nodeForm.setError(response.error.message);
+
+        onCreateNode?.(response.data);
+        closeModal();
+    };
+    return (
+        <NodeModal
+            modalButtons={[
+                {
+                    text: `Create Page!`,
+                    onClick: createNode,
+                },
+            ]}
+            modalTitle="Creating New Page"
+            nodeForm={nodeForm}
+        />
+    );
+};
+
+export const EditNodeModal = ({ node }: { readonly node: Node }) => {
+    const nodeForm = useInputForm({
+        title: node.title,
+        content: node.title,
+        pictureURL: node.pictureURL ?? "",
+        pictureUnsafe: node.pictureUnsafe,
+        hidden: node.hidden,
+        featured: node.featured,
+    });
+    const { openModal, closeModal, closeAllModals } = useContext(ModalContext);
+    const editNode = async () => {
+        if (!validateInputs()) return;
+
+        const { title, content, featured, hidden, pictureURL, pictureUnsafe } =
+            nodeForm.getValues();
+
+        const response = await apiClient.provide("patch", "/node/editNode", {
+            id: node.id,
+            title,
+            content,
+            hidden,
+            featured,
+            pictureURL: pictureURL || null,
+            pictureUnsafe,
+        });
+        if (response.status === "error")
+            return nodeForm.setError(response.error.message);
+
+        callback?.(response.data);
+        closeModal();
+    };
+    const deleteNode = async () => {
+        if (!node) throw new Error("Shouldnt have gotten here");
+        const response = await apiClient.provide("delete", "/node/deleteNode", {
+            id: String(node.id),
+        });
+        if (response.status === "error")
+            return nodeForm.setError(response.error.message);
+        closeAllModals();
+        router.back();
+    };
+    return (
+        <NodeModal
+            modalButtons={[
+                {
+                    text: `Edit Page`,
+                    onClick: editNode,
+                },
+                {
+                    active: Boolean(node),
+                    text: "Delete",
+                    category: "error",
+                    onClick: () =>
+                        openModal(
+                            <ConfirmModal
+                                onConfirm={deleteNode}
+                                title="Delete Page"
+                            >
+                                This will erase all suggested choices of this
+                                page, and their associated scores. This will NOT
+                                delete sub-pages of this page. Are you sure you
+                                wish to continue?
+                            </ConfirmModal>
+                        ),
+                },
+            ]}
+            modalTitle="Editing Page"
+            nodeForm={nodeForm}
+        />
+    );
+};
