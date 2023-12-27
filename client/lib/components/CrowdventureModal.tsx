@@ -6,10 +6,18 @@ import CrowdventureButton, {
     type CrowdventureButtonProps,
 } from "./CrowdventureButton";
 
-type ModalButton = {
+export type ModalButton = {
     active?: boolean;
     text: string;
 } & Omit<CrowdventureButtonProps, "children">;
+
+type ModalProps = {
+    readonly modalTitle?: string;
+    readonly children: ReactNode;
+    readonly modalButtons: ModalButton[];
+    readonly modalStyle?: CSSProperties;
+    readonly contentStyle?: CSSProperties;
+};
 
 const CrowdventureModal = ({
     modalTitle,
@@ -17,13 +25,7 @@ const CrowdventureModal = ({
     modalButtons,
     modalStyle,
     contentStyle,
-}: {
-    readonly modalTitle?: string;
-    readonly children: ReactNode;
-    readonly modalButtons: ModalButton[];
-    readonly modalStyle?: CSSProperties;
-    readonly contentStyle?: CSSProperties;
-}) => {
+}: ModalProps) => {
     const { closeModal } = useContext(ModalContext);
     const { backgroundColor, lightBackgroundColor } =
         useContext(PaletteContext);

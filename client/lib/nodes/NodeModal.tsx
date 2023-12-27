@@ -8,7 +8,9 @@ import React, {
 import { useRouter } from "next/router";
 
 import CrowdventureButton from "../components/CrowdventureButton";
-import CrowdventureModal from "../components/CrowdventureModal";
+import CrowdventureModal, {
+    type ModalButton,
+} from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { UserContext } from "../user";
 import ConfirmModal from "../components/ConfirmModal";
@@ -32,32 +34,39 @@ type NodeForm = {
     featured: boolean;
 };
 
+const validateInputs = (
+    nodeForm: FormWithValues<{ title: string; content: string }>
+) => {
+    const { title, content } = nodeForm.getValues();
+    if (!title) {
+        nodeForm.setError("Content cannot be empty!");
+        return false;
+    }
+
+    if (!content) {
+        nodeForm.setError("Title cannot be empty!");
+        return false;
+    }
+
+    return true;
+};
+
 const NodeModal = ({
     nodeForm,
+    ...modalProps
 }: {
     readonly nodeForm: FormWithValues<NodeForm>;
+    readonly modalButtons: ModalButton[];
+    readonly modalTitle: string;
 }) => {
     const { user } = useContext(UserContext);
     const { lightBackgroundColor } = useContext(PaletteContext);
 
-    const validateInputs = () => {
-        const { title, content } = nodeForm.getValues();
-        if (!title) {
-            nodeForm.setError("Content cannot be empty!");
-            return false;
-        }
-
-        if (!content) {
-            nodeForm.setError("Title cannot be empty!");
-            return false;
-        }
-
-        return true;
-    };
+    const { pictureURL } = nodeForm.getValues();
 
     return (
         <CrowdventureModal {...modalProps}>
-            {node?.pictureURL ? (
+            {pictureURL ? (
                 <div
                     style={{
                         borderWidth: 1,
@@ -69,7 +78,7 @@ const NodeModal = ({
                 >
                     <img
                         alt="This text shouldnt be showing!"
-                        src={node.pictureURL}
+                        src={pictureURL}
                         style={{
                             padding: 1,
                             borderRadius: 8,
@@ -172,7 +181,7 @@ export const CreateNodeModal = ({
     });
     const { closeModal } = useContext(ModalContext);
     const createNode = async () => {
-        if (!validateInputs()) return;
+        if (!validateInputs(nodeForm)) return;
         const { title, content, featured, pictureURL } = nodeForm.getValues();
 
         const response = await apiClient.provide("post", "/node/createNode", {
@@ -201,7 +210,15 @@ export const CreateNodeModal = ({
     );
 };
 
-export const EditNodeModal = ({ node }: { readonly node: Node }) => {
+export const EditNodeModal = ({
+    node,
+    onEditNode,
+    onDeleteNode,
+}: {
+    readonly node: Node;
+    readonly onEditNode?: (n: Node) => unknown;
+    readonly onDeleteNode?: () => unknown;
+}) => {
     const nodeForm = useInputForm({
         title: node.title,
         content: node.title,
@@ -212,7 +229,7 @@ export const EditNodeModal = ({ node }: { readonly node: Node }) => {
     });
     const { openModal, closeModal, closeAllModals } = useContext(ModalContext);
     const editNode = async () => {
-        if (!validateInputs()) return;
+        if (!validateInputs(nodeForm)) return;
 
         const { title, content, featured, hidden, pictureURL, pictureUnsafe } =
             nodeForm.getValues();
@@ -229,9 +246,10 @@ export const EditNodeModal = ({ node }: { readonly node: Node }) => {
         if (response.status === "error")
             return nodeForm.setError(response.error.message);
 
-        callback?.(response.data);
+        onEditNode?.(response.data);
         closeModal();
     };
+
     const deleteNode = async () => {
         if (!node) throw new Error("Shouldnt have gotten here");
         const response = await apiClient.provide("delete", "/node/deleteNode", {
@@ -239,9 +257,10 @@ export const EditNodeModal = ({ node }: { readonly node: Node }) => {
         });
         if (response.status === "error")
             return nodeForm.setError(response.error.message);
+        onDeleteNode?.();
         closeAllModals();
-        router.back();
     };
+
     return (
         <NodeModal
             modalButtons={[
@@ -260,9 +279,9 @@ export const EditNodeModal = ({ node }: { readonly node: Node }) => {
                                 title="Delete Page"
                             >
                                 This will erase all suggested choices of this
-                                page, and their associated scores. This will NOT
-                                delete sub-pages of this page. Are you sure you
-                                wish to continue?
+                                page as well as their associated scores. This
+                                will NOT delete sub-pages of this page. Are you
+                                sure you wish to continue?
                             </ConfirmModal>
                         ),
                 },
