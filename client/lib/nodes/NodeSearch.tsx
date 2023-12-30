@@ -2,19 +2,20 @@ import React, { useState } from "react";
 import AccountPreview from "../accounts/AccountPreview";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { useDebounce } from "../hooks";
+import apiClient from "../apiClient";
 import { type Node } from "@/types/models";
 
 const NodeSearch = ({
     onSelectNode,
-    toNode,
+    query: initQuery,
 }: {
     readonly onSelectNode: (node: Node) => void;
-    readonly toNode: Node;
+    readonly query?: string;
 }) => {
-    const [resultNodes, setResultNodes] = useState<Node[]>(undefined);
+    const [resultNodes, setResultNodes] = useState<Node[]>();
 
     const [open, setOpen] = useState(false);
-    const [query, setQuery] = useState(toNode?.title);
+    const [query, setQuery] = useState(initQuery ?? "");
 
     const selectNode = (node: Node) => {
         setQuery(node.title);
@@ -22,10 +23,12 @@ const NodeSearch = ({
         onSelectNode(node);
     };
 
-    const searchNodes = useDebounce((newQuery) => {
-        queryCall("searchNodes", NODE_PREVIEW_GQL, { query: newQuery }).then(
-            setResultNodes
-        );
+    const searchNodes = useDebounce(async (newQuery: string) => {
+        const response = await apiClient.provide("get", "/node/searchNodes", {
+            query: newQuery,
+        });
+        if (response.status === "error") return alert(response.error.message);
+        setResultNodes(response.data.nodes);
     });
 
     if (!resultNodes) return <div>Loading...</div>;
@@ -34,7 +37,10 @@ const NodeSearch = ({
         <>
             <CrowdventureTextInput
                 onBlur={() => setOpen(false)}
-                onChangeText={searchNodes}
+                onChangeText={(newQuery) => {
+                    setQuery(newQuery);
+                    searchNodes(newQuery);
+                }}
                 onFocus={() => setOpen(true)}
                 placeholder="(Leave Empty to Create New Page)"
                 value={query}

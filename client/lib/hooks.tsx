@@ -65,13 +65,13 @@ export const useScrollPosition = () => {
     return scrollPosition;
 };
 
-export const useDebounce = (
-    func: (...args: unknown[]) => void,
+export const useDebounce = <T extends Array<any>>(
+    func: (...args: T) => unknown,
     delay = 500
 ) => {
     const timerRef = useRef() as { current: ReturnType<typeof setTimeout> };
 
-    return (...args: unknown[]) => {
+    return (...args: T) => {
         clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => func(...args), delay);
     };

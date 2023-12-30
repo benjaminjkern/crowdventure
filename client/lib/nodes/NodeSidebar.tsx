@@ -8,7 +8,7 @@ import ChoiceCard from "../choices/ChoiceCard";
 import ChoiceModal from "../choices/ChoiceModal";
 import { PaletteContext } from "../colorPalette";
 import ParagraphText from "../components/ParagraphText";
-import NodeModal from "./NodeModal";
+import { EditNodeModal } from "./NodeModal";
 import { type Choice, type Node } from "@/types/models";
 
 const NodeSidebar = ({
@@ -72,7 +72,10 @@ const NodeSidebar = ({
                     <CrowdventureButton
                         onClick={() => {
                             openModal(
-                                <NodeModal node={node} setNode={setNode} />
+                                <EditNodeModal
+                                    node={node}
+                                    onEditNode={setNode}
+                                />
                             );
                         }}
                     >

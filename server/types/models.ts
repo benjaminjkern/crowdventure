@@ -7,5 +7,9 @@ import {
 
 export type Account = Omit<PrismaAccount, "encryptedPassword" | "lastIP">;
 export type Node = PrismaNode & { owner: Account | null };
-export type Choice = PrismaChoice & { suggestedBy: Account | null };
+export type Choice = PrismaChoice & {
+    suggestedBy: Account | null;
+    toNode: Node | null;
+    fromNode: Node;
+};
 export type Notification = PrismaNotification;

@@ -148,6 +148,34 @@ type GetChoiceGetChoicesForNodeResponse = {
             fromNodeId: number;
             toNodeId: number | null;
             suggestedByAccountId: number | null;
+            fromNode: {
+                id: number;
+                slug: string;
+                title: string;
+                content: string;
+                createdAt: any;
+                updatedAt: any;
+                storedViews: number;
+                featured: boolean;
+                pictureURL: string | null;
+                pictureUnsafe: boolean;
+                hidden: boolean;
+                views: number;
+                ownerId: number | null;
+                owner: {
+                    id: number;
+                    screenName: string;
+                    createdAt: any;
+                    updatedAt: any;
+                    isAdmin: boolean;
+                    hidden: boolean;
+                    profilePicURL: string | null;
+                    profilePicUnsafe: boolean;
+                    bio: string | null;
+                    totalNodeViews: number;
+                    totalSuggestionScore: number;
+                } | null;
+            };
             suggestedBy: {
                 id: number;
                 screenName: string;
@@ -160,6 +188,34 @@ type GetChoiceGetChoicesForNodeResponse = {
                 bio: string | null;
                 totalNodeViews: number;
                 totalSuggestionScore: number;
+            } | null;
+            toNode: {
+                id: number;
+                slug: string;
+                title: string;
+                content: string;
+                createdAt: any;
+                updatedAt: any;
+                storedViews: number;
+                featured: boolean;
+                pictureURL: string | null;
+                pictureUnsafe: boolean;
+                hidden: boolean;
+                views: number;
+                ownerId: number | null;
+                owner: {
+                    id: number;
+                    screenName: string;
+                    createdAt: any;
+                    updatedAt: any;
+                    isAdmin: boolean;
+                    hidden: boolean;
+                    profilePicURL: string | null;
+                    profilePicUnsafe: boolean;
+                    bio: string | null;
+                    totalNodeViews: number;
+                    totalSuggestionScore: number;
+                } | null;
             } | null;
         }[];
     };
@@ -190,6 +246,34 @@ type PostChoiceCreateChoiceResponse = {
         fromNodeId: number;
         toNodeId: number | null;
         suggestedByAccountId: number | null;
+        fromNode: {
+            id: number;
+            slug: string;
+            title: string;
+            content: string;
+            createdAt: any;
+            updatedAt: any;
+            storedViews: number;
+            featured: boolean;
+            pictureURL: string | null;
+            pictureUnsafe: boolean;
+            hidden: boolean;
+            views: number;
+            ownerId: number | null;
+            owner: {
+                id: number;
+                screenName: string;
+                createdAt: any;
+                updatedAt: any;
+                isAdmin: boolean;
+                hidden: boolean;
+                profilePicURL: string | null;
+                profilePicUnsafe: boolean;
+                bio: string | null;
+                totalNodeViews: number;
+                totalSuggestionScore: number;
+            } | null;
+        };
         suggestedBy: {
             id: number;
             screenName: string;
@@ -202,6 +286,34 @@ type PostChoiceCreateChoiceResponse = {
             bio: string | null;
             totalNodeViews: number;
             totalSuggestionScore: number;
+        } | null;
+        toNode: {
+            id: number;
+            slug: string;
+            title: string;
+            content: string;
+            createdAt: any;
+            updatedAt: any;
+            storedViews: number;
+            featured: boolean;
+            pictureURL: string | null;
+            pictureUnsafe: boolean;
+            hidden: boolean;
+            views: number;
+            ownerId: number | null;
+            owner: {
+                id: number;
+                screenName: string;
+                createdAt: any;
+                updatedAt: any;
+                isAdmin: boolean;
+                hidden: boolean;
+                profilePicURL: string | null;
+                profilePicUnsafe: boolean;
+                bio: string | null;
+                totalNodeViews: number;
+                totalSuggestionScore: number;
+            } | null;
         } | null;
     };
 } | {
@@ -233,6 +345,34 @@ type PatchChoiceEditChoiceResponse = {
         fromNodeId: number;
         toNodeId: number | null;
         suggestedByAccountId: number | null;
+        fromNode: {
+            id: number;
+            slug: string;
+            title: string;
+            content: string;
+            createdAt: any;
+            updatedAt: any;
+            storedViews: number;
+            featured: boolean;
+            pictureURL: string | null;
+            pictureUnsafe: boolean;
+            hidden: boolean;
+            views: number;
+            ownerId: number | null;
+            owner: {
+                id: number;
+                screenName: string;
+                createdAt: any;
+                updatedAt: any;
+                isAdmin: boolean;
+                hidden: boolean;
+                profilePicURL: string | null;
+                profilePicUnsafe: boolean;
+                bio: string | null;
+                totalNodeViews: number;
+                totalSuggestionScore: number;
+            } | null;
+        };
         suggestedBy: {
             id: number;
             screenName: string;
@@ -245,6 +385,34 @@ type PatchChoiceEditChoiceResponse = {
             bio: string | null;
             totalNodeViews: number;
             totalSuggestionScore: number;
+        } | null;
+        toNode: {
+            id: number;
+            slug: string;
+            title: string;
+            content: string;
+            createdAt: any;
+            updatedAt: any;
+            storedViews: number;
+            featured: boolean;
+            pictureURL: string | null;
+            pictureUnsafe: boolean;
+            hidden: boolean;
+            views: number;
+            ownerId: number | null;
+            owner: {
+                id: number;
+                screenName: string;
+                createdAt: any;
+                updatedAt: any;
+                isAdmin: boolean;
+                hidden: boolean;
+                profilePicURL: string | null;
+                profilePicUnsafe: boolean;
+                bio: string | null;
+                totalNodeViews: number;
+                totalSuggestionScore: number;
+            } | null;
         } | null;
     };
 } | {
@@ -465,7 +633,50 @@ type DeleteNodeDeleteNodeResponse = {
     };
 };
 
-export type Path = "/account/getAccount" | "/account/login" | "/account/createAccount" | "/account/editAccount" | "/account/deleteAccount" | "/choice/getChoicesForNode" | "/choice/createChoice" | "/choice/editChoice" | "/choice/deleteChoice" | "/node/featuredNodes" | "/node/getNode" | "/node/createNode" | "/node/editNode" | "/node/deleteNode";
+type GetNodeSearchNodesInput = {
+    query: string;
+};
+
+type GetNodeSearchNodesResponse = {
+    status: "success";
+    data: {
+        nodes: {
+            id: number;
+            slug: string;
+            title: string;
+            content: string;
+            createdAt: any;
+            updatedAt: any;
+            storedViews: number;
+            featured: boolean;
+            pictureURL: string | null;
+            pictureUnsafe: boolean;
+            hidden: boolean;
+            views: number;
+            ownerId: number | null;
+            owner: {
+                id: number;
+                screenName: string;
+                createdAt: any;
+                updatedAt: any;
+                isAdmin: boolean;
+                hidden: boolean;
+                profilePicURL: string | null;
+                profilePicUnsafe: boolean;
+                bio: string | null;
+                totalNodeViews: number;
+                totalSuggestionScore: number;
+            } | null;
+        }[];
+    };
+} | {
+    status: "error";
+    error: {
+        message: string;
+    };
+};
+
+export type Path = "/account/getAccount" | "/account/login" | "/account/createAccount" | "/account/editAccount" | "/account/deleteAccount" | "/choice/getChoicesForNode" | "/choice/createChoice" | "/choice/editChoice" | "/choice/deleteChoice" | "/node/featuredNodes" | "/node/getNode" | "/node/createNode" | "/node/editNode" | "/node/deleteNode" | "/node/searchNodes";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
@@ -486,6 +697,7 @@ export interface Input extends Record<MethodPath, any> {
     "post /node/createNode": PostNodeCreateNodeInput;
     "patch /node/editNode": PatchNodeEditNodeInput;
     "delete /node/deleteNode": DeleteNodeDeleteNodeInput;
+    "get /node/searchNodes": GetNodeSearchNodesInput;
 }
 
 export interface Response extends Record<MethodPath, any> {
@@ -503,11 +715,12 @@ export interface Response extends Record<MethodPath, any> {
     "post /node/createNode": PostNodeCreateNodeResponse;
     "patch /node/editNode": PatchNodeEditNodeResponse;
     "delete /node/deleteNode": DeleteNodeDeleteNodeResponse;
+    "get /node/searchNodes": GetNodeSearchNodesResponse;
 }
 
-export const jsonEndpoints = { "get /account/getAccount": true, "post /account/login": true, "post /account/createAccount": true, "patch /account/editAccount": true, "delete /account/deleteAccount": true, "get /choice/getChoicesForNode": true, "post /choice/createChoice": true, "patch /choice/editChoice": true, "delete /choice/deleteChoice": true, "get /node/featuredNodes": true, "get /node/getNode": true, "post /node/createNode": true, "patch /node/editNode": true, "delete /node/deleteNode": true };
+export const jsonEndpoints = { "get /account/getAccount": true, "post /account/login": true, "post /account/createAccount": true, "patch /account/editAccount": true, "delete /account/deleteAccount": true, "get /choice/getChoicesForNode": true, "post /choice/createChoice": true, "patch /choice/editChoice": true, "delete /choice/deleteChoice": true, "get /node/featuredNodes": true, "get /node/getNode": true, "post /node/createNode": true, "patch /node/editNode": true, "delete /node/deleteNode": true, "get /node/searchNodes": true };
 
-export const endpointTags = { "get /account/getAccount": [], "post /account/login": [], "post /account/createAccount": [], "patch /account/editAccount": [], "delete /account/deleteAccount": [], "get /choice/getChoicesForNode": [], "post /choice/createChoice": [], "patch /choice/editChoice": [], "delete /choice/deleteChoice": [], "get /node/featuredNodes": [], "get /node/getNode": [], "post /node/createNode": [], "patch /node/editNode": [], "delete /node/deleteNode": [] };
+export const endpointTags = { "get /account/getAccount": [], "post /account/login": [], "post /account/createAccount": [], "patch /account/editAccount": [], "delete /account/deleteAccount": [], "get /choice/getChoicesForNode": [], "post /choice/createChoice": [], "patch /choice/editChoice": [], "delete /choice/deleteChoice": [], "get /node/featuredNodes": [], "get /node/getNode": [], "post /node/createNode": [], "patch /node/editNode": [], "delete /node/deleteNode": [], "get /node/searchNodes": [] };
 
 export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[`${M} ${P}`]) => Promise<Response[`${M} ${P}`]>;
 

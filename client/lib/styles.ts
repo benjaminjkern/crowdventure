@@ -1,8 +1,13 @@
-export const blurImageStyle = (blur: boolean, blurAmount = 20) => {
+import { type CSSProperties } from "react";
+
+export const blurImageStyle = (
+    blur: boolean,
+    blurAmount = 20
+): CSSProperties => {
     if (!blur) return {};
 
     return {
-        "-webkit-filter": `blur(${blurAmount}px)`,
+        WebkitFilter: `blur(${blurAmount}px)`,
         filter: `blur(${blurAmount}px)`,
     };
 };

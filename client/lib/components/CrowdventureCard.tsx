@@ -30,7 +30,7 @@ const CrowdventureCard = ({
 }: {
     readonly href: string;
     readonly picture?: string;
-    readonly pictureUnsafe: boolean;
+    readonly pictureUnsafe?: boolean;
     readonly dropdownOptions: DropDownOption[];
     readonly overlayIcons: OverlayIcon[];
     readonly text: string;
@@ -55,7 +55,7 @@ const CrowdventureCard = ({
             style={{
                 objectFit: "cover",
                 // Blur bad images
-                ...blurImageStyle(pictureUnsafe),
+                ...blurImageStyle(pictureUnsafe ?? false),
             }}
         />
     ) : null;

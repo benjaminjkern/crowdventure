@@ -5,6 +5,7 @@ import CrowdventureCard from "../components/CrowdventureCard";
 import LikeDislikeController from "../components/LikeDislikeController";
 import { UnsafeModeContext } from "../unsafeMode";
 import { UserContext } from "../user";
+import apiClient from "../apiClient";
 import { type Choice } from "@/types/models";
 
 const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
@@ -17,80 +18,86 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
         setChoice(initChoice);
     }, [initChoice]);
 
-    const like = () => {
-        if (!user) return;
+    // const like = () => {
+    //     if (!user) return;
 
-        const oChoice = { ...choice };
+    //     const oChoice = { ...choice };
 
-        choice.dislikedBy = choice.dislikedBy.filter(
-            (account) => account.screenName !== user?.screenName
-        );
+    //     choice.dislikedBy = choice.dislikedBy.filter(
+    //         (account) => account.screenName !== user?.screenName
+    //     );
 
-        if (choice.liked)
-            choice.likedBy = choice.likedBy.filter(
-                (account) => account.screenName !== user?.screenName
-            );
-        else choice.likedBy.push(user);
+    //     if (choice.liked)
+    //         choice.likedBy = choice.likedBy.filter(
+    //             (account) => account.screenName !== user?.screenName
+    //         );
+    //     else choice.likedBy.push(user);
 
-        setChoice({ ...choice });
+    //     setChoice({ ...choice });
 
-        mutationCall(
-            "likeSuggestion",
-            { ID: 0 },
-            {
-                accountScreenName: user.screenName,
-                choiceID: choice.ID,
-            }
-        ).catch(() => {
-            setChoice(oChoice);
+    //     apiClient.provide("post", "")
+
+    //     mutationCall(
+    //         "likeSuggestion",
+    //         { ID: 0 },
+    //         {
+    //             accountScreenName: user.screenName,
+    //             choiceID: choice.ID,
+    //         }
+    //     ).catch(() => {
+    //         setChoice(oChoice);
+    //     });
+    // };
+
+    // const dislike = () => {
+    //     if (!user) return;
+
+    //     const oChoice = { ...choice };
+
+    //     choice.likedBy = choice.likedBy.filter(
+    //         (account) => account.screenName !== user?.screenName
+    //     );
+
+    //     if (choice.disliked)
+    //         choice.dislikedBy = choice.dislikedBy.filter(
+    //             (account) => account.screenName !== user?.screenName
+    //         );
+    //     else choice.dislikedBy.push(user);
+
+    //     setChoice({ ...choice });
+
+    //     mutationCall(
+    //         "dislikeSuggestion",
+    //         { ID: 0 },
+    //         {
+    //             accountScreenName: user.screenName,
+    //             choiceID: choice.ID,
+    //         }
+    //     ).catch(() => {
+    //         setChoice(oChoice);
+    //     });
+    // };
+
+    const makeCanon = () => {
+        apiClient.provide("patch", "/choice/editChoice", {
+            id: choice.id,
+            isCanon: true,
         });
     };
 
-    const dislike = () => {
-        if (!user) return;
-
-        const oChoice = { ...choice };
-
-        choice.likedBy = choice.likedBy.filter(
-            (account) => account.screenName !== user?.screenName
-        );
-
-        if (choice.disliked)
-            choice.dislikedBy = choice.dislikedBy.filter(
-                (account) => account.screenName !== user?.screenName
-            );
-        else choice.dislikedBy.push(user);
-
-        setChoice({ ...choice });
-
-        mutationCall(
-            "dislikeSuggestion",
-            { ID: 0 },
-            {
-                accountScreenName: user.screenName,
-                choiceID: choice.ID,
-            }
-        ).catch(() => {
-            setChoice(oChoice);
+    const makeNonCanon = () => {
+        apiClient.provide("patch", "/choice/editChoice", {
+            id: choice.id,
+            isCanon: false,
         });
+        // TODO: Do stuff
     };
 
-    const makeCanon = (choiceID) => {
-        mutationCall("makeCanon", { choiceID }, { ID: 0 }).then(() => {
-            // Refresh page
+    const deleteChoice = () => {
+        apiClient.provide("delete", "/choice/deleteChoice", {
+            id: String(choice.id),
         });
-    };
-
-    const makeNonCanon = (choiceID) => {
-        mutationCall("makeNonCanon", { choiceID }, { ID: 0 }).then(() => {
-            // Refresh page
-        });
-    };
-
-    const removeSuggestion = (choiceID) => {
-        mutationCall("removeSuggestion", { choiceID }).then(() => {
-            // Refresh page
-        });
+        // TODO: Do stuff after
     };
 
     // Hide hidden actions, but show if you
@@ -102,17 +109,18 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
         !(
             unsafeMode ||
             choice.suggestedBy.screenName === user?.screenName ||
-            (choice.canon && choice.from.owner.screenName === user?.screenName)
+            (choice.isCanon &&
+                choice.fromNode.owner.screenName === user?.screenName)
         )
     )
         return;
 
     const disabled =
-        !choice.to ||
-        ((choice.to.hidden || choice.to.owner.hidden) &&
+        !choice.toNode ||
+        ((choice.toNode.hidden || choice.toNode.owner.hidden) &&
             (!user ||
                 (!unsafeMode &&
-                    choice.to.owner.screenName !== user.screenName)));
+                    choice.toNode.owner.screenName !== user.screenName)));
 
     return (
         <CrowdventureCard
@@ -121,57 +129,44 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
                 {
                     disabled: !(
                         user?.isAdmin ||
-                        user?.screenName === choice.from.owner.screenName
+                        user?.screenName === choice.fromNode.owner.screenName
                     ),
-                    text: `Make ${choice.canon ? "Nonc" : "C"}anon`,
+                    text: `Make ${choice.isCanon ? "Nonc" : "C"}anon`,
                     onClick: () =>
-                        choice.canon
-                            ? makeNonCanon(choice.ID)
-                            : makeCanon(choice.ID),
+                        choice.isCanon ? makeNonCanon() : makeCanon(),
                 },
                 {
                     disabled: !(
                         user?.isAdmin ||
-                        user?.screenName === choice.from.owner.screenName ||
+                        user?.screenName === choice.fromNode.owner.screenName ||
                         user?.screenName === choice.suggestedBy.screenName
                     ),
                     text: "Delete",
-                    onClick: () => removeSuggestion(choice.ID),
+                    onClick: deleteChoice,
                 },
                 {
                     disabled: !(
                         user?.isAdmin ||
-                        (choice.canon &&
+                        (choice.isCanon &&
                             user?.screenName ===
-                                choice.from.owner.screenName) ||
-                        (!choice.canon &&
+                                choice.fromNode.owner.screenName) ||
+                        (!choice.isCanon &&
                             user?.screenName === choice.suggestedBy.screenName)
                     ),
                     text: "Edit",
                     onClick: () => {
-                        // showModal(
-                        //     <EditChoiceModal
-                        //         choice={choice}
-                        //         loggedInAs={loggedInAs}
-                        //         fromNode={node}
-                        //         close={() =>
-                        //             showModal(undefined)
-                        //         }
-                        //     />
-                        // )
+                        openModal(
+                            <EditChoiceModal
+                                choice={choice}
+                                close={() => showModal(undefined)}
+                                fromNode={node}
+                                loggedInAs={loggedInAs}
+                            />
+                        );
                     },
                 },
-                {},
-                { onClick: () => reportSuggestion(choice.ID), text: "Report" },
             ]}
-            href={`/node/${choice.to.ID}`}
-            onClick={() =>
-                window.scrollTo({
-                    top: 0,
-                    left: 0,
-                    behavior: "smooth",
-                })
-            }
+            href={`/node/${choice.toNode.id}`}
             overlayIcons={[
                 {
                     active: choice.hidden || choice.suggestedBy.hidden,

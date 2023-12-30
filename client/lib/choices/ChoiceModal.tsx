@@ -4,11 +4,11 @@ import CrowdventureModal from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { ModalContext } from "../modal";
 
-import NodeModal from "../nodes/NodeModal";
 import NodeSearch from "../nodes/NodeSearch";
 import { UserContext } from "../user";
 import apiClient from "../apiClient";
 import { useInputForm } from "../hooks";
+import { CreateNodeModal } from "../nodes/NodeModal";
 import { type Node, type Choice } from "@/types/models";
 
 const ChoiceModal = ({
@@ -18,7 +18,7 @@ const ChoiceModal = ({
     readonly fromNode: Node;
     readonly choice?: Choice;
 }) => {
-    const [toNodeId, setToNodeId] = useState(choice?.toNodeId ?? null);
+    const [toNode, setToNode] = useState<Node | null>(choice?.toNode ?? null);
     const choiceForm = useInputForm({
         action: choice?.action ?? "",
         hidden: choice?.action ?? false,
@@ -35,22 +35,22 @@ const ChoiceModal = ({
         return true;
     };
 
-    const openNodeModal = (callback: (n: number) => unknown) => {
+    const openNodeModal = (callback: (n: Node) => unknown) => {
         openModal(
-            <NodeModal
-                callback={(node) => callback(node.id)}
+            <CreateNodeModal
                 featured={false}
+                onCreateNode={callback}
                 pictureURL={fromNode.pictureURL}
                 pictureUnsafe={fromNode.pictureUnsafe}
             />
         );
     };
 
-    const editChoice = async (newNodeId: number | null) => {
+    const editChoice = async (newToNode = toNode) => {
         if (!choice) return;
         if (!verifyForm()) return;
 
-        if (!newNodeId) return openNodeModal(editChoice);
+        if (!newToNode) return openNodeModal(editChoice);
 
         const { action, hidden } = choiceForm.getValues();
 
@@ -60,7 +60,7 @@ const ChoiceModal = ({
             {
                 id: choice.id,
                 action,
-                toNodeId: newNodeId ?? toNodeId,
+                toNodeId: newToNode.id,
                 hidden: hidden as boolean,
             }
         );
@@ -72,10 +72,10 @@ const ChoiceModal = ({
         closeAllModals();
     };
 
-    const createChoice = async (newToNodeId: number | null) => {
+    const createChoice = async (newToNode = toNode) => {
         if (!verifyForm()) return;
 
-        if (!newToNodeId) return openNodeModal(createChoice);
+        if (!newToNode) return openNodeModal(createChoice);
 
         const { action } = choiceForm.getValues();
 
@@ -85,7 +85,7 @@ const ChoiceModal = ({
             {
                 fromNodeId: fromNode.id,
                 action,
-                toNodeId: newToNodeId,
+                toNodeId: newToNode.id,
             }
         );
         if (choiceResponse.status === "error")
@@ -102,8 +102,8 @@ const ChoiceModal = ({
                 {
                     text: `${choice ? "Edit" : "Submit New"} Choice`,
                     onClick: () => {
-                        if (choice) editChoice(toNodeId);
-                        else createChoice(toNodeId);
+                        if (choice) editChoice();
+                        else createChoice();
                     },
                 },
             ]}
@@ -112,7 +112,7 @@ const ChoiceModal = ({
             Action:
             <CrowdventureTextInput formElement={choiceForm.action} />
             Go to Page:
-            <NodeSearch setToNodeId={setToNodeId} toNodeId={toNodeId} />
+            <NodeSearch onSelectNode={setToNode} query={toNode?.title} />
             {user?.isAdmin ? (
                 <>
                     Admin Controls:

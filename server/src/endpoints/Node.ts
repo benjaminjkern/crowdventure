@@ -208,6 +208,20 @@ export const nodeEndpoints = {
             };
         },
     }),
+    searchNodes: defaultEndpointsFactory.build({
+        methods: ["get"],
+        input: z.object({ query: z.string() }),
+        output: z.object({ nodes: NodeSchema.array() }),
+        handler: async ({ input: { query } }) => {
+            return {
+                nodes: await prisma.node.findMany({
+                    where: { title: { contains: query } },
+                    take: 10, // TODO: Paginate this
+                    include: { owner: true },
+                }),
+            };
+        },
+    }),
 };
 
 // export const content = async (parent, args, context) => {

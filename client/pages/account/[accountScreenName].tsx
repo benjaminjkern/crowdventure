@@ -10,11 +10,11 @@ import NodeViewer from "+/lib/nodes/NodeViewer";
 import CrowdventureButton from "+/lib/components/CrowdventureButton";
 import AccountHeader from "+/lib/accounts/AccountHeader";
 import { ModalContext } from "+/lib/modal";
-import NodeModal from "+/lib/nodes/NodeModal";
 
 import { type Node, type Account } from "@/types/models";
 import apiClient from "+/lib/apiClient";
 import { useSafeGuardedNodes } from "+/lib/specialHooks";
+import { CreateNodeModal } from "+/lib/nodes/NodeModal";
 
 const getAccountNodes = async (accountId: number, unsafeMode: boolean) => {
     const nodesResponse = await apiClient.provide(
@@ -81,7 +81,7 @@ const AccountPage = ({
 
             {loggedInAsThisUser ? (
                 <CrowdventureButton
-                    onClick={() => openModal(<NodeModal featured />)}
+                    onClick={() => openModal(<CreateNodeModal featured />)}
                     style={{ marginTop: 10 }}
                 >
                     Create a New Adventure!

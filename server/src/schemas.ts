@@ -9,11 +9,13 @@ export const AccountSchema = ZodAccountSchema.omit({
     encryptedPassword: true,
     lastIP: true,
 });
-export const ChoiceSchema = ZodChoiceSchema.extend({
-    suggestedBy: AccountSchema.nullable(),
-});
 export const NodeSchema = ZodNodeSchema.extend({
     owner: AccountSchema.nullable(),
+});
+export const ChoiceSchema = ZodChoiceSchema.extend({
+    fromNode: NodeSchema,
+    suggestedBy: AccountSchema.nullable(),
+    toNode: NodeSchema.nullable(),
 });
 
 // type PaginatedResults<T> = {
