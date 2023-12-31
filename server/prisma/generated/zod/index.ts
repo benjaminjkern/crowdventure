@@ -261,10 +261,10 @@ export const NodeSelectSchema: z.ZodType<Prisma.NodeSelect> = z.object({
 //------------------------------------------------------
 
 export const ChoiceIncludeSchema: z.ZodType<Prisma.ChoiceInclude> = z.object({
-  from: z.union([z.boolean(),z.lazy(() => NodeArgsSchema)]).optional(),
-  to: z.union([z.boolean(),z.lazy(() => NodeArgsSchema)]).optional(),
+  fromNode: z.union([z.boolean(),z.lazy(() => NodeArgsSchema)]).optional(),
+  toNode: z.union([z.boolean(),z.lazy(() => NodeArgsSchema)]).optional(),
   suggestedBy: z.union([z.boolean(),z.lazy(() => AccountArgsSchema)]).optional(),
-  Reaction: z.union([z.boolean(),z.lazy(() => ReactionFindManyArgsSchema)]).optional(),
+  reactions: z.union([z.boolean(),z.lazy(() => ReactionFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => ChoiceCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -278,7 +278,7 @@ export const ChoiceCountOutputTypeArgsSchema: z.ZodType<Prisma.ChoiceCountOutput
 }).strict();
 
 export const ChoiceCountOutputTypeSelectSchema: z.ZodType<Prisma.ChoiceCountOutputTypeSelect> = z.object({
-  Reaction: z.boolean().optional(),
+  reactions: z.boolean().optional(),
 }).strict();
 
 export const ChoiceSelectSchema: z.ZodType<Prisma.ChoiceSelect> = z.object({
@@ -293,10 +293,10 @@ export const ChoiceSelectSchema: z.ZodType<Prisma.ChoiceSelect> = z.object({
   fromNodeId: z.boolean().optional(),
   toNodeId: z.boolean().optional(),
   suggestedByAccountId: z.boolean().optional(),
-  from: z.union([z.boolean(),z.lazy(() => NodeArgsSchema)]).optional(),
-  to: z.union([z.boolean(),z.lazy(() => NodeArgsSchema)]).optional(),
+  fromNode: z.union([z.boolean(),z.lazy(() => NodeArgsSchema)]).optional(),
+  toNode: z.union([z.boolean(),z.lazy(() => NodeArgsSchema)]).optional(),
   suggestedBy: z.union([z.boolean(),z.lazy(() => AccountArgsSchema)]).optional(),
-  Reaction: z.union([z.boolean(),z.lazy(() => ReactionFindManyArgsSchema)]).optional(),
+  reactions: z.union([z.boolean(),z.lazy(() => ReactionFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => ChoiceCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -645,10 +645,10 @@ export const ChoiceWhereInputSchema: z.ZodType<Prisma.ChoiceWhereInput> = z.obje
   fromNodeId: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   toNodeId: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
   suggestedByAccountId: z.union([ z.lazy(() => IntNullableFilterSchema),z.number() ]).optional().nullable(),
-  from: z.union([ z.lazy(() => NodeRelationFilterSchema),z.lazy(() => NodeWhereInputSchema) ]).optional(),
-  to: z.union([ z.lazy(() => NodeNullableRelationFilterSchema),z.lazy(() => NodeWhereInputSchema) ]).optional().nullable(),
+  fromNode: z.union([ z.lazy(() => NodeRelationFilterSchema),z.lazy(() => NodeWhereInputSchema) ]).optional(),
+  toNode: z.union([ z.lazy(() => NodeNullableRelationFilterSchema),z.lazy(() => NodeWhereInputSchema) ]).optional().nullable(),
   suggestedBy: z.union([ z.lazy(() => AccountNullableRelationFilterSchema),z.lazy(() => AccountWhereInputSchema) ]).optional().nullable(),
-  Reaction: z.lazy(() => ReactionListRelationFilterSchema).optional()
+  reactions: z.lazy(() => ReactionListRelationFilterSchema).optional()
 }).strict();
 
 export const ChoiceOrderByWithRelationInputSchema: z.ZodType<Prisma.ChoiceOrderByWithRelationInput> = z.object({
@@ -663,10 +663,10 @@ export const ChoiceOrderByWithRelationInputSchema: z.ZodType<Prisma.ChoiceOrderB
   fromNodeId: z.lazy(() => SortOrderSchema).optional(),
   toNodeId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   suggestedByAccountId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  from: z.lazy(() => NodeOrderByWithRelationInputSchema).optional(),
-  to: z.lazy(() => NodeOrderByWithRelationInputSchema).optional(),
+  fromNode: z.lazy(() => NodeOrderByWithRelationInputSchema).optional(),
+  toNode: z.lazy(() => NodeOrderByWithRelationInputSchema).optional(),
   suggestedBy: z.lazy(() => AccountOrderByWithRelationInputSchema).optional(),
-  Reaction: z.lazy(() => ReactionOrderByRelationAggregateInputSchema).optional()
+  reactions: z.lazy(() => ReactionOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
 export const ChoiceWhereUniqueInputSchema: z.ZodType<Prisma.ChoiceWhereUniqueInput> = z.union([
@@ -696,10 +696,10 @@ export const ChoiceWhereUniqueInputSchema: z.ZodType<Prisma.ChoiceWhereUniqueInp
   fromNodeId: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
   toNodeId: z.union([ z.lazy(() => IntNullableFilterSchema),z.number().int() ]).optional().nullable(),
   suggestedByAccountId: z.union([ z.lazy(() => IntNullableFilterSchema),z.number().int() ]).optional().nullable(),
-  from: z.union([ z.lazy(() => NodeRelationFilterSchema),z.lazy(() => NodeWhereInputSchema) ]).optional(),
-  to: z.union([ z.lazy(() => NodeNullableRelationFilterSchema),z.lazy(() => NodeWhereInputSchema) ]).optional().nullable(),
+  fromNode: z.union([ z.lazy(() => NodeRelationFilterSchema),z.lazy(() => NodeWhereInputSchema) ]).optional(),
+  toNode: z.union([ z.lazy(() => NodeNullableRelationFilterSchema),z.lazy(() => NodeWhereInputSchema) ]).optional().nullable(),
   suggestedBy: z.union([ z.lazy(() => AccountNullableRelationFilterSchema),z.lazy(() => AccountWhereInputSchema) ]).optional().nullable(),
-  Reaction: z.lazy(() => ReactionListRelationFilterSchema).optional()
+  reactions: z.lazy(() => ReactionListRelationFilterSchema).optional()
 }).strict());
 
 export const ChoiceOrderByWithAggregationInputSchema: z.ZodType<Prisma.ChoiceOrderByWithAggregationInput> = z.object({
@@ -897,18 +897,18 @@ export const ReactionOrderByWithRelationInputSchema: z.ZodType<Prisma.ReactionOr
 export const ReactionWhereUniqueInputSchema: z.ZodType<Prisma.ReactionWhereUniqueInput> = z.union([
   z.object({
     id: z.number().int(),
-    accountId_choiceId: z.lazy(() => ReactionAccountIdChoiceIdCompoundUniqueInputSchema)
+    reactionIdentifier: z.lazy(() => ReactionReactionIdentifierCompoundUniqueInputSchema)
   }),
   z.object({
     id: z.number().int(),
   }),
   z.object({
-    accountId_choiceId: z.lazy(() => ReactionAccountIdChoiceIdCompoundUniqueInputSchema),
+    reactionIdentifier: z.lazy(() => ReactionReactionIdentifierCompoundUniqueInputSchema),
   }),
 ])
 .and(z.object({
   id: z.number().int().optional(),
-  accountId_choiceId: z.lazy(() => ReactionAccountIdChoiceIdCompoundUniqueInputSchema).optional(),
+  reactionIdentifier: z.lazy(() => ReactionReactionIdentifierCompoundUniqueInputSchema).optional(),
   AND: z.union([ z.lazy(() => ReactionWhereInputSchema),z.lazy(() => ReactionWhereInputSchema).array() ]).optional(),
   OR: z.lazy(() => ReactionWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => ReactionWhereInputSchema),z.lazy(() => ReactionWhereInputSchema).array() ]).optional(),
@@ -1133,8 +1133,8 @@ export const NodeCreateInputSchema: z.ZodType<Prisma.NodeCreateInput> = z.object
   hidden: z.boolean().optional(),
   views: z.number().int(),
   owner: z.lazy(() => AccountCreateNestedOneWithoutOwnedNodesInputSchema).optional(),
-  childChoices: z.lazy(() => ChoiceCreateNestedManyWithoutFromInputSchema).optional(),
-  parentChoices: z.lazy(() => ChoiceCreateNestedManyWithoutToInputSchema).optional(),
+  childChoices: z.lazy(() => ChoiceCreateNestedManyWithoutFromNodeInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceCreateNestedManyWithoutToNodeInputSchema).optional(),
   View: z.lazy(() => ViewCreateNestedManyWithoutNodeInputSchema).optional()
 }).strict();
 
@@ -1152,8 +1152,8 @@ export const NodeUncheckedCreateInputSchema: z.ZodType<Prisma.NodeUncheckedCreat
   hidden: z.boolean().optional(),
   views: z.number().int(),
   ownerId: z.number().int().optional().nullable(),
-  childChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  parentChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  childChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutFromNodeInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutToNodeInputSchema).optional(),
   View: z.lazy(() => ViewUncheckedCreateNestedManyWithoutNodeInputSchema).optional()
 }).strict();
 
@@ -1170,8 +1170,8 @@ export const NodeUpdateInputSchema: z.ZodType<Prisma.NodeUpdateInput> = z.object
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   views: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   owner: z.lazy(() => AccountUpdateOneWithoutOwnedNodesNestedInputSchema).optional(),
-  childChoices: z.lazy(() => ChoiceUpdateManyWithoutFromNestedInputSchema).optional(),
-  parentChoices: z.lazy(() => ChoiceUpdateManyWithoutToNestedInputSchema).optional(),
+  childChoices: z.lazy(() => ChoiceUpdateManyWithoutFromNodeNestedInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceUpdateManyWithoutToNodeNestedInputSchema).optional(),
   View: z.lazy(() => ViewUpdateManyWithoutNodeNestedInputSchema).optional()
 }).strict();
 
@@ -1189,8 +1189,8 @@ export const NodeUncheckedUpdateInputSchema: z.ZodType<Prisma.NodeUncheckedUpdat
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   views: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ownerId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  childChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  parentChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  childChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutFromNodeNestedInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutToNodeNestedInputSchema).optional(),
   View: z.lazy(() => ViewUncheckedUpdateManyWithoutNodeNestedInputSchema).optional()
 }).strict();
 
@@ -1248,10 +1248,10 @@ export const ChoiceCreateInputSchema: z.ZodType<Prisma.ChoiceCreateInput> = z.ob
   hidden: z.boolean().optional(),
   isCanon: z.boolean(),
   score: z.number().int(),
-  from: z.lazy(() => NodeCreateNestedOneWithoutChildChoicesInputSchema),
-  to: z.lazy(() => NodeCreateNestedOneWithoutParentChoicesInputSchema).optional(),
+  fromNode: z.lazy(() => NodeCreateNestedOneWithoutChildChoicesInputSchema),
+  toNode: z.lazy(() => NodeCreateNestedOneWithoutParentChoicesInputSchema).optional(),
   suggestedBy: z.lazy(() => AccountCreateNestedOneWithoutSuggestedChoicesInputSchema).optional(),
-  Reaction: z.lazy(() => ReactionCreateNestedManyWithoutChoiceInputSchema).optional()
+  reactions: z.lazy(() => ReactionCreateNestedManyWithoutChoiceInputSchema).optional()
 }).strict();
 
 export const ChoiceUncheckedCreateInputSchema: z.ZodType<Prisma.ChoiceUncheckedCreateInput> = z.object({
@@ -1266,7 +1266,7 @@ export const ChoiceUncheckedCreateInputSchema: z.ZodType<Prisma.ChoiceUncheckedC
   fromNodeId: z.number().int(),
   toNodeId: z.number().int().optional().nullable(),
   suggestedByAccountId: z.number().int().optional().nullable(),
-  Reaction: z.lazy(() => ReactionUncheckedCreateNestedManyWithoutChoiceInputSchema).optional()
+  reactions: z.lazy(() => ReactionUncheckedCreateNestedManyWithoutChoiceInputSchema).optional()
 }).strict();
 
 export const ChoiceUpdateInputSchema: z.ZodType<Prisma.ChoiceUpdateInput> = z.object({
@@ -1277,10 +1277,10 @@ export const ChoiceUpdateInputSchema: z.ZodType<Prisma.ChoiceUpdateInput> = z.ob
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isCanon: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   score: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  from: z.lazy(() => NodeUpdateOneRequiredWithoutChildChoicesNestedInputSchema).optional(),
-  to: z.lazy(() => NodeUpdateOneWithoutParentChoicesNestedInputSchema).optional(),
+  fromNode: z.lazy(() => NodeUpdateOneRequiredWithoutChildChoicesNestedInputSchema).optional(),
+  toNode: z.lazy(() => NodeUpdateOneWithoutParentChoicesNestedInputSchema).optional(),
   suggestedBy: z.lazy(() => AccountUpdateOneWithoutSuggestedChoicesNestedInputSchema).optional(),
-  Reaction: z.lazy(() => ReactionUpdateManyWithoutChoiceNestedInputSchema).optional()
+  reactions: z.lazy(() => ReactionUpdateManyWithoutChoiceNestedInputSchema).optional()
 }).strict();
 
 export const ChoiceUncheckedUpdateInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateInput> = z.object({
@@ -1295,7 +1295,7 @@ export const ChoiceUncheckedUpdateInputSchema: z.ZodType<Prisma.ChoiceUncheckedU
   fromNodeId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   toNodeId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   suggestedByAccountId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  Reaction: z.lazy(() => ReactionUncheckedUpdateManyWithoutChoiceNestedInputSchema).optional()
+  reactions: z.lazy(() => ReactionUncheckedUpdateManyWithoutChoiceNestedInputSchema).optional()
 }).strict();
 
 export const ChoiceCreateManyInputSchema: z.ZodType<Prisma.ChoiceCreateManyInput> = z.object({
@@ -1464,7 +1464,7 @@ export const NotificationUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Notifi
 export const ReactionCreateInputSchema: z.ZodType<Prisma.ReactionCreateInput> = z.object({
   like: z.boolean(),
   account: z.lazy(() => AccountCreateNestedOneWithoutReactionInputSchema),
-  choice: z.lazy(() => ChoiceCreateNestedOneWithoutReactionInputSchema)
+  choice: z.lazy(() => ChoiceCreateNestedOneWithoutReactionsInputSchema)
 }).strict();
 
 export const ReactionUncheckedCreateInputSchema: z.ZodType<Prisma.ReactionUncheckedCreateInput> = z.object({
@@ -1477,7 +1477,7 @@ export const ReactionUncheckedCreateInputSchema: z.ZodType<Prisma.ReactionUnchec
 export const ReactionUpdateInputSchema: z.ZodType<Prisma.ReactionUpdateInput> = z.object({
   like: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   account: z.lazy(() => AccountUpdateOneRequiredWithoutReactionNestedInputSchema).optional(),
-  choice: z.lazy(() => ChoiceUpdateOneRequiredWithoutReactionNestedInputSchema).optional()
+  choice: z.lazy(() => ChoiceUpdateOneRequiredWithoutReactionsNestedInputSchema).optional()
 }).strict();
 
 export const ReactionUncheckedUpdateInputSchema: z.ZodType<Prisma.ReactionUncheckedUpdateInput> = z.object({
@@ -2050,7 +2050,7 @@ export const ChoiceRelationFilterSchema: z.ZodType<Prisma.ChoiceRelationFilter> 
   isNot: z.lazy(() => ChoiceWhereInputSchema).optional()
 }).strict();
 
-export const ReactionAccountIdChoiceIdCompoundUniqueInputSchema: z.ZodType<Prisma.ReactionAccountIdChoiceIdCompoundUniqueInput> = z.object({
+export const ReactionReactionIdentifierCompoundUniqueInputSchema: z.ZodType<Prisma.ReactionReactionIdentifierCompoundUniqueInput> = z.object({
   accountId: z.number(),
   choiceId: z.number()
 }).strict();
@@ -2356,17 +2356,17 @@ export const AccountCreateNestedOneWithoutOwnedNodesInputSchema: z.ZodType<Prism
   connect: z.lazy(() => AccountWhereUniqueInputSchema).optional()
 }).strict();
 
-export const ChoiceCreateNestedManyWithoutFromInputSchema: z.ZodType<Prisma.ChoiceCreateNestedManyWithoutFromInput> = z.object({
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutFromInputSchema),z.lazy(() => ChoiceCreateWithoutFromInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutFromInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutFromInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => ChoiceCreateManyFromInputEnvelopeSchema).optional(),
+export const ChoiceCreateNestedManyWithoutFromNodeInputSchema: z.ZodType<Prisma.ChoiceCreateNestedManyWithoutFromNodeInput> = z.object({
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutFromNodeInputSchema),z.lazy(() => ChoiceCreateWithoutFromNodeInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutFromNodeInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutFromNodeInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutFromNodeInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutFromNodeInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ChoiceCreateManyFromNodeInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const ChoiceCreateNestedManyWithoutToInputSchema: z.ZodType<Prisma.ChoiceCreateNestedManyWithoutToInput> = z.object({
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutToInputSchema),z.lazy(() => ChoiceCreateWithoutToInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutToInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutToInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutToInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutToInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => ChoiceCreateManyToInputEnvelopeSchema).optional(),
+export const ChoiceCreateNestedManyWithoutToNodeInputSchema: z.ZodType<Prisma.ChoiceCreateNestedManyWithoutToNodeInput> = z.object({
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutToNodeInputSchema),z.lazy(() => ChoiceCreateWithoutToNodeInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutToNodeInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutToNodeInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutToNodeInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutToNodeInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ChoiceCreateManyToNodeInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
@@ -2377,17 +2377,17 @@ export const ViewCreateNestedManyWithoutNodeInputSchema: z.ZodType<Prisma.ViewCr
   connect: z.union([ z.lazy(() => ViewWhereUniqueInputSchema),z.lazy(() => ViewWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const ChoiceUncheckedCreateNestedManyWithoutFromInputSchema: z.ZodType<Prisma.ChoiceUncheckedCreateNestedManyWithoutFromInput> = z.object({
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutFromInputSchema),z.lazy(() => ChoiceCreateWithoutFromInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutFromInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutFromInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => ChoiceCreateManyFromInputEnvelopeSchema).optional(),
+export const ChoiceUncheckedCreateNestedManyWithoutFromNodeInputSchema: z.ZodType<Prisma.ChoiceUncheckedCreateNestedManyWithoutFromNodeInput> = z.object({
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutFromNodeInputSchema),z.lazy(() => ChoiceCreateWithoutFromNodeInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutFromNodeInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutFromNodeInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutFromNodeInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutFromNodeInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ChoiceCreateManyFromNodeInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const ChoiceUncheckedCreateNestedManyWithoutToInputSchema: z.ZodType<Prisma.ChoiceUncheckedCreateNestedManyWithoutToInput> = z.object({
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutToInputSchema),z.lazy(() => ChoiceCreateWithoutToInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutToInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutToInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutToInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutToInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => ChoiceCreateManyToInputEnvelopeSchema).optional(),
+export const ChoiceUncheckedCreateNestedManyWithoutToNodeInputSchema: z.ZodType<Prisma.ChoiceUncheckedCreateNestedManyWithoutToNodeInput> = z.object({
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutToNodeInputSchema),z.lazy(() => ChoiceCreateWithoutToNodeInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutToNodeInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutToNodeInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutToNodeInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutToNodeInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ChoiceCreateManyToNodeInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
@@ -2408,31 +2408,31 @@ export const AccountUpdateOneWithoutOwnedNodesNestedInputSchema: z.ZodType<Prism
   update: z.union([ z.lazy(() => AccountUpdateToOneWithWhereWithoutOwnedNodesInputSchema),z.lazy(() => AccountUpdateWithoutOwnedNodesInputSchema),z.lazy(() => AccountUncheckedUpdateWithoutOwnedNodesInputSchema) ]).optional(),
 }).strict();
 
-export const ChoiceUpdateManyWithoutFromNestedInputSchema: z.ZodType<Prisma.ChoiceUpdateManyWithoutFromNestedInput> = z.object({
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutFromInputSchema),z.lazy(() => ChoiceCreateWithoutFromInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutFromInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutFromInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutFromInputSchema),z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => ChoiceCreateManyFromInputEnvelopeSchema).optional(),
+export const ChoiceUpdateManyWithoutFromNodeNestedInputSchema: z.ZodType<Prisma.ChoiceUpdateManyWithoutFromNodeNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutFromNodeInputSchema),z.lazy(() => ChoiceCreateWithoutFromNodeInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutFromNodeInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutFromNodeInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutFromNodeInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutFromNodeInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutFromNodeInputSchema),z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutFromNodeInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ChoiceCreateManyFromNodeInputEnvelopeSchema).optional(),
   set: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
   disconnect: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
   delete: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
   connect: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutFromInputSchema),z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => ChoiceUpdateManyWithWhereWithoutFromInputSchema),z.lazy(() => ChoiceUpdateManyWithWhereWithoutFromInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutFromNodeInputSchema),z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutFromNodeInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => ChoiceUpdateManyWithWhereWithoutFromNodeInputSchema),z.lazy(() => ChoiceUpdateManyWithWhereWithoutFromNodeInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => ChoiceScalarWhereInputSchema),z.lazy(() => ChoiceScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const ChoiceUpdateManyWithoutToNestedInputSchema: z.ZodType<Prisma.ChoiceUpdateManyWithoutToNestedInput> = z.object({
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutToInputSchema),z.lazy(() => ChoiceCreateWithoutToInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutToInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutToInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutToInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutToInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutToInputSchema),z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => ChoiceCreateManyToInputEnvelopeSchema).optional(),
+export const ChoiceUpdateManyWithoutToNodeNestedInputSchema: z.ZodType<Prisma.ChoiceUpdateManyWithoutToNodeNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutToNodeInputSchema),z.lazy(() => ChoiceCreateWithoutToNodeInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutToNodeInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutToNodeInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutToNodeInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutToNodeInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutToNodeInputSchema),z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutToNodeInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ChoiceCreateManyToNodeInputEnvelopeSchema).optional(),
   set: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
   disconnect: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
   delete: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
   connect: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutToInputSchema),z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => ChoiceUpdateManyWithWhereWithoutToInputSchema),z.lazy(() => ChoiceUpdateManyWithWhereWithoutToInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutToNodeInputSchema),z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutToNodeInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => ChoiceUpdateManyWithWhereWithoutToNodeInputSchema),z.lazy(() => ChoiceUpdateManyWithWhereWithoutToNodeInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => ChoiceScalarWhereInputSchema),z.lazy(() => ChoiceScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
@@ -2458,31 +2458,31 @@ export const NullableIntFieldUpdateOperationsInputSchema: z.ZodType<Prisma.Nulla
   divide: z.number().optional()
 }).strict();
 
-export const ChoiceUncheckedUpdateManyWithoutFromNestedInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateManyWithoutFromNestedInput> = z.object({
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutFromInputSchema),z.lazy(() => ChoiceCreateWithoutFromInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutFromInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutFromInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutFromInputSchema),z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => ChoiceCreateManyFromInputEnvelopeSchema).optional(),
+export const ChoiceUncheckedUpdateManyWithoutFromNodeNestedInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateManyWithoutFromNodeNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutFromNodeInputSchema),z.lazy(() => ChoiceCreateWithoutFromNodeInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutFromNodeInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutFromNodeInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutFromNodeInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutFromNodeInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutFromNodeInputSchema),z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutFromNodeInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ChoiceCreateManyFromNodeInputEnvelopeSchema).optional(),
   set: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
   disconnect: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
   delete: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
   connect: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutFromInputSchema),z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => ChoiceUpdateManyWithWhereWithoutFromInputSchema),z.lazy(() => ChoiceUpdateManyWithWhereWithoutFromInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutFromNodeInputSchema),z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutFromNodeInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => ChoiceUpdateManyWithWhereWithoutFromNodeInputSchema),z.lazy(() => ChoiceUpdateManyWithWhereWithoutFromNodeInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => ChoiceScalarWhereInputSchema),z.lazy(() => ChoiceScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const ChoiceUncheckedUpdateManyWithoutToNestedInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateManyWithoutToNestedInput> = z.object({
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutToInputSchema),z.lazy(() => ChoiceCreateWithoutToInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutToInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutToInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutToInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutToInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutToInputSchema),z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => ChoiceCreateManyToInputEnvelopeSchema).optional(),
+export const ChoiceUncheckedUpdateManyWithoutToNodeNestedInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateManyWithoutToNodeNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutToNodeInputSchema),z.lazy(() => ChoiceCreateWithoutToNodeInputSchema).array(),z.lazy(() => ChoiceUncheckedCreateWithoutToNodeInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutToNodeInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => ChoiceCreateOrConnectWithoutToNodeInputSchema),z.lazy(() => ChoiceCreateOrConnectWithoutToNodeInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutToNodeInputSchema),z.lazy(() => ChoiceUpsertWithWhereUniqueWithoutToNodeInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => ChoiceCreateManyToNodeInputEnvelopeSchema).optional(),
   set: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
   disconnect: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
   delete: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
   connect: z.union([ z.lazy(() => ChoiceWhereUniqueInputSchema),z.lazy(() => ChoiceWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutToInputSchema),z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => ChoiceUpdateManyWithWhereWithoutToInputSchema),z.lazy(() => ChoiceUpdateManyWithWhereWithoutToInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutToNodeInputSchema),z.lazy(() => ChoiceUpdateWithWhereUniqueWithoutToNodeInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => ChoiceUpdateManyWithWhereWithoutToNodeInputSchema),z.lazy(() => ChoiceUpdateManyWithWhereWithoutToNodeInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => ChoiceScalarWhereInputSchema),z.lazy(() => ChoiceScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
@@ -2624,9 +2624,9 @@ export const AccountCreateNestedOneWithoutReactionInputSchema: z.ZodType<Prisma.
   connect: z.lazy(() => AccountWhereUniqueInputSchema).optional()
 }).strict();
 
-export const ChoiceCreateNestedOneWithoutReactionInputSchema: z.ZodType<Prisma.ChoiceCreateNestedOneWithoutReactionInput> = z.object({
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutReactionInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutReactionInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => ChoiceCreateOrConnectWithoutReactionInputSchema).optional(),
+export const ChoiceCreateNestedOneWithoutReactionsInputSchema: z.ZodType<Prisma.ChoiceCreateNestedOneWithoutReactionsInput> = z.object({
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutReactionsInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutReactionsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => ChoiceCreateOrConnectWithoutReactionsInputSchema).optional(),
   connect: z.lazy(() => ChoiceWhereUniqueInputSchema).optional()
 }).strict();
 
@@ -2638,12 +2638,12 @@ export const AccountUpdateOneRequiredWithoutReactionNestedInputSchema: z.ZodType
   update: z.union([ z.lazy(() => AccountUpdateToOneWithWhereWithoutReactionInputSchema),z.lazy(() => AccountUpdateWithoutReactionInputSchema),z.lazy(() => AccountUncheckedUpdateWithoutReactionInputSchema) ]).optional(),
 }).strict();
 
-export const ChoiceUpdateOneRequiredWithoutReactionNestedInputSchema: z.ZodType<Prisma.ChoiceUpdateOneRequiredWithoutReactionNestedInput> = z.object({
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutReactionInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutReactionInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => ChoiceCreateOrConnectWithoutReactionInputSchema).optional(),
-  upsert: z.lazy(() => ChoiceUpsertWithoutReactionInputSchema).optional(),
+export const ChoiceUpdateOneRequiredWithoutReactionsNestedInputSchema: z.ZodType<Prisma.ChoiceUpdateOneRequiredWithoutReactionsNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutReactionsInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutReactionsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => ChoiceCreateOrConnectWithoutReactionsInputSchema).optional(),
+  upsert: z.lazy(() => ChoiceUpsertWithoutReactionsInputSchema).optional(),
   connect: z.lazy(() => ChoiceWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => ChoiceUpdateToOneWithWhereWithoutReactionInputSchema),z.lazy(() => ChoiceUpdateWithoutReactionInputSchema),z.lazy(() => ChoiceUncheckedUpdateWithoutReactionInputSchema) ]).optional(),
+  update: z.union([ z.lazy(() => ChoiceUpdateToOneWithWhereWithoutReactionsInputSchema),z.lazy(() => ChoiceUpdateWithoutReactionsInputSchema),z.lazy(() => ChoiceUncheckedUpdateWithoutReactionsInputSchema) ]).optional(),
 }).strict();
 
 export const NodeCreateNestedOneWithoutViewInputSchema: z.ZodType<Prisma.NodeCreateNestedOneWithoutViewInput> = z.object({
@@ -2844,9 +2844,9 @@ export const ChoiceCreateWithoutSuggestedByInputSchema: z.ZodType<Prisma.ChoiceC
   hidden: z.boolean().optional(),
   isCanon: z.boolean(),
   score: z.number().int(),
-  from: z.lazy(() => NodeCreateNestedOneWithoutChildChoicesInputSchema),
-  to: z.lazy(() => NodeCreateNestedOneWithoutParentChoicesInputSchema).optional(),
-  Reaction: z.lazy(() => ReactionCreateNestedManyWithoutChoiceInputSchema).optional()
+  fromNode: z.lazy(() => NodeCreateNestedOneWithoutChildChoicesInputSchema),
+  toNode: z.lazy(() => NodeCreateNestedOneWithoutParentChoicesInputSchema).optional(),
+  reactions: z.lazy(() => ReactionCreateNestedManyWithoutChoiceInputSchema).optional()
 }).strict();
 
 export const ChoiceUncheckedCreateWithoutSuggestedByInputSchema: z.ZodType<Prisma.ChoiceUncheckedCreateWithoutSuggestedByInput> = z.object({
@@ -2860,7 +2860,7 @@ export const ChoiceUncheckedCreateWithoutSuggestedByInputSchema: z.ZodType<Prism
   score: z.number().int(),
   fromNodeId: z.number().int(),
   toNodeId: z.number().int().optional().nullable(),
-  Reaction: z.lazy(() => ReactionUncheckedCreateNestedManyWithoutChoiceInputSchema).optional()
+  reactions: z.lazy(() => ReactionUncheckedCreateNestedManyWithoutChoiceInputSchema).optional()
 }).strict();
 
 export const ChoiceCreateOrConnectWithoutSuggestedByInputSchema: z.ZodType<Prisma.ChoiceCreateOrConnectWithoutSuggestedByInput> = z.object({
@@ -2885,8 +2885,8 @@ export const NodeCreateWithoutOwnerInputSchema: z.ZodType<Prisma.NodeCreateWitho
   pictureUnsafe: z.boolean().optional(),
   hidden: z.boolean().optional(),
   views: z.number().int(),
-  childChoices: z.lazy(() => ChoiceCreateNestedManyWithoutFromInputSchema).optional(),
-  parentChoices: z.lazy(() => ChoiceCreateNestedManyWithoutToInputSchema).optional(),
+  childChoices: z.lazy(() => ChoiceCreateNestedManyWithoutFromNodeInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceCreateNestedManyWithoutToNodeInputSchema).optional(),
   View: z.lazy(() => ViewCreateNestedManyWithoutNodeInputSchema).optional()
 }).strict();
 
@@ -2903,8 +2903,8 @@ export const NodeUncheckedCreateWithoutOwnerInputSchema: z.ZodType<Prisma.NodeUn
   pictureUnsafe: z.boolean().optional(),
   hidden: z.boolean().optional(),
   views: z.number().int(),
-  childChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  parentChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  childChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutFromNodeInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutToNodeInputSchema).optional(),
   View: z.lazy(() => ViewUncheckedCreateNestedManyWithoutNodeInputSchema).optional()
 }).strict();
 
@@ -2972,7 +2972,7 @@ export const NotificationCreateManyAccountInputEnvelopeSchema: z.ZodType<Prisma.
 
 export const ReactionCreateWithoutAccountInputSchema: z.ZodType<Prisma.ReactionCreateWithoutAccountInput> = z.object({
   like: z.boolean(),
-  choice: z.lazy(() => ChoiceCreateNestedOneWithoutReactionInputSchema)
+  choice: z.lazy(() => ChoiceCreateNestedOneWithoutReactionsInputSchema)
 }).strict();
 
 export const ReactionUncheckedCreateWithoutAccountInputSchema: z.ZodType<Prisma.ReactionUncheckedCreateWithoutAccountInput> = z.object({
@@ -3186,7 +3186,7 @@ export const AccountCreateOrConnectWithoutOwnedNodesInputSchema: z.ZodType<Prism
   create: z.union([ z.lazy(() => AccountCreateWithoutOwnedNodesInputSchema),z.lazy(() => AccountUncheckedCreateWithoutOwnedNodesInputSchema) ]),
 }).strict();
 
-export const ChoiceCreateWithoutFromInputSchema: z.ZodType<Prisma.ChoiceCreateWithoutFromInput> = z.object({
+export const ChoiceCreateWithoutFromNodeInputSchema: z.ZodType<Prisma.ChoiceCreateWithoutFromNodeInput> = z.object({
   slug: z.string(),
   action: z.string(),
   createdAt: z.coerce.date().optional(),
@@ -3194,12 +3194,12 @@ export const ChoiceCreateWithoutFromInputSchema: z.ZodType<Prisma.ChoiceCreateWi
   hidden: z.boolean().optional(),
   isCanon: z.boolean(),
   score: z.number().int(),
-  to: z.lazy(() => NodeCreateNestedOneWithoutParentChoicesInputSchema).optional(),
+  toNode: z.lazy(() => NodeCreateNestedOneWithoutParentChoicesInputSchema).optional(),
   suggestedBy: z.lazy(() => AccountCreateNestedOneWithoutSuggestedChoicesInputSchema).optional(),
-  Reaction: z.lazy(() => ReactionCreateNestedManyWithoutChoiceInputSchema).optional()
+  reactions: z.lazy(() => ReactionCreateNestedManyWithoutChoiceInputSchema).optional()
 }).strict();
 
-export const ChoiceUncheckedCreateWithoutFromInputSchema: z.ZodType<Prisma.ChoiceUncheckedCreateWithoutFromInput> = z.object({
+export const ChoiceUncheckedCreateWithoutFromNodeInputSchema: z.ZodType<Prisma.ChoiceUncheckedCreateWithoutFromNodeInput> = z.object({
   id: z.number().int().optional(),
   slug: z.string(),
   action: z.string(),
@@ -3210,20 +3210,20 @@ export const ChoiceUncheckedCreateWithoutFromInputSchema: z.ZodType<Prisma.Choic
   score: z.number().int(),
   toNodeId: z.number().int().optional().nullable(),
   suggestedByAccountId: z.number().int().optional().nullable(),
-  Reaction: z.lazy(() => ReactionUncheckedCreateNestedManyWithoutChoiceInputSchema).optional()
+  reactions: z.lazy(() => ReactionUncheckedCreateNestedManyWithoutChoiceInputSchema).optional()
 }).strict();
 
-export const ChoiceCreateOrConnectWithoutFromInputSchema: z.ZodType<Prisma.ChoiceCreateOrConnectWithoutFromInput> = z.object({
+export const ChoiceCreateOrConnectWithoutFromNodeInputSchema: z.ZodType<Prisma.ChoiceCreateOrConnectWithoutFromNodeInput> = z.object({
   where: z.lazy(() => ChoiceWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutFromInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutFromInputSchema) ]),
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutFromNodeInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutFromNodeInputSchema) ]),
 }).strict();
 
-export const ChoiceCreateManyFromInputEnvelopeSchema: z.ZodType<Prisma.ChoiceCreateManyFromInputEnvelope> = z.object({
-  data: z.union([ z.lazy(() => ChoiceCreateManyFromInputSchema),z.lazy(() => ChoiceCreateManyFromInputSchema).array() ]),
+export const ChoiceCreateManyFromNodeInputEnvelopeSchema: z.ZodType<Prisma.ChoiceCreateManyFromNodeInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => ChoiceCreateManyFromNodeInputSchema),z.lazy(() => ChoiceCreateManyFromNodeInputSchema).array() ]),
   skipDuplicates: z.boolean().optional()
 }).strict();
 
-export const ChoiceCreateWithoutToInputSchema: z.ZodType<Prisma.ChoiceCreateWithoutToInput> = z.object({
+export const ChoiceCreateWithoutToNodeInputSchema: z.ZodType<Prisma.ChoiceCreateWithoutToNodeInput> = z.object({
   slug: z.string(),
   action: z.string(),
   createdAt: z.coerce.date().optional(),
@@ -3231,12 +3231,12 @@ export const ChoiceCreateWithoutToInputSchema: z.ZodType<Prisma.ChoiceCreateWith
   hidden: z.boolean().optional(),
   isCanon: z.boolean(),
   score: z.number().int(),
-  from: z.lazy(() => NodeCreateNestedOneWithoutChildChoicesInputSchema),
+  fromNode: z.lazy(() => NodeCreateNestedOneWithoutChildChoicesInputSchema),
   suggestedBy: z.lazy(() => AccountCreateNestedOneWithoutSuggestedChoicesInputSchema).optional(),
-  Reaction: z.lazy(() => ReactionCreateNestedManyWithoutChoiceInputSchema).optional()
+  reactions: z.lazy(() => ReactionCreateNestedManyWithoutChoiceInputSchema).optional()
 }).strict();
 
-export const ChoiceUncheckedCreateWithoutToInputSchema: z.ZodType<Prisma.ChoiceUncheckedCreateWithoutToInput> = z.object({
+export const ChoiceUncheckedCreateWithoutToNodeInputSchema: z.ZodType<Prisma.ChoiceUncheckedCreateWithoutToNodeInput> = z.object({
   id: z.number().int().optional(),
   slug: z.string(),
   action: z.string(),
@@ -3247,16 +3247,16 @@ export const ChoiceUncheckedCreateWithoutToInputSchema: z.ZodType<Prisma.ChoiceU
   score: z.number().int(),
   fromNodeId: z.number().int(),
   suggestedByAccountId: z.number().int().optional().nullable(),
-  Reaction: z.lazy(() => ReactionUncheckedCreateNestedManyWithoutChoiceInputSchema).optional()
+  reactions: z.lazy(() => ReactionUncheckedCreateNestedManyWithoutChoiceInputSchema).optional()
 }).strict();
 
-export const ChoiceCreateOrConnectWithoutToInputSchema: z.ZodType<Prisma.ChoiceCreateOrConnectWithoutToInput> = z.object({
+export const ChoiceCreateOrConnectWithoutToNodeInputSchema: z.ZodType<Prisma.ChoiceCreateOrConnectWithoutToNodeInput> = z.object({
   where: z.lazy(() => ChoiceWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutToInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutToInputSchema) ]),
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutToNodeInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutToNodeInputSchema) ]),
 }).strict();
 
-export const ChoiceCreateManyToInputEnvelopeSchema: z.ZodType<Prisma.ChoiceCreateManyToInputEnvelope> = z.object({
-  data: z.union([ z.lazy(() => ChoiceCreateManyToInputSchema),z.lazy(() => ChoiceCreateManyToInputSchema).array() ]),
+export const ChoiceCreateManyToNodeInputEnvelopeSchema: z.ZodType<Prisma.ChoiceCreateManyToNodeInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => ChoiceCreateManyToNodeInputSchema),z.lazy(() => ChoiceCreateManyToNodeInputSchema).array() ]),
   skipDuplicates: z.boolean().optional()
 }).strict();
 
@@ -3329,36 +3329,36 @@ export const AccountUncheckedUpdateWithoutOwnedNodesInputSchema: z.ZodType<Prism
   Reaction: z.lazy(() => ReactionUncheckedUpdateManyWithoutAccountNestedInputSchema).optional()
 }).strict();
 
-export const ChoiceUpsertWithWhereUniqueWithoutFromInputSchema: z.ZodType<Prisma.ChoiceUpsertWithWhereUniqueWithoutFromInput> = z.object({
+export const ChoiceUpsertWithWhereUniqueWithoutFromNodeInputSchema: z.ZodType<Prisma.ChoiceUpsertWithWhereUniqueWithoutFromNodeInput> = z.object({
   where: z.lazy(() => ChoiceWhereUniqueInputSchema),
-  update: z.union([ z.lazy(() => ChoiceUpdateWithoutFromInputSchema),z.lazy(() => ChoiceUncheckedUpdateWithoutFromInputSchema) ]),
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutFromInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutFromInputSchema) ]),
+  update: z.union([ z.lazy(() => ChoiceUpdateWithoutFromNodeInputSchema),z.lazy(() => ChoiceUncheckedUpdateWithoutFromNodeInputSchema) ]),
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutFromNodeInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutFromNodeInputSchema) ]),
 }).strict();
 
-export const ChoiceUpdateWithWhereUniqueWithoutFromInputSchema: z.ZodType<Prisma.ChoiceUpdateWithWhereUniqueWithoutFromInput> = z.object({
+export const ChoiceUpdateWithWhereUniqueWithoutFromNodeInputSchema: z.ZodType<Prisma.ChoiceUpdateWithWhereUniqueWithoutFromNodeInput> = z.object({
   where: z.lazy(() => ChoiceWhereUniqueInputSchema),
-  data: z.union([ z.lazy(() => ChoiceUpdateWithoutFromInputSchema),z.lazy(() => ChoiceUncheckedUpdateWithoutFromInputSchema) ]),
+  data: z.union([ z.lazy(() => ChoiceUpdateWithoutFromNodeInputSchema),z.lazy(() => ChoiceUncheckedUpdateWithoutFromNodeInputSchema) ]),
 }).strict();
 
-export const ChoiceUpdateManyWithWhereWithoutFromInputSchema: z.ZodType<Prisma.ChoiceUpdateManyWithWhereWithoutFromInput> = z.object({
+export const ChoiceUpdateManyWithWhereWithoutFromNodeInputSchema: z.ZodType<Prisma.ChoiceUpdateManyWithWhereWithoutFromNodeInput> = z.object({
   where: z.lazy(() => ChoiceScalarWhereInputSchema),
-  data: z.union([ z.lazy(() => ChoiceUpdateManyMutationInputSchema),z.lazy(() => ChoiceUncheckedUpdateManyWithoutFromInputSchema) ]),
+  data: z.union([ z.lazy(() => ChoiceUpdateManyMutationInputSchema),z.lazy(() => ChoiceUncheckedUpdateManyWithoutFromNodeInputSchema) ]),
 }).strict();
 
-export const ChoiceUpsertWithWhereUniqueWithoutToInputSchema: z.ZodType<Prisma.ChoiceUpsertWithWhereUniqueWithoutToInput> = z.object({
+export const ChoiceUpsertWithWhereUniqueWithoutToNodeInputSchema: z.ZodType<Prisma.ChoiceUpsertWithWhereUniqueWithoutToNodeInput> = z.object({
   where: z.lazy(() => ChoiceWhereUniqueInputSchema),
-  update: z.union([ z.lazy(() => ChoiceUpdateWithoutToInputSchema),z.lazy(() => ChoiceUncheckedUpdateWithoutToInputSchema) ]),
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutToInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutToInputSchema) ]),
+  update: z.union([ z.lazy(() => ChoiceUpdateWithoutToNodeInputSchema),z.lazy(() => ChoiceUncheckedUpdateWithoutToNodeInputSchema) ]),
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutToNodeInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutToNodeInputSchema) ]),
 }).strict();
 
-export const ChoiceUpdateWithWhereUniqueWithoutToInputSchema: z.ZodType<Prisma.ChoiceUpdateWithWhereUniqueWithoutToInput> = z.object({
+export const ChoiceUpdateWithWhereUniqueWithoutToNodeInputSchema: z.ZodType<Prisma.ChoiceUpdateWithWhereUniqueWithoutToNodeInput> = z.object({
   where: z.lazy(() => ChoiceWhereUniqueInputSchema),
-  data: z.union([ z.lazy(() => ChoiceUpdateWithoutToInputSchema),z.lazy(() => ChoiceUncheckedUpdateWithoutToInputSchema) ]),
+  data: z.union([ z.lazy(() => ChoiceUpdateWithoutToNodeInputSchema),z.lazy(() => ChoiceUncheckedUpdateWithoutToNodeInputSchema) ]),
 }).strict();
 
-export const ChoiceUpdateManyWithWhereWithoutToInputSchema: z.ZodType<Prisma.ChoiceUpdateManyWithWhereWithoutToInput> = z.object({
+export const ChoiceUpdateManyWithWhereWithoutToNodeInputSchema: z.ZodType<Prisma.ChoiceUpdateManyWithWhereWithoutToNodeInput> = z.object({
   where: z.lazy(() => ChoiceScalarWhereInputSchema),
-  data: z.union([ z.lazy(() => ChoiceUpdateManyMutationInputSchema),z.lazy(() => ChoiceUncheckedUpdateManyWithoutToInputSchema) ]),
+  data: z.union([ z.lazy(() => ChoiceUpdateManyMutationInputSchema),z.lazy(() => ChoiceUncheckedUpdateManyWithoutToNodeInputSchema) ]),
 }).strict();
 
 export const ViewUpsertWithWhereUniqueWithoutNodeInputSchema: z.ZodType<Prisma.ViewUpsertWithWhereUniqueWithoutNodeInput> = z.object({
@@ -3399,7 +3399,7 @@ export const NodeCreateWithoutChildChoicesInputSchema: z.ZodType<Prisma.NodeCrea
   hidden: z.boolean().optional(),
   views: z.number().int(),
   owner: z.lazy(() => AccountCreateNestedOneWithoutOwnedNodesInputSchema).optional(),
-  parentChoices: z.lazy(() => ChoiceCreateNestedManyWithoutToInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceCreateNestedManyWithoutToNodeInputSchema).optional(),
   View: z.lazy(() => ViewCreateNestedManyWithoutNodeInputSchema).optional()
 }).strict();
 
@@ -3417,7 +3417,7 @@ export const NodeUncheckedCreateWithoutChildChoicesInputSchema: z.ZodType<Prisma
   hidden: z.boolean().optional(),
   views: z.number().int(),
   ownerId: z.number().int().optional().nullable(),
-  parentChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutToNodeInputSchema).optional(),
   View: z.lazy(() => ViewUncheckedCreateNestedManyWithoutNodeInputSchema).optional()
 }).strict();
 
@@ -3439,7 +3439,7 @@ export const NodeCreateWithoutParentChoicesInputSchema: z.ZodType<Prisma.NodeCre
   hidden: z.boolean().optional(),
   views: z.number().int(),
   owner: z.lazy(() => AccountCreateNestedOneWithoutOwnedNodesInputSchema).optional(),
-  childChoices: z.lazy(() => ChoiceCreateNestedManyWithoutFromInputSchema).optional(),
+  childChoices: z.lazy(() => ChoiceCreateNestedManyWithoutFromNodeInputSchema).optional(),
   View: z.lazy(() => ViewCreateNestedManyWithoutNodeInputSchema).optional()
 }).strict();
 
@@ -3457,7 +3457,7 @@ export const NodeUncheckedCreateWithoutParentChoicesInputSchema: z.ZodType<Prism
   hidden: z.boolean().optional(),
   views: z.number().int(),
   ownerId: z.number().int().optional().nullable(),
-  childChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  childChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutFromNodeInputSchema).optional(),
   View: z.lazy(() => ViewUncheckedCreateNestedManyWithoutNodeInputSchema).optional()
 }).strict();
 
@@ -3555,7 +3555,7 @@ export const NodeUpdateWithoutChildChoicesInputSchema: z.ZodType<Prisma.NodeUpda
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   views: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   owner: z.lazy(() => AccountUpdateOneWithoutOwnedNodesNestedInputSchema).optional(),
-  parentChoices: z.lazy(() => ChoiceUpdateManyWithoutToNestedInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceUpdateManyWithoutToNodeNestedInputSchema).optional(),
   View: z.lazy(() => ViewUpdateManyWithoutNodeNestedInputSchema).optional()
 }).strict();
 
@@ -3573,7 +3573,7 @@ export const NodeUncheckedUpdateWithoutChildChoicesInputSchema: z.ZodType<Prisma
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   views: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ownerId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  parentChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutToNodeNestedInputSchema).optional(),
   View: z.lazy(() => ViewUncheckedUpdateManyWithoutNodeNestedInputSchema).optional()
 }).strict();
 
@@ -3601,7 +3601,7 @@ export const NodeUpdateWithoutParentChoicesInputSchema: z.ZodType<Prisma.NodeUpd
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   views: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   owner: z.lazy(() => AccountUpdateOneWithoutOwnedNodesNestedInputSchema).optional(),
-  childChoices: z.lazy(() => ChoiceUpdateManyWithoutFromNestedInputSchema).optional(),
+  childChoices: z.lazy(() => ChoiceUpdateManyWithoutFromNodeNestedInputSchema).optional(),
   View: z.lazy(() => ViewUpdateManyWithoutNodeNestedInputSchema).optional()
 }).strict();
 
@@ -3619,7 +3619,7 @@ export const NodeUncheckedUpdateWithoutParentChoicesInputSchema: z.ZodType<Prism
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   views: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ownerId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  childChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  childChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutFromNodeNestedInputSchema).optional(),
   View: z.lazy(() => ViewUncheckedUpdateManyWithoutNodeNestedInputSchema).optional()
 }).strict();
 
@@ -3921,7 +3921,7 @@ export const AccountCreateOrConnectWithoutReactionInputSchema: z.ZodType<Prisma.
   create: z.union([ z.lazy(() => AccountCreateWithoutReactionInputSchema),z.lazy(() => AccountUncheckedCreateWithoutReactionInputSchema) ]),
 }).strict();
 
-export const ChoiceCreateWithoutReactionInputSchema: z.ZodType<Prisma.ChoiceCreateWithoutReactionInput> = z.object({
+export const ChoiceCreateWithoutReactionsInputSchema: z.ZodType<Prisma.ChoiceCreateWithoutReactionsInput> = z.object({
   slug: z.string(),
   action: z.string(),
   createdAt: z.coerce.date().optional(),
@@ -3929,12 +3929,12 @@ export const ChoiceCreateWithoutReactionInputSchema: z.ZodType<Prisma.ChoiceCrea
   hidden: z.boolean().optional(),
   isCanon: z.boolean(),
   score: z.number().int(),
-  from: z.lazy(() => NodeCreateNestedOneWithoutChildChoicesInputSchema),
-  to: z.lazy(() => NodeCreateNestedOneWithoutParentChoicesInputSchema).optional(),
+  fromNode: z.lazy(() => NodeCreateNestedOneWithoutChildChoicesInputSchema),
+  toNode: z.lazy(() => NodeCreateNestedOneWithoutParentChoicesInputSchema).optional(),
   suggestedBy: z.lazy(() => AccountCreateNestedOneWithoutSuggestedChoicesInputSchema).optional()
 }).strict();
 
-export const ChoiceUncheckedCreateWithoutReactionInputSchema: z.ZodType<Prisma.ChoiceUncheckedCreateWithoutReactionInput> = z.object({
+export const ChoiceUncheckedCreateWithoutReactionsInputSchema: z.ZodType<Prisma.ChoiceUncheckedCreateWithoutReactionsInput> = z.object({
   id: z.number().int().optional(),
   slug: z.string(),
   action: z.string(),
@@ -3948,9 +3948,9 @@ export const ChoiceUncheckedCreateWithoutReactionInputSchema: z.ZodType<Prisma.C
   suggestedByAccountId: z.number().int().optional().nullable()
 }).strict();
 
-export const ChoiceCreateOrConnectWithoutReactionInputSchema: z.ZodType<Prisma.ChoiceCreateOrConnectWithoutReactionInput> = z.object({
+export const ChoiceCreateOrConnectWithoutReactionsInputSchema: z.ZodType<Prisma.ChoiceCreateOrConnectWithoutReactionsInput> = z.object({
   where: z.lazy(() => ChoiceWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutReactionInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutReactionInputSchema) ]),
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutReactionsInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutReactionsInputSchema) ]),
 }).strict();
 
 export const AccountUpsertWithoutReactionInputSchema: z.ZodType<Prisma.AccountUpsertWithoutReactionInput> = z.object({
@@ -4003,18 +4003,18 @@ export const AccountUncheckedUpdateWithoutReactionInputSchema: z.ZodType<Prisma.
   notifications: z.lazy(() => NotificationUncheckedUpdateManyWithoutAccountNestedInputSchema).optional()
 }).strict();
 
-export const ChoiceUpsertWithoutReactionInputSchema: z.ZodType<Prisma.ChoiceUpsertWithoutReactionInput> = z.object({
-  update: z.union([ z.lazy(() => ChoiceUpdateWithoutReactionInputSchema),z.lazy(() => ChoiceUncheckedUpdateWithoutReactionInputSchema) ]),
-  create: z.union([ z.lazy(() => ChoiceCreateWithoutReactionInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutReactionInputSchema) ]),
+export const ChoiceUpsertWithoutReactionsInputSchema: z.ZodType<Prisma.ChoiceUpsertWithoutReactionsInput> = z.object({
+  update: z.union([ z.lazy(() => ChoiceUpdateWithoutReactionsInputSchema),z.lazy(() => ChoiceUncheckedUpdateWithoutReactionsInputSchema) ]),
+  create: z.union([ z.lazy(() => ChoiceCreateWithoutReactionsInputSchema),z.lazy(() => ChoiceUncheckedCreateWithoutReactionsInputSchema) ]),
   where: z.lazy(() => ChoiceWhereInputSchema).optional()
 }).strict();
 
-export const ChoiceUpdateToOneWithWhereWithoutReactionInputSchema: z.ZodType<Prisma.ChoiceUpdateToOneWithWhereWithoutReactionInput> = z.object({
+export const ChoiceUpdateToOneWithWhereWithoutReactionsInputSchema: z.ZodType<Prisma.ChoiceUpdateToOneWithWhereWithoutReactionsInput> = z.object({
   where: z.lazy(() => ChoiceWhereInputSchema).optional(),
-  data: z.union([ z.lazy(() => ChoiceUpdateWithoutReactionInputSchema),z.lazy(() => ChoiceUncheckedUpdateWithoutReactionInputSchema) ]),
+  data: z.union([ z.lazy(() => ChoiceUpdateWithoutReactionsInputSchema),z.lazy(() => ChoiceUncheckedUpdateWithoutReactionsInputSchema) ]),
 }).strict();
 
-export const ChoiceUpdateWithoutReactionInputSchema: z.ZodType<Prisma.ChoiceUpdateWithoutReactionInput> = z.object({
+export const ChoiceUpdateWithoutReactionsInputSchema: z.ZodType<Prisma.ChoiceUpdateWithoutReactionsInput> = z.object({
   slug: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   action: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4022,12 +4022,12 @@ export const ChoiceUpdateWithoutReactionInputSchema: z.ZodType<Prisma.ChoiceUpda
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isCanon: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   score: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  from: z.lazy(() => NodeUpdateOneRequiredWithoutChildChoicesNestedInputSchema).optional(),
-  to: z.lazy(() => NodeUpdateOneWithoutParentChoicesNestedInputSchema).optional(),
+  fromNode: z.lazy(() => NodeUpdateOneRequiredWithoutChildChoicesNestedInputSchema).optional(),
+  toNode: z.lazy(() => NodeUpdateOneWithoutParentChoicesNestedInputSchema).optional(),
   suggestedBy: z.lazy(() => AccountUpdateOneWithoutSuggestedChoicesNestedInputSchema).optional()
 }).strict();
 
-export const ChoiceUncheckedUpdateWithoutReactionInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateWithoutReactionInput> = z.object({
+export const ChoiceUncheckedUpdateWithoutReactionsInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateWithoutReactionsInput> = z.object({
   id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   slug: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   action: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4054,8 +4054,8 @@ export const NodeCreateWithoutViewInputSchema: z.ZodType<Prisma.NodeCreateWithou
   hidden: z.boolean().optional(),
   views: z.number().int(),
   owner: z.lazy(() => AccountCreateNestedOneWithoutOwnedNodesInputSchema).optional(),
-  childChoices: z.lazy(() => ChoiceCreateNestedManyWithoutFromInputSchema).optional(),
-  parentChoices: z.lazy(() => ChoiceCreateNestedManyWithoutToInputSchema).optional()
+  childChoices: z.lazy(() => ChoiceCreateNestedManyWithoutFromNodeInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceCreateNestedManyWithoutToNodeInputSchema).optional()
 }).strict();
 
 export const NodeUncheckedCreateWithoutViewInputSchema: z.ZodType<Prisma.NodeUncheckedCreateWithoutViewInput> = z.object({
@@ -4072,8 +4072,8 @@ export const NodeUncheckedCreateWithoutViewInputSchema: z.ZodType<Prisma.NodeUnc
   hidden: z.boolean().optional(),
   views: z.number().int(),
   ownerId: z.number().int().optional().nullable(),
-  childChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  parentChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  childChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutFromNodeInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceUncheckedCreateNestedManyWithoutToNodeInputSchema).optional()
 }).strict();
 
 export const NodeCreateOrConnectWithoutViewInputSchema: z.ZodType<Prisma.NodeCreateOrConnectWithoutViewInput> = z.object({
@@ -4105,8 +4105,8 @@ export const NodeUpdateWithoutViewInputSchema: z.ZodType<Prisma.NodeUpdateWithou
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   views: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   owner: z.lazy(() => AccountUpdateOneWithoutOwnedNodesNestedInputSchema).optional(),
-  childChoices: z.lazy(() => ChoiceUpdateManyWithoutFromNestedInputSchema).optional(),
-  parentChoices: z.lazy(() => ChoiceUpdateManyWithoutToNestedInputSchema).optional()
+  childChoices: z.lazy(() => ChoiceUpdateManyWithoutFromNodeNestedInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceUpdateManyWithoutToNodeNestedInputSchema).optional()
 }).strict();
 
 export const NodeUncheckedUpdateWithoutViewInputSchema: z.ZodType<Prisma.NodeUncheckedUpdateWithoutViewInput> = z.object({
@@ -4123,8 +4123,8 @@ export const NodeUncheckedUpdateWithoutViewInputSchema: z.ZodType<Prisma.NodeUnc
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   views: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   ownerId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  childChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  parentChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  childChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutFromNodeNestedInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutToNodeNestedInputSchema).optional()
 }).strict();
 
 export const ChoiceCreateManySuggestedByInputSchema: z.ZodType<Prisma.ChoiceCreateManySuggestedByInput> = z.object({
@@ -4186,9 +4186,9 @@ export const ChoiceUpdateWithoutSuggestedByInputSchema: z.ZodType<Prisma.ChoiceU
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isCanon: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   score: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  from: z.lazy(() => NodeUpdateOneRequiredWithoutChildChoicesNestedInputSchema).optional(),
-  to: z.lazy(() => NodeUpdateOneWithoutParentChoicesNestedInputSchema).optional(),
-  Reaction: z.lazy(() => ReactionUpdateManyWithoutChoiceNestedInputSchema).optional()
+  fromNode: z.lazy(() => NodeUpdateOneRequiredWithoutChildChoicesNestedInputSchema).optional(),
+  toNode: z.lazy(() => NodeUpdateOneWithoutParentChoicesNestedInputSchema).optional(),
+  reactions: z.lazy(() => ReactionUpdateManyWithoutChoiceNestedInputSchema).optional()
 }).strict();
 
 export const ChoiceUncheckedUpdateWithoutSuggestedByInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateWithoutSuggestedByInput> = z.object({
@@ -4202,7 +4202,7 @@ export const ChoiceUncheckedUpdateWithoutSuggestedByInputSchema: z.ZodType<Prism
   score: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   fromNodeId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   toNodeId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  Reaction: z.lazy(() => ReactionUncheckedUpdateManyWithoutChoiceNestedInputSchema).optional()
+  reactions: z.lazy(() => ReactionUncheckedUpdateManyWithoutChoiceNestedInputSchema).optional()
 }).strict();
 
 export const ChoiceUncheckedUpdateManyWithoutSuggestedByInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateManyWithoutSuggestedByInput> = z.object({
@@ -4230,8 +4230,8 @@ export const NodeUpdateWithoutOwnerInputSchema: z.ZodType<Prisma.NodeUpdateWitho
   pictureUnsafe: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   views: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  childChoices: z.lazy(() => ChoiceUpdateManyWithoutFromNestedInputSchema).optional(),
-  parentChoices: z.lazy(() => ChoiceUpdateManyWithoutToNestedInputSchema).optional(),
+  childChoices: z.lazy(() => ChoiceUpdateManyWithoutFromNodeNestedInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceUpdateManyWithoutToNodeNestedInputSchema).optional(),
   View: z.lazy(() => ViewUpdateManyWithoutNodeNestedInputSchema).optional()
 }).strict();
 
@@ -4248,8 +4248,8 @@ export const NodeUncheckedUpdateWithoutOwnerInputSchema: z.ZodType<Prisma.NodeUn
   pictureUnsafe: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   views: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  childChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  parentChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  childChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutFromNodeNestedInputSchema).optional(),
+  parentChoices: z.lazy(() => ChoiceUncheckedUpdateManyWithoutToNodeNestedInputSchema).optional(),
   View: z.lazy(() => ViewUncheckedUpdateManyWithoutNodeNestedInputSchema).optional()
 }).strict();
 
@@ -4319,7 +4319,7 @@ export const NotificationUncheckedUpdateManyWithoutAccountInputSchema: z.ZodType
 
 export const ReactionUpdateWithoutAccountInputSchema: z.ZodType<Prisma.ReactionUpdateWithoutAccountInput> = z.object({
   like: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  choice: z.lazy(() => ChoiceUpdateOneRequiredWithoutReactionNestedInputSchema).optional()
+  choice: z.lazy(() => ChoiceUpdateOneRequiredWithoutReactionsNestedInputSchema).optional()
 }).strict();
 
 export const ReactionUncheckedUpdateWithoutAccountInputSchema: z.ZodType<Prisma.ReactionUncheckedUpdateWithoutAccountInput> = z.object({
@@ -4334,7 +4334,7 @@ export const ReactionUncheckedUpdateManyWithoutAccountInputSchema: z.ZodType<Pri
   choiceId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const ChoiceCreateManyFromInputSchema: z.ZodType<Prisma.ChoiceCreateManyFromInput> = z.object({
+export const ChoiceCreateManyFromNodeInputSchema: z.ZodType<Prisma.ChoiceCreateManyFromNodeInput> = z.object({
   id: z.number().int().optional(),
   slug: z.string(),
   action: z.string(),
@@ -4347,7 +4347,7 @@ export const ChoiceCreateManyFromInputSchema: z.ZodType<Prisma.ChoiceCreateManyF
   suggestedByAccountId: z.number().int().optional().nullable()
 }).strict();
 
-export const ChoiceCreateManyToInputSchema: z.ZodType<Prisma.ChoiceCreateManyToInput> = z.object({
+export const ChoiceCreateManyToNodeInputSchema: z.ZodType<Prisma.ChoiceCreateManyToNodeInput> = z.object({
   id: z.number().int().optional(),
   slug: z.string(),
   action: z.string(),
@@ -4365,7 +4365,7 @@ export const ViewCreateManyNodeInputSchema: z.ZodType<Prisma.ViewCreateManyNodeI
   IP: z.string()
 }).strict();
 
-export const ChoiceUpdateWithoutFromInputSchema: z.ZodType<Prisma.ChoiceUpdateWithoutFromInput> = z.object({
+export const ChoiceUpdateWithoutFromNodeInputSchema: z.ZodType<Prisma.ChoiceUpdateWithoutFromNodeInput> = z.object({
   slug: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   action: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4373,12 +4373,12 @@ export const ChoiceUpdateWithoutFromInputSchema: z.ZodType<Prisma.ChoiceUpdateWi
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isCanon: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   score: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  to: z.lazy(() => NodeUpdateOneWithoutParentChoicesNestedInputSchema).optional(),
+  toNode: z.lazy(() => NodeUpdateOneWithoutParentChoicesNestedInputSchema).optional(),
   suggestedBy: z.lazy(() => AccountUpdateOneWithoutSuggestedChoicesNestedInputSchema).optional(),
-  Reaction: z.lazy(() => ReactionUpdateManyWithoutChoiceNestedInputSchema).optional()
+  reactions: z.lazy(() => ReactionUpdateManyWithoutChoiceNestedInputSchema).optional()
 }).strict();
 
-export const ChoiceUncheckedUpdateWithoutFromInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateWithoutFromInput> = z.object({
+export const ChoiceUncheckedUpdateWithoutFromNodeInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateWithoutFromNodeInput> = z.object({
   id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   slug: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   action: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4389,10 +4389,10 @@ export const ChoiceUncheckedUpdateWithoutFromInputSchema: z.ZodType<Prisma.Choic
   score: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   toNodeId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   suggestedByAccountId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  Reaction: z.lazy(() => ReactionUncheckedUpdateManyWithoutChoiceNestedInputSchema).optional()
+  reactions: z.lazy(() => ReactionUncheckedUpdateManyWithoutChoiceNestedInputSchema).optional()
 }).strict();
 
-export const ChoiceUncheckedUpdateManyWithoutFromInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateManyWithoutFromInput> = z.object({
+export const ChoiceUncheckedUpdateManyWithoutFromNodeInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateManyWithoutFromNodeInput> = z.object({
   id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   slug: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   action: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4405,7 +4405,7 @@ export const ChoiceUncheckedUpdateManyWithoutFromInputSchema: z.ZodType<Prisma.C
   suggestedByAccountId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
-export const ChoiceUpdateWithoutToInputSchema: z.ZodType<Prisma.ChoiceUpdateWithoutToInput> = z.object({
+export const ChoiceUpdateWithoutToNodeInputSchema: z.ZodType<Prisma.ChoiceUpdateWithoutToNodeInput> = z.object({
   slug: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   action: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4413,12 +4413,12 @@ export const ChoiceUpdateWithoutToInputSchema: z.ZodType<Prisma.ChoiceUpdateWith
   hidden: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isCanon: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   score: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  from: z.lazy(() => NodeUpdateOneRequiredWithoutChildChoicesNestedInputSchema).optional(),
+  fromNode: z.lazy(() => NodeUpdateOneRequiredWithoutChildChoicesNestedInputSchema).optional(),
   suggestedBy: z.lazy(() => AccountUpdateOneWithoutSuggestedChoicesNestedInputSchema).optional(),
-  Reaction: z.lazy(() => ReactionUpdateManyWithoutChoiceNestedInputSchema).optional()
+  reactions: z.lazy(() => ReactionUpdateManyWithoutChoiceNestedInputSchema).optional()
 }).strict();
 
-export const ChoiceUncheckedUpdateWithoutToInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateWithoutToInput> = z.object({
+export const ChoiceUncheckedUpdateWithoutToNodeInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateWithoutToNodeInput> = z.object({
   id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   slug: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   action: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4429,10 +4429,10 @@ export const ChoiceUncheckedUpdateWithoutToInputSchema: z.ZodType<Prisma.ChoiceU
   score: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   fromNodeId: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   suggestedByAccountId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  Reaction: z.lazy(() => ReactionUncheckedUpdateManyWithoutChoiceNestedInputSchema).optional()
+  reactions: z.lazy(() => ReactionUncheckedUpdateManyWithoutChoiceNestedInputSchema).optional()
 }).strict();
 
-export const ChoiceUncheckedUpdateManyWithoutToInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateManyWithoutToInput> = z.object({
+export const ChoiceUncheckedUpdateManyWithoutToNodeInputSchema: z.ZodType<Prisma.ChoiceUncheckedUpdateManyWithoutToNodeInput> = z.object({
   id: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   slug: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   action: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),

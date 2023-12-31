@@ -72,13 +72,13 @@ model Choice {
 
     score Int
 
-    from                 Node       @relation("childChoices", fields: [fromNodeId], references: [id])
+    fromNode             Node       @relation("childChoices", fields: [fromNodeId], references: [id])
     fromNodeId           Int
-    to                   Node?      @relation("parentChoices", fields: [toNodeId], references: [id])
+    toNode               Node?      @relation("parentChoices", fields: [toNodeId], references: [id])
     toNodeId             Int?
     suggestedBy          Account?   @relation(fields: [suggestedByAccountId], references: [id])
     suggestedByAccountId Int?
-    Reaction             Reaction[]
+    reactions            Reaction[]
 }
 
 model Feedback {
@@ -116,7 +116,7 @@ model Reaction {
     choice    Choice  @relation(fields: [choiceId], references: [id])
     choiceId  Int
 
-    @@unique([accountId, choiceId])
+    @@unique([accountId, choiceId], name: "reactionIdentifier")
 }
 
 model View {

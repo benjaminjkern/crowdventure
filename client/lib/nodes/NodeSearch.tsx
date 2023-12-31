@@ -9,7 +9,7 @@ const NodeSearch = ({
     onSelectNode,
     query: initQuery,
 }: {
-    readonly onSelectNode: (node: Node) => void;
+    readonly onSelectNode: (node: Node | null) => void;
     readonly query?: string;
 }) => {
     const [resultNodes, setResultNodes] = useState<Node[]>();
@@ -17,8 +17,8 @@ const NodeSearch = ({
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState(initQuery ?? "");
 
-    const selectNode = (node: Node) => {
-        setQuery(node.title);
+    const selectNode = (node: Node | null) => {
+        setQuery(node?.title ?? "");
         setOpen(false);
         onSelectNode(node);
     };
@@ -38,6 +38,7 @@ const NodeSearch = ({
             <CrowdventureTextInput
                 onBlur={() => setOpen(false)}
                 onChangeText={(newQuery) => {
+                    if (newQuery.length === 0) return selectNode(null);
                     setQuery(newQuery);
                     searchNodes(newQuery);
                 }}

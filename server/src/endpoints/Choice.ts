@@ -8,23 +8,40 @@ import authMiddleware from "+/auth";
 const prisma = new PrismaClient();
 
 export const choiceEndpoints = {
-    getChoicesForNode: defaultEndpointsFactory.build({
-        methods: ["get"],
-        input: z.object({
-            fromNodeId: z.string().transform((id) => parseInt(id)),
+    getChoicesForNode: defaultEndpointsFactory
+        .addMiddleware(authMiddleware)
+        .build({
+            methods: ["get"],
+            input: z.object({
+                fromNodeId: z.string().transform((id) => parseInt(id)),
+            }),
+            output: z.object({ choices: ChoiceSchema.array() }),
+            handler: async ({
+                input: { fromNodeId },
+                options: { loggedInAccount },
+            }) => {
+                return {
+                    choices: await prisma.choice.findMany({
+                        where: { fromNodeId },
+                        include: {
+                            suggestedBy: true,
+                            fromNode: {
+                                include: { owner: true },
+                            },
+                            toNode: {
+                                include: { owner: true },
+                            },
+                            reactions: {
+                                where: {
+                                    accountId: loggedInAccount?.id,
+                                },
+                                select: { like: true },
+                            },
+                        },
+                    }),
+                };
+            },
         }),
-        output: z.object({ choices: ChoiceSchema.array() }),
-        handler: async ({ input: { fromNodeId } }) => {
-            return {
-                choices: await prisma.choice.findMany({
-                    where: { fromNodeId },
-                    include: {
-                        suggestedBy: true,
-                    },
-                }),
-            };
-        },
-    }),
     createChoice: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
         methods: ["post"],
         input: z.object({
@@ -69,6 +86,12 @@ export const choiceEndpoints = {
                 },
                 include: {
                     suggestedBy: true,
+                    fromNode: {
+                        include: { owner: true },
+                    },
+                    toNode: {
+                        include: { owner: true },
+                    },
                 },
             });
 
@@ -113,11 +136,15 @@ export const choiceEndpoints = {
                 // TODO: Fix this when this happens
             }
 
+            if (!loggedInAccount) throw new Error("No permission!");
+
             if (
-                !loggedInAccount?.isAdmin &&
-                loggedInAccount?.id !== fromNode.ownerId &&
-                (choice.isCanon ||
-                    loggedInAccount?.id !== choice.suggestedByAccountId)
+                !(
+                    loggedInAccount.isAdmin ||
+                    loggedInAccount.id === fromNode.ownerId ||
+                    (!choice.isCanon &&
+                        loggedInAccount.id === choice.suggestedByAccountId)
+                )
             )
                 throw new Error("No permission!");
 
@@ -161,6 +188,12 @@ export const choiceEndpoints = {
                 data: choice,
                 include: {
                     suggestedBy: true,
+                    fromNode: {
+                        include: { owner: true },
+                    },
+                    toNode: {
+                        include: { owner: true },
+                    },
                 },
             });
         },
@@ -193,54 +226,84 @@ export const choiceEndpoints = {
             };
         },
     }),
-    // reactToChoice: defaultEndpointsFactory.build({
-    //     methods: ["post"],
-    //     input: z.object({
-    //         choiceID: z.string(),
-    //         like: z.boolean(),
-    //     }),
-    //     // @ts-ignore
-    //     output: z.number().int(),
-    //     handler: async ({ input: { choiceID, like } }) => {
-    //         const choice = await getChoice(choiceID);
-    //         if (!choice) throw new Error("That node doesnt exist!");
+    reactToChoice: defaultEndpointsFactory.addMiddleware(authMiddleware).build({
+        methods: ["post"],
+        input: z.object({
+            id: z.number(),
+            like: z.boolean().nullable(),
+        }),
+        output: z.object({ score: z.number().int() }),
+        handler: async ({
+            input: { id, like },
+            options: { loggedInAccount },
+        }) => {
+            const choice = await getChoice(id);
+            if (!choice) throw new Error("That choice doesnt exist!");
 
-    //         if (
-    //             !context.loggedInAccount?.isAdmin &&
-    //             !context.loggedInAccount?.screenName !== fromNode.owner &&
-    //             (choice.isCanon ||
-    //                 context.loggedInAccount?.screenName !== choice.suggestedBy)
-    //         )
-    //             throw new Error("No permission!");
+            if (!loggedInAccount) throw new Error("No permission!");
 
-    //         console.log(
-    //             `${context.loggedInAccount.screenName} is ${like ? 'liking' : 'disliking'} choice ${choice.ID} (${choice.action})`
-    //         );
+            console.log(
+                `${loggedInAccount.screenName} is ${
+                    like ? "liking" : "disliking"
+                } choice ${id} (${choice.action})`
+            );
 
-    //         const reaction = await databaseCalls.getReactionByAccountAndChoice(
-    //             args.accountScreenName,
-    //             args.choiceID
-    //         );
+            const reaction = await prisma.reaction.findUnique({
+                where: {
+                    reactionIdentifier: {
+                        accountId: loggedInAccount.id,
+                        choiceId: id,
+                    },
+                },
+            });
 
-    //         if (!reaction) {
-    //             await changeScore(choice, 1);
+            if (!reaction) {
+                if (like === null)
+                    throw new Error("No reaction existed! Ignoring.");
+                await prisma.reaction.create({
+                    data: { accountId: loggedInAccount.id, choiceId: id, like },
+                }); // TODO: Do this in a transaction just in case it gets fucked up
+                const newScore = choice.score + (like ? 1 : -1);
+                await prisma.choice.update({
+                    where: { id },
+                    data: { score: newScore },
+                });
+                return { score: newScore };
+            }
+            if (like === null) {
+                await prisma.reaction.delete({
+                    where: {
+                        reactionIdentifier: {
+                            accountId: loggedInAccount.id,
+                            choiceId: id,
+                        },
+                    },
+                });
+                const newScore = choice.score + (reaction.like ? -1 : 1);
+                await prisma.choice.update({
+                    where: { id },
+                    data: { score: newScore },
+                });
+                return { score: newScore };
+            }
 
-    //             return await databaseCalls.addReaction({
-    //                 ID: await uniqueID(databaseCalls.getReaction),
-    //                 account: args.accountScreenName,
-    //                 choice: args.choiceID,
-    //                 like: true,
-    //             });
-    //         } else if (reaction.like === true) {
-    //             await changeScore(choice, -1);
-    //             // replace with reaction.like === args.like
-    //             // If it already matches what you are trying to do, turn it off
-    //             return await databaseCalls.removeReaction(reaction.ID);
-    //         } else {
-    //             await changeScore(choice, 2);
-    //             reaction.like = true;
-    //             return await databaseCalls.addReaction(reaction);
-    //         }
-    //     },
-    // }),
+            if (reaction.like === like)
+                throw new Error("Not changing anything with the reaction.");
+            await prisma.reaction.update({
+                where: {
+                    reactionIdentifier: {
+                        accountId: loggedInAccount.id,
+                        choiceId: id,
+                    },
+                },
+                data: { like },
+            });
+            const newScore = choice.score + (like ? 2 : -2);
+            await prisma.choice.update({
+                where: { id },
+                data: { score: newScore },
+            });
+            return { score: newScore };
+        },
+    }),
 };

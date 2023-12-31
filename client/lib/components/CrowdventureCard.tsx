@@ -28,7 +28,7 @@ const CrowdventureCard = ({
     disabled,
     onImageError = () => {},
 }: {
-    readonly href: string;
+    readonly href?: string;
     readonly picture?: string;
     readonly pictureUnsafe?: boolean;
     readonly dropdownOptions: DropDownOption[];

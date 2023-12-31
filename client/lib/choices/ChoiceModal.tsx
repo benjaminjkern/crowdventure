@@ -1,41 +1,40 @@
-import React, { useContext, useState } from "react";
+import React, {
+    type Dispatch,
+    type SetStateAction,
+    useContext,
+    useState,
+} from "react";
 import CrowdventureCheckboxInput from "../components/CrowdventureCheckboxInput";
-import CrowdventureModal from "../components/CrowdventureModal";
+import CrowdventureModal, {
+    type ModalButton,
+} from "../components/CrowdventureModal";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { ModalContext } from "../modal";
 
 import NodeSearch from "../nodes/NodeSearch";
 import { UserContext } from "../user";
 import apiClient from "../apiClient";
-import { useInputForm } from "../hooks";
+import { type FormWithValues, useInputForm } from "../hooks";
 import { CreateNodeModal } from "../nodes/NodeModal";
 import { type Node, type Choice } from "@/types/models";
 
 const ChoiceModal = ({
-    fromNode,
-    choice,
+    choiceForm,
+    setToNode,
+    toNode,
+    modalTitle,
+    modalButtons,
 }: {
-    readonly fromNode: Node;
-    readonly choice?: Choice;
+    readonly choiceForm: FormWithValues<{ hidden: boolean; action: string }>;
+    readonly setToNode: Dispatch<SetStateAction<Node | null>>;
+    readonly toNode: Node | null;
+    readonly modalTitle: string;
+    readonly modalButtons: ModalButton[];
 }) => {
-    const [toNode, setToNode] = useState<Node | null>(choice?.toNode ?? null);
-
     const { user } = useContext(UserContext);
-    const { openModal, closeAllModals } = useContext(ModalContext);
 
     return (
-        <CrowdventureModal
-            modalButtons={[
-                {
-                    text: `${choice ? "Edit" : "Submit New"} Choice`,
-                    onClick: () => {
-                        if (choice) editChoice();
-                        else createChoice();
-                    },
-                },
-            ]}
-            modalTitle={`${choice ? "Editing" : "Suggesting New"} Choice`}
-        >
+        <CrowdventureModal modalButtons={modalButtons} modalTitle={modalTitle}>
             Action:
             <CrowdventureTextInput formElement={choiceForm.action} />
             Go to Page:
@@ -56,20 +55,23 @@ const ChoiceModal = ({
 
 export const CreateChoiceModal = ({
     fromNode,
+    onCreateChoice,
 }: {
     readonly fromNode: Node;
+    readonly onCreateChoice?: (c: Choice) => unknown;
 }) => {
     const choiceForm = useInputForm({
         action: "",
         hidden: false,
     });
+    const [toNode, setToNode] = useState<Node | null>(null);
     const { openModal, closeAllModals } = useContext(ModalContext);
-    const createChoice = async (toNode: Node) => {
+    const createChoice = async (newToNode: Node | null) => {
         const { action, hidden } = choiceForm.getValues(); // TODO: Unsure about having hidden be here in create choice
 
         if (!action) return choiceForm.setError("Action cannot be empty!");
 
-        if (!toNode)
+        if (!newToNode)
             return openModal(
                 <CreateNodeModal
                     featured={false}
@@ -85,41 +87,50 @@ export const CreateChoiceModal = ({
             {
                 fromNodeId: fromNode.id,
                 action,
-                toNodeId: toNode.id,
+                toNodeId: newToNode.id,
                 hidden,
             }
         );
         if (choiceResponse.status === "error")
             return choiceForm.setError(choiceResponse.error.message);
 
-        // TODO: DO stuff
-
+        onCreateChoice?.(choiceResponse.data);
         closeAllModals();
     };
     return (
         <ChoiceModal
+            choiceForm={choiceForm}
             modalButtons={[
                 {
                     text: `Suggest New Choice`,
-                    onClick: createChoice,
+                    onClick: () => createChoice(toNode),
                 },
             ]}
             modalTitle="Suggesting Choice"
+            setToNode={setToNode}
+            toNode={toNode}
         />
     );
 };
 
-export const EditChoiceModal = ({ choice }: { readonly choice: Choice }) => {
+export const EditChoiceModal = ({
+    choice,
+    onEditChoice,
+}: {
+    readonly choice: Choice;
+    readonly onEditChoice?: (c: Choice) => unknown;
+}) => {
     const choiceForm = useInputForm({
         action: choice.action,
         hidden: choice.hidden,
     });
+    const [toNode, setToNode] = useState<Node | null>(null);
     const { openModal, closeAllModals } = useContext(ModalContext);
-    const editChoice = async (toNode: Node) => {
+    const editChoice = async (newToNode: Node | null) => {
         const { action, hidden } = choiceForm.getValues();
         if (!action) return choiceForm.setError("Action cannot be empty!");
 
-        if (!toNode)
+        if (!newToNode)
             return openModal(
                 <CreateNodeModal
                     featured={false}
@@ -136,29 +147,28 @@ export const EditChoiceModal = ({ choice }: { readonly choice: Choice }) => {
                 id: choice.id,
                 action,
                 toNodeId: newToNode.id,
-                hidden: hidden as boolean,
+                hidden,
             }
         );
         if (choiceResponse.status === "error")
             return choiceForm.setError(choiceResponse.error.message);
 
-        // TODO: DO stuff
-
+        onEditChoice?.(choiceResponse.data);
         closeAllModals();
     };
 
     return (
         <ChoiceModal
+            choiceForm={choiceForm}
             modalButtons={[
                 {
-                    text: `${choice ? "Edit" : "Submit New"} Choice`,
-                    onClick: () => {
-                        if (choice) editChoice();
-                        else createChoice();
-                    },
+                    text: `Edit Choice`,
+                    onClick: () => editChoice(toNode),
                 },
             ]}
-            modalTitle={`${choice ? "Editing" : "Suggesting New"} Choice`}
+            modalTitle="Editing Choice"
+            setToNode={setToNode}
+            toNode={toNode}
         />
     );
 };

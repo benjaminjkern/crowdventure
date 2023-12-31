@@ -16,6 +16,11 @@ export const ChoiceSchema = ZodChoiceSchema.extend({
     fromNode: NodeSchema,
     suggestedBy: AccountSchema.nullable(),
     toNode: NodeSchema.nullable(),
+    reactions: z
+        .object({
+            like: z.boolean(),
+        })
+        .array(),
 });
 
 // type PaginatedResults<T> = {

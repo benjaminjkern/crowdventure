@@ -129,7 +129,7 @@ type DeleteAccountDeleteAccountResponse = {
     };
 };
 
-type GetChoiceGetChoicesForNodeInput = {
+type GetChoiceGetChoicesForNodeInput = {} & {
     fromNodeId: string;
 };
 
@@ -217,6 +217,9 @@ type GetChoiceGetChoicesForNodeResponse = {
                     totalSuggestionScore: number;
                 } | null;
             } | null;
+            reactions: {
+                like: boolean;
+            }[];
         }[];
     };
 } | {
@@ -316,6 +319,9 @@ type PostChoiceCreateChoiceResponse = {
                 totalSuggestionScore: number;
             } | null;
         } | null;
+        reactions: {
+            like: boolean;
+        }[];
     };
 } | {
     status: "error";
@@ -415,6 +421,9 @@ type PatchChoiceEditChoiceResponse = {
                 totalSuggestionScore: number;
             } | null;
         } | null;
+        reactions: {
+            like: boolean;
+        }[];
     };
 } | {
     status: "error";
@@ -431,6 +440,23 @@ type DeleteChoiceDeleteChoiceResponse = {
     status: "success";
     data: {
         deleted: boolean;
+    };
+} | {
+    status: "error";
+    error: {
+        message: string;
+    };
+};
+
+type PostChoiceReactToChoiceInput = {} & {
+    id: number;
+    like: boolean | null;
+};
+
+type PostChoiceReactToChoiceResponse = {
+    status: "success";
+    data: {
+        score: number;
     };
 } | {
     status: "error";
@@ -677,7 +703,7 @@ type GetNodeSearchNodesResponse = {
     };
 };
 
-export type Path = "/account/getAccount" | "/account/login" | "/account/createAccount" | "/account/editAccount" | "/account/deleteAccount" | "/choice/getChoicesForNode" | "/choice/createChoice" | "/choice/editChoice" | "/choice/deleteChoice" | "/node/featuredNodes" | "/node/getNode" | "/node/createNode" | "/node/editNode" | "/node/deleteNode" | "/node/searchNodes";
+export type Path = "/account/getAccount" | "/account/login" | "/account/createAccount" | "/account/editAccount" | "/account/deleteAccount" | "/choice/getChoicesForNode" | "/choice/createChoice" | "/choice/editChoice" | "/choice/deleteChoice" | "/choice/reactToChoice" | "/node/featuredNodes" | "/node/getNode" | "/node/createNode" | "/node/editNode" | "/node/deleteNode" | "/node/searchNodes";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
@@ -693,6 +719,7 @@ export interface Input extends Record<MethodPath, any> {
     "post /choice/createChoice": PostChoiceCreateChoiceInput;
     "patch /choice/editChoice": PatchChoiceEditChoiceInput;
     "delete /choice/deleteChoice": DeleteChoiceDeleteChoiceInput;
+    "post /choice/reactToChoice": PostChoiceReactToChoiceInput;
     "get /node/featuredNodes": GetNodeFeaturedNodesInput;
     "get /node/getNode": GetNodeGetNodeInput;
     "post /node/createNode": PostNodeCreateNodeInput;
@@ -711,6 +738,7 @@ export interface Response extends Record<MethodPath, any> {
     "post /choice/createChoice": PostChoiceCreateChoiceResponse;
     "patch /choice/editChoice": PatchChoiceEditChoiceResponse;
     "delete /choice/deleteChoice": DeleteChoiceDeleteChoiceResponse;
+    "post /choice/reactToChoice": PostChoiceReactToChoiceResponse;
     "get /node/featuredNodes": GetNodeFeaturedNodesResponse;
     "get /node/getNode": GetNodeGetNodeResponse;
     "post /node/createNode": PostNodeCreateNodeResponse;
@@ -719,9 +747,9 @@ export interface Response extends Record<MethodPath, any> {
     "get /node/searchNodes": GetNodeSearchNodesResponse;
 }
 
-export const jsonEndpoints = { "get /account/getAccount": true, "post /account/login": true, "post /account/createAccount": true, "patch /account/editAccount": true, "delete /account/deleteAccount": true, "get /choice/getChoicesForNode": true, "post /choice/createChoice": true, "patch /choice/editChoice": true, "delete /choice/deleteChoice": true, "get /node/featuredNodes": true, "get /node/getNode": true, "post /node/createNode": true, "patch /node/editNode": true, "delete /node/deleteNode": true, "get /node/searchNodes": true };
+export const jsonEndpoints = { "get /account/getAccount": true, "post /account/login": true, "post /account/createAccount": true, "patch /account/editAccount": true, "delete /account/deleteAccount": true, "get /choice/getChoicesForNode": true, "post /choice/createChoice": true, "patch /choice/editChoice": true, "delete /choice/deleteChoice": true, "post /choice/reactToChoice": true, "get /node/featuredNodes": true, "get /node/getNode": true, "post /node/createNode": true, "patch /node/editNode": true, "delete /node/deleteNode": true, "get /node/searchNodes": true };
 
-export const endpointTags = { "get /account/getAccount": [], "post /account/login": [], "post /account/createAccount": [], "patch /account/editAccount": [], "delete /account/deleteAccount": [], "get /choice/getChoicesForNode": [], "post /choice/createChoice": [], "patch /choice/editChoice": [], "delete /choice/deleteChoice": [], "get /node/featuredNodes": [], "get /node/getNode": [], "post /node/createNode": [], "patch /node/editNode": [], "delete /node/deleteNode": [], "get /node/searchNodes": [] };
+export const endpointTags = { "get /account/getAccount": [], "post /account/login": [], "post /account/createAccount": [], "patch /account/editAccount": [], "delete /account/deleteAccount": [], "get /choice/getChoicesForNode": [], "post /choice/createChoice": [], "patch /choice/editChoice": [], "delete /choice/deleteChoice": [], "post /choice/reactToChoice": [], "get /node/featuredNodes": [], "get /node/getNode": [], "post /node/createNode": [], "patch /node/editNode": [], "delete /node/deleteNode": [], "get /node/searchNodes": [] };
 
 export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[`${M} ${P}`]) => Promise<Response[`${M} ${P}`]>;
 

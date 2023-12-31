@@ -6,7 +6,8 @@ import LikeDislikeController from "../components/LikeDislikeController";
 import { UnsafeModeContext } from "../unsafeMode";
 import { UserContext } from "../user";
 import apiClient from "../apiClient";
-import ChoiceModal from "./ChoiceModal";
+import { ModalContext } from "../modal";
+import { EditChoiceModal } from "./ChoiceModal";
 import { type Choice } from "@/types/models";
 
 const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
@@ -14,6 +15,7 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
     const { user } = useContext(UserContext);
 
     const [choice, setChoice] = useState(initChoice);
+    const { openModal, closeAllModals } = useContext(ModalContext);
 
     useEffect(() => {
         setChoice(initChoice);
@@ -79,19 +81,26 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
     //     });
     // };
 
-    const makeCanon = () => {
-        apiClient.provide("patch", "/choice/editChoice", {
-            id: choice.id,
-            isCanon: true,
-        });
+    const reactToChoice = async (like: boolean) => {
+        const response = await apiClient.provide(
+            "post",
+            "/choice/reactToChoice",
+            {
+                id: choice.id,
+                like: like === choice.reactionStatus ? null : like,
+            }
+        );
     };
 
-    const makeNonCanon = () => {
-        apiClient.provide("patch", "/choice/editChoice", {
-            id: choice.id,
-            isCanon: false,
-        });
-        // TODO: Do stuff
+    const toggleCanon = async () => {
+        const response = await apiClient.provide(
+            "patch",
+            "/choice/editChoice",
+            {
+                id: choice.id,
+                isCanon: !choice.isCanon,
+            }
+        );
     };
 
     const deleteChoice = () => {
@@ -105,55 +114,49 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
     // 1. are in unsafeMode,
     // 2. suggested the action, or
     // 3. own the page and the action is canon
+
+    const choiceHidden = choice.hidden || (choice.suggestedBy?.hidden ?? false);
+    const toNodeHidden =
+        choice.toNode?.hidden || (choice.toNode?.owner?.hidden ?? false);
+    const userIsAdmin = user?.isAdmin ?? false;
+    const userOwnsChoice = user && choice.suggestedByAccountId === user.id;
+    const userOwnsFromNode = user && choice.fromNode.ownerId === user.id;
+    const userOwnsToNode = user && choice.toNode?.ownerId === user.id;
     if (
-        (choice.hidden || (choice.suggestedBy?.hidden ?? false)) &&
-        !(
-            unsafeMode ||
-            (user && choice.suggestedBy?.screenName === user.screenName) ||
-            (user &&
-                choice.isCanon &&
-                choice.fromNode.owner?.screenName === user.screenName)
-        )
+        choiceHidden &&
+        !unsafeMode &&
+        !userOwnsChoice &&
+        !(userOwnsFromNode && choice.isCanon)
     )
         return;
 
     const disabled =
-        !choice.toNode ||
-        ((choice.toNode.hidden || choice.toNode.owner.hidden) &&
-            (!user ||
-                (!unsafeMode &&
-                    choice.toNode.owner.screenName !== user.screenName)));
+        !choice.toNode || (toNodeHidden && !unsafeMode && !userOwnsToNode);
 
     return (
         <CrowdventureCard
             disabled={disabled}
             dropdownOptions={[
                 {
-                    disabled: !(
-                        user?.isAdmin ||
-                        user?.screenName === choice.fromNode.owner.screenName
-                    ),
+                    disabled: !(userIsAdmin || userOwnsFromNode),
                     text: `Make ${choice.isCanon ? "Nonc" : "C"}anon`,
-                    onClick: () =>
-                        choice.isCanon ? makeNonCanon() : makeCanon(),
+                    onClick: () => toggleCanon(),
                 },
                 {
+                    // TODO: Synchronize these permissions with the backend
                     disabled: !(
-                        user?.isAdmin ||
-                        user?.screenName === choice.fromNode.owner.screenName ||
-                        user?.screenName === choice.suggestedBy.screenName
+                        userIsAdmin ||
+                        userOwnsFromNode ||
+                        userOwnsChoice
                     ),
                     text: "Delete",
                     onClick: deleteChoice,
                 },
                 {
                     disabled: !(
-                        user?.isAdmin ||
-                        (choice.isCanon &&
-                            user?.screenName ===
-                                choice.fromNode.owner.screenName) ||
-                        (!choice.isCanon &&
-                            user?.screenName === choice.suggestedBy.screenName)
+                        userIsAdmin ||
+                        (choice.isCanon && userOwnsFromNode) ||
+                        (!choice.isCanon && userOwnsChoice)
                     ),
                     text: "Edit",
                     onClick: () => {
@@ -161,46 +164,52 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
                     },
                 },
             ]}
-            href={`/node/${choice.toNode.id}`}
+            href={choice.toNode ? `/node/${choice.toNode.id}` : undefined}
             overlayIcons={[
                 {
-                    active: choice.hidden || choice.suggestedBy.hidden,
+                    active: choiceHidden,
                     tooltip: (
                         <span>
                             This action is hidden, because it has been marked as
                             unsafe! You can see it because you are{" "}
                             {unsafeMode ? "in Unsafe Mode." : "the owner."}
+                            {/* TODO: Lol not specifying the owner of the choice or the node */}
                         </span>
                     ),
                     icon: faMinusCircle,
                     iconColor: "red",
                 },
                 {
-                    active:
-                        !choice.hidden &&
-                        choice.to &&
-                        (choice.to.hidden || choice.to.owner.hidden) &&
-                        !disabled,
+                    active: toNodeHidden,
                     tooltip: (
                         <span>
                             This page this action leads to is hidden, because it
-                            has been marked as unsafe! You will be able to see
-                            it because you are{" "}
-                            {unsafeMode ? "in Unsafe Mode." : "the owner."}
+                            has been marked as unsafe!
+                            {!disabled ? (
+                                ""
+                            ) : (
+                                <>
+                                    {" "}
+                                    You will be able to see it because you are{" "}
+                                    {unsafeMode
+                                        ? "in Unsafe Mode."
+                                        : "the owner."}
+                                </>
+                            )}
                         </span>
                     ),
                     icon: faMinusCircle,
                     iconColor: "red",
                 },
             ]}
-            text={choice.action} // { active, tooltip, icon, iconColor }
+            text={choice.action}
         >
             <LikeDislikeController
                 count={choice.score}
-                dislike={dislike}
-                disliked={choice.disliked}
-                like={like}
-                liked={choice.liked}
+                disliked={choice.reactionStatus === false}
+                liked={choice.reactionStatus === true}
+                onClickDislike={() => reactToChoice(false)}
+                onClickLike={() => reactToChoice(true)}
             />
             <span style={{ gap: 5, marginTop: 5 }}>
                 Suggested By:{" "}
