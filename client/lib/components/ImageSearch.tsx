@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faWarning } from "@fortawesome/free-solid-svg-icons";
 import { UnsafeModeContext } from "../unsafeMode";
 import { UserContext } from "../user";
 import { splitIntoRows } from "../utils";
 import CrowdventureTextInput from "./CrowdventureTextInput";
 import TooltipWrapper from "./TooltipWrapper";
 import UnsafeImage from "./UnsafeImage";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWarning } from "@fortawesome/free-solid-svg-icons";
 
 // Should hide this
 const BING_API_KEY = "8300cebe5f0d452a9ccb4bca67af4659";

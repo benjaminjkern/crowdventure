@@ -31,10 +31,11 @@ export const choiceEndpoints = {
             fromNodeId: z.number(),
             toNodeId: z.number(),
             action: z.string().min(1),
+            hidden: z.boolean().optional(),
         }),
         output: ChoiceSchema,
         handler: async ({
-            input: { fromNodeId, toNodeId, action },
+            input: { fromNodeId, toNodeId, action, hidden },
             options: { loggedInAccount },
         }) => {
             if (!loggedInAccount)
@@ -62,7 +63,7 @@ export const choiceEndpoints = {
                     action,
                     toNodeId: toNode.id,
                     suggestedByAccountId: account.id,
-                    hidden: flagContent(action) || undefined, // Let users know if its flagged
+                    hidden: flagContent(action) || hidden, // Let users know if its flagged
                     score: 0,
                     isCanon: account.id === fromNode.ownerId,
                 },

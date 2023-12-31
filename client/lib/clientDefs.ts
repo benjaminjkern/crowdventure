@@ -230,6 +230,7 @@ type PostChoiceCreateChoiceInput = {} & {
     fromNodeId: number;
     toNodeId: number;
     action: string;
+    hidden?: boolean | undefined;
 };
 
 type PostChoiceCreateChoiceResponse = {

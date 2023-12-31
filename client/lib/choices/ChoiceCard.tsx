@@ -6,6 +6,7 @@ import LikeDislikeController from "../components/LikeDislikeController";
 import { UnsafeModeContext } from "../unsafeMode";
 import { UserContext } from "../user";
 import apiClient from "../apiClient";
+import ChoiceModal from "./ChoiceModal";
 import { type Choice } from "@/types/models";
 
 const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
@@ -105,12 +106,13 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
     // 2. suggested the action, or
     // 3. own the page and the action is canon
     if (
-        (choice.hidden || choice.suggestedBy.hidden) &&
+        (choice.hidden || (choice.suggestedBy?.hidden ?? false)) &&
         !(
             unsafeMode ||
-            choice.suggestedBy.screenName === user?.screenName ||
-            (choice.isCanon &&
-                choice.fromNode.owner.screenName === user?.screenName)
+            (user && choice.suggestedBy?.screenName === user.screenName) ||
+            (user &&
+                choice.isCanon &&
+                choice.fromNode.owner?.screenName === user.screenName)
         )
     )
         return;
@@ -155,14 +157,7 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
                     ),
                     text: "Edit",
                     onClick: () => {
-                        openModal(
-                            <EditChoiceModal
-                                choice={choice}
-                                close={() => showModal(undefined)}
-                                fromNode={node}
-                                loggedInAs={loggedInAs}
-                            />
-                        );
+                        openModal(<EditChoiceModal choice={choice} />);
                     },
                 },
             ]}

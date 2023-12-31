@@ -19,82 +19,9 @@ const ChoiceModal = ({
     readonly choice?: Choice;
 }) => {
     const [toNode, setToNode] = useState<Node | null>(choice?.toNode ?? null);
-    const choiceForm = useInputForm({
-        action: choice?.action ?? "",
-        hidden: choice?.action ?? false,
-    });
 
     const { user } = useContext(UserContext);
     const { openModal, closeAllModals } = useContext(ModalContext);
-
-    const verifyForm = () => {
-        if (!choiceForm.getValues().action) {
-            choiceForm.setError("Action cannot be empty!");
-            return false;
-        }
-        return true;
-    };
-
-    const openNodeModal = (callback: (n: Node) => unknown) => {
-        openModal(
-            <CreateNodeModal
-                featured={false}
-                onCreateNode={callback}
-                pictureURL={fromNode.pictureURL}
-                pictureUnsafe={fromNode.pictureUnsafe}
-            />
-        );
-    };
-
-    const editChoice = async (newToNode = toNode) => {
-        if (!choice) return;
-        if (!verifyForm()) return;
-
-        if (!newToNode) return openNodeModal(editChoice);
-
-        const { action, hidden } = choiceForm.getValues();
-
-        const choiceResponse = await apiClient.provide(
-            "patch",
-            "/choice/editChoice",
-            {
-                id: choice.id,
-                action,
-                toNodeId: newToNode.id,
-                hidden: hidden as boolean,
-            }
-        );
-        if (choiceResponse.status === "error")
-            return choiceForm.setError(choiceResponse.error.message);
-
-        // TODO: DO stuff
-
-        closeAllModals();
-    };
-
-    const createChoice = async (newToNode = toNode) => {
-        if (!verifyForm()) return;
-
-        if (!newToNode) return openNodeModal(createChoice);
-
-        const { action } = choiceForm.getValues();
-
-        const choiceResponse = await apiClient.provide(
-            "post",
-            "/choice/createChoice",
-            {
-                fromNodeId: fromNode.id,
-                action,
-                toNodeId: newToNode.id,
-            }
-        );
-        if (choiceResponse.status === "error")
-            return choiceForm.setError(choiceResponse.error.message);
-
-        // TODO: DO stuff
-
-        closeAllModals();
-    };
 
     return (
         <CrowdventureModal
@@ -127,4 +54,111 @@ const ChoiceModal = ({
     );
 };
 
-export default ChoiceModal;
+export const CreateChoiceModal = ({
+    fromNode,
+}: {
+    readonly fromNode: Node;
+}) => {
+    const choiceForm = useInputForm({
+        action: "",
+        hidden: false,
+    });
+    const { openModal, closeAllModals } = useContext(ModalContext);
+    const createChoice = async (toNode: Node) => {
+        const { action, hidden } = choiceForm.getValues(); // TODO: Unsure about having hidden be here in create choice
+
+        if (!action) return choiceForm.setError("Action cannot be empty!");
+
+        if (!toNode)
+            return openModal(
+                <CreateNodeModal
+                    featured={false}
+                    onCreateNode={createChoice}
+                    pictureURL={fromNode.pictureURL}
+                    pictureUnsafe={fromNode.pictureUnsafe}
+                />
+            );
+
+        const choiceResponse = await apiClient.provide(
+            "post",
+            "/choice/createChoice",
+            {
+                fromNodeId: fromNode.id,
+                action,
+                toNodeId: toNode.id,
+                hidden,
+            }
+        );
+        if (choiceResponse.status === "error")
+            return choiceForm.setError(choiceResponse.error.message);
+
+        // TODO: DO stuff
+
+        closeAllModals();
+    };
+    return (
+        <ChoiceModal
+            modalButtons={[
+                {
+                    text: `Suggest New Choice`,
+                    onClick: createChoice,
+                },
+            ]}
+            modalTitle="Suggesting Choice"
+        />
+    );
+};
+
+export const EditChoiceModal = ({ choice }: { readonly choice: Choice }) => {
+    const choiceForm = useInputForm({
+        action: choice.action,
+        hidden: choice.hidden,
+    });
+    const { openModal, closeAllModals } = useContext(ModalContext);
+    const editChoice = async (toNode: Node) => {
+        const { action, hidden } = choiceForm.getValues();
+        if (!action) return choiceForm.setError("Action cannot be empty!");
+
+        if (!toNode)
+            return openModal(
+                <CreateNodeModal
+                    featured={false}
+                    onCreateNode={editChoice}
+                    pictureURL={choice.fromNode.pictureURL}
+                    pictureUnsafe={choice.fromNode.pictureUnsafe}
+                />
+            );
+
+        const choiceResponse = await apiClient.provide(
+            "patch",
+            "/choice/editChoice",
+            {
+                id: choice.id,
+                action,
+                toNodeId: newToNode.id,
+                hidden: hidden as boolean,
+            }
+        );
+        if (choiceResponse.status === "error")
+            return choiceForm.setError(choiceResponse.error.message);
+
+        // TODO: DO stuff
+
+        closeAllModals();
+    };
+
+    return (
+        <ChoiceModal
+            modalButtons={[
+                {
+                    text: `${choice ? "Edit" : "Submit New"} Choice`,
+                    onClick: () => {
+                        if (choice) editChoice();
+                        else createChoice();
+                    },
+                },
+            ]}
+            modalTitle={`${choice ? "Editing" : "Suggesting New"} Choice`}
+        />
+    );
+};
