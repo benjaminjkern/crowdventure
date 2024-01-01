@@ -21,75 +21,25 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
         setChoice(initChoice);
     }, [initChoice]);
 
-    // const like = () => {
-    //     if (!user) return;
-
-    //     const oChoice = { ...choice };
-
-    //     choice.dislikedBy = choice.dislikedBy.filter(
-    //         (account) => account.screenName !== user?.screenName
-    //     );
-
-    //     if (choice.liked)
-    //         choice.likedBy = choice.likedBy.filter(
-    //             (account) => account.screenName !== user?.screenName
-    //         );
-    //     else choice.likedBy.push(user);
-
-    //     setChoice({ ...choice });
-
-    //     apiClient.provide("post", "")
-
-    //     mutationCall(
-    //         "likeSuggestion",
-    //         { ID: 0 },
-    //         {
-    //             accountScreenName: user.screenName,
-    //             choiceID: choice.ID,
-    //         }
-    //     ).catch(() => {
-    //         setChoice(oChoice);
-    //     });
-    // };
-
-    // const dislike = () => {
-    //     if (!user) return;
-
-    //     const oChoice = { ...choice };
-
-    //     choice.likedBy = choice.likedBy.filter(
-    //         (account) => account.screenName !== user?.screenName
-    //     );
-
-    //     if (choice.disliked)
-    //         choice.dislikedBy = choice.dislikedBy.filter(
-    //             (account) => account.screenName !== user?.screenName
-    //         );
-    //     else choice.dislikedBy.push(user);
-
-    //     setChoice({ ...choice });
-
-    //     mutationCall(
-    //         "dislikeSuggestion",
-    //         { ID: 0 },
-    //         {
-    //             accountScreenName: user.screenName,
-    //             choiceID: choice.ID,
-    //         }
-    //     ).catch(() => {
-    //         setChoice(oChoice);
-    //     });
-    // };
+    const reactionStatus = choice.reactions[0]?.like ?? null;
 
     const reactToChoice = async (like: boolean) => {
+        const nextLike = like === reactionStatus ? null : like;
         const response = await apiClient.provide(
             "post",
             "/choice/reactToChoice",
             {
                 id: choice.id,
-                like: like === choice.reactionStatus ? null : like,
+                like: nextLike,
             }
         );
+        if (response.status === "error") return alert(response.error.message);
+
+        setChoice({
+            ...choice,
+            score: response.data.score,
+            reactions: nextLike !== null ? [{ like: nextLike }] : [],
+        });
     };
 
     const toggleCanon = async () => {
@@ -164,7 +114,7 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
                     },
                 },
             ]}
-            href={choice.toNode ? `/node/${choice.toNode.id}` : undefined}
+            href={choice.toNode ? `/node/${choice.toNode.slug}` : undefined}
             overlayIcons={[
                 {
                     active: choiceHidden,
@@ -206,8 +156,8 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
         >
             <LikeDislikeController
                 count={choice.score}
-                disliked={choice.reactionStatus === false}
-                liked={choice.reactionStatus === true}
+                disliked={reactionStatus === false}
+                liked={reactionStatus === true}
                 onClickDislike={() => reactToChoice(false)}
                 onClickLike={() => reactToChoice(true)}
             />

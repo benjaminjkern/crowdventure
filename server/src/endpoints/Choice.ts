@@ -92,6 +92,12 @@ export const choiceEndpoints = {
                     toNode: {
                         include: { owner: true },
                     },
+                    reactions: {
+                        where: {
+                            accountId: loggedInAccount?.id,
+                        },
+                        select: { like: true },
+                    },
                 },
             });
 
@@ -193,6 +199,12 @@ export const choiceEndpoints = {
                     },
                     toNode: {
                         include: { owner: true },
+                    },
+                    reactions: {
+                        where: {
+                            accountId: loggedInAccount?.id,
+                        },
+                        select: { like: true },
                     },
                 },
             });

@@ -1,4 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import {
+    type Dispatch,
+    type SetStateAction,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 import { UnsafeModeContext } from "./unsafeMode";
 import { type Node } from "@/types/models";
 
@@ -28,5 +34,8 @@ export const useSafeGuardedNodes = (
             });
         });
     });
-    return unsafeMode ? nodesLists.allNodes : nodesLists.safeNodes;
+    return [
+        unsafeMode ? nodesLists.allNodes : nodesLists.safeNodes,
+        setNodesLists,
+    ] as [Node[], Dispatch<SetStateAction<SafeGuardedNodesLists>>];
 };

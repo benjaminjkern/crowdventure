@@ -1,7 +1,7 @@
 import React from "react";
 
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import NodePreview from "./NodePreview";
+import NodeCard from "./NodeCard";
 import { type Node } from "@/types/models";
 
 const NodeViewer = ({ nodes }: { readonly nodes: Node[] }) => (
@@ -13,7 +13,7 @@ const NodeViewer = ({ nodes }: { readonly nodes: Node[] }) => (
             }}
         >
             {nodes.map((node, i) => (
-                <NodePreview key={i} node={node} />
+                <NodeCard key={i} node={node} />
             ))}
         </Masonry>
     </ResponsiveMasonry>

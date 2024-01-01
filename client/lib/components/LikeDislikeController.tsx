@@ -21,10 +21,11 @@ const LikeDislikeController = ({
         <span style={{ gap: 5 }}>
             <CrowdventureButton
                 buttonType="icon"
-                icon={faThumbsUp}
-                onClick={onClickLike}
+                icon={faThumbsDown}
+                onClick={onClickDislike}
                 requireSignedIn
                 style={{
+                    backgroundColor: "transparent",
                     color: disliked ? "red" : unsafeMode ? "white" : "black",
                 }}
             >
@@ -33,10 +34,11 @@ const LikeDislikeController = ({
             {` ${count} `}
             <CrowdventureButton
                 buttonType="icon"
-                icon={faThumbsDown}
-                onClick={onClickDislike}
+                icon={faThumbsUp}
+                onClick={onClickLike}
                 requireSignedIn
                 style={{
+                    backgroundColor: "transparent",
                     color: liked ? "green" : unsafeMode ? "white" : "black",
                 }}
             >

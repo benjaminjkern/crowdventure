@@ -11,7 +11,13 @@ import { type Node } from "@/types/models";
 
 // import ConfirmModal from "./Modals/ConfirmModal";
 
-const NodePreview = ({ node }: { readonly node: Node }) => {
+const NodeCard = ({
+    node,
+    onDeleteNode,
+}: {
+    readonly node: Node;
+    readonly onDeleteNode?: () => void;
+}) => {
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
@@ -33,6 +39,9 @@ const NodePreview = ({ node }: { readonly node: Node }) => {
         const response = await apiClient.provide("delete", "/node/deleteNode", {
             id: String(node.id),
         });
+        if (response.status === "error") return alert(response.error.message);
+
+        onDeleteNode?.();
     };
 
     const userOwnsNode = user?.id === node.ownerId;
@@ -122,4 +131,4 @@ const NodePreview = ({ node }: { readonly node: Node }) => {
     );
 };
 
-export default NodePreview;
+export default NodeCard;

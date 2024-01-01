@@ -5,9 +5,9 @@ import { UserContext } from "../user";
 import AccountPreview from "../accounts/AccountPreview";
 import { ModalContext } from "../modal";
 import ChoiceCard from "../choices/ChoiceCard";
-import ChoiceModal from "../choices/ChoiceModal";
 import { PaletteContext } from "../colorPalette";
 import ParagraphText from "../components/ParagraphText";
+import { CreateChoiceModal } from "../choices/ChoiceModal";
 import { EditNodeModal } from "./NodeModal";
 import { type Choice, type Node } from "@/types/models";
 
@@ -15,10 +15,12 @@ const NodeSidebar = ({
     node,
     setNode,
     choices,
+    setChoices,
 }: {
     readonly node: Node;
     readonly setNode: Dispatch<SetStateAction<Node>>;
     readonly choices: Choice[];
+    readonly setChoices: Dispatch<SetStateAction<Choice[]>>;
 }) => {
     const { user } = useContext(UserContext);
     const { openModal } = useContext(ModalContext);
@@ -84,15 +86,19 @@ const NodeSidebar = ({
                 ) : null}
                 <CrowdventureButton
                     onClick={() => {
-                        openModal(<ChoiceModal fromNode={node} />);
+                        openModal(
+                            <CreateChoiceModal
+                                fromNode={node}
+                                onCreateChoice={(choice) => {
+                                    setChoices([...choices, choice]);
+                                }}
+                            />
+                        );
                     }}
                     requireSignedIn
                 >
                     Suggest New Choice
                 </CrowdventureButton>
-                {/* <CrowdventureButton category="error" onClick={reportNode}>
-                    Report Page
-                </CrowdventureButton> */}
             </div>
             <hr />
             {choices.length > 0 ? (

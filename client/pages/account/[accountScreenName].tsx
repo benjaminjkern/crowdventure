@@ -41,8 +41,9 @@ const AccountPage = ({
     accountNodes: initAccountNodes,
 }: AccountPageProps) => {
     const [account, setAccount] = useState(initAccount);
-    const accountNodes = useSafeGuardedNodes(initAccountNodes, () =>
-        getAccountNodes(account.id, true)
+    const [accountNodes, setAccountNodes] = useSafeGuardedNodes(
+        initAccountNodes,
+        () => getAccountNodes(account.id, true)
     );
     const { user } = useContext(UserContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
@@ -81,7 +82,27 @@ const AccountPage = ({
 
             {loggedInAsThisUser ? (
                 <CrowdventureButton
-                    onClick={() => openModal(<CreateNodeModal featured />)}
+                    onClick={() =>
+                        openModal(
+                            <CreateNodeModal
+                                featured
+                                onCreateNode={(node) => {
+                                    setAccountNodes((currAccountNodes) => ({
+                                        safeNodes: node.hidden
+                                            ? currAccountNodes.safeNodes
+                                            : [
+                                                  ...currAccountNodes.safeNodes,
+                                                  node,
+                                              ],
+                                        allNodes: [
+                                            ...currAccountNodes.allNodes,
+                                            node,
+                                        ],
+                                    }));
+                                }}
+                            />
+                        )
+                    }
                     style={{ marginTop: 10 }}
                 >
                     Create a New Adventure!

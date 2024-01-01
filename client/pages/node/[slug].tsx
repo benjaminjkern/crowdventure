@@ -9,7 +9,6 @@ import LoadingBox from "+/lib/components/LoadingBox";
 import PictureModal from "+/lib/components/PictureModal";
 import { ModalContext } from "+/lib/modal";
 import { UnsafeModeContext } from "+/lib/unsafeMode";
-import { deepCopy } from "+/lib/utils";
 import { PaletteContext } from "+/lib/colorPalette";
 import { useMediaQuery, useWindowSize } from "+/lib/hooks";
 import NodeSidebar from "+/lib/nodes/NodeSidebar";
@@ -27,16 +26,18 @@ type NodePageProps = {
     readonly choices: Choice[];
 };
 
-const NodePage = ({ node: initNode, choices }: NodePageProps) => {
+const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { openModal } = useContext(ModalContext);
     const { lightBackgroundColor } = useContext(PaletteContext);
 
-    const [node, setNode] = useState(deepCopy(initNode)); // TODO: ?????
+    const [node, setNode] = useState(initNode);
+    const [choices, setChoices] = useState(initChoices);
 
     useEffect(() => {
-        setNode(deepCopy(initNode));
-    }, [initNode]);
+        setNode(initNode);
+        setChoices(initChoices);
+    }, [initNode, initChoices]);
 
     const { effectiveContentWidth } = useWindowSize();
 
@@ -160,7 +161,12 @@ const NodePage = ({ node: initNode, choices }: NodePageProps) => {
                         Go back!
                     </CrowdventureButton>
                 )}
-                <NodeSidebar choices={choices} node={node} setNode={setNode} />
+                <NodeSidebar
+                    choices={choices}
+                    node={node}
+                    setChoices={setChoices}
+                    setNode={setNode}
+                />
             </div>
         </div>
     );

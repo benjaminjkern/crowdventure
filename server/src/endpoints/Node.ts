@@ -1,9 +1,9 @@
 import { flagContent, scramble, uniqueID } from "../utils.js";
 import { defaultEndpointsFactory } from "express-zod-api";
 import { z } from "zod";
-import { AccountSchema, NodeSchema } from "+/schemas.js";
+import { NodeSchema } from "+/schemas.js";
 import authMiddleware from "+/auth.js";
-import { getAccount, getNode, getNodeBySlug } from "+/commonQueries.js";
+import { getNode, getNodeBySlug } from "+/commonQueries.js";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 

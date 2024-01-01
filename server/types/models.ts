@@ -11,6 +11,7 @@ export type Choice = PrismaChoice & {
     suggestedBy: Account | null;
     toNode: Node | null;
     fromNode: Node;
-    reactionStatus?: boolean;
+
+    reactions: { like: boolean }[];
 };
 export type Notification = PrismaNotification;

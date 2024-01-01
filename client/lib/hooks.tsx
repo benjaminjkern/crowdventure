@@ -105,7 +105,7 @@ export const useInputForm = <T extends FormType>(
     const [error, setError] = useState("");
     const [rerender, setRerender] = useState({}); // eslint-disable-line @typescript-eslint/no-unused-vars
     const form = {
-        getValues: () => ref.current,
+        getValues: () => ref.current ?? initialForm,
         getError: () =>
             error ? <span style={{ color: "red" }}>{error}</span> : null,
         setError,

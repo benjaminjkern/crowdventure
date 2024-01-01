@@ -221,7 +221,7 @@ export const EditNodeModal = ({
 }) => {
     const nodeForm = useInputForm({
         title: node.title,
-        content: node.title,
+        content: node.content,
         pictureURL: node.pictureURL ?? "",
         pictureUnsafe: node.pictureUnsafe,
         hidden: node.hidden,

@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import React, { type ReactNode, useContext, useState } from "react";
+import React, {
+    type ReactNode,
+    useContext,
+    useState,
+    type CSSProperties,
+} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { type IconProp } from "@fortawesome/fontawesome-svg-core";
 import { PaletteContext } from "../colorPalette";
@@ -59,7 +64,6 @@ const CrowdventureCard = ({
             }}
         />
     ) : null;
-
     return (
         <EventListener event="hover">
             {([hover, listener]) => (
@@ -77,39 +81,53 @@ const CrowdventureCard = ({
                     }}
                 >
                     <div style={{ overflow: "hidden", borderRadius: 5 }}>
-                        <Link
-                            href={href}
-                            {...listener}
-                            style={{
+                        {(() => {
+                            const style: CSSProperties = {
                                 color: disabled ? "grey" : undefined,
                                 pointerEvents: disabled ? "none" : "auto",
                                 justifyContent: "center",
                                 flex: 1,
-                            }}
-                        >
-                            <div style={{ width: "100%" }}>
-                                {picture && showImage ? (
+                            };
+                            const inside = (
+                                <div style={{ width: "100%" }}>
+                                    {picture && showImage ? (
+                                        <div
+                                            style={{
+                                                backgroundColor: "white",
+                                                // loggedInAs && loggedInAs.unsafeMode
+                                                //     ? palette[5]
+                                                //     : "white",
+                                                padding: "1px",
+                                                position: "relative",
+                                                aspectRatio: 16 / 9,
+                                            }}
+                                        >
+                                            {cardImage}
+                                        </div>
+                                    ) : null}
                                     <div
                                         style={{
-                                            backgroundColor: "white",
-                                            // loggedInAs && loggedInAs.unsafeMode
-                                            //     ? palette[5]
-                                            //     : "white",
-                                            padding: "1px",
-                                            position: "relative",
-                                            aspectRatio: 16 / 9,
+                                            padding: 20,
+                                            textAlign: "center",
                                         }}
                                     >
-                                        {cardImage}
+                                        {text}
                                     </div>
-                                ) : null}
-                                <div
-                                    style={{ padding: 20, textAlign: "center" }}
-                                >
-                                    {text}
                                 </div>
-                            </div>
-                        </Link>
+                            );
+                            if (href && !disabled)
+                                return (
+                                    <Link
+                                        href={href}
+                                        {...listener}
+                                        style={style}
+                                    >
+                                        {inside}
+                                    </Link>
+                                );
+
+                            return <span style={style}>{inside}</span>;
+                        })()}
 
                         <div
                             style={{
