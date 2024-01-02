@@ -5,6 +5,7 @@ import React, {
     type InputHTMLAttributes,
     type TextareaHTMLAttributes,
     type ChangeEvent,
+    type KeyboardEvent,
 } from "react";
 import { PaletteContext } from "../colorPalette";
 import { type FormElement } from "../hooks";
@@ -15,12 +16,14 @@ const CrowdventureTextInput = ({
     onChangeText = () => {},
     style = {},
     rows = 1,
+    onPressEnter = () => {},
     ...props
 }: {
     readonly formElement?: FormElement;
-    readonly onChangeText?: (e: string) => void;
+    readonly onChangeText?: (s: string) => void;
     readonly style?: CSSProperties;
     readonly rows?: number;
+    readonly onPressEnter?: () => void;
 } & (
     | DetailedHTMLProps<
           TextareaHTMLAttributes<HTMLTextAreaElement>,
@@ -40,6 +43,11 @@ const CrowdventureTextInput = ({
                     ) => {
                         onChangeText(e.target.value);
                         if (formElement) formElement.setValue(e.target.value);
+                    },
+                    onKeyDown: (
+                        e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
+                    ) => {
+                        if (e.key === "Enter") onPressEnter();
                     },
                     style: {
                         backgroundColor: focus

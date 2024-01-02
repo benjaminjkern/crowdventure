@@ -115,7 +115,19 @@ const AccountPage = ({
             </div>
 
             <h3>Featured Stories:</h3>
-            <NodeViewer nodes={accountNodes} />
+            <NodeViewer
+                nodes={accountNodes}
+                onDeleteNode={(nodeId) => {
+                    setAccountNodes((currAccountNodes) => ({
+                        safeNodes: currAccountNodes.safeNodes.filter(
+                            (accountNode) => accountNode.id !== nodeId
+                        ),
+                        allNodes: currAccountNodes.allNodes.filter(
+                            (accountNode) => accountNode.id !== nodeId
+                        ),
+                    }));
+                }}
+            />
         </>
     );
 };

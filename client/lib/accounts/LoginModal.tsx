@@ -41,6 +41,7 @@ const LoginModal = () => {
             Password:
             <CrowdventureTextInput
                 formElement={loginForm.password}
+                onPressEnter={login}
                 type="password"
             />
             {loginForm.getError()}

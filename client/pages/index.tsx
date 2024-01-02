@@ -25,8 +25,9 @@ type HomePageProps = {
 
 const HomePage = ({ featuredNodes: initFeaturedNodes }: HomePageProps) => {
     const { openModal } = useContext(ModalContext);
-    const featuredNodes = useSafeGuardedNodes(initFeaturedNodes, () =>
-        getFeaturedNodes(true)
+    const [featuredNodes, setFeaturedNodes] = useSafeGuardedNodes(
+        initFeaturedNodes,
+        () => getFeaturedNodes(true)
     );
 
     return (
@@ -41,7 +42,19 @@ const HomePage = ({ featuredNodes: initFeaturedNodes }: HomePageProps) => {
             <hr />
 
             <h3>Featured Stories:</h3>
-            <NodeViewer nodes={featuredNodes} />
+            <NodeViewer
+                nodes={featuredNodes}
+                onDeleteNode={(nodeId) => {
+                    setFeaturedNodes((currAccountNodes) => ({
+                        safeNodes: currAccountNodes.safeNodes.filter(
+                            (accountNode) => accountNode.id !== nodeId
+                        ),
+                        allNodes: currAccountNodes.allNodes.filter(
+                            (accountNode) => accountNode.id !== nodeId
+                        ),
+                    }));
+                }}
+            />
         </>
     );
 };

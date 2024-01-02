@@ -39,7 +39,6 @@ const UserProvider = ({ children }: { readonly children: ReactNode }) => {
     };
 
     useEffect(() => {
-        console.log("RUN");
         const savedUserJSON = localStorage.getItem("savedUser");
         if (!savedUserJSON) {
             setUser(null);

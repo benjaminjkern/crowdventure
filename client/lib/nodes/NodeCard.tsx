@@ -19,7 +19,7 @@ const NodeCard = ({
     readonly onDeleteNode?: () => void;
 }) => {
     const { user } = useContext(UserContext);
-    const { openModal } = useContext(ModalContext);
+    const { openModal, closeModal } = useContext(ModalContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
 
     const hideNode = async (hidden: boolean) => {
@@ -42,6 +42,7 @@ const NodeCard = ({
         if (response.status === "error") return alert(response.error.message);
 
         onDeleteNode?.();
+        closeModal();
     };
 
     const userOwnsNode = user?.id === node.ownerId;
@@ -50,13 +51,12 @@ const NodeCard = ({
         <CrowdventureCard
             dropdownOptions={[
                 {
-                    active: Boolean(user),
+                    active: user?.isAdmin || userOwnsNode,
                     onClick: () => featureNode(!node.featured),
-                    disabled: !(user?.isAdmin || userOwnsNode),
                     text: `${node.featured ? "Un-f" : "F"}eature page`,
                 },
                 {
-                    active: Boolean(user),
+                    active: user?.isAdmin || userOwnsNode,
                     onClick: () => {
                         openModal(
                             <ConfirmModal
@@ -70,20 +70,11 @@ const NodeCard = ({
                             </ConfirmModal>
                         );
                     },
-                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                    disabled: !(user?.isAdmin || userOwnsNode),
                     text: "Delete",
                 },
-                // {
-                //     active: user,
-                //     disabled: true,
-                //     text: "Make Private",
-                // },
-                { active: Boolean(user) },
-                // { onClick: () => reportNode(), text: "Report" },
-                { active: user?.isAdmin },
+                { active: user?.isAdmin ?? false },
                 {
-                    active: user?.isAdmin,
+                    active: user?.isAdmin ?? false,
                     onClick: () => hideNode(!node.hidden),
                     text: `${node.hidden ? "Un-h" : "H"}ide page`,
                 },
