@@ -215,7 +215,7 @@ export const nodeEndpoints = {
         handler: async ({ input: { query } }) => {
             return {
                 nodes: await prisma.node.findMany({
-                    where: { title: { contains: query } },
+                    where: { title: { contains: query, mode: "insensitive" } },
                     take: 10, // TODO: Paginate this
                     include: { owner: true },
                 }),

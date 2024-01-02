@@ -12,9 +12,10 @@ const NodeSearch = ({
     readonly onSelectNode: (node: Node | null) => void;
     readonly query?: string;
 }) => {
-    const [resultNodes, setResultNodes] = useState<Node[]>();
+    const [resultNodes, setResultNodes] = useState<Node[]>([]);
 
     const [open, setOpen] = useState(false);
+    const [fetching, setFetching] = useState(false);
     const [query, setQuery] = useState(initQuery ?? "");
 
     const selectNode = (node: Node | null) => {
@@ -24,14 +25,14 @@ const NodeSearch = ({
     };
 
     const searchNodes = useDebounce(async (newQuery: string) => {
+        setFetching(true);
         const response = await apiClient.provide("get", "/node/searchNodes", {
             query: newQuery,
         });
         if (response.status === "error") return alert(response.error.message);
+        setFetching(false);
         setResultNodes(response.data.nodes);
     });
-
-    if (!resultNodes) return <div>Loading...</div>;
 
     return (
         <>
@@ -39,22 +40,29 @@ const NodeSearch = ({
                 onBlur={() => setOpen(false)}
                 onChangeText={(newQuery) => {
                     if (newQuery.length === 0) return selectNode(null);
+                    setOpen(true);
                     setQuery(newQuery);
                     searchNodes(newQuery);
                 }}
-                onFocus={() => setOpen(true)}
+                onFocus={() => {
+                    if (query.length > 0) setOpen(true);
+                }}
                 placeholder="(Leave Empty to Create New Page)"
                 value={query}
             />
             {open ? (
-                <div style={{ maxHeight: 200 }}>
-                    {resultNodes.map((node, i) => (
-                        <div key={i} onClick={() => selectNode(node)}>
-                            {node.title}
-                            <AccountPreview account={node.owner} />
-                        </div>
-                    ))}
-                </div>
+                fetching ? (
+                    <>Loading...</>
+                ) : (
+                    <div style={{ maxHeight: 200 }}>
+                        {resultNodes.map((node, i) => (
+                            <div key={i} onClick={() => selectNode(node)}>
+                                {node.title}
+                                <AccountPreview account={node.owner} />
+                            </div>
+                        ))}
+                    </div>
+                )
             ) : null}
         </>
     );

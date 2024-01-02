@@ -39,12 +39,12 @@ const validateInputs = (
 ) => {
     const { title, content } = nodeForm.getValues();
     if (!title) {
-        nodeForm.setError("Content cannot be empty!");
+        nodeForm.setError("Title cannot be empty!");
         return false;
     }
 
     if (!content) {
-        nodeForm.setError("Title cannot be empty!");
+        nodeForm.setError("Content cannot be empty!");
         return false;
     }
 

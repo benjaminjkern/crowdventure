@@ -34,7 +34,6 @@ module.exports = {
         "no-plusplus": ["warn", { allowForLoopAfterthoughts: true }],
         "prefer-named-capture-group": "warn",
         "react/no-unescaped-entities": "warn",
-        "no-alert": "warn",
         "react/jsx-sort-props": "warn",
 
         // Import ones that are turned off for some reason
@@ -140,6 +139,7 @@ module.exports = {
         "react/require-default-props": "off",
         "import/no-unresolved": "off",
         "import/prefer-default-export": "off",
+        "no-alert": "off",
 
         /*
          * Doesnt exist here but it does exist in eslint-plugin-unicorn
