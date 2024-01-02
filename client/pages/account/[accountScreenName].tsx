@@ -127,6 +127,20 @@ const AccountPage = ({
                         ),
                     }));
                 }}
+                onEditNode={(node) => {
+                    setAccountNodes((currAccountNodes) => ({
+                        safeNodes: currAccountNodes.safeNodes.map(
+                            (currNode) => {
+                                if (currNode.id !== node.id) return currNode;
+                                return node;
+                            }
+                        ),
+                        allNodes: currAccountNodes.allNodes.map((currNode) => {
+                            if (currNode.id !== node.id) return currNode;
+                            return node;
+                        }),
+                    }));
+                }}
             />
         </>
     );

@@ -45,13 +45,25 @@ const HomePage = ({ featuredNodes: initFeaturedNodes }: HomePageProps) => {
             <NodeViewer
                 nodes={featuredNodes}
                 onDeleteNode={(nodeId) => {
-                    setFeaturedNodes((currAccountNodes) => ({
-                        safeNodes: currAccountNodes.safeNodes.filter(
-                            (accountNode) => accountNode.id !== nodeId
+                    setFeaturedNodes((currNodes) => ({
+                        safeNodes: currNodes.safeNodes.filter(
+                            (currNode) => currNode.id !== nodeId
                         ),
-                        allNodes: currAccountNodes.allNodes.filter(
-                            (accountNode) => accountNode.id !== nodeId
+                        allNodes: currNodes.allNodes.filter(
+                            (currNode) => currNode.id !== nodeId
                         ),
+                    }));
+                }}
+                onEditNode={(node) => {
+                    setFeaturedNodes((currNodes) => ({
+                        safeNodes: currNodes.safeNodes.map((currNode) => {
+                            if (currNode.id !== node.id) return currNode;
+                            return node;
+                        }),
+                        allNodes: currNodes.allNodes.map((currNode) => {
+                            if (currNode.id !== node.id) return currNode;
+                            return node;
+                        }),
                     }));
                 }}
             />

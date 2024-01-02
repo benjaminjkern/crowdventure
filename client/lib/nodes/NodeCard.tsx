@@ -14,9 +14,11 @@ import { type Node } from "@/types/models";
 const NodeCard = ({
     node,
     onDeleteNode,
+    onEditNode,
 }: {
     readonly node: Node;
     readonly onDeleteNode?: () => void;
+    readonly onEditNode?: (newNode: Node) => void;
 }) => {
     const { user } = useContext(UserContext);
     const { openModal, closeModal } = useContext(ModalContext);
@@ -27,6 +29,8 @@ const NodeCard = ({
             id: node.id,
             hidden,
         });
+        if (response.status === "error") return alert(response.error.message);
+        onEditNode?.(response.data);
     };
 
     const featureNode = async (featured: boolean) => {
@@ -34,6 +38,8 @@ const NodeCard = ({
             id: node.id,
             featured,
         });
+        if (response.status === "error") return alert(response.error.message);
+        onEditNode?.(response.data);
     };
     const deleteNode = async () => {
         const response = await apiClient.provide("delete", "/node/deleteNode", {

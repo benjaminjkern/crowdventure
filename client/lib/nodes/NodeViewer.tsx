@@ -7,9 +7,11 @@ import { type Node } from "@/types/models";
 const NodeViewer = ({
     nodes,
     onDeleteNode,
+    onEditNode,
 }: {
     readonly nodes: Node[];
     readonly onDeleteNode: (id: number) => void;
+    readonly onEditNode: (node: Node) => void;
 }) => (
     <ResponsiveMasonry columnsCountBreakPoints={{ 0: 1, 700: 2, 1000: 3 }}>
         <Masonry
@@ -23,6 +25,7 @@ const NodeViewer = ({
                     key={i}
                     node={node}
                     onDeleteNode={() => onDeleteNode(node.id)}
+                    onEditNode={onEditNode}
                 />
             ))}
         </Masonry>
