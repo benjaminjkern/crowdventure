@@ -5,15 +5,37 @@ import React, {
     useState,
 } from "react";
 import Link from "next/link";
-import { PaletteContext } from "../colorPalette";
+import { createUseStyles } from "react-jss";
+import { PaletteContext, type PaletteType } from "../colorPalette";
 import CloseButton from "../components/CloseButton";
 import { UserContext } from "../user";
-import EventListener from "../components/EventListener";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import { useDebounce } from "../hooks";
 import apiClient from "../apiClient";
 import NotificationButton from "./NotificationButton";
 import { type Notification } from "@/types/models";
+
+const useStyles = createUseStyles(
+    ({ backgroundColor, rootColor }: PaletteType) => ({
+        notificationClass: {
+            backgroundColor: backgroundColor[0],
+            borderRadius: 10,
+            boxShadow: `0 0 3px ${rootColor[1]}`,
+            padding: 10,
+            gap: 10,
+            cursor: "pointer",
+            flexDirection: "column",
+            paddingLeft: 70, // Make space for buttons
+            paddingRight: 30,
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            minHeight: 70,
+            "&:hover": {
+                boxShadow: `0 0 6px ${rootColor[0]}`,
+            },
+        },
+    })
+);
 
 const CrowdventureNotification = ({
     notification,
@@ -57,47 +79,29 @@ const CrowdventureNotification = ({
 
     const deleteNotification = () => {};
 
+    const { notificationClass } = useStyles();
+
     return (
         <div style={{ position: "relative" }}>
-            <EventListener event="hover">
-                {([hover, hoverListener]) => (
-                    <Link
-                        href={notification.link || "#"}
-                        onClick={() => seeNotification(true)}
-                        {...hoverListener}
-                        style={{
-                            backgroundColor: backgroundColor[0],
-                            borderRadius: 10,
-                            boxShadow: hover
-                                ? `0 0 6px ${rootColor[0]}`
-                                : `0 0 3px ${rootColor[1]}`,
-                            padding: 10,
-                            gap: 10,
-                            cursor: "pointer",
-                            flexDirection: "column",
-                            paddingLeft: 70, // Make space for buttons
-                            paddingRight: 30,
-                            justifyContent: "space-between",
-                            alignItems: "flex-start",
-                            minHeight: 70,
-                        }}
-                    >
-                        <span style={{ justifyContent: "flex-start" }}>
-                            {notification.content}
-                        </span>
+            <Link
+                className={notificationClass}
+                href={notification.link || "#"}
+                onClick={() => seeNotification(true)}
+            >
+                <span style={{ justifyContent: "flex-start" }}>
+                    {notification.content}
+                </span>
 
-                        <span
-                            style={{
-                                justifyContent: "flex-start",
-                                fontSize: DEFAULT_TEXT_SIZE * 0.8,
-                                color: mutedTextColor,
-                            }}
-                        >
-                            {new Date(notification.createdAt).toLocaleString()}
-                        </span>
-                    </Link>
-                )}
-            </EventListener>
+                <span
+                    style={{
+                        justifyContent: "flex-start",
+                        fontSize: DEFAULT_TEXT_SIZE * 0.8,
+                        color: mutedTextColor,
+                    }}
+                >
+                    {new Date(notification.createdAt).toLocaleString()}
+                </span>
+            </Link>
             {/* These are hovering over the link so that they don't interfere with it with styles or events*/}
             <NotificationButton
                 onClick={() => seeNotification(!seen)}

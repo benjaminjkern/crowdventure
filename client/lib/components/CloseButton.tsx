@@ -2,7 +2,7 @@ import React, { type MouseEventHandler, type CSSProperties } from "react";
 import { createUseStyles } from "react-jss";
 
 const useStyles = createUseStyles({
-    closeButton: {
+    closeButtonStyle: {
         color: "#888", // TODO: Set colors
         cursor: "pointer",
         textShadow:
@@ -20,9 +20,9 @@ const CloseButton = ({
     readonly onClick: MouseEventHandler;
     readonly style?: CSSProperties;
 }) => {
-    const { closeButton } = useStyles();
+    const { closeButtonStyle } = useStyles();
     return (
-        <span className={closeButton} onClick={onClick} style={style}>
+        <span className={closeButtonStyle} onClick={onClick} style={style}>
             X
         </span>
     );

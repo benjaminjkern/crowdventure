@@ -24,7 +24,7 @@ module.exports = {
             },
         ],
         // "no-unused-vars": "warn",
-        "react/forbid-component-props": ["error", { forbid: ["className"] }],
+        "react/forbid-component-props": "off",
         "max-len": ["warn", { code: 120 }],
         curly: ["error", "multi"],
         "react/jsx-no-constructed-context-values": "warn",
