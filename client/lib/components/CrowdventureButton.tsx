@@ -2,19 +2,11 @@ import React, { useContext, type CSSProperties, type ReactNode } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { type IconProp } from "@fortawesome/fontawesome-svg-core";
-import styled from "styled-jss";
 import { PaletteContext } from "../colorPalette";
 import { UserContext } from "../user";
+import EventListener, { type EventListenerPair } from "./EventListener";
 
 const DEFAULT_ICON_SIZE = 20;
-
-const IconButtonSpan = styled("span")(({ margin, theme }) => ({
-    backgroundColor: hover ? darkColor : lightColor,
-    color: backgroundColor[2],
-    width: DEFAULT_ICON_SIZE * iconScale,
-    height: DEFAULT_ICON_SIZE * iconScale,
-    borderRadius: DEFAULT_ICON_SIZE * iconScale,
-}));
 
 export type CrowdventureButtonProps = {
     readonly children?: ReactNode;
@@ -68,23 +60,35 @@ const CrowdventureButton = ({
 
     if (buttonType === "icon")
         return (
-            <IconButtonSpan
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                onClick={onClick}
-                style={commonStyle}
-            >
-                {icon ? (
-                    <FontAwesomeIcon
-                        icon={icon}
+            <EventListener event="hover">
+                {([hover, hoverListener]: EventListenerPair) => (
+                    <span
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
+                        onClick={onClick}
                         style={{
-                            width: (DEFAULT_ICON_SIZE - 2) * iconScale,
-                            height: (DEFAULT_ICON_SIZE - 2) * iconScale,
-                            pointerEvents: "none",
+                            backgroundColor: hover ? darkColor : lightColor,
+                            color: backgroundColor[2],
+                            width: DEFAULT_ICON_SIZE * iconScale,
+                            height: DEFAULT_ICON_SIZE * iconScale,
+                            borderRadius: DEFAULT_ICON_SIZE * iconScale,
+                            ...commonStyle,
                         }}
-                    />
-                ) : null}
-            </IconButtonSpan>
+                        {...hoverListener}
+                    >
+                        {icon ? (
+                            <FontAwesomeIcon
+                                icon={icon}
+                                style={{
+                                    width: (DEFAULT_ICON_SIZE - 2) * iconScale,
+                                    height: (DEFAULT_ICON_SIZE - 2) * iconScale,
+                                    pointerEvents: "none",
+                                }}
+                            />
+                        ) : null}
+                    </span>
+                )}
+            </EventListener>
         );
 
     if (buttonType === "text")
