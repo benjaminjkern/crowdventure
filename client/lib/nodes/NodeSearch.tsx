@@ -1,9 +1,22 @@
 import React, { useState } from "react";
+import { createUseStyles } from "react-jss";
 import AccountPreview from "../accounts/AccountPreview";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { useDebounce } from "../hooks";
 import apiClient from "../apiClient";
+import { type PaletteType } from "../colorPalette";
 import { type Node } from "@/types/models";
+
+const useStyles = createUseStyles(({ lightBackgroundColor }: PaletteType) => ({
+    nodeClass: {
+        cursor: "pointer",
+        padding: 10,
+        borderRadius: 5,
+        "&:hover": {
+            backgroundColor: lightBackgroundColor,
+        },
+    },
+}));
 
 const NodeSearch = ({
     onSelectNode,
@@ -34,10 +47,12 @@ const NodeSearch = ({
         setResultNodes(response.data.nodes);
     });
 
+    const { nodeClass } = useStyles();
+
     return (
         <>
             <CrowdventureTextInput
-                onBlur={() => setOpen(false)}
+                onBlur={() => setTimeout(() => setOpen(false), 100)} // Delay this so it can register a click
                 onChangeText={(newQuery) => {
                     if (newQuery.length === 0) return selectNode(null);
                     setOpen(true);
@@ -54,11 +69,27 @@ const NodeSearch = ({
                 fetching ? (
                     <>Loading...</>
                 ) : (
-                    <div style={{ maxHeight: 200 }}>
+                    <div
+                        style={{
+                            maxHeight: 200,
+                            overflow: "auto",
+                            margin: 5,
+                        }}
+                    >
                         {resultNodes.map((node, i) => (
-                            <div key={i} onClick={() => selectNode(node)}>
+                            <div
+                                className={nodeClass}
+                                key={i}
+                                onClick={() => {
+                                    selectNode(node);
+                                }}
+                            >
                                 {node.title}
-                                <AccountPreview account={node.owner} />
+                                <AccountPreview
+                                    account={node.owner}
+                                    isLink={false}
+                                    scale={0.75}
+                                />
                             </div>
                         ))}
                     </div>

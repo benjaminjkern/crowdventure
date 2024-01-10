@@ -34,13 +34,18 @@ const ChoiceModal = ({
     const { user } = useContext(UserContext);
 
     return (
-        <CrowdventureModal modalButtons={modalButtons} modalTitle={modalTitle}>
+        <CrowdventureModal
+            contentStyle={{ gap: 5 }}
+            modalButtons={modalButtons}
+            modalTitle={modalTitle}
+        >
             Action:
             <CrowdventureTextInput formElement={choiceForm.action} />
             Go to Page:
             <NodeSearch onSelectNode={setToNode} query={toNode?.title} />
             {user?.isAdmin ? (
                 <>
+                    <hr />
                     Admin Controls:
                     <CrowdventureCheckboxInput
                         formElement={choiceForm.hidden}
