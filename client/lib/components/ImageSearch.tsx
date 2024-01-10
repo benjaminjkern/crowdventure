@@ -154,8 +154,8 @@ const ImageSearch = ({ onSelectImage }) => {
                                         }}
                                         src={image.thumbnailUrl}
                                         style={{
-                                            marginRight: "10px",
-                                            borderRadius: "4px",
+                                            marginRight: 10,
+                                            borderRadius: 4,
                                             width: "100%",
                                             height: "100%",
                                             cursor: "pointer",

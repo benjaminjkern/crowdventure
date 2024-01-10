@@ -1,7 +1,28 @@
-import React, { type CSSProperties, type ReactNode, useContext } from "react";
+import React, { type CSSProperties, type ReactNode } from "react";
+import { createUseStyles } from "react-jss";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
-import { PaletteContext } from "../colorPalette";
-import EventListener from "./EventListener";
+import { type PaletteType } from "../colorPalette";
+
+const useStyles = createUseStyles(
+    ({ textColor, backgroundColor }: PaletteType) => ({
+        tooltipClass: {
+            position: "absolute",
+            textAlign: "center",
+            opacity: 0,
+            pointerEvents: "none",
+            fontSize: DEFAULT_TEXT_SIZE * 0.8,
+            padding: 5,
+            borderRadius: 5,
+            backgroundColor: textColor,
+            color: backgroundColor[0],
+            width: 200,
+            zIndex: 2,
+            "div:hover + &": {
+                opacity: 1,
+            },
+        },
+    })
+);
 
 const TooltipWrapper = ({
     tooltip,
@@ -12,7 +33,7 @@ const TooltipWrapper = ({
     readonly children: ReactNode;
     readonly tooltipStyle?: CSSProperties;
 }) => {
-    const { textColor, backgroundColor } = useContext(PaletteContext);
+    const { tooltipClass } = useStyles();
     return (
         <div
             style={{
@@ -21,31 +42,10 @@ const TooltipWrapper = ({
                 alignItems: "center",
             }}
         >
-            <EventListener event="hover">
-                {([hover, listener]) => (
-                    <>
-                        <div {...listener}>{children}</div>
-                        <div
-                            style={{
-                                position: "absolute",
-                                textAlign: "center",
-                                opacity: hover ? 1 : 0,
-                                pointerEvents: "none",
-                                fontSize: DEFAULT_TEXT_SIZE * 0.8,
-                                padding: 5,
-                                borderRadius: 5,
-                                backgroundColor: textColor,
-                                color: backgroundColor[0],
-                                width: 200,
-                                zIndex: 2,
-                                ...tooltipStyle,
-                            }}
-                        >
-                            {tooltip}
-                        </div>
-                    </>
-                )}
-            </EventListener>
+            <div>{children}</div>
+            <div className={tooltipClass} style={tooltipStyle}>
+                {tooltip}
+            </div>
         </div>
     );
 };

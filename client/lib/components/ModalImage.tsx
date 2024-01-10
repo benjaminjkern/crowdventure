@@ -17,7 +17,7 @@ const ModalImage = ({
             height={200}
             src={src}
             style={{
-                borderRadius: "8px",
+                borderRadius: 8,
                 ...style,
             }}
             width={200}

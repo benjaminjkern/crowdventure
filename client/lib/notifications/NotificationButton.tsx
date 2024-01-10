@@ -1,8 +1,27 @@
-import React, { type CSSProperties, useContext } from "react";
+import React, { type CSSProperties } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamation } from "@fortawesome/free-solid-svg-icons";
-import EventListener from "../components/EventListener";
-import { PaletteContext } from "../colorPalette";
+import { createUseStyles } from "react-jss";
+import { type PaletteType } from "../colorPalette";
+
+const useStyles = createUseStyles<
+    "notificationButtonClass",
+    { seen: boolean },
+    PaletteType
+>(({ rootColor }) => ({
+    notificationButtonClass: {
+        backgroundColor: ({ seen }) => (seen ? "lightgrey" : rootColor[2]),
+        "&:active": ({ seen }) => (seen ? "darkgray" : rootColor[0]),
+        "&:hover": ({ seen }) => (seen ? "silver" : rootColor[1]),
+        color: ({ seen }) => (seen ? "grey" : "white"),
+        width: 50,
+        height: 50,
+        padding: 10,
+        borderRadius: "50%",
+        textAlign: "center",
+        cursor: "pointer",
+    },
+}));
 
 const NotificationButton = ({
     onClick,
@@ -13,44 +32,16 @@ const NotificationButton = ({
     readonly seen: boolean;
     readonly style: CSSProperties;
 }) => {
-    const { rootColor } = useContext(PaletteContext);
+    const { notificationButtonClass } = useStyles({ seen });
 
     return (
-        <EventListener events={["hover", "mousedown"]}>
-            {(
-                [insideHover, insideHoverListener],
-                [mousedown, mousedownListener]
-            ) => (
-                <div
-                    onClick={onClick}
-                    {...insideHoverListener}
-                    {...mousedownListener}
-                    style={{
-                        backgroundColor: seen
-                            ? mousedown // TODO: Clean this UP!!!! GROSS
-                                ? "darkgray"
-                                : insideHover
-                                ? "silver"
-                                : "lightgrey"
-                            : mousedown
-                            ? rootColor[0]
-                            : insideHover
-                            ? rootColor[1]
-                            : rootColor[2],
-                        color: seen ? "grey" : "white",
-                        width: 50,
-                        height: 50,
-                        padding: 10,
-                        borderRadius: "50%",
-                        textAlign: "center",
-                        cursor: "pointer",
-                        ...style,
-                    }}
-                >
-                    <FontAwesomeIcon icon={faExclamation} />
-                </div>
-            )}
-        </EventListener>
+        <div
+            className={notificationButtonClass}
+            onClick={onClick}
+            style={style}
+        >
+            <FontAwesomeIcon icon={faExclamation} />
+        </div>
     );
 };
 

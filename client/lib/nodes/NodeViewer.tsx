@@ -16,8 +16,8 @@ const NodeViewer = ({
     <ResponsiveMasonry columnsCountBreakPoints={{ 0: 1, 700: 2, 1000: 3 }}>
         <Masonry
             style={{
-                marginTop: "5px",
-                marginBottom: "5px",
+                marginTop: 5,
+                marginBottom: 5,
             }}
         >
             {nodes.map((node, i) => (

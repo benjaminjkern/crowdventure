@@ -64,6 +64,9 @@ const CrowdventureCard = ({
             }}
         />
     ) : null;
+
+    // Needed to keep event listener because I wanted to style the parent component if hovering over a
+    // specific child element and didn't want to do weird pointer-disabling stuff
     return (
         <EventListener event="hover">
             {([hover, listener]) => (
@@ -97,7 +100,7 @@ const CrowdventureCard = ({
                                                 // loggedInAs && loggedInAs.unsafeMode
                                                 //     ? palette[5]
                                                 //     : "white",
-                                                padding: "1px",
+                                                padding: 1,
                                                 position: "relative",
                                                 aspectRatio: 16 / 9,
                                             }}
