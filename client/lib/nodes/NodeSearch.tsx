@@ -80,7 +80,8 @@ const NodeSearch = ({
                         width: "100%",
                         zIndex: -1,
                         borderRadius: 10,
-                        backgroundColor: backgroundColor[2],
+                        backgroundColor: backgroundColor[0],
+                        boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.5)",
                     }}
                 >
                     {resultNodes.length ? (

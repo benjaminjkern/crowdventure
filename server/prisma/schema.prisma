@@ -72,7 +72,7 @@ model Choice {
 
     score Int
 
-    fromNode             Node       @relation("childChoices", fields: [fromNodeId], references: [id])
+    fromNode             Node       @relation("childChoices", fields: [fromNodeId], references: [id], onDelete: Cascade)
     fromNodeId           Int
     toNode               Node?      @relation("parentChoices", fields: [toNodeId], references: [id])
     toNodeId             Int?
@@ -102,7 +102,7 @@ model Notification {
     link      String?
     seen      Boolean  @default(false)
 
-    account   Account @relation(fields: [accountId], references: [id])
+    account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
     accountId Int
 }
 
@@ -111,9 +111,9 @@ model Reaction {
 
     like Boolean
 
-    account   Account @relation(fields: [accountId], references: [id])
+    account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
     accountId Int
-    choice    Choice  @relation(fields: [choiceId], references: [id])
+    choice    Choice  @relation(fields: [choiceId], references: [id], onDelete: Cascade)
     choiceId  Int
 
     @@unique([accountId, choiceId], name: "reactionIdentifier")
@@ -124,6 +124,6 @@ model View {
 
     IP String
 
-    node   Node @relation(fields: [nodeId], references: [id])
+    node   Node @relation(fields: [nodeId], references: [id], onDelete: Cascade)
     nodeId Int
 }
