@@ -40,6 +40,7 @@ const CrowdventureModal = ({
                 width: "100%",
                 height: "100%",
                 alignItems: "center",
+                justifyContent: "center",
                 zIndex: 10,
                 backgroundColor: "rgba(0,0,0,0.5)",
                 overflow: "scroll",

@@ -5,10 +5,12 @@ import React, {
     type TextareaHTMLAttributes,
     type ChangeEvent,
     type KeyboardEvent,
+    useRef,
 } from "react";
 import { createUseStyles } from "react-jss";
 import { type PaletteType } from "../colorPalette";
 import { type FormElement } from "../hooks";
+import CloseButton from "./CloseButton";
 
 const useStyles = createUseStyles(
     ({ lightBackgroundColor, backgroundColor, textColor }: PaletteType) => ({
@@ -34,6 +36,7 @@ const CrowdventureTextInput = ({
     style = {},
     rows = 1,
     onPressEnter = () => {},
+    includeClearButton = false,
     ...props
 }: {
     readonly formElement?: FormElement;
@@ -41,6 +44,7 @@ const CrowdventureTextInput = ({
     readonly style?: CSSProperties;
     readonly rows?: number;
     readonly onPressEnter?: () => void;
+    readonly includeClearButton?: boolean;
 } & (
     | DetailedHTMLProps<
           TextareaHTMLAttributes<HTMLTextAreaElement>,
@@ -65,11 +69,47 @@ const CrowdventureTextInput = ({
         className: textInputStyle,
         ...props,
     };
+    const ref = useRef<HTMLInputElement>();
 
-    // @ts-ignore
-    if (rows > 1) return <textarea {...appliedProps} />;
-    // @ts-ignore
-    return <input {...appliedProps} />;
+    if (rows > 1) {
+        if (includeClearButton)
+            console.error(
+                "Clear button isn't available for multiline text inputs!"
+            );
+        // @ts-ignore
+        return <textarea {...appliedProps} />;
+    }
+    return (
+        <div style={{ position: "relative" }}>
+            {/* @ts-ignore */}
+            <input {...appliedProps} ref={ref} />
+            {ref.current?.value && includeClearButton ? (
+                <div
+                    style={{
+                        position: "absolute",
+                        width: "100%",
+                        height: "100%",
+                        justifyContent: "center",
+                        alignItems: "flex-end",
+                        paddingRight: 7,
+                        pointerEvents: "none",
+                    }}
+                >
+                    <CloseButton
+                        onClick={() => {
+                            if (ref.current) {
+                                ref.current.value = "";
+                                ref.current.focus();
+                            }
+                            onChangeText("");
+                            if (formElement) formElement.setValue("");
+                        }}
+                        style={{ pointerEvents: "auto" }}
+                    />
+                </div>
+            ) : null}
+        </div>
+    );
 };
 
 export default CrowdventureTextInput;

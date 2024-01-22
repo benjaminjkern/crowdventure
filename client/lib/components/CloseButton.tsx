@@ -1,3 +1,5 @@
+import { faClose } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { type MouseEventHandler, type CSSProperties } from "react";
 import { createUseStyles } from "react-jss";
 
@@ -5,8 +7,7 @@ const useStyles = createUseStyles({
     closeButtonStyle: {
         color: "#888", // TODO: Set colors
         cursor: "pointer",
-        textShadow:
-            "-1px 0 2px white, 0 1px 2px white, 1px 0 2px white, 0 -1px 2px white",
+        width: 15,
         "&:hover": {
             color: "#555",
         },
@@ -22,9 +23,12 @@ const CloseButton = ({
 }) => {
     const { closeButtonStyle } = useStyles();
     return (
-        <span className={closeButtonStyle} onClick={onClick} style={style}>
-            X
-        </span>
+        <FontAwesomeIcon
+            className={closeButtonStyle}
+            icon={faClose}
+            onClick={onClick}
+            style={style}
+        />
     );
 };
 

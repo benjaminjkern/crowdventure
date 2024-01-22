@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { createUseStyles } from "react-jss";
 import AccountPreview from "../accounts/AccountPreview";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { useDebounce } from "../hooks";
 import apiClient from "../apiClient";
-import { type PaletteType } from "../colorPalette";
+import { PaletteContext, type PaletteType } from "../colorPalette";
 import { type Node } from "@/types/models";
 
 const useStyles = createUseStyles(({ lightBackgroundColor }: PaletteType) => ({
@@ -30,15 +30,16 @@ const NodeSearch = ({
     const [open, setOpen] = useState(false);
     const [fetching, setFetching] = useState(false);
     const [query, setQuery] = useState(initQuery ?? "");
+    const { backgroundColor } = useContext(PaletteContext);
 
     const selectNode = (node: Node | null) => {
         setQuery(node?.title ?? "");
         setOpen(false);
+        setResultNodes(node ? [node] : []);
         onSelectNode(node);
     };
 
     const searchNodes = useDebounce(async (newQuery: string) => {
-        setFetching(true);
         const response = await apiClient.provide("get", "/node/searchNodes", {
             query: newQuery,
         });
@@ -50,13 +51,15 @@ const NodeSearch = ({
     const { nodeClass } = useStyles();
 
     return (
-        <>
+        <div style={{ position: "relative", zIndex: 1 }}>
             <CrowdventureTextInput
+                includeClearButton
                 onBlur={() => setTimeout(() => setOpen(false), 100)} // Delay this so it can register a click
                 onChangeText={(newQuery) => {
                     if (newQuery.length === 0) return selectNode(null);
                     setOpen(true);
                     setQuery(newQuery);
+                    setFetching(true);
                     searchNodes(newQuery);
                 }}
                 onFocus={() => {
@@ -66,23 +69,29 @@ const NodeSearch = ({
                 value={query}
             />
             {open ? (
-                fetching ? (
-                    <>Loading...</>
-                ) : (
-                    <div
-                        style={{
-                            maxHeight: 200,
-                            overflow: "auto",
-                            margin: 5,
-                        }}
-                    >
-                        {resultNodes.map((node, i) => (
+                <div
+                    style={{
+                        maxHeight: 300,
+                        overflow: "scroll",
+                        position: "absolute",
+                        alignItems: "center",
+                        padding: 5,
+                        paddingTop: 33,
+                        width: "100%",
+                        zIndex: -1,
+                        borderRadius: 10,
+                        backgroundColor: backgroundColor[2],
+                    }}
+                >
+                    {resultNodes.length ? (
+                        resultNodes.map((node, i) => (
                             <div
                                 className={nodeClass}
                                 key={i}
                                 onClick={() => {
                                     selectNode(node);
                                 }}
+                                style={{ width: "100%" }}
                             >
                                 {node.title}
                                 <AccountPreview
@@ -91,11 +100,15 @@ const NodeSearch = ({
                                     scale={0.75}
                                 />
                             </div>
-                        ))}
-                    </div>
-                )
+                        ))
+                    ) : fetching ? (
+                        <>Loading...</>
+                    ) : (
+                        <>No results!</>
+                    )}
+                </div>
             ) : null}
-        </>
+        </div>
     );
 };
 
