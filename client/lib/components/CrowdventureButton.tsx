@@ -10,7 +10,7 @@ const DEFAULT_ICON_SIZE = 20;
 
 export type CrowdventureButtonProps = {
     readonly children?: ReactNode;
-    readonly style?: CSSProperties;
+    readonly style?: CSSProperties | ((hover: boolean) => CSSProperties);
     readonly buttonType?: "icon" | "text";
     readonly category?: "error";
     readonly requireSignedIn?: boolean;
@@ -53,10 +53,10 @@ const CrowdventureButton = ({
         ? errorColor[1]
         : rootColor[1];
 
-    const commonStyle = {
+    const commonStyle = (hover: boolean) => ({
         cursor: disabled ? "default" : "pointer",
-        ...style,
-    };
+        ...(typeof style === "function" ? style(hover) : style),
+    });
 
     if (buttonType === "icon")
         return (
@@ -74,7 +74,7 @@ const CrowdventureButton = ({
                             width: DEFAULT_ICON_SIZE * iconScale,
                             height: DEFAULT_ICON_SIZE * iconScale,
                             borderRadius: DEFAULT_ICON_SIZE * iconScale,
-                            ...commonStyle,
+                            ...commonStyle(hover),
                         }}
                         {...hoverListener}
                     >
@@ -108,7 +108,7 @@ const CrowdventureButton = ({
                             color: lightColor,
                             textDecoration:
                                 hover && !disabled ? "underline" : undefined,
-                            ...commonStyle,
+                            ...commonStyle(hover),
                         }}
                     >
                         {children}
@@ -132,7 +132,7 @@ const CrowdventureButton = ({
                         backgroundColor: hover ? darkColor : lightColor,
                         color: "white",
                         width: "100%",
-                        ...commonStyle,
+                        ...commonStyle(hover),
                     }}
                     {...hoverListener}
                     {...props}

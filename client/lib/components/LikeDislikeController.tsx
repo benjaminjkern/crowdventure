@@ -19,6 +19,20 @@ const LikeDislikeController = ({
 }) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { user } = useContext(UserContext);
+    const dislikeColor = user
+        ? disliked
+            ? "red"
+            : unsafeMode
+            ? "white"
+            : "black"
+        : "gray";
+    const likeColor = user
+        ? liked
+            ? "green"
+            : unsafeMode
+            ? "white"
+            : "black"
+        : "gray";
     return (
         <span style={{ gap: 5 }}>
             <CrowdventureButton
@@ -26,38 +40,32 @@ const LikeDislikeController = ({
                 icon={faThumbsDown}
                 onClick={onClickDislike}
                 requireSignedIn
-                style={{
+                style={(hover) => ({
                     backgroundColor: "transparent",
-                    color: user
-                        ? disliked
-                            ? "red"
-                            : unsafeMode
-                            ? "white"
-                            : "black"
-                        : "gray",
-                }}
-            >
-                Dislike
-            </CrowdventureButton>
+                    color: dislikeColor,
+                    borderRadius: 0,
+                    borderColor: dislikeColor,
+                    borderStyle: "solid",
+                    borderWidth: 0,
+                    borderBottomWidth: hover ? 1 : 0,
+                })}
+            />
             {` ${count} `}
             <CrowdventureButton
                 buttonType="icon"
                 icon={faThumbsUp}
                 onClick={onClickLike}
                 requireSignedIn
-                style={{
+                style={(hover) => ({
                     backgroundColor: "transparent",
-                    color: user
-                        ? liked
-                            ? "green"
-                            : unsafeMode
-                            ? "white"
-                            : "black"
-                        : "gray",
-                }}
-            >
-                Like
-            </CrowdventureButton>
+                    color: likeColor,
+                    borderRadius: 0,
+                    borderColor: likeColor,
+                    borderStyle: "solid",
+                    borderWidth: 0,
+                    borderBottomWidth: hover ? 1 : 0,
+                })}
+            />
         </span>
     );
 };
