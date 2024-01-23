@@ -8,8 +8,11 @@ export default new ExpressZodAPIClient(async (method, path, params) => {
 
     const authToken = process.browser && localStorage.getItem("authToken");
     if (authToken) headers = { Authorization: `Bearer ${authToken}` };
+    console.log(
+        `https://crowdventure-backend-f3a189dfad64.herokuapp.com${path}${searchParams}`
+    );
     const response = await fetch(
-        `http://localhost:4000${path}${searchParams}`,
+        `https://crowdventure-backend-f3a189dfad64.herokuapp.com${path}${searchParams}`,
         {
             method: method.toUpperCase(),
             headers: hasBody
