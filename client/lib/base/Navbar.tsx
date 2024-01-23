@@ -1,6 +1,8 @@
 import React, { type MouseEvent, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { useMediaQuery } from "../hooks";
 import AccountManager from "./AccountManager";
 
@@ -8,7 +10,13 @@ const NavbarCollapse = ({
     onClick,
 }: {
     readonly onClick: (e: MouseEvent) => unknown;
-}) => <button onClick={onClick}>Open</button>;
+}) => (
+    <FontAwesomeIcon
+        icon={faBars}
+        onClick={onClick}
+        style={{ cursor: "pointer", width: 30 }}
+    />
+);
 
 const Navbar = () => {
     const isMobile = useMediaQuery("(max-width: 800px)");
