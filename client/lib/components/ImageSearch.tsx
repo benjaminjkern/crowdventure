@@ -155,6 +155,7 @@ const ImageSearch = ({
 
     return (
         <SearchDropdown
+            height={500}
             onChangeText={(newQuery) => {
                 // if (newQuery.length === 0) return selectNode(null);
                 setQuery(newQuery);

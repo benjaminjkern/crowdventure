@@ -51,6 +51,8 @@ const AccountPage = ({
 
     useEffect(() => {
         if (initAccount) setAccount(initAccount);
+        if (initAccountNodes)
+            setAccountNodes({ safeNodes: initAccountNodes, allNodes: [] });
     }, [initAccount]);
 
     if (!account) return <LoadingBox />;

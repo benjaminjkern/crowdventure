@@ -36,8 +36,14 @@ export const useSafeGuardedNodes = (
             setFetched(true);
         });
     });
+
+    const setter = (lists: SafeGuardedNodesLists) => {
+        setFetched(false);
+        setNodesLists(lists);
+    };
+
     return [
         unsafeMode ? nodesLists.allNodes : nodesLists.safeNodes,
-        setNodesLists,
+        setter,
     ] as [Node[], Dispatch<SetStateAction<SafeGuardedNodesLists>>];
 };

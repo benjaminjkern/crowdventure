@@ -18,16 +18,20 @@
     - Go to random page on home page
 - Frontend
   - Switched frontend to NextJS so it's smoother
-  - Got rid of bootstrap in favor of custom css so I have more control over making stuff consistent and looking nice
+  - Overall cleanup of styles
+    - Got rid of bootstrap in favor of custom css so I have more control over making stuff consistent and looking nice
   - Made the node screen a little nicer
     - Image shows to the left in desktop mode instead of being stretched on top
-    - Merged canon & noncanon choices
+    - Merged canon & noncanon choices, now just shows with a star if it is canon
 - Backend
-  - Switched backend to Express Zod API so I can have more control over the db calls that are made and the data that is returned
-  - Made sure passwords are actually being encrypted (lol)
+  - Switched to Express Zod API because it's super nice to use
   - Switched database to postgres so I can make the data more structured (Also dynamodb kinda sucked anyways)
-  - Made datecreated and updated at into dates
-  - Added ids to everything instead of using slugs to refer to everything
+  - Added prisma so I can have more control over the db calls that are made and the data that is returned
+  - Cleaned up lots of the data
+    - No more null | undefined | '' business
+    - Made datecreated and updated at into dates
+    - Added ids to everything instead of using slugs to refer to everything
+    - Made sure passwords are actually being encrypted (lol)
 
 # 0.2 - Beta / Streamlining and bug fixing
 

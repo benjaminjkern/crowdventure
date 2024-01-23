@@ -7,11 +7,13 @@ const SearchDropdown = ({
     query,
     onChangeText,
     placeholder,
+    height = 300,
 }: {
     readonly children: ReactNode;
     readonly query: string;
     readonly onChangeText: (s: string) => unknown;
     readonly placeholder?: string;
+    readonly height?: number;
 }) => {
     const [open, setOpen] = useState(false);
     const { backgroundColor } = useContext(PaletteContext);
@@ -39,7 +41,7 @@ const SearchDropdown = ({
             {open ? (
                 <div
                     style={{
-                        maxHeight: 300,
+                        maxHeight: height,
                         overflow: "scroll",
                         position: "absolute",
                         alignItems: "center",
