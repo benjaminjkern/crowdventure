@@ -8,8 +8,10 @@
     "repository": "https://github.com/benjaminjkern/crowdventure",
     "scripts": {
         "gen-client": "tsx scripts/generateClient.ts",
-        "start": "nodemon --ext '*' --exec 'pnpm gen-client && tsx index.ts'",
-        "seed-db": "tsx scripts/writeDb.ts"
+        "dev": "nodemon --ext '*' --exec 'pnpm gen-client && tsx index.ts'",
+        "seed-db": "tsx scripts/writeDb.ts",
+        "build": "tsup index.ts && attw --pack",
+        "start": "node dist/index.js"
     },
     "dependencies": {
         "@prisma/client": "5.7.1",
@@ -24,6 +26,7 @@
         "zod-prisma-types": "^3.1.6"
     },
     "devDependencies": {
+        "@arethetypeswrong/cli": "^0.13.6",
         "@types/bcrypt": "^5.0.2",
         "@types/eslint": "^8.44.7",
         "@types/express": "^4.17.21",
@@ -39,6 +42,7 @@
         "prettier": "^2.8.1",
         "ts-node": "^10.9.2",
         "tsconfig-paths": "^4.2.0",
+        "tsup": "^8.0.1",
         "tsx": "^4.7.0",
         "typescript": "^5.3.3",
         "winston": "^3.11.0"
