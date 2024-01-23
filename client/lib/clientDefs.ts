@@ -557,7 +557,9 @@ type PostNodeCreateNodeInput = {} & {
     title: string;
     content: string;
     pictureURL?: string | undefined;
+    pictureUnsafe?: boolean | undefined;
     featured?: boolean | undefined;
+    hidden?: boolean | undefined;
 };
 
 type PostNodeCreateNodeResponse = {

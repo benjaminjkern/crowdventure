@@ -73,7 +73,7 @@ const NodeModal = ({
                     <CloseButton
                         onClick={() => {
                             nodeForm.pictureURL.setValue("");
-                            // setShouldHide(false);
+                            nodeForm.pictureUnsafe.setValue(false);
                         }}
                         style={{ position: "absolute", top: 10, right: 10 }}
                     />
@@ -168,16 +168,32 @@ export const CreateNodeModal = ({
         ["pictureURL", "pictureUnsafe"]
     );
     const { closeModal } = useContext(ModalContext);
+    const { user } = useContext(UserContext);
     const createNode = async () => {
         if (!validateInputs(nodeForm)) return;
-        const { title, content, featured, pictureURL } = nodeForm.getValues();
+        const { title, content, featured, pictureURL, pictureUnsafe, hidden } =
+            nodeForm.getValues();
 
-        const response = await apiClient.provide("post", "/node/createNode", {
+        const newNode: {
+            title: string;
+            content: string;
+            pictureURL?: string | undefined;
+            pictureUnsafe?: boolean | undefined;
+            featured?: boolean | undefined;
+            hidden?: boolean | undefined;
+        } = {
             title,
             content,
             featured,
             pictureURL: pictureURL || undefined,
-        });
+            pictureUnsafe,
+        };
+        if (user?.isAdmin) newNode.hidden = hidden;
+        const response = await apiClient.provide(
+            "post",
+            "/node/createNode",
+            newNode
+        );
         if (response.status === "error")
             return nodeForm.setError(response.error.message);
 
@@ -219,21 +235,36 @@ export const EditNodeModal = ({
         ["pictureURL", "pictureUnsafe"]
     );
     const { openModal, closeModal, closeAllModals } = useContext(ModalContext);
+    const { user } = useContext(UserContext);
     const editNode = async () => {
         if (!validateInputs(nodeForm)) return;
 
         const { title, content, featured, hidden, pictureURL, pictureUnsafe } =
             nodeForm.getValues();
 
-        const response = await apiClient.provide("patch", "/node/editNode", {
+        const newNode: {
+            id: number;
+            title?: string | undefined;
+            content?: string | undefined;
+            pictureURL?: string | null | undefined;
+            pictureUnsafe?: boolean | undefined;
+            hidden?: boolean | undefined;
+            featured?: boolean | undefined;
+        } = {
             id: node.id,
             title,
             content,
-            hidden,
             featured,
             pictureURL: pictureURL || null,
             pictureUnsafe,
-        });
+        };
+        if (user?.isAdmin) newNode.hidden = hidden;
+
+        const response = await apiClient.provide(
+            "patch",
+            "/node/editNode",
+            newNode
+        );
         if (response.status === "error")
             return nodeForm.setError(response.error.message);
 

@@ -66,11 +66,20 @@ export const nodeEndpoints = {
             title: z.string().min(1),
             content: z.string().min(1),
             pictureURL: z.string().min(1).optional(),
+            pictureUnsafe: z.boolean().optional(),
             featured: z.boolean().optional(),
+            hidden: z.boolean().optional(),
         }),
         output: NodeSchema,
         handler: async ({
-            input: { title, content, pictureURL, featured },
+            input: {
+                title,
+                content,
+                pictureURL,
+                pictureUnsafe,
+                featured,
+                hidden,
+            },
             options: { loggedInAccount },
         }) => {
             if (!loggedInAccount)
@@ -89,10 +98,13 @@ export const nodeEndpoints = {
                     title,
                     content,
                     pictureURL,
+                    pictureUnsafe,
                     featured,
                     hidden:
                         // TODO: Let user know if its flagged and they didnt mean it to be hidden
-                        flagContent(title) || flagContent(content),
+                        ((loggedInAccount?.isAdmin && hidden) ?? false) ||
+                        flagContent(title) ||
+                        flagContent(content),
                     storedViews: 0,
                     views: 0,
                 },
@@ -152,8 +164,7 @@ export const nodeEndpoints = {
                 // TODO: Let users know it was flagged
             }
             if (pictureURL !== undefined) node.pictureURL = pictureURL;
-            if (loggedInAccount?.isAdmin && pictureUnsafe !== undefined)
-                node.pictureUnsafe = pictureUnsafe;
+            if (pictureUnsafe !== undefined) node.pictureUnsafe = pictureUnsafe;
             if (loggedInAccount?.isAdmin && hidden !== undefined) {
                 node.hidden = hidden;
             }

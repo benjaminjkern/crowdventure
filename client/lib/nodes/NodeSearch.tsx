@@ -52,6 +52,7 @@ const NodeSearch = ({
     return (
         <SearchDropdown
             onChangeText={(newQuery) => {
+                setQuery(newQuery);
                 if (newQuery.length === 0) return selectNode(null);
                 setFetching(true);
                 searchNodes(newQuery);

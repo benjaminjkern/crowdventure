@@ -32,11 +32,13 @@ const OptionsDropdown = ({
     const { backgroundColor } = useContext(PaletteContext);
 
     useEffect(() => {
-        const listener = (e) => {
+        const listener = (e: MouseEvent) => {
             if (
                 ref.current &&
                 (e.target === ref.current ||
+                    // @ts-ignore
                     [...ref.current.children].includes(e.target) ||
+                    // @ts-ignore
                     [...ref.current.children[1].children].includes(e.target))
             )
                 return;
@@ -50,6 +52,7 @@ const OptionsDropdown = ({
 
     return (
         <div
+            // @ts-ignore
             ref={ref}
             style={{
                 position: "relative",
@@ -84,9 +87,6 @@ const OptionsDropdown = ({
                                 disabled={disabled || !onClick}
                                 key={i}
                                 onClick={onClick}
-                                style={{
-                                    backgroundColor,
-                                }}
                             >
                                 {text}
                             </CrowdventureButton>
