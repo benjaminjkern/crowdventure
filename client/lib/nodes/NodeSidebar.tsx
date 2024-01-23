@@ -1,5 +1,6 @@
 import React, { type Dispatch, type SetStateAction, useContext } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
+import { useRouter } from "next/router";
 import CrowdventureButton from "../components/CrowdventureButton";
 import { UserContext } from "../user";
 import AccountPreview from "../accounts/AccountPreview";
@@ -27,6 +28,8 @@ const NodeSidebar = ({
     const { mutedTextColor } = useContext(PaletteContext);
 
     const canonChoices = choices.filter((choice) => choice.isCanon);
+
+    const router = useRouter();
 
     const loggedInAsOwner = node.ownerId === user?.id;
     return (
@@ -76,6 +79,9 @@ const NodeSidebar = ({
                             openModal(
                                 <EditNodeModal
                                     node={node}
+                                    onDeleteNode={() => {
+                                        router.back();
+                                    }}
                                     onEditNode={setNode}
                                 />
                             );

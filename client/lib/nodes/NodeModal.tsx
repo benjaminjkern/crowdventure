@@ -251,7 +251,6 @@ export const EditNodeModal = ({
     };
 
     const deleteNode = async () => {
-        if (!node) throw new Error("Shouldnt have gotten here");
         const response = await apiClient.provide("delete", "/node/deleteNode", {
             id: String(node.id),
         });
