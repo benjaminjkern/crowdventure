@@ -3,5 +3,8 @@
         "heroku-prebuild": "cd server && npm install && npm run build",
         "start": "cd server && npm start",
         "prepare": "husky install"
+    },
+    "devDependencies": {
+        "husky": "^8.0.3"
     }
 }
