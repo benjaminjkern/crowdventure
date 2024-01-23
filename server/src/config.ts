@@ -3,7 +3,7 @@ import { createConfig } from "express-zod-api";
 
 export const config = createConfig({
     server: {
-        listen: process.env.NODE_ENV === "production" ? 80 : 4000,
+        listen: process.env.NODE_ENV === "devlopment" ? 4000 : 80,
         upload: true,
         // TODO: IDK WHAT THIS IS
         compression: true, // affects sendAvatarEndpoint
