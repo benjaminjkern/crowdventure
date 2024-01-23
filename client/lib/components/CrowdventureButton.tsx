@@ -29,7 +29,7 @@ const CrowdventureButton = ({
     requireSignedIn,
     onClick,
     href,
-    disabled,
+    disabled: initDisabled,
     icon,
     iconScale = 1,
     ...props
@@ -40,21 +40,21 @@ const CrowdventureButton = ({
 
     // The value that is actually used
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const isDisabled = disabled || (requireSignedIn && !user);
+    const disabled = initDisabled || (requireSignedIn && !user);
 
-    const darkColor = isDisabled
+    const darkColor = disabled
         ? grayColor[0]
         : category === "error"
         ? errorColor[0]
         : rootColor[0];
-    const lightColor = isDisabled
+    const lightColor = disabled
         ? grayColor[1]
         : category === "error"
         ? errorColor[1]
         : rootColor[1];
 
     const commonStyle = {
-        cursor: isDisabled ? "default" : "pointer",
+        cursor: disabled ? "default" : "pointer",
         ...style,
     };
 
@@ -63,9 +63,11 @@ const CrowdventureButton = ({
             <EventListener event="hover">
                 {([hover, hoverListener]: EventListenerPair) => (
                     <span
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        // @ts-ignore
-                        onClick={onClick}
+                        onClick={(e) => {
+                            if (disabled) return;
+                            // @ts-ignore
+                            onClick?.(e);
+                        }}
                         style={{
                             backgroundColor: hover ? darkColor : lightColor,
                             color: backgroundColor[2],
@@ -96,14 +98,16 @@ const CrowdventureButton = ({
             <EventListener event="hover">
                 {([hover, hoverListener]) => (
                     <span
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        // @ts-ignore
-                        onClick={onClick}
+                        onClick={(e) => {
+                            if (disabled) return;
+                            // @ts-ignore
+                            onClick?.(e);
+                        }}
                         {...hoverListener}
                         style={{
                             color: lightColor,
                             textDecoration:
-                                hover && !isDisabled ? "underline" : undefined,
+                                hover && !disabled ? "underline" : undefined,
                             ...commonStyle,
                         }}
                     >
@@ -117,7 +121,7 @@ const CrowdventureButton = ({
         <EventListener event="hover">
             {([hover, hoverListener]) => (
                 <button
-                    disabled={isDisabled}
+                    disabled={disabled}
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     onClick={onClick}

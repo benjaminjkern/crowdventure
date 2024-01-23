@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { faThumbsDown, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { UnsafeModeContext } from "../unsafeMode";
+import { UserContext } from "../user";
 import CrowdventureButton from "./CrowdventureButton";
 
 const LikeDislikeController = ({
@@ -17,6 +18,7 @@ const LikeDislikeController = ({
     readonly onClickDislike: () => void;
 }) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
+    const { user } = useContext(UserContext);
     return (
         <span style={{ gap: 5 }}>
             <CrowdventureButton
@@ -26,7 +28,13 @@ const LikeDislikeController = ({
                 requireSignedIn
                 style={{
                     backgroundColor: "transparent",
-                    color: disliked ? "red" : unsafeMode ? "white" : "black",
+                    color: user
+                        ? disliked
+                            ? "red"
+                            : unsafeMode
+                            ? "white"
+                            : "black"
+                        : "gray",
                 }}
             >
                 Dislike
@@ -39,7 +47,13 @@ const LikeDislikeController = ({
                 requireSignedIn
                 style={{
                     backgroundColor: "transparent",
-                    color: liked ? "green" : unsafeMode ? "white" : "black",
+                    color: user
+                        ? liked
+                            ? "green"
+                            : unsafeMode
+                            ? "white"
+                            : "black"
+                        : "gray",
                 }}
             >
                 Like

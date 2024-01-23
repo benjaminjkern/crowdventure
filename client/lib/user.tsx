@@ -22,7 +22,10 @@ const UserProvider = ({ children }: { readonly children: ReactNode }) => {
 
     const saveUser = (newUser?: Account) => {
         if (newUser) localStorage.setItem("savedUser", JSON.stringify(newUser));
-        else localStorage.removeItem("savedUser");
+        else {
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("savedUser");
+        }
 
         setUser(newUser ?? null);
     };
