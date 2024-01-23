@@ -5,6 +5,7 @@ import { ModalContext } from "../modal";
 import { UserContext } from "../user";
 import CrowdventureButton from "../components/CrowdventureButton";
 import ParagraphText from "../components/ParagraphText";
+import { useMediaQuery } from "../hooks";
 import EditAccountModal from "./EditAccountModal";
 import AccountPreview from "./AccountPreview";
 import { type Account } from "@/types/models";
@@ -17,12 +18,17 @@ const AccountHeader = ({
     readonly setAccount: Dispatch<SetStateAction<Account>>;
 }) => {
     const { openModal } = useContext(ModalContext);
+    const isMobile = useMediaQuery("(max-width: 800px)");
 
     const { user, setUser } = useContext(UserContext);
     const loggedInAsThisUser = user?.screenName === account.screenName;
     const unseenNotifications = 0;
+
+    const buttonsHorizontal = useMediaQuery(
+        "(min-width: 425px) and (max-width: 800px)"
+    );
     return (
-        <div style={{ flexDirection: "row" }}>
+        <div style={{ flexDirection: isMobile ? "column" : "row" }}>
             <div style={{ flex: 3, gap: 10 }}>
                 <AccountPreview
                     account={account}
@@ -42,41 +48,57 @@ const AccountHeader = ({
 
                 <ParagraphText text={account.bio} />
             </div>
-            <div style={{ flex: 1, gap: 5 }}>
+            <div
+                style={{
+                    flex: 1,
+                    gap: 5,
+                    flexDirection: buttonsHorizontal ? "row" : "column",
+                    marginTop: isMobile ? 20 : 0,
+                }}
+            >
                 {loggedInAsThisUser ? (
-                    <CrowdventureButton href="/notifications" onClick={() => 5}>
-                        Notifications{" "}
-                        {unseenNotifications ? (
-                            <span style={{ color: "red" }}>
-                                ({unseenNotifications} New)
-                            </span>
-                        ) : null}
-                    </CrowdventureButton>
+                    <div style={{ flex: 1 }}>
+                        <CrowdventureButton
+                            href="/notifications"
+                            onClick={() => 5}
+                        >
+                            Notifications{" "}
+                            {unseenNotifications ? (
+                                <span style={{ color: "red" }}>
+                                    ({unseenNotifications} New)
+                                </span>
+                            ) : null}
+                        </CrowdventureButton>
+                    </div>
                 ) : null}
                 {loggedInAsThisUser || user?.isAdmin ? (
-                    <CrowdventureButton
-                        onClick={() => {
-                            openModal(
-                                <EditAccountModal
-                                    account={account}
-                                    setAccount={setAccount}
-                                />
-                            );
-                        }}
-                    >
-                        Edit Account
-                    </CrowdventureButton>
+                    <div style={{ flex: 1 }}>
+                        <CrowdventureButton
+                            onClick={() => {
+                                openModal(
+                                    <EditAccountModal
+                                        account={account}
+                                        setAccount={setAccount}
+                                    />
+                                );
+                            }}
+                        >
+                            Edit Account
+                        </CrowdventureButton>
+                    </div>
                 ) : null}
 
                 {loggedInAsThisUser ? (
-                    <CrowdventureButton
-                        category="error"
-                        onClick={() => {
-                            setUser();
-                        }}
-                    >
-                        Log out
-                    </CrowdventureButton>
+                    <div style={{ flex: 1 }}>
+                        <CrowdventureButton
+                            category="error"
+                            onClick={() => {
+                                setUser();
+                            }}
+                        >
+                            Log out
+                        </CrowdventureButton>
+                    </div>
                 ) : null}
             </div>
         </div>

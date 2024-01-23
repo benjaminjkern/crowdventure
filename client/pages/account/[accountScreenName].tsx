@@ -79,7 +79,7 @@ const AccountPage = ({
             ) : null}
 
             <AccountHeader account={account} setAccount={setAccount} />
-
+            <hr />
             {loggedInAsThisUser ? (
                 <CrowdventureButton
                     onClick={() =>
