@@ -104,28 +104,19 @@ const ImageSearch = ({
     const MAXROWLENGTH = 2;
 
     // TODO: Add this stuff for filtering out accidental bad images
-    // const checkImage = async (image: BingImage) => {
-    //     if (!image.isFamilyFriendly && !unsafeMode) return false;
-    //     return await new Promise((resolve) => {
-    //         const img = new Image();
-    //         img.onload = () => {
-    //             resolve(image);
-    //         };
-    //         img.onerror = () => {
-    //             // console.warn(image);
-    //             resolve(false);
-    //         };
-    //         img.src = image.contentUrl;
-    //     });
-    // };
-
-    // const filterImages = async (images) => {
-    //     const validImages = (
-    //         await Promise.all(images.map((image) => checkImage(image)))
-    //     ).filter((image) => image);
-
-    //     return { filteredImages: validImages };
-    // };
+    const checkImage = async (image: BingImage): Promise<BingImage | null> => {
+        if (!image.isFamilyFriendly && !unsafeMode) return null;
+        return await new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                resolve(image);
+            };
+            img.onerror = () => {
+                resolve(null);
+            };
+            img.src = image.contentUrl;
+        });
+    };
 
     const fetchImages = useDebounce((newQuery) => {
         axios
@@ -141,8 +132,12 @@ const ImageSearch = ({
                     "Ocp-Apim-Subscription-Key": BING_API_KEY,
                 },
             })
-            .then((response) => {
-                setImages(response.data.value);
+            .then(async (response) => {
+                setImages(
+                    (
+                        await Promise.all(response.data.value.map(checkImage))
+                    ).filter((image) => image) as BingImage[]
+                );
             })
             .catch(console.error);
     });
