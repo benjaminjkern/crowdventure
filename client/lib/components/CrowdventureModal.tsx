@@ -46,7 +46,14 @@ const CrowdventureModal = ({
                 ...modalStyle,
             }}
         >
-            <div style={{ height: "fit-content", overflow: "scroll" }}>
+            <div
+                style={{
+                    height: "fit-content",
+                    overflow: "auto",
+                    width: "100%",
+                    alignItems: "center",
+                }}
+            >
                 <div
                     onMouseDown={(e) => {
                         e.stopPropagation();

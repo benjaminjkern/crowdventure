@@ -1,27 +1,42 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {
+    type CSSProperties,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWarning } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 import { UnsafeModeContext } from "../unsafeMode";
 import { UserContext } from "../user";
 import { splitIntoRows } from "../utils";
+import { useDebounce } from "../hooks";
 import CrowdventureTextInput from "./CrowdventureTextInput";
 import TooltipWrapper from "./TooltipWrapper";
 import UnsafeImage from "./UnsafeImage";
 
-// Should hide this
-const BING_API_KEY = "8300cebe5f0d452a9ccb4bca67af4659";
+type BingImage = {
+    contentUrl: string;
+    thumbnailUrl: string;
+    isFamilyFriendly: boolean;
+};
 
-const ImageSearch = ({ onSelectImage }) => {
+// Should hide this
+const BING_API_KEY = process.env.BING_API_KEY;
+
+const ImageSearch = ({
+    onSelectImage,
+    style,
+}: {
+    readonly onSelectImage: (url: string, familyFriendly: boolean) => unknown;
+    readonly style: CSSProperties;
+}) => {
     const { user } = useContext(UserContext);
     // const { unsafeMode } = useContext(UnsafeModeContext);
     const unsafeMode = useContext(UnsafeModeContext);
 
-    const [fetching, setFetching] = useState(undefined);
-    const [fetchResults, setFetchResults] = useState(undefined);
-    const [images, setImages] = useState([]);
-    const [atEnd, setAtEnd] = useState(false);
+    const [images, setImages] = useState<BingImage[]>([]);
 
-    const [query, setQuery] = useState("");
     const [open, setOpen] = useState(false);
 
     const PAGESIZE = 20;
@@ -51,82 +66,73 @@ const ImageSearch = ({ onSelectImage }) => {
         return { filteredImages: validImages };
     };
 
-    useEffect(() => {
-        if (query.length < MIN_SEARCH_LENGTH) {
-            setOpen(false);
-            setFetching(undefined);
-            return;
-        }
-        setOpen(true);
-        setTimeout(() => {
-            setFetching(query);
-        }, 1000);
-    }, [query]);
+    // useEffect(() => {
+    //     if (query.length < MIN_SEARCH_LENGTH) {
+    //         setOpen(false);
+    //         setFetching(undefined);
+    //         return;
+    //     }
+    //     setOpen(true);
+    //     setTimeout(() => {
+    //         setFetching(query);
+    //     }, 1000);
+    // }, [query]);
 
-    useEffect(() => {
-        if (!fetching) return;
-        if (fetching !== query) return;
-        fetchImages(fetching).then((newImages) => {
-            setFetchResults({ newImages, fetching });
-            setFetching(undefined);
-        });
-    }, [fetching]);
+    // useEffect(() => {
+    //     if (!fetching) return;
+    //     if (fetching !== query) return;
+    //     fetchImages(fetching).then((newImages) => {
+    //         setFetchResults({ newImages, fetching });
+    //         setFetching(undefined);
+    //     });
+    // }, [fetching]);
 
-    useEffect(() => {
-        if (!fetchResults) return;
-        if (fetchResults.fetching !== query) return;
-        setImages(fetchResults.newImages);
-        setFetchResults(undefined);
-    }, [fetchResults]);
+    // useEffect(() => {
+    //     if (!fetchResults) return;
+    //     if (fetchResults.fetching !== query) return;
+    //     setImages(fetchResults.newImages);
+    //     setFetchResults(undefined);
+    // }, [fetchResults]);
 
-    const fetchImages = (query, amount = PAGESIZE, offset = 0) =>
-        fetch(
-            `https://api.cognitive.microsoft.com/bing/v7.0/images/search?q=${encodeURIComponent(
-                query
-            )}&count=${amount}&safeSearch=${
-                unsafeMode ? "Off" : "Strict"
-            }&offset=${offset}`,
-            {
+    const fetchImages = useDebounce((newQuery) => {
+        axios
+            .get<{
+                value: BingImage[];
+            }>(`https://api.bing.microsoft.com/v7.0/images/search`, {
+                params: {
+                    q: newQuery,
+                    safeSearch: unsafeMode ? "Off" : "Strict",
+                },
                 headers: {
                     "Ocp-Apim-Subscription-Key": BING_API_KEY,
                 },
-            }
-        )
-            .then((data) => data.json())
-            .then(({ value, error, ...rest }) => {
-                if (error?.code === 429) return { error };
-                if (!value) return { error: "Something went wrong!" };
-                // return new Promise(resolve => {
-                //         setTimeout(() => resolve(fetchImages(query, amount, offset)), 5000);
-                //     })
-                // console.log(value, rest);
-                return filterImages(value);
             })
-            .then(async ({ filteredImages, error }) => {
-                if (error) return [];
-                if (filteredImages.length === amount) return filteredImages;
-                return [
-                    ...filteredImages,
-                    // ...(await fetchImages({
-                    //     query,
-                    //     amount: amount - filteredImages.length,
-                    //     offset: offset + amount}
-                    // )),
-                ];
-            });
+            .then((response) => {
+                setImages(response.data.value);
+            })
+            .catch(console.error);
+    });
 
     const rows = splitIntoRows(images, MAXROWLENGTH);
+    console.log(rows);
 
     return (
         <>
             <CrowdventureTextInput
-                onChangeText={setQuery}
+                onChangeText={(newQuery) => {
+                    // if (newQuery.length === 0) return selectNode(null);
+                    setOpen(true);
+                    // setQuery(newQuery);
+                    // setFetching(true);
+                    // searchNodes(newQuery);
+
+                    fetchImages(newQuery);
+                }}
                 placeholder="Search for an image..."
-                value={query}
+                style={style}
             />
             {open ? (
                 <div style={{ height: 350, overflow: "scroll" }}>
-                    {fetching || fetchResults ? "Loading..." : null}
                     {rows.map((row, r) => (
                         <div
                             key={r}
@@ -161,7 +167,7 @@ const ImageSearch = ({ onSelectImage }) => {
                                             cursor: "pointer",
                                             objectFit: "contain",
                                         }}
-                                        unsafe={!image.isFamilyFriendly}
+                                        // unsafe={!image.isFamilyFriendly}
                                     />
                                     {!image.isFamilyFriendly && (
                                         <TooltipWrapper

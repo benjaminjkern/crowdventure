@@ -4,12 +4,12 @@ import { type FormElement } from "../hooks";
 const CrowdventureCheckboxInput = ({
     formElement,
     label,
-    onChange = () => {},
+    onCheck = () => {},
     ...props
 }: {
     readonly formElement?: FormElement;
     readonly label: string;
-    readonly onChange?: (b: boolean) => void;
+    readonly onCheck?: (b: boolean) => unknown;
 } & DetailedHTMLProps<
     InputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
@@ -19,7 +19,7 @@ const CrowdventureCheckboxInput = ({
         <input
             defaultChecked={formElement?.defaultValue as boolean}
             onChange={(e) => {
-                onChange(e.target.checked);
+                onCheck(e.target.checked);
                 formElement?.setValue(e.target.checked);
             }}
             type="checkbox"

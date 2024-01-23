@@ -8,7 +8,7 @@ const ModalImage = ({
 }: {
     readonly src: string | null;
     readonly alt: string;
-    readonly style: CSSProperties;
+    readonly style?: CSSProperties;
 }) => {
     if (!src) return;
     return (

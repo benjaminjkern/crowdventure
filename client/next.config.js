@@ -3,6 +3,9 @@
  * for Docker builds.
  */
 /** @type {import("next").NextConfig} */
+
+if (!process.env.BING_API_KEY) throw new Error("MISSING BING API KEY");
+
 const config = {
     reactStrictMode: false,
 
@@ -16,6 +19,10 @@ const config = {
     i18n: {
         locales: ["en"],
         defaultLocale: "en",
+    },
+    env: {
+        BING_API_KEY: process.env.BING_API_KEY,
+        npm_package_version: process.env.npm_package_version,
     },
 
     // eslint-disable-next-line require-await

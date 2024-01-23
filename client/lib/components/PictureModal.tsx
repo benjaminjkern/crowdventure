@@ -10,7 +10,6 @@ const PictureModal = ({
     readonly pictureURL: string;
 }) => {
     const { closeModal } = useContext(ModalContext);
-    // TODO: Figure out how to do this well with the next/image
     return (
         <CrowdventureModal
             modalButtons={[
@@ -29,7 +28,6 @@ const PictureModal = ({
                     src={pictureURL}
                     style={{
                         objectFit: "cover",
-                        maxHeight: "70vh",
                     }}
                 />
             </div>

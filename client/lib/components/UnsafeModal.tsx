@@ -60,7 +60,7 @@ IX. User Account
             <CrowdventureCheckboxInput
                 checked={understand}
                 label="I agree to the terms of service."
-                onChange={setUnderstand}
+                onCheck={setUnderstand}
             />
         </CrowdventureModal>
     );

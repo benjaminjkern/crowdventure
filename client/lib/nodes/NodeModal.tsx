@@ -21,6 +21,7 @@ import CloseButton from "../components/CloseButton";
 import { PaletteContext } from "../colorPalette";
 import { type FormWithValues, useInputForm } from "../hooks";
 import apiClient from "../apiClient";
+import ModalImage from "../components/ModalImage";
 import { type Node } from "@/types/models";
 
 // import SearchImage from "../SearchImage";
@@ -53,80 +54,71 @@ const validateInputs = (
 
 const NodeModal = ({
     nodeForm,
+    originalPictureURL,
     ...modalProps
 }: {
     readonly nodeForm: FormWithValues<NodeForm>;
+    readonly originalPictureURL?: string | null;
     readonly modalButtons: ModalButton[];
     readonly modalTitle: string;
 }) => {
     const { user } = useContext(UserContext);
-    const { lightBackgroundColor } = useContext(PaletteContext);
+    const { mutedTextColor, lightBackgroundColor } = useContext(PaletteContext);
 
     const { pictureURL } = nodeForm.getValues();
 
+    const [showImageSearch, setShowImageSearch] = useState(false);
+
     return (
         <CrowdventureModal {...modalProps}>
-            {pictureURL ? (
-                <div
-                    style={{
-                        borderWidth: 1,
-                        borderStyle: "solid",
-                        borderColor: lightBackgroundColor,
-                        borderRadius: 8,
-                        position: "relative",
-                    }}
-                >
-                    <img
-                        alt="This text shouldnt be showing!"
-                        src={pictureURL}
-                        style={{
-                            padding: 1,
-                            borderRadius: 8,
-                        }}
-                    />
-                    {/* <CloseButton
+            <div style={{ position: "relative" }}>
+                <ModalImage
+                    alt="This text shouldnt be showing!"
+                    src={pictureURL}
+                />
+                {pictureURL ? (
+                    <CloseButton
                         onClick={() => {
-                            setPictureField("");
-                            setShouldHide(false);
+                            nodeForm.pictureURL.setValue("");
+                            // setShouldHide(false);
                         }}
-                    /> */}
-                </div>
-            ) : null}
-            {/* <div
+                        style={{ position: "absolute", top: 10, right: 10 }}
+                    />
+                ) : null}
+            </div>
+            <div
                 style={{
                     flexDirection: "row",
                     justifyContent: "space-between",
-                    marginTop: 5,
-                    marginBottom: 5,
+                    marginTop: pictureURL ? 10 : 0,
                 }}
             >
                 <span>Picture:</span>
-                <span style={{ color: mutedTextColor }}>
-                    {!pictureField
+                <span style={{ color: mutedTextColor, flex: 1 }}>
+                    {!pictureURL
                         ? "(Don't use any picture)"
-                        : pictureField === node?.pictureURL
+                        : pictureURL === originalPictureURL
                         ? "(Use existing picture)"
                         : "(Use new picture)"}
                 </span>
-            </div> */}
-            {/* <CrowdventureButton
-                onClick={() => setShowImageSearch(!showImageSearch)}
-            >
-                {pictureField ? "Change" : "Select"} Picture
-            </CrowdventureButton> */}
-            {/* {showImageSearch ? (
-                <>
-                    <br />
-                    <ImageSearch
-                        onSelectImage={(url, familyFriendly) => {
-                            setPictureField(url);
-                            // setShowChangePic(false);
-                            setShowImageSearch(false);
-                            setShouldHide(!familyFriendly);
-                        }}
-                    />
-                </>
-            ) : null} */}
+                <CrowdventureButton
+                    onClick={() => setShowImageSearch(!showImageSearch)}
+                    style={{ width: undefined }}
+                >
+                    {pictureURL ? "Change" : "Select"} Picture
+                </CrowdventureButton>
+            </div>
+            {showImageSearch ? (
+                <ImageSearch
+                    onSelectImage={(url, familyFriendly) => {
+                        nodeForm.pictureURL.setValue(url);
+                        // setShowChangePic(false);
+                        setShowImageSearch(false);
+                        // setShouldHide(!familyFriendly);
+                    }}
+                    style={{ marginTop: 10 }}
+                />
+            ) : null}
             <hr />
             <div style={{ gap: 5 }}>
                 Title:
@@ -171,14 +163,17 @@ export const CreateNodeModal = ({
     readonly pictureUnsafe?: boolean;
     readonly featured?: boolean;
 }) => {
-    const nodeForm = useInputForm({
-        title: "",
-        content: "",
-        pictureURL: initPictureURL ?? "",
-        pictureUnsafe: initPictureUnsafe ?? false,
-        hidden: false,
-        featured: initFeatured ?? false,
-    });
+    const nodeForm = useInputForm(
+        {
+            title: "",
+            content: "",
+            pictureURL: initPictureURL ?? "",
+            pictureUnsafe: initPictureUnsafe ?? false,
+            hidden: false,
+            featured: initFeatured ?? false,
+        },
+        ["pictureURL"]
+    );
     const { closeModal } = useContext(ModalContext);
     const createNode = async () => {
         if (!validateInputs(nodeForm)) return;
@@ -219,14 +214,17 @@ export const EditNodeModal = ({
     readonly onEditNode?: (n: Node) => unknown;
     readonly onDeleteNode?: () => unknown;
 }) => {
-    const nodeForm = useInputForm({
-        title: node.title,
-        content: node.content,
-        pictureURL: node.pictureURL ?? "",
-        pictureUnsafe: node.pictureUnsafe,
-        hidden: node.hidden,
-        featured: node.featured,
-    });
+    const nodeForm = useInputForm(
+        {
+            title: node.title,
+            content: node.content,
+            pictureURL: node.pictureURL ?? "",
+            pictureUnsafe: node.pictureUnsafe,
+            hidden: node.hidden,
+            featured: node.featured,
+        },
+        ["pictureURL"]
+    );
     const { openModal, closeModal, closeAllModals } = useContext(ModalContext);
     const editNode = async () => {
         if (!validateInputs(nodeForm)) return;
@@ -287,6 +285,7 @@ export const EditNodeModal = ({
             ]}
             modalTitle="Editing Page"
             nodeForm={nodeForm}
+            originalPictureURL={node.pictureURL}
         />
     );
 };

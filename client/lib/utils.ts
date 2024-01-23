@@ -11,7 +11,7 @@ export const deepCopy: <T>(object: T) => T = <T>(object: T) => {
     );
 };
 
-export const splitIntoRows = <T>(list: T[], numPerRow: number) =>
+export const splitIntoRows = <T>(list: T[], numPerRow: number): T[][] =>
     list.reduce(
         (p, c, i) =>
             i % numPerRow === 0
