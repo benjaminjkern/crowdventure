@@ -4,7 +4,6 @@ import Link from "next/link";
 import AccountManager from "./AccountManager";
 
 const Navbar = () => (
-    // TODO: Should collapse on smaller width screens
     <nav
         style={{
             height: 100,

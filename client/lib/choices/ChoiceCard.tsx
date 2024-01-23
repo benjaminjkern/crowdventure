@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
+import { faMinusCircle, faStar } from "@fortawesome/free-solid-svg-icons";
 import AccountPreview from "../accounts/AccountPreview";
 import CrowdventureCard from "../components/CrowdventureCard";
 import LikeDislikeController from "../components/LikeDislikeController";
@@ -7,15 +7,24 @@ import { UnsafeModeContext } from "../unsafeMode";
 import { UserContext } from "../user";
 import apiClient from "../apiClient";
 import { ModalContext } from "../modal";
+import ConfirmModal from "../components/ConfirmModal";
 import { EditChoiceModal } from "./ChoiceModal";
 import { type Choice } from "@/types/models";
 
-const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
+const ChoiceCard = ({
+    choice: initChoice,
+    onEditChoice,
+    onDeleteChoice,
+}: {
+    readonly choice: Choice;
+    readonly onEditChoice?: (c: Choice) => unknown;
+    readonly onDeleteChoice?: (c: Choice) => unknown;
+}) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { user } = useContext(UserContext);
 
     const [choice, setChoice] = useState(initChoice);
-    const { openModal, closeAllModals } = useContext(ModalContext);
+    const { openModal, closeModal } = useContext(ModalContext);
 
     useEffect(() => {
         setChoice(initChoice);
@@ -51,13 +60,21 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
                 isCanon: !choice.isCanon,
             }
         );
+        if (response.status === "error") return alert(response.error.message);
+        onEditChoice?.(response.data);
     };
 
-    const deleteChoice = () => {
-        apiClient.provide("delete", "/choice/deleteChoice", {
-            id: String(choice.id),
-        });
-        // TODO: Do stuff after
+    const deleteChoice = async () => {
+        const response = await apiClient.provide(
+            "delete",
+            "/choice/deleteChoice",
+            {
+                id: String(choice.id),
+            }
+        );
+        if (response.status === "error") return alert(response.error.message);
+        onDeleteChoice?.(choice);
+        closeModal();
     };
 
     // Hide hidden actions, but show if you
@@ -100,7 +117,19 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
                         userOwnsChoice
                     ),
                     text: "Delete",
-                    onClick: deleteChoice,
+                    onClick: () => {
+                        openModal(
+                            <ConfirmModal
+                                onConfirm={() => deleteChoice()}
+                                title="Delete Choice"
+                            >
+                                This will erase this choice from this page, and
+                                its associated score from all score tracking.
+                                This will NOT delete the page this choice leads
+                                to. Are you sure you wish to continue?
+                            </ConfirmModal>
+                        );
+                    },
                 },
                 {
                     disabled: !(
@@ -110,20 +139,37 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
                     ),
                     text: "Edit",
                     onClick: () => {
-                        openModal(<EditChoiceModal choice={choice} />);
+                        openModal(
+                            <EditChoiceModal
+                                choice={choice}
+                                onEditChoice={setChoice}
+                            />
+                        );
                     },
                 },
             ]}
             href={choice.toNode ? `/node/${choice.toNode.slug}` : undefined}
             overlayIcons={[
                 {
+                    active: choice.isCanon,
+                    tooltip: (
+                        <span>
+                            This choice is &quot;canon&quot; in this story,
+                            according to{" "}
+                            {choice.fromNode.owner?.screenName ?? "the owner"}.
+                        </span>
+                    ),
+                    icon: faStar,
+                    iconColor: "yellow",
+                },
+                {
                     active: choiceHidden,
                     tooltip: (
                         <span>
-                            This action is hidden, because it has been marked as
+                            This choice is hidden, because it has been marked as
                             unsafe! You can see it because you are{" "}
                             {unsafeMode ? "in Unsafe Mode." : "the owner."}
-                            {/* TODO: Lol not specifying the owner of the choice or the node */}
+                            {/* Lol not specifying the owner of the choice or the node, but it doesnt really matter I guess */}
                         </span>
                     ),
                     icon: faMinusCircle,
@@ -133,7 +179,7 @@ const ChoiceCard = ({ choice: initChoice }: { readonly choice: Choice }) => {
                     active: toNodeHidden,
                     tooltip: (
                         <span>
-                            This page this action leads to is hidden, because it
+                            This page this choice leads to is hidden, because it
                             has been marked as unsafe!
                             {!disabled ? (
                                 ""

@@ -111,7 +111,27 @@ const NodeSidebar = ({
                 >
                     <Masonry>
                         {choices.map((choice, idx) => (
-                            <ChoiceCard choice={choice} key={idx} />
+                            <ChoiceCard
+                                choice={choice}
+                                key={idx}
+                                onDeleteChoice={(newChoice) => {
+                                    setChoices(
+                                        choices.filter(
+                                            (otherChoice) =>
+                                                otherChoice.id !== newChoice.id
+                                        )
+                                    );
+                                }}
+                                onEditChoice={(newChoice) => {
+                                    setChoices(
+                                        choices.map((otherChoice) =>
+                                            otherChoice.id === newChoice.id
+                                                ? newChoice
+                                                : otherChoice
+                                        )
+                                    );
+                                }}
+                            />
                         ))}
                     </Masonry>
                 </ResponsiveMasonry>

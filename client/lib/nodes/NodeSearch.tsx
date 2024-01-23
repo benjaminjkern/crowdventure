@@ -20,16 +20,18 @@ const useStyles = createUseStyles(({ lightBackgroundColor }: PaletteType) => ({
 
 const NodeSearch = ({
     onSelectNode,
-    query: initQuery,
+    node: initNode,
 }: {
     readonly onSelectNode: (node: Node | null) => void;
-    readonly query?: string;
+    readonly node: Node | null;
 }) => {
-    const [resultNodes, setResultNodes] = useState<Node[]>([]);
+    const [resultNodes, setResultNodes] = useState<Node[]>(
+        initNode ? [initNode] : []
+    );
 
     const [open, setOpen] = useState(false);
     const [fetching, setFetching] = useState(false);
-    const [query, setQuery] = useState(initQuery ?? "");
+    const [query, setQuery] = useState(initNode?.title ?? "");
     const { backgroundColor } = useContext(PaletteContext);
 
     const selectNode = (node: Node | null) => {

@@ -42,7 +42,7 @@ const ChoiceModal = ({
             Action:
             <CrowdventureTextInput formElement={choiceForm.action} />
             Go to Page:
-            <NodeSearch onSelectNode={setToNode} query={toNode?.title} />
+            <NodeSearch node={toNode} onSelectNode={setToNode} />
             {user?.isAdmin ? (
                 <>
                     <hr />
@@ -129,7 +129,7 @@ export const EditChoiceModal = ({
         action: choice.action,
         hidden: choice.hidden,
     });
-    const [toNode, setToNode] = useState<Node | null>(null);
+    const [toNode, setToNode] = useState<Node | null>(choice.toNode);
     const { openModal, closeAllModals } = useContext(ModalContext);
     const editChoice = async (newToNode: Node | null) => {
         const { action, hidden } = choiceForm.getValues();
