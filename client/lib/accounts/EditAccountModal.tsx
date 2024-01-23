@@ -39,7 +39,7 @@ const EditAccountModal = ({
         ["profilePicURL", "pass1"]
     );
 
-    const editPage = async () => {
+    const editAccount = async () => {
         const {
             pass1,
             pass2,
@@ -50,10 +50,6 @@ const EditAccountModal = ({
             hidden,
             isAdmin,
         } = editAccountForm.getValues();
-        if (pass1 && pass2 && pass1 !== pass2) {
-            editAccountForm.setError("Passwords must match!");
-            return;
-        }
 
         const params: {
             id: number;
@@ -69,9 +65,16 @@ const EditAccountModal = ({
             screenName,
             bio: bio || null,
             profilePicURL: profilePicURL || null,
-            oldPassword,
-            newPassword: pass1,
         };
+
+        if (pass1) {
+            if (pass1 !== pass2) {
+                editAccountForm.setError("Passwords must match!");
+                return;
+            }
+            params.oldPassword = oldPassword;
+            params.newPassword = pass1;
+        }
         if (user?.isAdmin) {
             params.hidden = hidden;
             params.isAdmin = isAdmin;
@@ -105,8 +108,9 @@ const EditAccountModal = ({
 
     return (
         <CrowdventureModal
+            contentStyle={{ gap: 5 }}
             modalButtons={[
-                { text: "Edit Account", onClick: editPage },
+                { text: "Edit Account", onClick: editAccount },
                 {
                     text: "Delete Account",
                     onClick: () => {
@@ -122,6 +126,7 @@ const EditAccountModal = ({
                             </ConfirmModal>
                         );
                     },
+                    category: "error",
                 },
             ]}
             modalTitle="Editing Account"
@@ -137,7 +142,8 @@ const EditAccountModal = ({
                             : 0.2,
                 }}
             />
-            {account.screenName}
+            Screen Name:
+            <CrowdventureTextInput disabled value={account.screenName} />
             Profile Pic URL:
             <CrowdventureTextInput
                 formElement={editAccountForm.profilePicURL}

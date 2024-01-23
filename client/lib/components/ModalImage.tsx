@@ -12,16 +12,24 @@ const ModalImage = ({
 }) => {
     if (!src) return;
     return (
-        <Image
-            alt={alt}
-            height={200}
-            src={src}
+        <div
             style={{
-                borderRadius: 8,
-                ...style,
+                position: "relative",
+                height: "min(100vw, 50vh)",
+                width: "100%",
             }}
-            width={200}
-        />
+        >
+            <Image
+                alt={alt}
+                fill
+                src={src}
+                style={{
+                    objectFit: "cover",
+                    borderRadius: 8,
+                    ...style,
+                }}
+            />
+        </div>
     );
 };
 

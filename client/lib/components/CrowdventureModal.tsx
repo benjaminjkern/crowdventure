@@ -38,62 +38,66 @@ const CrowdventureModal = ({
                 left: 0,
                 top: 0,
                 width: "100%",
-                height: "100%",
+                height: "100vh",
                 alignItems: "center",
                 justifyContent: "center",
                 zIndex: 10,
                 backgroundColor: "rgba(0,0,0,0.5)",
-                overflow: "scroll",
                 ...modalStyle,
             }}
         >
-            <div
-                onMouseDown={(e) => {
-                    e.stopPropagation();
-                }}
-                style={{
-                    margin: 50,
-                    width: 600,
-                    backgroundColor: backgroundColor[1],
-                    padding: 20,
-                    borderRadius: 20,
-                }}
-            >
+            <div style={{ height: "fit-content", overflow: "scroll" }}>
                 <div
+                    onMouseDown={(e) => {
+                        e.stopPropagation();
+                    }}
                     style={{
-                        position: "relative",
-                        borderBottomColor: lightBackgroundColor,
-                        borderBottomWidth: 1,
-                        borderBottomStyle: "solid",
-                        textAlign: "center",
-                        marginBottom: 10,
-                        paddingBottom: 10,
+                        margin: 30,
+                        width: "min(600px, 100vw - 60px)",
+                        backgroundColor: backgroundColor[1],
+                        padding: 20,
+                        borderRadius: 20,
                     }}
                 >
-                    {modalTitle}
-                    <CloseButton
-                        onClick={closeModal}
-                        style={{ position: "absolute", top: 0, right: 0 }}
-                    />
+                    <div
+                        style={{
+                            position: "relative",
+                            borderBottomColor: lightBackgroundColor,
+                            borderBottomWidth: 1,
+                            borderBottomStyle: "solid",
+                            textAlign: "center",
+                            marginBottom: 10,
+                            paddingBottom: 10,
+                        }}
+                    >
+                        {modalTitle}
+                        <CloseButton
+                            onClick={closeModal}
+                            style={{ position: "absolute", top: 0, right: 0 }}
+                        />
+                    </div>
+                    <div style={contentStyle}>{children}</div>
+                    {modalButtons.length ? (
+                        <>
+                            <hr />
+                            <div style={{ gap: 10, flexDirection: "row" }}>
+                                {modalButtons.map(
+                                    ({ active = true, text, ...props }, i) => {
+                                        if (!active) return;
+                                        return (
+                                            <CrowdventureButton
+                                                key={i}
+                                                {...props}
+                                            >
+                                                {text}
+                                            </CrowdventureButton>
+                                        );
+                                    }
+                                )}
+                            </div>
+                        </>
+                    ) : null}
                 </div>
-                <div style={contentStyle}>{children}</div>
-                {modalButtons.length ? (
-                    <>
-                        <hr />
-                        <div style={{ gap: 10, flexDirection: "row" }}>
-                            {modalButtons.map(
-                                ({ active = true, text, ...props }, i) => {
-                                    if (!active) return;
-                                    return (
-                                        <CrowdventureButton key={i} {...props}>
-                                            {text}
-                                        </CrowdventureButton>
-                                    );
-                                }
-                            )}
-                        </div>
-                    </>
-                ) : null}
             </div>
         </div>
     );

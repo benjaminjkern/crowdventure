@@ -43,11 +43,13 @@ const SignUpModal = () => {
             Create Password:
             <CrowdventureTextInput
                 formElement={signupForm.pass1}
+                onPressEnter={handleSubmitSignUp}
                 type="password"
             />
             Confirm Password:
             <CrowdventureTextInput
                 formElement={signupForm.pass2}
+                onPressEnter={handleSubmitSignUp}
                 type="password"
             />
             {signupForm.getError()}

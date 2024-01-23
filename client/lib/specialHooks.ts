@@ -21,17 +21,19 @@ export const useSafeGuardedNodes = (
         safeNodes,
         allNodes: [],
     });
+    const [fetched, setFetched] = useState(false);
 
     const { unsafeMode } = useContext(UnsafeModeContext);
 
     useEffect(() => {
         if (!unsafeMode) return;
-        if (nodesLists.allNodes.length) return;
+        if (fetched) return;
         getUnsafeNodes().then((unsafeNodes) => {
             setNodesLists({
                 ...nodesLists,
                 allNodes: unsafeNodes,
             });
+            setFetched(true);
         });
     });
     return [

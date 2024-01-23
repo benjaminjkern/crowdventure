@@ -12,23 +12,25 @@ import { type PaletteType } from "../colorPalette";
 import { type FormElement } from "../hooks";
 import CloseButton from "./CloseButton";
 
-const useStyles = createUseStyles(
-    ({ lightBackgroundColor, backgroundColor, textColor }: PaletteType) => ({
-        textInputStyle: {
-            backgroundColor: backgroundColor[2],
-            color: textColor,
-            border: `1px solid ${lightBackgroundColor}`,
-            padding: 5,
-            borderRadius: 5,
-            width: "100%",
-            resize: "vertical",
-            "&:focus": {
-                outline: "none",
-                backgroundColor: lightBackgroundColor,
-            },
+const useStyles = createUseStyles<
+    "textInputStyle",
+    { disabled: boolean },
+    PaletteType
+>(({ lightBackgroundColor, backgroundColor, textColor }: PaletteType) => ({
+    textInputStyle: {
+        backgroundColor: backgroundColor[2],
+        color: ({ disabled }) => (disabled ? "gray" : textColor),
+        border: `1px solid ${lightBackgroundColor}`,
+        padding: 5,
+        borderRadius: 5,
+        width: "100%",
+        resize: "vertical",
+        "&:focus": {
+            outline: "none",
+            backgroundColor: lightBackgroundColor,
         },
-    })
-);
+    },
+}));
 
 const CrowdventureTextInput = ({
     formElement,
@@ -52,7 +54,7 @@ const CrowdventureTextInput = ({
       >
     | DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
 )) => {
-    const { textInputStyle } = useStyles();
+    const { textInputStyle } = useStyles({ disabled: props.disabled ?? false });
     const appliedProps = {
         onChange: (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
             onChangeText(e.target.value);

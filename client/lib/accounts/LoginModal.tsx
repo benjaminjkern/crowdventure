@@ -37,7 +37,10 @@ const LoginModal = () => {
             modalTitle="Log in"
         >
             Screen Name:
-            <CrowdventureTextInput formElement={loginForm.screenName} />
+            <CrowdventureTextInput
+                formElement={loginForm.screenName}
+                onPressEnter={login}
+            />
             Password:
             <CrowdventureTextInput
                 formElement={loginForm.password}
