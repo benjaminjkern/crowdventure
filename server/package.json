@@ -10,7 +10,7 @@
         "gen-client": "tsx scripts/generateClient.ts",
         "dev": "nodemon --ext '*' --exec 'pnpm gen-client && tsx index.ts'",
         "seed-db": "tsx scripts/writeDb.ts",
-        "build": "npx tsup index.ts",
+        "build": "tsup index.ts",
         "start": "node dist/index.js"
     },
     "dependencies": {
