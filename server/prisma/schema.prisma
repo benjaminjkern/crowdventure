@@ -7,22 +7,24 @@ generator zod {
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+    // provider="postgresql"
+    provider     = "mysql"
+    url          = env("DATABASE_URL")
+    relationMode = "prisma"
 }
 
 model Account {
     id Int @id @default(autoincrement())
 
-    screenName        String   @unique
+    screenName        String   @unique @db.VarChar(20)
     createdAt         DateTime @default(now())
     updatedAt         DateTime @updatedAt
     encryptedPassword String
     isAdmin           Boolean  @default(false)
     hidden            Boolean  @default(false)
-    profilePicURL     String?
+    profilePicURL     String?  @db.VarChar(1000)
     profilePicUnsafe  Boolean  @default(false)
-    bio               String?
+    bio               String?  @db.VarChar(1000)
 
     lastIP String // Iffy about this
 
@@ -40,13 +42,13 @@ model Node {
     id Int @id @default(autoincrement())
 
     slug          String   @unique
-    title         String
-    content       String
+    title         String   @db.VarChar(100)
+    content       String   @db.VarChar(1000)
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
     storedViews   Int // Todo: Convert these to regular views
     featured      Boolean  @default(false)
-    pictureURL    String?
+    pictureURL    String?  @db.VarChar(1000)
     pictureUnsafe Boolean  @default(false)
     hidden        Boolean  @default(false)
 
@@ -64,7 +66,7 @@ model Choice {
     id Int @id @default(autoincrement())
 
     slug      String   @unique // Only needed for initial migration to link feedback to choices
-    action    String
+    action    String   @db.VarChar(100)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     hidden    Boolean  @default(false)
@@ -87,7 +89,7 @@ model Feedback {
     IP            String // Iffy about this
     reportingType String? // Node | Choice | Account
     reportingId   Int?
-    info          String
+    info          String   @db.VarChar(100)
     createdAt     DateTime @default(now())
 
     submittedBy   Account? @relation(fields: [submittedById], references: [id])
@@ -97,9 +99,9 @@ model Feedback {
 model Notification {
     id Int @id @default(autoincrement())
 
-    content   String
+    content   String   @db.VarChar(200)
     createdAt DateTime @default(now())
-    link      String?
+    link      String?  @db.VarChar(100)
     seen      Boolean  @default(false)
 
     account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)

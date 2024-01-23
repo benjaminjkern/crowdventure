@@ -9,7 +9,7 @@
     "scripts": {
         "gen-client": "tsx scripts/generateClient.ts",
         "start": "nodemon --ext '*' --exec 'pnpm gen-client && tsx index.ts'",
-        "save-db": "tsx scripts/saveDb.ts"
+        "seed-db": "tsx scripts/writeDb.ts"
     },
     "dependencies": {
         "@prisma/client": "5.7.1",
