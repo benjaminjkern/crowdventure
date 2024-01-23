@@ -109,15 +109,16 @@ const NodeModal = ({
                 </CrowdventureButton>
             </div>
             {showImageSearch ? (
-                <ImageSearch
-                    onSelectImage={(url, familyFriendly) => {
-                        nodeForm.pictureURL.setValue(url);
-                        // setShowChangePic(false);
-                        setShowImageSearch(false);
-                        // setShouldHide(!familyFriendly);
-                    }}
-                    style={{ marginTop: 10 }}
-                />
+                <div style={{ marginTop: 10 }}>
+                    <ImageSearch
+                        onSelectImage={(url, familyFriendly) => {
+                            nodeForm.pictureURL.setValue(url);
+                            // setShowChangePic(false);
+                            setShowImageSearch(false);
+                            // setShouldHide(!familyFriendly);
+                        }}
+                    />
+                </div>
             ) : null}
             <hr />
             <div style={{ gap: 5 }}>

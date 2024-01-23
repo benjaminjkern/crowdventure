@@ -11,6 +11,7 @@ const ModalImage = ({
     readonly style?: CSSProperties;
 }) => {
     if (!src) return;
+
     return (
         <div
             style={{
