@@ -47,7 +47,7 @@ const LikeDislikeController = ({
                     borderColor: dislikeColor,
                     borderStyle: "solid",
                     borderWidth: 0,
-                    borderBottomWidth: hover ? 1 : 0,
+                    borderBottomWidth: user && hover ? 1 : 0,
                 })}
             />
             {` ${count} `}
@@ -63,7 +63,7 @@ const LikeDislikeController = ({
                     borderColor: likeColor,
                     borderStyle: "solid",
                     borderWidth: 0,
-                    borderBottomWidth: hover ? 1 : 0,
+                    borderBottomWidth: user && hover ? 1 : 0,
                 })}
             />
         </span>
