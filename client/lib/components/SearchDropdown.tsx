@@ -13,7 +13,7 @@ const SearchDropdown = ({
     readonly onChangeText: (s: string) => unknown;
     readonly placeholder?: string;
 }) => {
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     const { backgroundColor } = useContext(PaletteContext);
 
     return (

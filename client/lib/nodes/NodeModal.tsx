@@ -1,11 +1,4 @@
-import Image from "next/image";
-import React, {
-    useContext,
-    useState,
-    type Dispatch,
-    type SetStateAction,
-} from "react";
-import { useRouter } from "next/router";
+import React, { useContext, useState } from "react";
 
 import CrowdventureButton from "../components/CrowdventureButton";
 import CrowdventureModal, {
@@ -63,9 +56,9 @@ const NodeModal = ({
     readonly modalTitle: string;
 }) => {
     const { user } = useContext(UserContext);
-    const { mutedTextColor, lightBackgroundColor } = useContext(PaletteContext);
+    const { mutedTextColor } = useContext(PaletteContext);
 
-    const { pictureURL } = nodeForm.getValues();
+    const { pictureURL, pictureUnsafe } = nodeForm.getValues();
 
     const [showImageSearch, setShowImageSearch] = useState(false);
 
@@ -113,9 +106,8 @@ const NodeModal = ({
                     <ImageSearch
                         onSelectImage={(url, familyFriendly) => {
                             nodeForm.pictureURL.setValue(url);
-                            // setShowChangePic(false);
+                            nodeForm.pictureUnsafe.setValue(!familyFriendly);
                             setShowImageSearch(false);
-                            // setShouldHide(!familyFriendly);
                         }}
                     />
                 </div>
@@ -142,13 +134,13 @@ const NodeModal = ({
                 </>
             ) : null}
             {nodeForm.getError()}
-            {/* {shouldHide ? (
+            {pictureUnsafe ? (
                 <span style={{ color: "red" }}>
                     The image chosen will cause the page to automatically be
                     hidden. If you would like to not have this happen, change or
                     remove the image.
                 </span>
-            ) : null} */}
+            ) : null}
         </CrowdventureModal>
     );
 };
@@ -173,7 +165,7 @@ export const CreateNodeModal = ({
             hidden: false,
             featured: initFeatured ?? false,
         },
-        ["pictureURL"]
+        ["pictureURL", "pictureUnsafe"]
     );
     const { closeModal } = useContext(ModalContext);
     const createNode = async () => {
@@ -224,7 +216,7 @@ export const EditNodeModal = ({
             hidden: node.hidden,
             featured: node.featured,
         },
-        ["pictureURL"]
+        ["pictureURL", "pictureUnsafe"]
     );
     const { openModal, closeModal, closeAllModals } = useContext(ModalContext);
     const editNode = async () => {

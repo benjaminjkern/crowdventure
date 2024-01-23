@@ -13,17 +13,17 @@ import SearchDropdown from "./SearchDropdown";
 
 const useStyles = createUseStyles<
     "imageClass",
-    { unsafe: boolean },
+    { unsafe: boolean; exists: boolean },
     PaletteType
 >(({ lightBackgroundColor }: PaletteType) => ({
-    imageClass: ({ unsafe }) => ({
+    imageClass: ({ unsafe, exists }) => ({
         padding: 10,
         position: "relative",
         flex: 1,
         height: "100%",
-        cursor: "pointer",
+        cursor: exists ? "pointer" : undefined,
         "&:hover": {
-            backgroundColor: lightBackgroundColor,
+            backgroundColor: exists ? lightBackgroundColor : undefined,
         },
         borderRadius: 5,
         "& img": {
@@ -48,43 +48,52 @@ const ImageResult = ({
     image,
     onClick,
 }: {
-    readonly image: BingImage;
+    readonly image: BingImage | null;
     readonly onClick: (m: MouseEvent) => unknown;
 }) => {
-    const { imageClass } = useStyles({ unsafe: !image.isFamilyFriendly });
+    const { imageClass } = useStyles({
+        unsafe: !image?.isFamilyFriendly,
+        exists: Boolean(image),
+    });
     return (
         <div className={imageClass} onClick={onClick}>
-            {!image.isFamilyFriendly && (
-                <TooltipWrapper
-                    tooltip={
-                        <span>
-                            This picture will automatically flag this page as
-                            hidden!
-                        </span>
-                    }
-                >
-                    <FontAwesomeIcon
-                        color="red"
-                        icon={faWarning}
+            {image ? (
+                <>
+                    {!image.isFamilyFriendly && (
+                        <TooltipWrapper
+                            tooltip={
+                                <span>
+                                    This picture will automatically flag this
+                                    page as hidden!
+                                </span>
+                            }
+                            tooltipStyle={{ top: 0 }}
+                        >
+                            <FontAwesomeIcon
+                                color="red"
+                                icon={faWarning}
+                                style={{
+                                    position: "absolute",
+                                    top: 5,
+                                    left: 5,
+                                    zIndex: 1,
+                                    width: 20,
+                                }}
+                            />
+                        </TooltipWrapper>
+                    )}
+                    <img
+                        src={image.thumbnailUrl}
                         style={{
-                            position: "absolute",
-                            top: 5,
-                            left: 5,
-                            zIndex: 1,
+                            marginRight: 10,
+                            borderRadius: 4,
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
                         }}
                     />
-                </TooltipWrapper>
-            )}
-            <img
-                src={image.thumbnailUrl}
-                style={{
-                    marginRight: 10,
-                    borderRadius: 4,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                }}
-            />
+                </>
+            ) : null}
         </div>
     );
 };
@@ -97,13 +106,12 @@ const ImageSearch = ({
     const { unsafeMode } = useContext(UnsafeModeContext);
 
     const [images, setImages] = useState<BingImage[]>([]);
-
+    const [fetching, setFetching] = useState(false);
     const [query, setQuery] = useState("");
 
     const PAGESIZE = 20;
     const MAXROWLENGTH = 2;
 
-    // TODO: Add this stuff for filtering out accidental bad images
     const checkImage = async (image: BingImage): Promise<BingImage | null> => {
         if (!image.isFamilyFriendly && !unsafeMode) return null;
         return await new Promise((resolve) => {
@@ -138,6 +146,7 @@ const ImageSearch = ({
                         await Promise.all(response.data.value.map(checkImage))
                     ).filter((image) => image) as BingImage[]
                 );
+                setFetching(false);
             })
             .catch(console.error);
     });
@@ -149,37 +158,47 @@ const ImageSearch = ({
             onChangeText={(newQuery) => {
                 // if (newQuery.length === 0) return selectNode(null);
                 setQuery(newQuery);
-                // setFetching(true);
-                // searchNodes(newQuery);
 
-                if (newQuery.length > 0) fetchImages(newQuery);
+                if (newQuery.length === 0) return;
+                setFetching(true);
+                fetchImages(newQuery);
             }}
             placeholder="Search for an image..."
             query={query}
         >
-            {rows.map((row, r) => (
-                <div
-                    key={r}
-                    style={{
-                        height: 150,
-                        width: "100%",
-                        flexDirection: "row",
-                    }}
-                >
-                    {row.map((image, i) => (
-                        <ImageResult
-                            image={image}
-                            key={i}
-                            onClick={() => {
-                                onSelectImage(
-                                    image.contentUrl,
-                                    image.isFamilyFriendly
-                                );
-                            }}
-                        />
-                    ))}
-                </div>
-            ))}
+            {rows.length ? (
+                rows.map((row, r) => (
+                    <div
+                        key={r}
+                        style={{
+                            height: 150,
+                            width: "100%",
+                            flexDirection: "row",
+                        }}
+                    >
+                        {(row.length === 2
+                            ? row
+                            : ([row[0], null] as (BingImage | null)[])
+                        ).map((image, i) => (
+                            <ImageResult
+                                image={image}
+                                key={i}
+                                onClick={() => {
+                                    if (!image) return;
+                                    onSelectImage(
+                                        image.contentUrl,
+                                        image.isFamilyFriendly
+                                    );
+                                }}
+                            />
+                        ))}
+                    </div>
+                ))
+            ) : fetching ? (
+                <>Loading...</>
+            ) : (
+                <>No results!</>
+            )}
         </SearchDropdown>
     );
 };

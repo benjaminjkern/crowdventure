@@ -100,7 +100,7 @@ const NodeCard = ({
                     iconColor: "yellow",
                 },
                 {
-                    active: node.hidden,
+                    active: node.hidden || node.pictureUnsafe,
                     tooltip: (
                         <span>
                             This page is hidden, because it has been marked as
