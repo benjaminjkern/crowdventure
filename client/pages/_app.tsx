@@ -58,6 +58,11 @@ const App: AppType<DefaultPageProps> = ({ Component, pageProps }) => {
                     }
                     property="og:image"
                 />
+                <script
+                    async
+                    crossOrigin="anonymous"
+                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3556492457867678"
+                />
 
                 <title>{pageTitle ?? "Crowdventure"}</title>
                 <link href="/favicon.png" rel="icon" />
