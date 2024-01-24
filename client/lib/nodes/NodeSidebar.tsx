@@ -9,6 +9,7 @@ import ChoiceCard from "../choices/ChoiceCard";
 import { PaletteContext } from "../colorPalette";
 import ParagraphText from "../components/ParagraphText";
 import { CreateChoiceModal } from "../choices/ChoiceModal";
+import { useMediaQuery } from "../hooks";
 import { EditNodeModal } from "./NodeModal";
 import { type Choice, type Node } from "@/types/models";
 
@@ -27,6 +28,8 @@ const NodeSidebar = ({
     const { openModal } = useContext(ModalContext);
     const { mutedTextColor } = useContext(PaletteContext);
 
+    const isMobile = useMediaQuery("(max-width: 800px)");
+
     const canonChoices = choices.filter((choice) => choice.isCanon);
 
     const router = useRouter();
@@ -37,13 +40,16 @@ const NodeSidebar = ({
             <div
                 style={{
                     gap: 20,
-                    marginInline: 20,
-                    marginTop: 30,
+                    margin: 20,
+                    marginBottom: 15,
+                    marginInline: isMobile ? 20 : 0,
                 }}
             >
-                <h1 style={{ textAlign: "center", display: "block" }}>
-                    {node.title}
-                </h1>
+                {!isMobile && (
+                    <h1 style={{ textAlign: "center", display: "block" }}>
+                        {node.title}
+                    </h1>
+                )}
 
                 <ParagraphText text={node.content} />
 
@@ -59,10 +65,11 @@ const NodeSidebar = ({
                 style={{
                     flexDirection: "row",
                     justifyContent: "space-between",
+                    flexWrap: "wrap",
                 }}
             >
                 <span>Views: {node.views}</span>
-                <span style={{ gap: 5 }}>
+                <span style={{ gap: 5, flexWrap: "wrap" }}>
                     Author: <AccountPreview account={node.owner} />
                 </span>
             </div>

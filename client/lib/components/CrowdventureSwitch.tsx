@@ -12,7 +12,7 @@ const CrowdventureSwitch = ({
     readonly size?: number;
     readonly padding?: number;
 }) => {
-    const { lightBackgroundColor, rootColor, backgroundColor } =
+    const { lightBackgroundColor, rootColor, textColor } =
         useContext(PaletteContext);
     return (
         <div
@@ -25,13 +25,16 @@ const CrowdventureSwitch = ({
                 backgroundColor: lightBackgroundColor,
                 padding,
                 cursor: "pointer",
+                outlineWidth: 1,
+                outlineStyle: "solid",
+                outlineColor: textColor,
             }}
         >
             <div
                 style={{
                     position: "relative",
                     transition: "left 0.3s, background-color 0.3s",
-                    backgroundColor: value ? rootColor[1] : backgroundColor[1],
+                    backgroundColor: value ? rootColor[2] : textColor,
                     width: size - padding * 2,
                     height: size - padding * 2,
                     borderRadius: size, // Overdo it, always a circle

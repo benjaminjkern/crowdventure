@@ -14,7 +14,7 @@ const NavbarCollapse = ({
     <FontAwesomeIcon
         icon={faBars}
         onClick={onClick}
-        style={{ cursor: "pointer", width: 30 }}
+        style={{ cursor: "pointer", width: 30, marginRight: 20 }}
     />
 );
 

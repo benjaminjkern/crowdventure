@@ -70,13 +70,24 @@ const useDefaultStyles = createUseStyles((theme: PaletteType) => {
                 fontSize: DEFAULT_TEXT_SIZE,
                 color: textColor,
                 margin: 0,
-                backgroundImage: `linear-gradient(
-                    to right,
-                    rgb(158, 232, 255),
-                    ${backgroundColor[0]} 10%,
-                    ${backgroundColor[0]} 90%,
-                    rgb(158, 232, 255)
-                )`,
+                "@media (max-width: 800px)": {
+                    backgroundImage: `linear-gradient(
+                        to right,
+                        rgb(158, 232, 255),
+                        ${backgroundColor[0]} 30px,
+                        ${backgroundColor[0]} calc(100% - 30px),
+                        rgb(158, 232, 255)
+                    )`,
+                },
+                "@media (min-width: 801px)": {
+                    backgroundImage: `linear-gradient(
+                        to right,
+                        rgb(158, 232, 255),
+                        ${backgroundColor[0]} 10%,
+                        ${backgroundColor[0]} 90%,
+                        rgb(158, 232, 255)
+                    )`,
+                },
             },
         },
     };

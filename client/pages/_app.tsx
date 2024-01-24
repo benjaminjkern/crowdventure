@@ -2,6 +2,7 @@ import React from "react";
 import Head from "next/head";
 import { type AppType } from "next/app";
 
+import { createUseStyles } from "react-jss";
 import Footer from "+/lib/base/Footer";
 import Navbar from "+/lib/base/Navbar";
 
@@ -18,8 +19,21 @@ export type DefaultPageProps = {
     previewImage?: string | null;
 };
 
+const useStyles = createUseStyles({
+    insideDiv: {
+        minHeight: "100vh",
+        "@media (min-width: 801px)": {
+            width: `calc(min(80vw, ${MAX_CONTENT_WIDTH}px) - 20px)`,
+        },
+        "@media (max-width: 800px)": {
+            width: "calc(100vw - 60px)",
+        },
+    },
+});
+
 const App: AppType<DefaultPageProps> = ({ Component, pageProps }) => {
     const { pageTitle, previewImage, ...otherPageProps } = pageProps;
+    const { insideDiv } = useStyles();
 
     return (
         <>
@@ -53,19 +67,14 @@ const App: AppType<DefaultPageProps> = ({ Component, pageProps }) => {
                 <UnsafeModeProvider>
                     <PaletteProvider>
                         <ModalProvider>
-                            <div
-                                style={{
-                                    minHeight: "100vh",
-                                    paddingInline: `max(30px, 50vw - ${
-                                        MAX_CONTENT_WIDTH / 2
-                                    }px)`,
-                                }}
-                            >
-                                <Navbar />
-                                <div style={{ flex: 1 }}>
-                                    <Component {...otherPageProps} />
+                            <div style={{ alignItems: "center" }}>
+                                <div className={insideDiv}>
+                                    <Navbar />
+                                    <div style={{ flex: 1 }}>
+                                        <Component {...otherPageProps} />
+                                    </div>
+                                    <Footer />
                                 </div>
-                                <Footer />
                             </div>
                         </ModalProvider>
                     </PaletteProvider>

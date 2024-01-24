@@ -14,7 +14,7 @@ const useStyles = createUseStyles(
             padding: 5,
             borderRadius: 5,
             backgroundColor: textColor,
-            color: backgroundColor[0],
+            color: backgroundColor[2],
             width: 200,
             zIndex: 2,
             "div:hover + &": {

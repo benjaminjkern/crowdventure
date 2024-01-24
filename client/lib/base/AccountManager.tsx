@@ -119,7 +119,7 @@ const AccountManager = ({
                             flagged as unsafe for the general public!
                         </span>
                     }
-                    tooltipStyle={{ top: "100%" }}
+                    tooltipStyle={{ top: "calc(100% + 5px)", right: 0 }}
                 >
                     <FontAwesomeIcon
                         icon={faInfoCircle}

@@ -10,6 +10,7 @@ import { CreateNodeModal } from "+/lib/nodes/NodeModal";
 import { type Node } from "@/types/models";
 import apiClient from "+/lib/apiClient";
 import { useSafeGuardedNodes } from "+/lib/specialHooks";
+import { UserContext } from "+/lib/user";
 
 const getFeaturedNodes = async (unsafeMode: boolean) => {
     const response = await apiClient.provide("get", "/node/featuredNodes", {
@@ -29,17 +30,19 @@ const HomePage = ({ featuredNodes: initFeaturedNodes }: HomePageProps) => {
         initFeaturedNodes,
         () => getFeaturedNodes(true)
     );
+    const { user } = useContext(UserContext);
 
     return (
         <>
-            <CrowdventureButton
-                onClick={() => openModal(<CreateNodeModal />)}
-                requireSignedIn
-            >
-                Create a New Adventure!
-            </CrowdventureButton>
-
-            <hr />
+            {user ? (
+                <CrowdventureButton
+                    onClick={() => openModal(<CreateNodeModal />)}
+                    requireSignedIn
+                    style={{ marginBlock: 10 }}
+                >
+                    Create a New Adventure!
+                </CrowdventureButton>
+            ) : null}
 
             <h3>Featured Stories:</h3>
             <NodeViewer

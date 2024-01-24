@@ -28,7 +28,7 @@ const AccountPreview = ({
 }) => {
     const imageSize = 30 * scale;
     const textSize = DEFAULT_TEXT_SIZE * scale;
-    const { mutedTextColor } = useContext(PaletteContext);
+    const { mutedTextColor, lightBackgroundColor } = useContext(PaletteContext);
     const wrapperStyle = {
         alignItems: "center",
         justifyContent: "flex-start",
@@ -83,7 +83,7 @@ const AccountPreview = ({
                     objectFit: "cover",
                     borderWidth: 1,
                     borderStyle: "solid",
-                    borderColor: mutedTextColor,
+                    borderColor: lightBackgroundColor,
                     borderRadius: "50%",
                     cursor: isLink || onClickImage ? "pointer" : "auto",
                 }}

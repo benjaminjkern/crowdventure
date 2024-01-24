@@ -28,8 +28,12 @@ const getPalette = (unsafeMode: boolean) => ({
               string,
               string
           ])
-        : (["white", "white", "white"] as [string, string, string]),
-    lightBackgroundColor: unsafeMode ? "rgb(60,60,70)" : "rgb(230,240,255)",
+        : (["rgb(210,242,255)", "rgb(235,252,255)", "white"] as [
+              string,
+              string,
+              string
+          ]),
+    lightBackgroundColor: unsafeMode ? "rgb(60,60,70)" : "rgb(220,245,255)",
     grayColor: ["#777", "#888", "#999"] as [string, string, string],
 });
 

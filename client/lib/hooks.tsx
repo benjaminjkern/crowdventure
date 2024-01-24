@@ -37,10 +37,13 @@ export const useWindowSize = () => {
             setSize({
                 width: document.body.scrollWidth,
                 height: document.body.scrollHeight,
-                effectiveContentWidth: Math.min(
-                    MAX_CONTENT_WIDTH,
-                    document.body.scrollWidth * 0.8 - 40
-                ),
+                effectiveContentWidth:
+                    document.body.scrollWidth > 800
+                        ? Math.min(
+                              MAX_CONTENT_WIDTH,
+                              0.8 * document.body.scrollWidth
+                          ) - 10
+                        : document.body.scrollWidth - 60,
             });
         };
         updateSize();

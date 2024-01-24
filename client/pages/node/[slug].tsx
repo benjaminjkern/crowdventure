@@ -80,6 +80,18 @@ const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
 
     return (
         <div style={{ flexDirection: !isMobile ? "row" : undefined, flex: 1 }}>
+            {isMobile ? (
+                <h1
+                    style={{
+                        textAlign: "center",
+                        display: "block",
+                        marginBottom: 20,
+                        fontSize: 40,
+                    }}
+                >
+                    {node.title}
+                </h1>
+            ) : null}
             {node.pictureURL ? (
                 <div
                     style={{

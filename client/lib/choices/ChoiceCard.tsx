@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { faMinusCircle, faStar } from "@fortawesome/free-solid-svg-icons";
+import { faBookOpen, faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import AccountPreview from "../accounts/AccountPreview";
 import CrowdventureCard from "../components/CrowdventureCard";
 import LikeDislikeController from "../components/LikeDislikeController";
@@ -8,6 +8,7 @@ import { UserContext } from "../user";
 import apiClient from "../apiClient";
 import { ModalContext } from "../modal";
 import ConfirmModal from "../components/ConfirmModal";
+import { PaletteContext } from "../colorPalette";
 import { EditChoiceModal } from "./ChoiceModal";
 import { type Choice } from "@/types/models";
 
@@ -25,6 +26,7 @@ const ChoiceCard = ({
 
     const [choice, setChoice] = useState(initChoice);
     const { openModal, closeModal } = useContext(ModalContext);
+    const { rootColor } = useContext(PaletteContext);
 
     useEffect(() => {
         setChoice(initChoice);
@@ -159,8 +161,8 @@ const ChoiceCard = ({
                             {choice.fromNode.owner?.screenName ?? "the owner"}.
                         </span>
                     ),
-                    icon: faStar,
-                    iconColor: "yellow",
+                    icon: faBookOpen,
+                    iconColor: rootColor[2],
                 },
                 {
                     active: choiceHidden,
@@ -169,7 +171,8 @@ const ChoiceCard = ({
                             This choice is hidden, because it has been marked as
                             unsafe! You can see it because you are{" "}
                             {unsafeMode ? "in Unsafe Mode." : "the owner."}
-                            {/* Lol not specifying the owner of the choice or the node, but it doesnt really matter I guess */}
+                            {/* Lol not specifying the owner of the choice or the node,
+                            but it doesnt really matter I guess */}
                         </span>
                     ),
                     icon: faMinusCircle,
