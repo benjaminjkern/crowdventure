@@ -3,6 +3,7 @@ import Head from "next/head";
 import { type AppType } from "next/app";
 
 import { createUseStyles } from "react-jss";
+import Script from "next/script";
 import Footer from "+/lib/base/Footer";
 import Navbar from "+/lib/base/Navbar";
 
@@ -58,10 +59,15 @@ const App: AppType<DefaultPageProps> = ({ Component, pageProps }) => {
                     }
                     property="og:image"
                 />
-                <script
+                <Script
                     async
                     crossOrigin="anonymous"
+                    id="Adsense-id"
+                    onError={(e) => {
+                        console.error("Script failed to load", e);
+                    }}
                     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3556492457867678"
+                    strategy="afterInteractive"
                 />
 
                 <title>{pageTitle ?? "Crowdventure"}</title>

@@ -31,26 +31,20 @@ const NodeViewer = ({
                         onEditNode={onEditNode}
                     />
                 ))}
-                <script
-                    async
-                    crossOrigin="anonymous"
-                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3556492457867678"
-                />
                 <ins
                     className="adsbygoogle"
                     data-ad-client="ca-pub-3556492457867678"
                     data-ad-format="fluid"
                     data-ad-layout-key="-73+ez-1k-38+c0"
                     data-ad-slot="8616021842"
-                    // @ts-ignore
-                    style="display:block" // eslint-disable-line
+                    style={{ display: "block" }}
                 />
                 <script>
                     (adsbygoogle = window.adsbygoogle || []).push({});
                 </script>
                 {splitNodes2.map((node, i) => (
                     <NodeCard
-                        key={i}
+                        key={i + nodes.length}
                         node={node}
                         onDeleteNode={() => onDeleteNode(node.id)}
                         onEditNode={onEditNode}
