@@ -1,6 +1,5 @@
 {
     "scripts": {
-        "preinstall": "cd server && pnpm install && cd ../client && pnpm install",
         "heroku-prebuild": "cd server && npm install && npm run build",
         "start": "cd server && npm start",
         "prepare": "husky install"

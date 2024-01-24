@@ -12,7 +12,7 @@
         "seed-db": "tsx scripts/writeDb.ts",
         "build": "tsup index.ts",
         "start": "node dist/index.js",
-        "postinstall": "npx prisma generate"
+        "preinstall": "npx prisma generate"
     },
     "dependencies": {
         "@prisma/client": "5.7.1",
