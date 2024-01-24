@@ -15,9 +15,14 @@ const useDefaultStyles = createUseStyles((theme: PaletteType) => {
         theme;
     return {
         "@global": {
+            "@font-face": {
+                fontFamily: "CrowdventureFont",
+                src: 'url("/arialroundedmtbold.ttf") format("truetype")',
+                fontWeight: 700,
+            },
             "*": {
                 boxSizing: "border-box",
-                fontFamily: "Arial Rounded MT Bold",
+                fontFamily: "CrowdventureFont",
             },
             /** ***************** Custom Selection ************************/
 

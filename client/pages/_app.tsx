@@ -56,7 +56,7 @@ const App: AppType<DefaultPageProps> = ({ Component, pageProps }) => {
                             <div
                                 style={{
                                     minHeight: "100vh",
-                                    paddingInline: `max(10vw + 20px, 50vw - ${
+                                    paddingInline: `max(30px, 50vw - ${
                                         MAX_CONTENT_WIDTH / 2
                                     }px)`,
                                 }}
