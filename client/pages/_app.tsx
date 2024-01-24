@@ -40,7 +40,7 @@ const App: AppType<DefaultPageProps> = ({ Component, pageProps }) => {
             <Head>
                 <meta charSet="utf-8" />
                 <meta
-                    content="width=device-width, initial-scale=1"
+                    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
                     name="viewport"
                 />
                 <meta content="Crowdventure your mom" name="description" />
@@ -52,7 +52,6 @@ const App: AppType<DefaultPageProps> = ({ Component, pageProps }) => {
                     property="og:title"
                 />
                 <meta
-                    // TODO: This was href instead of content before
                     content={
                         previewImage ??
                         "https://github.com/benjaminjkern/crowdventure/blob/master/NewLogo.png?raw=true"
