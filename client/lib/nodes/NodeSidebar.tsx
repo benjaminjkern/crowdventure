@@ -10,6 +10,7 @@ import { PaletteContext } from "../colorPalette";
 import ParagraphText from "../components/ParagraphText";
 import { CreateChoiceModal } from "../choices/ChoiceModal";
 import { useMediaQuery } from "../hooks";
+import GoogleAdList from "../components/GoogleAdList";
 import { EditNodeModal } from "./NodeModal";
 import { type Choice, type Node } from "@/types/models";
 
@@ -115,39 +116,37 @@ const NodeSidebar = ({
             </div>
             <hr />
             {choices.length > 0 ? (
-                <ResponsiveMasonry
+                <GoogleAdList
                     columnsCountBreakPoints={
                         node.pictureURL
                             ? { 0: 1, 1400: 2 }
                             : { 0: 1, 600: 2, 900: 3 }
                     }
-                >
-                    <Masonry>
-                        {choices.map((choice, idx) => (
-                            <ChoiceCard
-                                choice={choice}
-                                key={idx}
-                                onDeleteChoice={(newChoice) => {
-                                    setChoices(
-                                        choices.filter(
-                                            (otherChoice) =>
-                                                otherChoice.id !== newChoice.id
-                                        )
-                                    );
-                                }}
-                                onEditChoice={(newChoice) => {
-                                    setChoices(
-                                        choices.map((otherChoice) =>
-                                            otherChoice.id === newChoice.id
-                                                ? newChoice
-                                                : otherChoice
-                                        )
-                                    );
-                                }}
-                            />
-                        ))}
-                    </Masonry>
-                </ResponsiveMasonry>
+                    data={choices}
+                    render={(choice, idx) => (
+                        <ChoiceCard
+                            choice={choice}
+                            key={idx}
+                            onDeleteChoice={(newChoice) => {
+                                setChoices(
+                                    choices.filter(
+                                        (otherChoice) =>
+                                            otherChoice.id !== newChoice.id
+                                    )
+                                );
+                            }}
+                            onEditChoice={(newChoice) => {
+                                setChoices(
+                                    choices.map((otherChoice) =>
+                                        otherChoice.id === newChoice.id
+                                            ? newChoice
+                                            : otherChoice
+                                    )
+                                );
+                            }}
+                        />
+                    )}
+                />
             ) : (
                 <span
                     style={{

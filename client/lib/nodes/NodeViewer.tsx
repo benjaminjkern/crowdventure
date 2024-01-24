@@ -1,6 +1,5 @@
 import React from "react";
-
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
+import GoogleAdList from "../components/GoogleAdList";
 import NodeCard from "./NodeCard";
 import { type Node } from "@/types/models";
 
@@ -12,47 +11,23 @@ const NodeViewer = ({
     readonly nodes: Node[];
     readonly onDeleteNode: (id: number) => void;
     readonly onEditNode: (node: Node) => void;
-}) => {
-    const splitNodes1 = nodes.slice(0, Math.floor(nodes.length / 2));
-    const splitNodes2 = nodes.slice(Math.floor(nodes.length / 2));
-    return (
-        <ResponsiveMasonry columnsCountBreakPoints={{ 0: 1, 700: 2, 1000: 3 }}>
-            <Masonry
-                style={{
-                    marginTop: 5,
-                    marginBottom: 5,
-                }}
-            >
-                {splitNodes1.map((node, i) => (
-                    <NodeCard
-                        key={i}
-                        node={node}
-                        onDeleteNode={() => onDeleteNode(node.id)}
-                        onEditNode={onEditNode}
-                    />
-                ))}
-                <ins
-                    className="adsbygoogle"
-                    data-ad-client="ca-pub-3556492457867678"
-                    data-ad-format="fluid"
-                    data-ad-layout-key="-73+ez-1k-38+c0"
-                    data-ad-slot="8616021842"
-                    style={{ display: "block" }}
-                />
-                <script>
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
-                {splitNodes2.map((node, i) => (
-                    <NodeCard
-                        key={i + nodes.length}
-                        node={node}
-                        onDeleteNode={() => onDeleteNode(node.id)}
-                        onEditNode={onEditNode}
-                    />
-                ))}
-            </Masonry>
-        </ResponsiveMasonry>
-    );
-};
+}) => (
+    <GoogleAdList
+        columnsCountBreakPoints={{ 0: 1, 700: 2, 1000: 3 }}
+        data={nodes}
+        render={(node, i) => (
+            <NodeCard
+                key={i}
+                node={node as Node}
+                onDeleteNode={() => onDeleteNode((node as Node).id)}
+                onEditNode={onEditNode}
+            />
+        )}
+        style={{
+            marginTop: 5,
+            marginBottom: 5,
+        }}
+    />
+);
 
 export default NodeViewer;
