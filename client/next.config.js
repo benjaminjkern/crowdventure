@@ -5,6 +5,7 @@
 /** @type {import("next").NextConfig} */
 
 if (!process.env.BING_API_KEY) throw new Error("MISSING BING API KEY");
+if (!process.env.API_URL) throw new Error("MISSING API URL");
 
 const config = {
     reactStrictMode: false,
@@ -21,6 +22,7 @@ const config = {
         defaultLocale: "en",
     },
     env: {
+        API_URL: process.env.API_URL,
         BING_API_KEY: process.env.BING_API_KEY,
         npm_package_version: process.env.npm_package_version,
     },

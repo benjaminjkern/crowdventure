@@ -9,7 +9,7 @@ export default new ExpressZodAPIClient(async (method, path, params) => {
     const authToken = process.browser && localStorage.getItem("authToken");
     if (authToken) headers = { Authorization: `Bearer ${authToken}` };
     const response = await fetch(
-        `https://crowdventure-backend-f3a189dfad64.herokuapp.com${path}${searchParams}`,
+        `${process.env.API_URL}${path}${searchParams}`,
         {
             method: method.toUpperCase(),
             headers: hasBody

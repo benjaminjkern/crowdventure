@@ -4,7 +4,7 @@ import { z } from "zod";
 import { NodeSchema } from "+/schemas.js";
 import authMiddleware from "+/auth.js";
 import { getNode, getNodeBySlug } from "+/commonQueries.js";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const nodeEndpoints = {
@@ -226,7 +226,11 @@ export const nodeEndpoints = {
         handler: async ({ input: { query } }) => {
             return {
                 nodes: await prisma.node.findMany({
-                    where: { title: { contains: query, mode: "insensitive" } },
+                    where: {
+                        title: {
+                            contains: query,
+                        },
+                    },
                     take: 10, // TODO: Paginate this
                     include: { owner: true },
                 }),
