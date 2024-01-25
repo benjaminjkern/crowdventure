@@ -61,7 +61,7 @@ const GoogleAdList = <T,>({
                     item ? (
                         render(item, i)
                     ) : (
-                        <GoogleAd key={i} onError={() => {}} />
+                        <GoogleAd key={i} onError={() => setShowAd(false)} />
                     )
                 )}
             </Masonry>
