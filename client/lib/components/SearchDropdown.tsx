@@ -47,9 +47,10 @@ const SearchDropdown = ({
                         overflowY: "scroll",
                         overflowX: "hidden",
                         position: "absolute",
+                        top: 2, // Put this at two because for some reason on mobile it was showing 2 pixels above where it should have been
                         alignItems: "center",
                         padding: 5,
-                        paddingTop: 33,
+                        paddingTop: 36.5,
                         width: "100%",
                         zIndex: -1,
                         borderRadius: 10,

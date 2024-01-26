@@ -10,6 +10,7 @@ import React, {
 import { createUseStyles } from "react-jss";
 import { type PaletteType } from "../colorPalette";
 import { type FormElement } from "../hooks";
+import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import CloseButton from "./CloseButton";
 
 const useStyles = createUseStyles<
@@ -29,6 +30,7 @@ const useStyles = createUseStyles<
             outline: "none",
             backgroundColor: lightBackgroundColor,
         },
+        fontSize: DEFAULT_TEXT_SIZE,
     },
 }));
 
