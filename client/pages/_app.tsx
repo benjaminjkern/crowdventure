@@ -23,7 +23,7 @@ export type DefaultPageProps = {
 
 const useStyles = createUseStyles({
     insideDiv: {
-        minHeight: "100vh",
+        minHeight: "100dvh",
         "@media (min-width: 801px)": {
             width: `calc(min(80vw, ${MAX_CONTENT_WIDTH}px) - 20px)`,
         },

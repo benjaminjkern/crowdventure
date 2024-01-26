@@ -16,7 +16,7 @@ const ModalImage = ({
         <div
             style={{
                 position: "relative",
-                height: "min(100vw, 50vh)",
+                height: "min(100vw, 50dvh)",
                 width: "100%",
             }}
         >

@@ -43,22 +43,30 @@ const SearchDropdown = ({
             {open ? (
                 <div
                     style={{
-                        maxHeight: height,
-                        overflowY: "scroll",
-                        overflowX: "hidden",
                         position: "absolute",
-                        top: 2, // Put this at two because for some reason on mobile it was showing 2 pixels above where it should have been
-                        alignItems: "center",
-                        padding: 5,
-                        paddingTop: 36.5,
                         width: "100%",
+                        overflow: "visible",
                         zIndex: -1,
-                        borderRadius: 10,
-                        backgroundColor: backgroundColor[0],
-                        boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.5)",
+                        top: 2, // Put this at two because for some reason on mobile it was showing 2 pixels above where it should have been
                     }}
                 >
-                    {children}
+                    <div
+                        style={{
+                            maxHeight: height,
+                            overflowY: "scroll",
+                            overflowX: "hidden",
+                            alignItems: "center",
+                            padding: 5,
+                            paddingTop: 36.5,
+                            width: "100%",
+                            borderRadius: 10,
+                            backgroundColor: backgroundColor[0],
+                            marginBottom: 30,
+                            boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.5)",
+                        }}
+                    >
+                        {children}
+                    </div>
                 </div>
             ) : null}
         </div>
