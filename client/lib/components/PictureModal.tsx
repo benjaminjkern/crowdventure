@@ -26,7 +26,7 @@ const PictureModal = ({
             ]}
             modalTitle={title}
         >
-            <div style={{ position: "relative", height: "calc(70vh)" }}>
+            <div style={{ position: "relative", height: "calc(60dvh)" }}>
                 <FallbackImage
                     alt="A Cool Picture!"
                     fallbackSrc={fallbackImage}
