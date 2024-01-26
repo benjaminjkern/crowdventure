@@ -19,6 +19,7 @@ import "+/lib/staticStyles.css";
 export type DefaultPageProps = {
     pageTitle?: string;
     previewImage?: string | null;
+    pageDescription?: string;
 };
 
 const useStyles = createUseStyles({
@@ -34,7 +35,8 @@ const useStyles = createUseStyles({
 });
 
 const App: AppType<DefaultPageProps> = ({ Component, pageProps }) => {
-    const { pageTitle, previewImage, ...otherPageProps } = pageProps;
+    const { pageTitle, previewImage, pageDescription, ...otherPageProps } =
+        pageProps;
     const { insideDiv } = useStyles();
 
     return (
@@ -45,8 +47,12 @@ const App: AppType<DefaultPageProps> = ({ Component, pageProps }) => {
                     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
                     name="viewport"
                 />
-                <meta content="Crowdventure your mom" name="description" />
+                <meta
+                    content={pageDescription ?? "Crowdventure your mom"}
+                    name="description"
+                />
                 <meta content="Ben Kern" name="author" />
+                <meta content={pageTitle ?? "Crowdventure"} property="title" />
 
                 {/* This stuff shows up when you send someone the link via imessage */}
                 <meta

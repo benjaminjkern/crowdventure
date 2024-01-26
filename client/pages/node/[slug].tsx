@@ -231,6 +231,7 @@ export const getStaticProps = async ({
             choices: choicesResponse.data.choices,
             pageTitle: `${node.title} - Crowdventure`,
             previewImage: node.pictureURL,
+            pageDescription: node.content,
         },
         revalidate: 1,
     };

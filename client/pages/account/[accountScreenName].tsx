@@ -187,6 +187,7 @@ export const getStaticProps = async ({
             accountNodes: await getAccountNodes(account.id, false),
             pageTitle: `${account.screenName} on Crowdventure!`,
             previewImage: account.profilePicURL,
+            pageDescription: account.bio ?? "Check me out on Crowdventure!",
         },
         revalidate: 1,
     };
