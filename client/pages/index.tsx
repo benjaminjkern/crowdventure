@@ -44,7 +44,6 @@ const HomePage = ({ featuredNodes: initFeaturedNodes }: HomePageProps) => {
                 </CrowdventureButton>
             ) : null}
 
-            <h3>Featured Stories:</h3>
             <NodeViewer
                 nodes={featuredNodes}
                 onDeleteNode={(nodeId) => {

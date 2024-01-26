@@ -116,7 +116,6 @@ const AccountPage = ({
                 {account.totalSuggestionScore}
             </div>
 
-            <h3>Featured Stories:</h3>
             <NodeViewer
                 nodes={accountNodes}
                 onDeleteNode={(nodeId) => {
