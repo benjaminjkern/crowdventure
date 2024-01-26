@@ -56,12 +56,11 @@ module.exports = {
         "import/no-useless-path-segments": "error",
         "import/no-webpack-loader-syntax": "error",
         "import/dynamic-import-chunkname": "error",
-        "import/extensions": "error",
         "import/first": "error",
         "import/newline-after-import": "error",
         "import/no-named-default": "error",
         "import/no-namespace": "error",
-        "import/no-unassigned-import": { allow: ["**/*.css"] },
+        "import/no-unassigned-import": ["error", { allow: ["**/*.css"] }],
 
         "import/order": "warn",
         "import/consistent-type-specifier-style": ["warn", "prefer-inline"],

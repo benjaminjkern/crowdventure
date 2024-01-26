@@ -1,5 +1,4 @@
 import React, { type Dispatch, type SetStateAction, useContext } from "react";
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import { useRouter } from "next/router";
 import CrowdventureButton from "../components/CrowdventureButton";
 import { UserContext } from "../user";
@@ -90,7 +89,10 @@ const NodeSidebar = ({
                                     onDeleteNode={() => {
                                         router.back();
                                     }}
-                                    onEditNode={setNode}
+                                    onEditNode={(newNode: Node) => {
+                                        setNode(newNode);
+                                        router.replace(router.asPath);
+                                    }}
                                 />
                             );
                         }}

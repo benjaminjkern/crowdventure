@@ -3,7 +3,6 @@ import React, {
     createContext,
     useEffect,
     useState,
-    useContext,
 } from "react";
 import apiClient from "./apiClient";
 import { type Account } from "@/types/models";
@@ -56,7 +55,7 @@ const UserProvider = ({ children }: { readonly children: ReactNode }) => {
     }, []);
 
     return (
-        <UserContext.Provider value={{ user: user, setUser: saveUser }}>
+        <UserContext.Provider value={{ user, setUser: saveUser }}>
             {children}
         </UserContext.Provider>
     );
