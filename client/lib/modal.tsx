@@ -1,4 +1,5 @@
 import React, { type ReactNode, createContext, useState } from "react";
+import { useScrollBlock } from "./hooks";
 
 type ModalContextType = {
     openModal: (newModal: ReactNode) => void;
@@ -12,19 +13,19 @@ export const ModalContext = createContext<ModalContextType>(
 
 const ModalProvider = ({ children }: { readonly children: ReactNode }) => {
     const [modalStack, setModalStack] = useState<ReactNode[]>([]);
+    const [blockScroll, allowScroll] = useScrollBlock();
 
-    // TODO: Lock the body scrolling in a less hacky way!
     const openModal = (newModal: ReactNode) => {
-        document.body.style.overflowY = "hidden";
         setModalStack([...modalStack, newModal]);
+        blockScroll();
     };
     const closeModal = () => {
         setModalStack(modalStack.slice(0, -1));
-        if (modalStack.length === 1) document.body.style.overflowY = "auto";
+        if (modalStack.length === 1) allowScroll();
     };
     const closeAllModals = () => {
         setModalStack([]);
-        document.body.style.overflowY = "auto";
+        allowScroll();
     };
 
     return (
