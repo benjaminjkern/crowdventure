@@ -9,6 +9,25 @@
     font-family: CrowdventureFont;
 }
 
+body,
+div,
+nav,
+footer {
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    margin: 0px;
+}
+
+span,
+a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 @keyframes spin {
     from {
         transform: rotate(0deg);

@@ -25,15 +25,6 @@ const useDefaultStyles = createUseStyles((theme: PaletteType) => {
             },
 
             /** ***************** Force flex on everything *********************/
-            "body, div, nav, footer": {
-                display: "flex",
-                flexDirection: "column",
-            },
-            "span, a": {
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-            },
             /** ***************** Overwrite default styles *********************/
             "h1,h2,h3,h4,h5,h6": {
                 display: "inline-flex",
@@ -59,7 +50,6 @@ const useDefaultStyles = createUseStyles((theme: PaletteType) => {
             body: {
                 fontSize: DEFAULT_TEXT_SIZE,
                 color: textColor,
-                margin: 0,
                 "@media (max-width: 800px)": {
                     backgroundImage: `linear-gradient(
                         to right,
