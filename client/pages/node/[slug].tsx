@@ -131,6 +131,9 @@ const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
                                 );
                             }}
                             onError={() => {
+                                console.error(
+                                    "There was a problem when loading the image!"
+                                );
                                 setNode({ ...node, pictureURL: null });
                             }}
                             src={node.pictureURL}
