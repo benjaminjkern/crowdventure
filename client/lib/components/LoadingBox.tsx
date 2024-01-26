@@ -18,7 +18,7 @@ const LoadingBox = () => (
     <div
         style={{
             flex: 1,
-            minHeight: "100dvh",
+            minHeight: "100vh",
             minWidth: "100vw",
             justifyContent: "center",
             alignItems: "center",

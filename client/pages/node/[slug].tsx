@@ -95,8 +95,8 @@ const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
                     <div
                         style={{
                             height: isMobile
-                                ? "50dvh"
-                                : `calc(100dvh - ${NAVBAR_HEIGHT}px - ${FOOTER_HEIGHT}px)`,
+                                ? "50vh"
+                                : `calc(100vh - ${NAVBAR_HEIGHT}px - ${FOOTER_HEIGHT}px)`,
                             ...(!isMobile && {
                                 position: "fixed",
                                 top: NAVBAR_HEIGHT,
