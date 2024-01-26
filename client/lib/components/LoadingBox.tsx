@@ -3,7 +3,7 @@ import React, { type ReactNode } from "react";
 const Spinner = ({ children }: { readonly children?: ReactNode }) => (
     <div
         style={{
-            border: "2px groove rgb(158, 232, 255)",
+            border: "4px groove rgb(158, 232, 255)",
 
             display: "table-cell",
             borderRadius: 999,

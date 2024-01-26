@@ -89,10 +89,7 @@ const NodeSidebar = ({
                                     onDeleteNode={() => {
                                         router.back();
                                     }}
-                                    onEditNode={(newNode: Node) => {
-                                        setNode(newNode);
-                                        router.replace(router.asPath);
-                                    }}
+                                    onEditNode={setNode}
                                 />
                             );
                         }}

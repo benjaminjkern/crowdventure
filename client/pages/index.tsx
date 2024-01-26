@@ -80,6 +80,7 @@ export const getStaticProps = async (): Promise<
     props: {
         featuredNodes: await getFeaturedNodes(false),
     },
+    revalidate: 10,
 });
 
 export default HomePage;

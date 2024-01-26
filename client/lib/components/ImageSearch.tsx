@@ -148,7 +148,11 @@ const ImageSearch = ({
                 );
                 setFetching(false);
             })
-            .catch(console.error);
+            .catch(() => {
+                // TODO: Should probably display an error if one happens but just saying no results is probably fine
+                setImages([]);
+                setFetching(false);
+            });
     });
 
     const rows = splitIntoRows(images, MAXROWLENGTH);

@@ -25,7 +25,7 @@ module.exports = {
         ],
         // "no-unused-vars": "warn",
         "react/forbid-component-props": "off",
-        "max-len": ["warn", { code: 120 }],
+        "max-len": ["warn", { code: 120, ignoreComments: true }],
         curly: ["error", "multi"],
         "react/jsx-no-constructed-context-values": "warn",
         "no-console": "warn",
@@ -139,6 +139,7 @@ module.exports = {
         "import/no-unresolved": "off",
         "import/prefer-default-export": "off",
         "no-alert": "off",
+        "react-hooks/exhaustive-deps": "off",
 
         /*
          * Doesnt exist here but it does exist in eslint-plugin-unicorn

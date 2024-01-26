@@ -59,6 +59,7 @@ export const getStaticProps = async (): Promise<
             notifications,
             pageTitle: "Crowdventure - Notifications", // Ideally this would say number of notifications but I dont wanna worry about that rn
         },
+        revalidate: 10,
     };
 };
 

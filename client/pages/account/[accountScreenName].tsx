@@ -1,8 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 
 import { type GetStaticPropsResult } from "next";
-import { useRouter } from "next/router";
-import { revalidatePath } from "next/cache";
 import { type DefaultPageProps } from "../_app";
 import { UserContext } from "+/lib/user";
 import LoadingBox from "+/lib/components/LoadingBox";
@@ -50,7 +48,6 @@ const AccountPage = ({
     const { user } = useContext(UserContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { openModal } = useContext(ModalContext);
-    const router = useRouter();
 
     useEffect(() => {
         if (initAccount) setAccount(initAccount);
@@ -104,7 +101,6 @@ const AccountPage = ({
                                             node,
                                         ],
                                     }));
-                                    revalidatePath(router.asPath);
                                 }}
                             />
                         )
@@ -180,6 +176,7 @@ export const getStaticProps = async ({
             pageTitle: `${account.screenName} on Crowdventure!`,
             previewImage: account.profilePicURL,
         },
+        revalidate: 10,
     };
 };
 
