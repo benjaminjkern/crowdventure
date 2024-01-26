@@ -18,16 +18,16 @@ const CrowdventureSwitch = ({
         <div
             onClick={() => onChange(!value)}
             style={{
-                width: size * 2,
-                height: size,
-                borderRadius: size / 2,
+                width: size * 2 + 2,
+                height: size + 2,
+                borderRadius: size / 2 + 2,
                 justifyContent: "center",
                 backgroundColor: lightBackgroundColor,
                 padding,
                 cursor: "pointer",
-                outlineWidth: 1,
-                outlineStyle: "solid",
-                outlineColor: textColor,
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderColor: textColor,
             }}
         >
             <div

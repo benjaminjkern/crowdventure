@@ -14,7 +14,7 @@ const NavbarCollapse = ({
     <FontAwesomeIcon
         icon={faBars}
         onClick={onClick}
-        style={{ cursor: "pointer", width: 30, marginRight: 20 }}
+        style={{ cursor: "pointer", width: 30, height: 30, marginRight: 20 }}
     />
 );
 
@@ -27,7 +27,8 @@ const Navbar = () => {
         <>
             <nav
                 style={{
-                    height: 100,
+                    maxHeight: 100,
+                    minHeight: 70,
                     justifyContent: "space-between",
                     alignItems: "center",
                     flexDirection: "row",
@@ -37,7 +38,7 @@ const Navbar = () => {
                     href="/"
                     style={{
                         position: "relative",
-                        height: "100%",
+                        height: 70,
                         width: "100%",
                         maxWidth: 348,
                     }}
@@ -53,17 +54,13 @@ const Navbar = () => {
                 {isMobile ? (
                     <NavbarCollapse onClick={() => setOpen(!open)} />
                 ) : (
-                    <AccountManager
-                        vertical
-                        wrapperStyle={{ marginRight: 50, marginTop: 5 }}
-                    />
+                    <AccountManager vertical wrapperStyle={{ margin: 20 }} />
                 )}
             </nav>
             {isMobile ? (
                 <div
                     style={{
                         display: "grid",
-                        marginBottom: 10,
                         transition: "grid-template-rows 0.3s",
                         gridTemplateRows: open ? "1fr" : "0fr",
                     }}
@@ -73,7 +70,7 @@ const Navbar = () => {
                             overflow: "hidden",
                         }}
                     >
-                        <AccountManager />
+                        <AccountManager wrapperStyle={{ paddingBottom: 10 }} />
                     </div>
                 </div>
             ) : null}

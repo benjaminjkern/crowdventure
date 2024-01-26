@@ -12,6 +12,7 @@ import ModalProvider from "+/lib/modal";
 import UserProvider from "+/lib/user";
 import UnsafeModeProvider from "+/lib/unsafeMode";
 import { MAX_CONTENT_WIDTH } from "+/lib/hooks";
+import "../lib/staticStyles.css";
 
 // Crowdventure! - Page not found! - for 404 page (NONEXISTENT RIGHT NOW)
 

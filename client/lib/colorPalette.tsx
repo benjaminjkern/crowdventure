@@ -8,6 +8,8 @@ import React, {
 import { ThemeProvider } from "react-jss";
 import { UnsafeModeContext } from "./unsafeMode";
 import GlobalStyleProvider from "./dynamicGlobalStyles";
+import { UserContext } from "./user";
+import LoadingBox from "./components/LoadingBox";
 
 const getPalette = (unsafeMode: boolean) => ({
     rootColor: [
@@ -49,6 +51,18 @@ export type PaletteType = {
 
 export const PaletteContext = createContext<PaletteType>(getPalette(false)); // Unsafe mode default value = false
 
+const PaletteInsideProvider = ({
+    children,
+}: {
+    readonly children: ReactNode;
+}) => {
+    const { user } = useContext(UserContext);
+
+    if (user === undefined) return <LoadingBox />;
+
+    return children;
+};
+
 const PaletteProvider = ({ children }: { readonly children: ReactNode }) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
 
@@ -61,7 +75,9 @@ const PaletteProvider = ({ children }: { readonly children: ReactNode }) => {
     return (
         <PaletteContext.Provider value={palette}>
             <ThemeProvider theme={palette}>
-                <GlobalStyleProvider>{children}</GlobalStyleProvider>
+                <GlobalStyleProvider>
+                    <PaletteInsideProvider>{children}</PaletteInsideProvider>
+                </GlobalStyleProvider>
             </ThemeProvider>
         </PaletteContext.Provider>
     );

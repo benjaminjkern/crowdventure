@@ -61,7 +61,7 @@ module.exports = {
         "import/newline-after-import": "error",
         "import/no-named-default": "error",
         "import/no-namespace": "error",
-        "import/no-unassigned-import": "error",
+        "import/no-unassigned-import": { allow: ["**/*.css"] },
 
         "import/order": "warn",
         "import/consistent-type-specifier-style": ["warn", "prefer-inline"],

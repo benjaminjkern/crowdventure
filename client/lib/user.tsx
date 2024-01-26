@@ -3,13 +3,13 @@ import React, {
     createContext,
     useEffect,
     useState,
+    useContext,
 } from "react";
-import LoadingBox from "./components/LoadingBox";
 import apiClient from "./apiClient";
 import { type Account } from "@/types/models";
 
 type UserContextType = {
-    user: Account | null;
+    user: Account | null | undefined;
     setUser: (newUser?: Account) => void;
 };
 
@@ -55,10 +55,8 @@ const UserProvider = ({ children }: { readonly children: ReactNode }) => {
         }
     }, []);
 
-    if (user === undefined) return <LoadingBox />;
-
     return (
-        <UserContext.Provider value={{ user, setUser: saveUser }}>
+        <UserContext.Provider value={{ user: user, setUser: saveUser }}>
             {children}
         </UserContext.Provider>
     );
