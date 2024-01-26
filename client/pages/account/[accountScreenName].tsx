@@ -61,7 +61,7 @@ const AccountPage = ({
 
     if (account.hidden && !unsafeMode && !loggedInAsThisUser)
         return (
-            <CrowdventureAlert title="Unsafe!">
+            <CrowdventureAlert goBackButton title="Unsafe!">
                 This page has been hidden from general users, because the
                 content has been deemed unsafe. If you would like to see it, log
                 in and turn on <b>Unsafe mode</b>!
