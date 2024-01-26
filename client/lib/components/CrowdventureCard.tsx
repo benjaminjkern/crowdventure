@@ -10,7 +10,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { type IconProp } from "@fortawesome/fontawesome-svg-core";
 import { PaletteContext } from "../colorPalette";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
-import { blurImageStyle } from "../styles";
+import { blurImageStyle, nonSelectableTextStyle } from "../styles";
+import { useMediaQuery } from "../hooks";
 import OptionsDropdown, { type DropDownOption } from "./OptionsDropdown";
 import TooltipWrapper from "./TooltipWrapper";
 import EventListener from "./EventListener";
@@ -47,6 +48,8 @@ const CrowdventureCard = ({
         useContext(PaletteContext);
 
     const [showImage, setShowImage] = useState(true);
+
+    const isMobile = useMediaQuery("(max-device-width: 800px)");
 
     const cardImage = picture ? (
         <Image
@@ -147,13 +150,18 @@ const CrowdventureCard = ({
                                         <TooltipWrapper
                                             key={i}
                                             tooltip={tooltip}
+                                            tooltipStyle={{
+                                                left: "calc(100% + 5px)",
+                                                top: 0,
+                                            }}
                                         >
                                             <FontAwesomeIcon
                                                 color={iconColor}
                                                 icon={icon}
                                                 style={{
-                                                    width: 15,
-                                                    height: 15,
+                                                    ...nonSelectableTextStyle,
+                                                    width: isMobile ? 30 : 15,
+                                                    height: isMobile ? 30 : 15,
                                                     filter: `drop-shadow(0 0 1px black)`,
                                                 }}
                                             />
@@ -161,11 +169,19 @@ const CrowdventureCard = ({
                                     )
                             )}
                         </div>
-                        <div style={{ position: "absolute", top: 5, right: 5 }}>
-                            <OptionsDropdown
-                                dropdownOptions={dropdownOptions}
-                            />
-                        </div>
+                        {dropdownOptions.some((option) => !option.disabled) ? (
+                            <div
+                                style={{
+                                    position: "absolute",
+                                    top: 5,
+                                    right: 5,
+                                }}
+                            >
+                                <OptionsDropdown
+                                    dropdownOptions={dropdownOptions}
+                                />
+                            </div>
+                        ) : null}
 
                         <div
                             style={{

@@ -28,10 +28,14 @@ const TooltipWrapper = ({
     tooltip,
     children,
     tooltipStyle = { bottom: "100%" },
+    wrapperStyle,
+    containerStyle,
 }: {
     readonly tooltip: string | ReactNode;
     readonly children: ReactNode;
     readonly tooltipStyle?: CSSProperties;
+    readonly wrapperStyle?: CSSProperties;
+    readonly containerStyle?: CSSProperties;
 }) => {
     const { tooltipClass } = useStyles();
     return (
@@ -40,9 +44,10 @@ const TooltipWrapper = ({
                 position: "relative",
                 justifyContent: "center",
                 alignItems: "center",
+                ...containerStyle,
             }}
         >
-            <div>{children}</div>
+            <div style={wrapperStyle}>{children}</div>
             <div className={tooltipClass} style={tooltipStyle}>
                 {tooltip}
             </div>

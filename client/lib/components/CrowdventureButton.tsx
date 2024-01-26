@@ -6,13 +6,14 @@ import { PaletteContext } from "../colorPalette";
 import { UserContext } from "../user";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import EventListener, { type EventListenerPair } from "./EventListener";
+import TooltipWrapper from "./TooltipWrapper";
 
 const DEFAULT_ICON_SIZE = 20;
 
 export type CrowdventureButtonProps = {
     readonly children?: ReactNode;
     readonly style?: CSSProperties | ((hover: boolean) => CSSProperties);
-    readonly buttonType?: "icon" | "text";
+    readonly buttonType?: "button" | "icon" | "text";
     readonly category?: "error";
     readonly requireSignedIn?: boolean;
     readonly onClick?: (e: MouseEvent) => unknown;
@@ -25,7 +26,7 @@ export type CrowdventureButtonProps = {
 const CrowdventureButton = ({
     children,
     style,
-    buttonType,
+    buttonType = "button",
     category,
     requireSignedIn,
     onClick,
@@ -59,97 +60,122 @@ const CrowdventureButton = ({
         ...(typeof style === "function" ? style(hover) : style),
     });
 
-    if (buttonType === "icon")
-        return (
-            <EventListener event="hover">
-                {([hover, hoverListener]: EventListenerPair) => (
-                    <span
-                        onClick={(e) => {
-                            if (disabled) return;
-                            // @ts-ignore
-                            onClick?.(e);
-                        }}
-                        style={{
-                            backgroundColor: hover ? darkColor : lightColor,
-                            color: backgroundColor[2],
-                            width: DEFAULT_ICON_SIZE * iconScale,
-                            height: DEFAULT_ICON_SIZE * iconScale,
-                            borderRadius: DEFAULT_ICON_SIZE * iconScale,
-                            ...commonStyle(hover),
-                        }}
-                        {...hoverListener}
-                    >
-                        {icon ? (
-                            <FontAwesomeIcon
-                                icon={icon}
-                                style={{
-                                    width: (DEFAULT_ICON_SIZE - 2) * iconScale,
-                                    height: (DEFAULT_ICON_SIZE - 2) * iconScale,
-                                    pointerEvents: "none",
-                                }}
-                            />
-                        ) : null}
-                    </span>
-                )}
-            </EventListener>
-        );
+    const button = (() => {
+        if (buttonType === "icon")
+            return (
+                <EventListener event="hover">
+                    {([hover, hoverListener]: EventListenerPair) => (
+                        <span
+                            onClick={(e) => {
+                                if (disabled) return;
+                                // @ts-ignore
+                                onClick?.(e);
+                            }}
+                            style={{
+                                backgroundColor: hover ? darkColor : lightColor,
+                                color: backgroundColor[2],
+                                width: DEFAULT_ICON_SIZE * iconScale,
+                                height: DEFAULT_ICON_SIZE * iconScale,
+                                borderRadius: DEFAULT_ICON_SIZE * iconScale,
+                                ...commonStyle(hover),
+                            }}
+                            {...hoverListener}
+                        >
+                            {icon ? (
+                                <FontAwesomeIcon
+                                    icon={icon}
+                                    style={{
+                                        width:
+                                            (DEFAULT_ICON_SIZE - 2) * iconScale,
+                                        height:
+                                            (DEFAULT_ICON_SIZE - 2) * iconScale,
+                                        pointerEvents: "none",
+                                    }}
+                                />
+                            ) : null}
+                        </span>
+                    )}
+                </EventListener>
+            );
 
-    if (buttonType === "text")
-        return (
+        if (buttonType === "text")
+            return (
+                <EventListener event="hover">
+                    {([hover, hoverListener]) => (
+                        <span
+                            onClick={(e) => {
+                                if (disabled) return;
+                                // @ts-ignore
+                                onClick?.(e);
+                            }}
+                            {...hoverListener}
+                            style={{
+                                color: lightColor,
+                                textDecoration:
+                                    hover && !disabled
+                                        ? "underline"
+                                        : undefined,
+                                ...commonStyle(hover),
+                            }}
+                        >
+                            {children}
+                        </span>
+                    )}
+                </EventListener>
+            );
+
+        const buttonElement = (
             <EventListener event="hover">
                 {([hover, hoverListener]) => (
-                    <span
-                        onClick={(e) => {
-                            if (disabled) return;
-                            // @ts-ignore
-                            onClick?.(e);
-                        }}
-                        {...hoverListener}
+                    <button
+                        disabled={disabled}
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
+                        onClick={onClick}
                         style={{
-                            color: lightColor,
-                            textDecoration:
-                                hover && !disabled ? "underline" : undefined,
+                            border: `1px solid ${darkColor}`,
+                            padding: 5,
+                            borderRadius: 5,
+                            backgroundColor: hover ? darkColor : lightColor,
+                            color: "white",
+                            width: "100%",
+                            fontSize: DEFAULT_TEXT_SIZE,
                             ...commonStyle(hover),
                         }}
+                        {...hoverListener}
+                        {...props}
                     >
                         {children}
-                    </span>
+                    </button>
                 )}
             </EventListener>
         );
+        if (!href || disabled) return buttonElement;
 
-    const button = (
-        <EventListener event="hover">
-            {([hover, hoverListener]) => (
-                <button
-                    disabled={disabled}
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    onClick={onClick}
-                    style={{
-                        border: `1px solid ${darkColor}`,
-                        padding: 5,
-                        borderRadius: 5,
-                        backgroundColor: hover ? darkColor : lightColor,
-                        color: "white",
-                        width: "100%",
-                        fontSize: DEFAULT_TEXT_SIZE,
-                        ...commonStyle(hover),
-                    }}
-                    {...hoverListener}
-                    {...props}
-                >
-                    {children}
-                </button>
-            )}
-        </EventListener>
-    );
-    if (!href) return button;
+        return (
+            <Link
+                href={href}
+                style={{ textDecoration: "none", color: lightColor }}
+            >
+                {buttonElement}
+            </Link>
+        );
+    })();
 
-    return (
-        <Link href={href} style={{ textDecoration: "none", color: lightColor }}>
-            {button}
-        </Link>
-    );
+    if (requireSignedIn && !user)
+        return (
+            <TooltipWrapper
+                containerStyle={
+                    buttonType === "button" ? { width: "100%" } : undefined
+                }
+                tooltip={<>You must be signed in!</>}
+                tooltipStyle={{ bottom: "calc(100% + 5px)" }}
+                wrapperStyle={{ width: "100%" }}
+            >
+                {button}
+            </TooltipWrapper>
+        );
+
+    return button;
 };
 export default CrowdventureButton;

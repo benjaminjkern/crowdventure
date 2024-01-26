@@ -126,7 +126,7 @@ const NodeSidebar = ({
                     render={(choice, idx) => (
                         <ChoiceCard
                             choice={choice}
-                            key={idx}
+                            key={`${node.id}-${idx}`}
                             onDeleteChoice={(newChoice) => {
                                 setChoices(
                                     choices.filter(

@@ -8,7 +8,7 @@ import React, {
 import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import { PaletteContext } from "../colorPalette";
-import { useBlur } from "../hooks";
+import { useBlur, useMediaQuery } from "../hooks";
 import CrowdventureButton from "./CrowdventureButton";
 
 export type DropDownOption = {
@@ -33,6 +33,8 @@ const OptionsDropdown = ({
 
     const ref = useBlur<HTMLDivElement>(() => setOpen(false));
 
+    const isMobile = useMediaQuery("(max-device-width: 800px)");
+
     return (
         <div
             ref={ref}
@@ -44,6 +46,7 @@ const OptionsDropdown = ({
             <CrowdventureButton
                 buttonType="icon"
                 icon={faEllipsis}
+                iconScale={isMobile ? 1.5 : 1}
                 onClick={() => setOpen((newOpen) => !newOpen)}
             />
             <div
@@ -69,6 +72,7 @@ const OptionsDropdown = ({
                                 disabled={disabled || !onClick}
                                 key={i}
                                 onClick={onClick}
+                                style={{ margin: 5 }}
                             >
                                 {text}
                             </CrowdventureButton>

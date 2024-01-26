@@ -129,6 +129,7 @@ const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
                         <Image
                             alt="Image failed to load."
                             fill
+                            key={node.id}
                             onClick={() => {
                                 openModal(
                                     <PictureModal
@@ -138,6 +139,7 @@ const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
                                 );
                             }}
                             onError={() => {
+                                console.error("ERROR");
                                 setNode({ ...node, pictureURL: null });
                             }}
                             src={node.pictureURL}
