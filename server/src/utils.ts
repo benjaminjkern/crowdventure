@@ -29,8 +29,9 @@ export const uniqueID = async <T>(
     return ID;
 };
 
+// TODO: Make this better
 const BAD_WORDS = new RegExp(
-    ["nigg", "fag"].map((word) => word.split("").join(".{0,4}")).join("|")
+    ["nigg", "fag", "dyke"].map((word) => word).join("|")
 );
 
 export const flagContent = (content: string) =>
