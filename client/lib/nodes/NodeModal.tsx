@@ -84,22 +84,33 @@ const NodeModal = ({
                     flexDirection: "row",
                     justifyContent: "space-between",
                     marginTop: pictureURL ? 10 : 0,
+                    gap: 5,
                 }}
             >
-                <span>Picture:</span>
-                <span style={{ color: mutedTextColor, flex: 1 }}>
+                <span style={{ flex: 1, justifyContent: "flex-start" }}>
+                    Picture:
+                </span>
+                <span
+                    style={{
+                        color: mutedTextColor,
+                        flex: 2,
+                        textAlign: "center",
+                    }}
+                >
                     {!pictureURL
                         ? "(Don't use any picture)"
                         : pictureURL === originalPictureURL
                         ? "(Use existing picture)"
                         : "(Use new picture)"}
                 </span>
-                <CrowdventureButton
-                    onClick={() => setShowImageSearch(!showImageSearch)}
-                    style={{ width: undefined }}
-                >
-                    {pictureURL ? "Change" : "Select"} Picture
-                </CrowdventureButton>
+                <span style={{ flex: 1, justifyContent: "flex-end" }}>
+                    <CrowdventureButton
+                        onClick={() => setShowImageSearch(!showImageSearch)}
+                        style={{ width: undefined }}
+                    >
+                        {pictureURL ? "Change" : "Select"} Picture
+                    </CrowdventureButton>
+                </span>
             </div>
             {showImageSearch ? (
                 <div style={{ marginTop: 10 }}>

@@ -1,8 +1,9 @@
-import React, { type MouseEvent, useState } from "react";
+import React, { type MouseEvent, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/router";
 import { useMediaQuery } from "../hooks";
 import AccountManager from "./AccountManager";
 
@@ -22,6 +23,12 @@ const Navbar = () => {
     const isMobile = useMediaQuery("(max-width: 800px)");
 
     const [open, setOpen] = useState(false);
+
+    const router = useRouter();
+
+    useEffect(() => {
+        if (open) setOpen(false);
+    }, [router.asPath]);
 
     return (
         <>

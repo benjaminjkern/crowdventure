@@ -37,19 +37,20 @@ const CrowdventureModal = ({
                 position: "fixed",
                 left: 0,
                 top: 0,
-                width: "100%",
+                width: "100vw",
                 height: "100vh",
-                alignItems: "center",
-                justifyContent: "center",
+                overflow: "auto",
                 zIndex: 10,
                 backgroundColor: "rgba(0,0,0,0.5)",
-                ...modalStyle,
             }}
         >
             <div
                 style={{
-                    height: "fit-content",
-                    overflow: "auto",
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    minHeight: "100vh",
+                    justifyContent: "center",
                     width: "100%",
                     alignItems: "center",
                 }}
@@ -64,6 +65,7 @@ const CrowdventureModal = ({
                         backgroundColor: backgroundColor[1],
                         padding: 20,
                         borderRadius: 20,
+                        ...modalStyle,
                     }}
                 >
                     <div
@@ -80,7 +82,11 @@ const CrowdventureModal = ({
                         {modalTitle}
                         <CloseButton
                             onClick={closeModal}
-                            style={{ position: "absolute", top: 0, right: 0 }}
+                            style={{
+                                position: "absolute",
+                                top: 0,
+                                right: 0,
+                            }}
                         />
                     </div>
                     <div style={contentStyle}>{children}</div>
