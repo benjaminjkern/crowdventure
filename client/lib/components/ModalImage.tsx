@@ -1,14 +1,17 @@
 import React, { type CSSProperties } from "react";
-import Image from "next/image";
+import { type StaticImport } from "next/dist/shared/lib/get-img-props";
+import FallbackImage from "./FallbackImage";
 
 const ModalImage = ({
     src,
     alt,
     style,
+    fallbackImage,
 }: {
     readonly src: string | null;
     readonly alt: string;
     readonly style?: CSSProperties;
+    readonly fallbackImage?: string | StaticImport;
 }) => {
     if (!src) return;
 
@@ -20,8 +23,9 @@ const ModalImage = ({
                 width: "100%",
             }}
         >
-            <Image
+            <FallbackImage
                 alt={alt}
+                fallbackSrc={fallbackImage}
                 fill
                 src={src}
                 style={{

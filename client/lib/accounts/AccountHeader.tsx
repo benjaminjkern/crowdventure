@@ -35,6 +35,7 @@ const AccountHeader = ({
                     onClickImage={() => {
                         openModal(
                             <PictureModal
+                                fallbackImage={require("../../public/defaultProfilePic.jpg")}
                                 pictureURL={
                                     account.profilePicURL ??
                                     require("../../public/defaultProfilePic.jpg")

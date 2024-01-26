@@ -133,6 +133,7 @@ const EditAccountModal = ({
         >
             <ModalImage
                 alt={`${account.screenName}'s Profile Pic`}
+                fallbackImage={require("../../public/defaultProfilePic.jpg")}
                 src={account.profilePicURL}
                 style={{
                     opacity:

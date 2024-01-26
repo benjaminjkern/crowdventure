@@ -1,4 +1,4 @@
-import React, { type ComponentProps, useState, useRef, useEffect } from "react";
+import React, { type ComponentProps, useState, useEffect } from "react";
 
 import Image from "next/image";
 import { type StaticImport } from "next/dist/shared/lib/get-img-props";
@@ -35,11 +35,13 @@ const FallbackImage = ({
             >
                 {src !== null && src !== undefined && (
                     <Image
-                        onLoadingComplete={() => setLoaded(true)}
+                        onLoadingComplete={() => {
+                            setLoaded(true);
+                        }}
                         src={src}
                         style={{
-                            opacity: loaded ? 1 : 0,
                             ...style,
+                            opacity: loaded ? style?.opacity ?? 1 : 0,
                         }}
                         {...props}
                     />
