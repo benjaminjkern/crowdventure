@@ -149,7 +149,7 @@ const NodeSidebar = ({
                 />
             );
 
-        return <EmptyText>{backup}</EmptyText>;
+        if (backup) return <EmptyText>{backup}</EmptyText>;
     };
 
     return (
