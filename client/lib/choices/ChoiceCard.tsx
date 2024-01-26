@@ -165,12 +165,11 @@ const ChoiceCard = ({
                     iconColor: rootColor[2],
                 },
                 {
-                    active: choiceHidden,
+                    active: choiceHidden && !unsafeMode,
                     tooltip: (
                         <span>
                             This choice is hidden, because it has been marked as
-                            unsafe! You can see it because you are{" "}
-                            {unsafeMode ? "in Unsafe Mode." : "the owner."}
+                            unsafe! You can see it because you are the owner.
                             {/* Lol not specifying the owner of the choice or the node,
                             but it doesnt really matter I guess */}
                         </span>
@@ -179,20 +178,18 @@ const ChoiceCard = ({
                     iconColor: "red",
                 },
                 {
-                    active: toNodeHidden,
+                    active: toNodeHidden && !unsafeMode,
                     tooltip: (
                         <span>
-                            This page this choice leads to is hidden, because it
+                            The page this choice leads to is hidden, because it
                             has been marked as unsafe!
-                            {!disabled ? (
+                            {disabled ? (
                                 ""
                             ) : (
                                 <>
                                     {" "}
-                                    You will be able to see it because you are{" "}
-                                    {unsafeMode
-                                        ? "in Unsafe Mode."
-                                        : "the owner."}
+                                    You will be able to see it because you are
+                                    the owner.
                                 </>
                             )}
                         </span>

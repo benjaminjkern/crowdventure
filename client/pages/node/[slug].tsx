@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 
 import { type GetStaticPropsResult } from "next";
+import Link from "next/link";
 import { type DefaultPageProps } from "../_app";
 import CrowdventureAlert from "+/lib/components/CrowdventureAlert";
 import LoadingBox from "+/lib/components/LoadingBox";
@@ -18,6 +19,7 @@ import { blurImageStyle } from "+/lib/styles";
 import { type Choice, type Node } from "@/types/models";
 import apiClient from "+/lib/apiClient";
 import { DEFAULT_TEXT_SIZE } from "+/lib/dynamicGlobalStyles";
+import { UserContext } from "+/lib/user";
 
 const NAVBAR_HEIGHT = 100;
 const FOOTER_HEIGHT = 78;
@@ -46,9 +48,13 @@ const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
 
     const isMobile = useMediaQuery(`(max-width: 800px)`);
 
+    const { user } = useContext(UserContext);
+
     if (!node) return <LoadingBox />;
 
-    if (node.hidden && !unsafeMode)
+    const userOwnsPage = node.owner && node.owner.id === user?.id;
+
+    if ((node.hidden || node.owner?.hidden) && !unsafeMode && !userOwnsPage)
         return (
             <CrowdventureAlert goBackButton title="Unsafe!">
                 This page has been hidden from general users, because the
@@ -57,42 +63,28 @@ const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
             </CrowdventureAlert>
         );
 
-    if (node.owner?.hidden && !unsafeMode)
-        return (
-            <CrowdventureAlert goBackButton title="Unsafe!">
-                This page has been hidden from general users, because the author
-                has been flagged as unsafe for the general public. If you would
-                like to see it, log in and turn on <b>Unsafe mode</b>!
+    const unsafeButYouOwnIt =
+        (node.hidden || node.owner?.hidden) &&
+        node.owner &&
+        userOwnsPage &&
+        !unsafeMode ? (
+            <CrowdventureAlert style={{ marginBottom: 10 }} title="Unsafe!">
+                This page has been hidden from general users, because the
+                content has been deemed unsafe. Users in unsafe mode can see
+                this page and its content. Since you own this page, you can see
+                it. If you believe this page should be considered safe, click{" "}
+                <Link href="/">here</Link>.
             </CrowdventureAlert>
-        );
-
-    // TODO: Figure out where to put this (Alert but still show page)
-    // {(node.hidden || node.owner.hidden) &&
-    //     node.owner.screenName === user?.screenName &&
-    //     !unsafeMode ? (
-    //         <CrowdventureAlert title="Unsafe!">
-    //             This page has been hidden from general users, because the
-    //             content has been deemed unsafe. Users in unsafe mode can see
-    //             this page and its content. Since you own this page, you can
-    //             see it. If you believe this page should be considered safe,
-    //             click <Link href="">Here</Link>.
-    //         </CrowdventureAlert>
-    //     ) : null}
+        ) : null;
 
     return (
-        <div style={{ flexDirection: !isMobile ? "row" : undefined, flex: 1 }}>
-            {isMobile ? (
-                <h1
-                    style={{
-                        textAlign: "center",
-                        display: "block",
-                        marginBottom: 20,
-                        fontSize: DEFAULT_TEXT_SIZE * 2,
-                    }}
-                >
-                    {node.title}
-                </h1>
-            ) : null}
+        <div
+            style={{
+                flexDirection: !isMobile ? "row" : undefined,
+                flex: 1,
+            }}
+        >
+            {isMobile ? unsafeButYouOwnIt : null}
             {node.pictureURL ? (
                 <div
                     style={{
@@ -164,6 +156,7 @@ const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
                     paddingLeft: !node.pictureURL || isMobile ? 0 : 50,
                 }}
             >
+                {!isMobile ? unsafeButYouOwnIt : null}
                 {!node.pictureURL && (
                     <CrowdventureButton
                         onClick={() => {
@@ -176,6 +169,18 @@ const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
                         Go back!
                     </CrowdventureButton>
                 )}
+                {isMobile ? (
+                    <h1
+                        style={{
+                            textAlign: "center",
+                            display: "block",
+                            marginTop: 20,
+                            fontSize: DEFAULT_TEXT_SIZE * 2,
+                        }}
+                    >
+                        {node.title}
+                    </h1>
+                ) : null}
                 <NodeSidebar
                     choices={choices}
                     node={node}

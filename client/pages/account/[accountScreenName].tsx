@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 
 import { type GetStaticPropsResult } from "next";
+import Link from "next/link";
 import { type DefaultPageProps } from "../_app";
 import { UserContext } from "+/lib/user";
 import LoadingBox from "+/lib/components/LoadingBox";
@@ -71,12 +72,12 @@ const AccountPage = ({
     return (
         <>
             {account.hidden && !unsafeMode && loggedInAsThisUser ? (
-                <CrowdventureAlert title="Unsafe!">
+                <CrowdventureAlert style={{ marginBottom: 10 }} title="Unsafe!">
                     This page has been hidden from general users, because the
                     content has been deemed unsafe. Users in unsafe mode can see
                     this page and its content. Since you own this page, you can
                     see it. If you believe this page should be considered safe,
-                    click <a href="">Here</a>.
+                    click <Link href="/">here</Link>.
                 </CrowdventureAlert>
             ) : null}
 

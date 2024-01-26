@@ -100,12 +100,15 @@ const NodeCard = ({
                     iconColor: "yellow",
                 },
                 {
-                    active: node.hidden || node.pictureUnsafe,
+                    active:
+                        (node.hidden ||
+                            node.owner?.hidden ||
+                            node.pictureUnsafe) &&
+                        !unsafeMode,
                     tooltip: (
                         <span>
                             This page is hidden, because it has been marked as
-                            unsafe! You can see it because you are{" "}
-                            {unsafeMode ? "in Unsafe Mode." : "the owner."}
+                            unsafe! You can see it because you are the owner.
                         </span>
                     ),
                     icon: faMinusCircle,

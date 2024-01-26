@@ -1,4 +1,4 @@
-import React, { type ReactNode } from "react";
+import React, { type CSSProperties, type ReactNode } from "react";
 import { useRouter } from "next/router";
 import CrowdventureButton from "./CrowdventureButton";
 
@@ -6,10 +6,12 @@ const CrowdventureAlert = ({
     title,
     children,
     goBackButton = false,
+    style,
 }: {
     readonly title: string;
     readonly children: ReactNode;
     readonly goBackButton?: boolean;
+    readonly style?: CSSProperties;
 }) => {
     const router = useRouter();
 
@@ -23,6 +25,7 @@ const CrowdventureAlert = ({
                 borderColor: "rgba(255,0,0,0.3)",
                 borderWidth: 1,
                 borderStyle: "solid",
+                ...style,
             }}
         >
             <h3>{title}</h3>
