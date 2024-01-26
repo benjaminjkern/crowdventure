@@ -113,7 +113,7 @@ const CrowdventureCard = ({
                                     ) : null}
                                     <div
                                         style={{
-                                            padding: 20,
+                                            padding: isMobile ? 40 : 20,
                                             textAlign: "center",
                                         }}
                                     >
