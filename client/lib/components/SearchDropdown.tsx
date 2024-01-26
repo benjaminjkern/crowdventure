@@ -42,7 +42,8 @@ const SearchDropdown = ({
                 <div
                     style={{
                         maxHeight: height,
-                        overflow: "scroll",
+                        overflowY: "scroll",
+                        overflowX: "hidden",
                         position: "absolute",
                         alignItems: "center",
                         padding: 5,
