@@ -12,10 +12,20 @@ export const ModalContext = createContext<ModalContextType>(
 
 const ModalProvider = ({ children }: { readonly children: ReactNode }) => {
     const [modalStack, setModalStack] = useState<ReactNode[]>([]);
-    const openModal = (newModal: ReactNode) =>
+
+    // TODO: Lock the body scrolling in a less hacky way!
+    const openModal = (newModal: ReactNode) => {
+        document.body.style.overflowY = "hidden";
         setModalStack([...modalStack, newModal]);
-    const closeModal = () => setModalStack(modalStack.slice(0, -1));
-    const closeAllModals = () => setModalStack([]);
+    };
+    const closeModal = () => {
+        setModalStack(modalStack.slice(0, -1));
+        if (modalStack.length === 1) document.body.style.overflowY = "auto";
+    };
+    const closeAllModals = () => {
+        setModalStack([]);
+        document.body.style.overflowY = "auto";
+    };
 
     return (
         <ModalContext.Provider
