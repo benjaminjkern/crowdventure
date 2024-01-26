@@ -4,9 +4,9 @@ import React, {
     useContext,
 } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { PaletteContext } from "../colorPalette";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
+import FallbackImage from "../components/FallbackImage";
 import { type Account } from "@/types/models";
 
 const AccountPreview = ({
@@ -34,6 +34,7 @@ const AccountPreview = ({
         justifyContent: "flex-start",
         ...style,
     };
+
     const screenName = account?.screenName ?? "(Account deleted)";
 
     // TODO: Overlay notification badge
@@ -70,14 +71,12 @@ const AccountPreview = ({
                         </div>
                     )
                 } */}
-            <Image
+            <FallbackImage
                 alt={`${screenName}'s Profile Pic`}
+                fallbackSrc={require("../../public/defaultProfilePic.jpg")}
                 height={imageSize}
                 onClick={onClickImage}
-                src={
-                    account?.profilePicURL ??
-                    require("../../public/defaultProfilePic.jpg")
-                }
+                src={account?.profilePicURL}
                 style={{
                     objectFit: "cover",
                     borderWidth: 1,
