@@ -176,7 +176,7 @@ export const getStaticProps = async ({
             pageTitle: `${account.screenName} on Crowdventure!`,
             previewImage: account.profilePicURL,
         },
-        revalidate: 10,
+        revalidate: 1,
     };
 };
 

@@ -222,7 +222,7 @@ export const getStaticProps = async ({
             pageTitle: `Crowdventure! - ${node.title}`,
             previewImage: node.pictureURL,
         },
-        revalidate: 10,
+        revalidate: 1,
     };
 };
 
