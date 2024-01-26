@@ -7,7 +7,7 @@ import { type PaletteType } from "./colorPalette";
 // I want pulled out with the button, so that's its own component.
 // Basically this is for components that I plan on using as-is.
 
-export const DEFAULT_TEXT_SIZE = 18;
+export const DEFAULT_TEXT_SIZE = 17;
 
 const useDefaultStyles = createUseStyles((theme: PaletteType) => {
     // Use theme basically just so react-jss doesnt get mad at me
