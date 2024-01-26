@@ -1,9 +1,11 @@
 import React, { useContext } from "react";
 import Link from "next/link";
 import { PaletteContext } from "../colorPalette";
+import { useMediaQuery } from "../hooks";
 
 const Footer = () => {
     const { mutedTextColor } = useContext(PaletteContext);
+    const isMobile = useMediaQuery("(max-width: 800px)");
     return (
         <footer
             style={{
@@ -11,6 +13,7 @@ const Footer = () => {
                 paddingBlock: 30,
                 justifyContent: "space-between",
                 gap: 10,
+                maxHeight: isMobile ? undefined : 78,
             }}
         >
             <Link
