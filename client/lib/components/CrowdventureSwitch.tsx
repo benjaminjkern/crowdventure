@@ -12,7 +12,7 @@ const CrowdventureSwitch = ({
     readonly size?: number;
     readonly padding?: number;
 }) => {
-    const { lightBackgroundColor, rootColor, textColor } =
+    const { lightBackgroundColor, rootColor, mutedTextColor, textColor } =
         useContext(PaletteContext);
     return (
         <div
@@ -27,7 +27,7 @@ const CrowdventureSwitch = ({
                 cursor: "pointer",
                 borderWidth: 1,
                 borderStyle: "solid",
-                borderColor: textColor,
+                borderColor: mutedTextColor,
             }}
         >
             <div
