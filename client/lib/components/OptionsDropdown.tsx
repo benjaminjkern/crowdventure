@@ -8,6 +8,7 @@ import React, {
 import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import { PaletteContext } from "../colorPalette";
+import { useBlur } from "../hooks";
 import CrowdventureButton from "./CrowdventureButton";
 
 export type DropDownOption = {
@@ -26,33 +27,14 @@ const OptionsDropdown = ({
     readonly wrapperStyle?: CSSProperties;
     readonly dropdownStyle?: CSSProperties;
 }) => {
-    const ref = useRef();
     const [open, setOpen] = useState(false);
 
     const { backgroundColor } = useContext(PaletteContext);
 
-    useEffect(() => {
-        const listener = (e: MouseEvent) => {
-            if (
-                ref.current &&
-                (e.target === ref.current ||
-                    // @ts-ignore
-                    [...ref.current.children].includes(e.target) ||
-                    // @ts-ignore
-                    [...ref.current.children[1].children].includes(e.target))
-            )
-                return;
-            setOpen(false);
-        };
-        document.addEventListener("click", listener);
-        return () => {
-            document.removeEventListener("click", listener);
-        };
-    }, []);
+    const ref = useBlur<HTMLDivElement>(() => setOpen(false));
 
     return (
         <div
-            // @ts-ignore
             ref={ref}
             style={{
                 position: "relative",

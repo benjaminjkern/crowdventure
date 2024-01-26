@@ -136,3 +136,24 @@ export const useInputForm = <T extends FormType>(
 
     return form;
 };
+
+export const useBlur = <T extends HTMLElement>(onBlur: () => unknown) => {
+    const ref = useRef<T>(null);
+    useEffect(() => {
+        const listener = (e: MouseEvent) => {
+            if (!e.target) return;
+            if (
+                ref.current &&
+                (e.target === ref.current ||
+                    ref.current.contains(e.target as Node))
+            )
+                return;
+            onBlur();
+        };
+        document.addEventListener("click", listener);
+        return () => {
+            document.removeEventListener("click", listener);
+        };
+    }, []);
+    return ref;
+};

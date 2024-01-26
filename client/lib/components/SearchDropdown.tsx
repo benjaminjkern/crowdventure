@@ -1,6 +1,7 @@
 import React, { type ReactNode, useContext, useState } from "react";
 import CrowdventureTextInput from "../components/CrowdventureTextInput";
 import { PaletteContext } from "../colorPalette";
+import { useBlur } from "../hooks";
 
 const SearchDropdown = ({
     children,
@@ -18,11 +19,12 @@ const SearchDropdown = ({
     const [open, setOpen] = useState(false);
     const { backgroundColor } = useContext(PaletteContext);
 
+    const ref = useBlur<HTMLDivElement>(() => setOpen(false));
+
     return (
-        <div style={{ position: "relative", zIndex: 1 }}>
+        <div ref={ref} style={{ position: "relative", zIndex: 1 }}>
             <CrowdventureTextInput
                 includeClearButton
-                onBlur={() => setTimeout(() => setOpen(false), 100)} // Delay this so it can register a click
                 onChangeText={(newQuery) => {
                     if (newQuery.length === 0) {
                         setOpen(false);
