@@ -16,6 +16,7 @@ import { type Node, type Account } from "@/types/models";
 import apiClient from "+/lib/apiClient";
 import { useSafeGuardedNodes } from "+/lib/specialHooks";
 import { CreateNodeModal } from "+/lib/nodes/NodeModal";
+import { PaletteContext } from "+/lib/colorPalette";
 
 const getAccountNodes = async (accountId: number, unsafeMode: boolean) => {
     const nodesResponse = await apiClient.provide(
@@ -49,6 +50,7 @@ const AccountPage = ({
     const { user } = useContext(UserContext);
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { openModal } = useContext(ModalContext);
+    const { mutedTextColor } = useContext(PaletteContext);
 
     useEffect(() => {
         if (initAccount) setAccount(initAccount);
@@ -117,33 +119,43 @@ const AccountPage = ({
                 {account.totalSuggestionScore}
             </div>
 
-            <NodeViewer
-                nodes={accountNodes}
-                onDeleteNode={(nodeId) => {
-                    setAccountNodes((currAccountNodes) => ({
-                        safeNodes: currAccountNodes.safeNodes.filter(
-                            (accountNode) => accountNode.id !== nodeId
-                        ),
-                        allNodes: currAccountNodes.allNodes.filter(
-                            (accountNode) => accountNode.id !== nodeId
-                        ),
-                    }));
-                }}
-                onEditNode={(node) => {
-                    setAccountNodes((currAccountNodes) => ({
-                        safeNodes: currAccountNodes.safeNodes.map(
-                            (currNode) => {
-                                if (currNode.id !== node.id) return currNode;
-                                return node;
-                            }
-                        ),
-                        allNodes: currAccountNodes.allNodes.map((currNode) => {
-                            if (currNode.id !== node.id) return currNode;
-                            return node;
-                        }),
-                    }));
-                }}
-            />
+            {accountNodes.length ? (
+                <NodeViewer
+                    nodes={accountNodes}
+                    onDeleteNode={(nodeId) => {
+                        setAccountNodes((currAccountNodes) => ({
+                            safeNodes: currAccountNodes.safeNodes.filter(
+                                (accountNode) => accountNode.id !== nodeId
+                            ),
+                            allNodes: currAccountNodes.allNodes.filter(
+                                (accountNode) => accountNode.id !== nodeId
+                            ),
+                        }));
+                    }}
+                    onEditNode={(node) => {
+                        setAccountNodes((currAccountNodes) => ({
+                            safeNodes: currAccountNodes.safeNodes.map(
+                                (currNode) => {
+                                    if (currNode.id !== node.id)
+                                        return currNode;
+                                    return node;
+                                }
+                            ),
+                            allNodes: currAccountNodes.allNodes.map(
+                                (currNode) => {
+                                    if (currNode.id !== node.id)
+                                        return currNode;
+                                    return node;
+                                }
+                            ),
+                        }));
+                    }}
+                />
+            ) : (
+                <span style={{ color: mutedTextColor, marginTop: 20 }}>
+                    {account.screenName} doesn&apos;t have any owned pages!
+                </span>
+            )}
         </>
     );
 };

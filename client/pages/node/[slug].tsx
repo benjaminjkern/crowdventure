@@ -229,7 +229,7 @@ export const getStaticProps = async ({
         props: {
             node,
             choices: choicesResponse.data.choices,
-            pageTitle: `Crowdventure! - ${node.title}`,
+            pageTitle: `${node.title} - Crowdventure`,
             previewImage: node.pictureURL,
         },
         revalidate: 1,
