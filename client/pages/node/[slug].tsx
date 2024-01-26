@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 import { type GetStaticPropsResult } from "next";
 import Link from "next/link";
@@ -19,7 +20,6 @@ import { type Choice, type Node } from "@/types/models";
 import apiClient from "+/lib/apiClient";
 import { DEFAULT_TEXT_SIZE } from "+/lib/dynamicGlobalStyles";
 import { UserContext } from "+/lib/user";
-import FallbackImage from "+/lib/components/FallbackImage";
 
 const NAVBAR_HEIGHT = 100;
 const FOOTER_HEIGHT = 78;
@@ -118,7 +118,7 @@ const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
                         >
                             Go back!
                         </CrowdventureButton>
-                        <FallbackImage
+                        <Image
                             alt="Image failed to load."
                             fill
                             key={node.id}
@@ -129,6 +129,9 @@ const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
                                         title={node.title}
                                     />
                                 );
+                            }}
+                            onError={() => {
+                                setNode({ ...node, pictureURL: null });
                             }}
                             src={node.pictureURL}
                             style={{
