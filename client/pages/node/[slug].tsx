@@ -17,6 +17,7 @@ import { blurImageStyle } from "+/lib/styles";
 
 import { type Choice, type Node } from "@/types/models";
 import apiClient from "+/lib/apiClient";
+import { DEFAULT_TEXT_SIZE } from "+/lib/dynamicGlobalStyles";
 
 const NAVBAR_HEIGHT = 100;
 const FOOTER_HEIGHT = 78;
@@ -86,7 +87,7 @@ const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
                         textAlign: "center",
                         display: "block",
                         marginBottom: 20,
-                        fontSize: 40,
+                        fontSize: DEFAULT_TEXT_SIZE * 2,
                     }}
                 >
                     {node.title}

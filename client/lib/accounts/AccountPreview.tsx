@@ -63,7 +63,6 @@ const AccountPreview = ({
                                 width: "2em",
                                 height: "2em",
                                 lineHeight: "2em",
-                                fontSize: "0.5em",
                                 color: "white",
                             }}
                         >

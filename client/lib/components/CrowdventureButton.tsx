@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { type IconProp } from "@fortawesome/fontawesome-svg-core";
 import { PaletteContext } from "../colorPalette";
 import { UserContext } from "../user";
+import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import EventListener, { type EventListenerPair } from "./EventListener";
 
 const DEFAULT_ICON_SIZE = 20;
@@ -132,6 +133,7 @@ const CrowdventureButton = ({
                         backgroundColor: hover ? darkColor : lightColor,
                         color: "white",
                         width: "100%",
+                        fontSize: DEFAULT_TEXT_SIZE,
                         ...commonStyle(hover),
                     }}
                     {...hoverListener}

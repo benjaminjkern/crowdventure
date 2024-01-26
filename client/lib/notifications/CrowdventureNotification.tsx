@@ -11,7 +11,6 @@ import CloseButton from "../components/CloseButton";
 import { UserContext } from "../user";
 import { DEFAULT_TEXT_SIZE } from "../dynamicGlobalStyles";
 import { useDebounce } from "../hooks";
-import apiClient from "../apiClient";
 import NotificationButton from "./NotificationButton";
 import { type Notification } from "@/types/models";
 
