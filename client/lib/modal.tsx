@@ -21,7 +21,7 @@ const ModalProvider = ({ children }: { readonly children: ReactNode }) => {
     };
     const closeModal = () => {
         setModalStack(modalStack.slice(0, -1));
-        if (modalStack.length === 1) allowScroll();
+        if (modalStack.length <= 1) allowScroll();
     };
     const closeAllModals = () => {
         setModalStack([]);

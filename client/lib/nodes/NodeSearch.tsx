@@ -31,11 +31,13 @@ const NodeSearch = ({
 
     const [fetching, setFetching] = useState(false);
     const [query, setQuery] = useState(initNode?.title ?? "");
+    const [key, setKey] = useState(Math.random());
 
     const selectNode = (node: Node | null) => {
         setQuery(node?.title ?? "");
         setResultNodes(node ? [node] : []);
         onSelectNode(node);
+        setKey(Math.random()); // TODO: This is kind of a hack
     };
 
     const searchNodes = useDebounce(async (newQuery: string) => {
@@ -51,6 +53,7 @@ const NodeSearch = ({
 
     return (
         <SearchDropdown
+            key={key}
             onChangeText={(newQuery) => {
                 setQuery(newQuery);
                 if (newQuery.length === 0) return selectNode(null);

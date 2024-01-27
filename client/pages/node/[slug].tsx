@@ -233,7 +233,7 @@ export const getStaticProps = async ({
             previewImage: node.pictureURL,
             pageDescription: node.content,
         },
-        revalidate: 0,
+        revalidate: 1,
     };
 };
 
