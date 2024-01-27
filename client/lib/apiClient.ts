@@ -16,6 +16,7 @@ export default new ExpressZodAPIClient(async (method, path, params) => {
                 ? { ...headers, "Content-Type": "application/json" }
                 : headers,
             body: hasBody ? JSON.stringify(params) : undefined,
+            next: { revalidate: 0 },
         }
     );
 

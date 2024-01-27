@@ -29,6 +29,35 @@ type NodePageProps = {
     readonly choices: Choice[];
 };
 
+const getData = async (slug: string): Promise<Partial<NodePageProps>> => {
+    const nodeResponse = await apiClient.provide("get", "/node/getNode", {
+        slug,
+    });
+
+    if (nodeResponse.status === "error") {
+        console.error(nodeResponse.error.message);
+        return {};
+    }
+
+    const node = nodeResponse.data.node;
+
+    if (!node) return {};
+
+    const choicesResponse = await apiClient.provide(
+        "get",
+        "/choice/getChoicesForNode",
+        {
+            fromNodeId: String(node.id),
+        }
+    );
+    if (choicesResponse.status === "error") {
+        console.error(choicesResponse.error.message);
+        return { node, choices: [] };
+    }
+
+    return { node, choices: choicesResponse.data.choices };
+};
+
 const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
     const { unsafeMode } = useContext(UnsafeModeContext);
     const { openModal } = useContext(ModalContext);
@@ -40,6 +69,13 @@ const NodePage = ({ node: initNode, choices: initChoices }: NodePageProps) => {
     useEffect(() => {
         setNode(initNode);
         setChoices(initChoices);
+
+        getData(initNode.slug).then(
+            ({ node: newNode, choices: newChoices }) => {
+                if (newNode) setNode(newNode);
+                if (newChoices) setChoices(newChoices);
+            }
+        );
     }, [initNode, initChoices]);
 
     const { effectiveContentWidth } = useWindowSize();
@@ -204,31 +240,14 @@ export const getStaticProps = async ({
 }: {
     params: { slug: string };
 }): Promise<GetStaticPropsResult<NodePageProps & DefaultPageProps>> => {
-    const nodeResponse = await apiClient.provide("get", "/node/getNode", {
-        slug,
-    });
-
-    if (nodeResponse.status === "error")
-        throw new Error(nodeResponse.error.message);
-
-    const node = nodeResponse.data.node;
+    const { node, choices } = await getData(slug);
 
     if (!node) return { notFound: true };
-
-    const choicesResponse = await apiClient.provide(
-        "get",
-        "/choice/getChoicesForNode",
-        {
-            fromNodeId: String(node.id),
-        }
-    );
-    if (choicesResponse.status === "error")
-        throw new Error(choicesResponse.error.message);
 
     return {
         props: {
             node,
-            choices: choicesResponse.data.choices,
+            choices: choices ?? [],
             pageTitle: `${node.title} - Crowdventure`,
             previewImage: node.pictureURL,
             pageDescription: node.content,

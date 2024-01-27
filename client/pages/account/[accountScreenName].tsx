@@ -27,8 +27,10 @@ const getAccountNodes = async (accountId: number, unsafeMode: boolean) => {
             ownedByAccount: String(accountId),
         }
     );
-    if (nodesResponse.status === "error")
-        throw new Error(nodesResponse.error.message);
+    if (nodesResponse.status === "error") {
+        console.error(nodesResponse.error.message);
+        return [];
+    }
 
     return nodesResponse.data.nodes;
 };
@@ -36,6 +38,28 @@ const getAccountNodes = async (accountId: number, unsafeMode: boolean) => {
 type AccountPageProps = {
     readonly account: Account;
     readonly accountNodes: Node[];
+};
+
+const getData = async (
+    accountScreenName: string,
+    unsafeMode: boolean = false
+): Promise<Partial<AccountPageProps>> => {
+    const accountResponse = await apiClient.provide(
+        "get",
+        "/account/getAccount",
+        { screenName: accountScreenName }
+    );
+    if (accountResponse.status === "error") {
+        console.error(accountResponse.error.message);
+        return {};
+    }
+
+    const account = accountResponse.data.account;
+
+    if (!account) return {};
+
+    const accountNodes = await getAccountNodes(account.id, unsafeMode);
+    return { account, accountNodes };
 };
 
 const AccountPage = ({
@@ -56,6 +80,17 @@ const AccountPage = ({
         if (initAccount) setAccount(initAccount);
         if (initAccountNodes)
             setAccountNodes({ safeNodes: initAccountNodes, allNodes: [] });
+
+        getData(initAccount.screenName, false).then(
+            ({ account: newAccount, accountNodes: newAccountNodes }) => {
+                if (newAccount) setAccount(newAccount);
+                if (newAccountNodes)
+                    setAccountNodes({
+                        safeNodes: newAccountNodes,
+                        allNodes: [],
+                    });
+            }
+        );
     }, [initAccount]);
 
     if (!account) return <LoadingBox />;
@@ -170,21 +205,14 @@ export const getStaticProps = async ({
 }: {
     params: { accountScreenName: string };
 }): Promise<GetStaticPropsResult<AccountPageProps & DefaultPageProps>> => {
-    const accountResponse = await apiClient.provide(
-        "get",
-        "/account/getAccount",
-        { screenName: accountScreenName }
-    );
-    if (accountResponse.status === "error")
-        throw new Error(accountResponse.error.message);
-    const account = accountResponse.data.account;
+    const { account, accountNodes } = await getData(accountScreenName);
 
     if (!account) return { notFound: true };
 
     return {
         props: {
             account,
-            accountNodes: await getAccountNodes(account.id, false),
+            accountNodes: accountNodes ?? [],
             pageTitle: `${account.screenName} on Crowdventure!`,
             previewImage: account.profilePicURL,
             pageDescription: account.bio ?? "Check me out on Crowdventure!",
