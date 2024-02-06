@@ -48,6 +48,10 @@ const App: AppType<DefaultPageProps> = ({ Component, pageProps }) => {
                     name="viewport"
                 />
                 <meta
+                    content="ca-pub-3556492457867678"
+                    name="google-adsense-account"
+                />
+                <meta
                     content={pageDescription ?? "Crowdventure your mom"}
                     name="description"
                 />
